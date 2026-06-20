@@ -281,6 +281,10 @@
 </div>
 
 <script>
+// Always start at the top on fresh load; let browser handle in-page hash links normally.
+if('scrollRestoration' in history){history.scrollRestoration='manual';}
+if(!window.location.hash){window.scrollTo(0,0);}
+
 // Preserve readable layouts if a media request fails unexpectedly.
 (function(){
   document.querySelectorAll('img').forEach(function(img){
