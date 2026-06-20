@@ -40,4 +40,26 @@ for (const page of pages) {
       assert.ok(existsSync(diskPath), `${page} references missing asset ${assetPath}`);
     }
   });
+
+  test(`${page} includes the accessible SVG caravan progress strip`, () => {
+    const html = read(page);
+    assert.match(html, /id="journeyProgress"[^>]+role="progressbar"[^>]+aria-valuemin="0"[^>]+aria-valuemax="100"[^>]+aria-valuenow="0"/s);
+    assert.match(html, /class="journey-dunes"/);
+    assert.match(html, /class="caravan"/);
+    assert.match(html, /function updateJourneyProgress\(\)/);
+    assert.match(html, /style\.setProperty\('--journey-progress'/);
+    assert.match(html, /setAttribute\('aria-valuenow'/);
+    assert.match(html, /requestAnimationFrame\(updateJourneyProgress\)/);
+  });
 }
+
+test('both page variants keep identical journey markup', () => {
+  const snippets = pages.map((page) => {
+    const html = read(page);
+    const match = html.match(/<!-- JOURNEY PROGRESS -->([\s\S]+?)<!-- HERO -->/);
+    assert.ok(match, `${page} is missing the journey progress block`);
+    return match[1].trim();
+  });
+
+  assert.equal(snippets[0], snippets[1]);
+});

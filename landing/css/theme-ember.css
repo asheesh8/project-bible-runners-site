@@ -34,6 +34,12 @@ header.nav{background:rgba(15,11,7,.82);border-bottom:1px solid var(--line)}
 .brand b{color:var(--bone)}
 .brand span span{color:var(--leather)}
 
+/* journey strip */
+.journey{background:#17110b}
+.dune-back{fill:#2b1e12}.dune-front{fill:#5e4024;opacity:.72}
+.journey-route{stroke:var(--gold)}
+.caravan{fill:var(--gold);filter:drop-shadow(0 1px 0 rgba(15,11,7,.9))}
+
 /* hero — push the scrim a touch darker for legibility on the dark theme */
 .hero .scrim{background:
   linear-gradient(180deg, rgba(12,8,5,.62) 0%, rgba(12,8,5,.22) 30%, rgba(12,8,5,.5) 62%, rgba(10,7,4,.96) 100%),
