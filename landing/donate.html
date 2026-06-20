@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Give — Project Bible Runners</title>
+<meta name="description" content="Place a Bible in waiting hands or power an entire village's offline Bible library. 100% of your gift goes to the mission." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/base.css">
+
+<style>
+/* ── Page shell ─────────────────────────────────────────── */
+body{background:var(--bone)}
+header.nav{position:static;background:var(--forest)}
+.donate-wrap{max-width:480px;margin:0 auto;padding:0 0 100px}
+
+/* ── Org banner ─────────────────────────────────────────── */
+.donate-banner{position:relative;height:210px;overflow:hidden;background:var(--forest);flex-shrink:0}
+.donate-banner img{width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:saturate(.72) brightness(.78)}
+.donate-banner-meta{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:52px 20px 15px;
+  background:linear-gradient(transparent,rgba(8,17,10,.75));
+  display:flex;align-items:center;gap:9px
+}
+.donate-banner-meta .mark{
+  width:26px;height:26px;border-radius:5px;background:var(--ochre);
+  position:relative;flex:0 0 auto
+}
+.donate-banner-meta .mark:before{content:"";position:absolute;inset:6px 12px;background:var(--bone);border-radius:1px}
+.donate-banner-meta .mark:after{content:"";position:absolute;inset:6px 6px;border-left:2.5px solid var(--bone);border-radius:1px}
+.donate-banner-meta span{font-size:13px;font-weight:700;color:rgba(255,253,247,.9);letter-spacing:.04em}
+
+/* ── Content area ───────────────────────────────────────── */
+.donate-content{padding:26px 24px 0}
+.donate-content h1{font-size:clamp(24px,6vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1.1;color:var(--forest);margin:0 0 10px}
+.donate-desc{font-size:14.5px;color:var(--ink-soft);line-height:1.52;margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.donate-more{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:13px;font-weight:700;color:var(--ochre);text-decoration:none}
+.donate-more:hover{color:var(--terra-deep)}
+
+.donate-divider{height:1px;background:var(--line);margin:22px 0}
+
+/* ── Frequency tabs ─────────────────────────────────────── */
+.freq-row{display:flex;gap:8px;margin-bottom:24px}
+.freq-tab{
+  flex:1;padding:10px 8px;
+  border:1.5px solid var(--line);border-radius:var(--radius-ui);
+  background:transparent;font-family:var(--sans);font-size:14px;font-weight:700;
+  color:var(--ink-soft);cursor:pointer;transition:all .18s;line-height:1
+}
+.freq-tab.active{background:var(--forest);border-color:var(--forest);color:var(--bone)}
+.freq-tab[data-freq="monthly"].active{background:transparent;border-color:var(--ochre);color:var(--ochre)}
+
+/* ── Amount grid ────────────────────────────────────────── */
+.choose-label{font-weight:700;font-size:14px;color:var(--ink);margin:0 0 13px}
+.amounts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.amt-btn{
+  padding:15px 12px;border:1.5px solid var(--line);border-radius:var(--radius-ui);
+  background:var(--bone);font-family:var(--sans);font-size:18px;font-weight:700;
+  color:var(--ink);cursor:pointer;transition:all .18s;text-align:center
+}
+.amt-btn:hover{border-color:rgba(23,33,24,.35);color:var(--forest)}
+.amt-btn.selected{background:var(--forest);border-color:var(--forest);color:var(--bone)}
+
+/* ── Custom amount input ────────────────────────────────── */
+.custom-amt-wrap{
+  display:flex;align-items:center;
+  border:1.5px solid var(--line);border-radius:var(--radius-ui);
+  background:var(--bone);padding:0 16px;margin-bottom:22px;
+  transition:border-color .18s
+}
+.custom-amt-wrap:focus-within{border-color:var(--forest)}
+.custom-amt-wrap.selected{border-color:var(--forest)}
+.currency-sign{font-size:22px;font-weight:600;color:var(--ink-soft);margin-right:5px;line-height:1}
+.custom-amt-wrap input{
+  flex:1;border:none;background:transparent;
+  font-family:var(--sans);font-size:22px;font-weight:500;color:var(--ink);
+  padding:13px 0;outline:none;width:100%;min-width:0
+}
+.custom-amt-wrap input::placeholder{color:var(--paper-2);font-weight:400}
+
+/* ── Info notes ─────────────────────────────────────────── */
+.donate-note{
+  display:flex;align-items:flex-start;gap:11px;
+  background:var(--paper);border-radius:var(--radius-ui);
+  padding:13px 15px;margin-bottom:10px;
+  font-size:13px;color:var(--ink-soft);line-height:1.5
+}
+.ni{font-size:17px;flex:0 0 auto;line-height:1.2}
+
+/* ── CTA ────────────────────────────────────────────────── */
+.btn-continue{
+  display:flex;width:100%;justify-content:center;
+  margin-top:20px;padding:17px;font-size:16px;
+  border-radius:var(--radius-ui);letter-spacing:.01em
+}
+
+/* ── Zeffy badge ────────────────────────────────────────── */
+.zeffy-badge{
+  text-align:center;margin-top:18px;
+  font-size:13px;font-weight:800;color:var(--ink-soft);
+  letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:4px
+}
+.zeffy-badge svg{width:14px;height:14px;fill:currentColor;opacity:.6}
+
+/* ── Mobile ─────────────────────────────────────────────── */
+@media(max-width:600px){
+  .donate-content{padding:22px 20px 0}
+  .donate-banner{height:185px}
+  .btn-continue{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="./index.html">
+      <span class="mark" aria-hidden="true"></span>
+      <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
+    </a>
+    <nav class="nav-links">
+      <a class="lnk" href="./index.html#why">The Need</a>
+      <a class="lnk" href="./index.html#villageserver">VillageServer</a>
+    </nav>
+  </div>
+</header>
+
+<!-- DONATION FORM -->
+<div class="donate-wrap">
+
+  <!-- Org banner image -->
+  <div class="donate-banner">
+    <img src="./img/receiving.webp" alt="A believer lifting a Bible she prayed years to hold" width="900" height="1675" fetchpriority="high" decoding="async" />
+    <div class="donate-banner-meta">
+      <span class="mark" aria-hidden="true"></span>
+      <span>Project Bible Runners</span>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="donate-content">
+    <h1>A Bible for Every Believer</h1>
+    <p class="donate-desc">Thank you so much for partnering with us to ensure faithful followers of Jesus have access to His Word. $7 places a Bible in waiting hands — $500 lights up an entire village.</p>
+    <a class="donate-more" href="./index.html">More details ↗</a>
+
+    <div class="donate-divider"></div>
+
+    <!-- Frequency -->
+    <div class="freq-row">
+      <button class="freq-tab active" data-freq="once">One-time</button>
+      <button class="freq-tab" data-freq="monthly">&#9829; Monthly</button>
+      <button class="freq-tab" data-freq="yearly">Yearly</button>
+    </div>
+
+    <!-- Amount grid -->
+    <p class="choose-label">Choose an amount:</p>
+    <div class="amounts-grid">
+      <button class="amt-btn" data-amount="7">$7</button>
+      <button class="amt-btn" data-amount="35">$35</button>
+      <button class="amt-btn" data-amount="70">$70</button>
+      <button class="amt-btn" data-amount="500">$500</button>
+    </div>
+
+    <!-- Custom amount -->
+    <div class="custom-amt-wrap" id="custom-wrap">
+      <span class="currency-sign">$</span>
+      <input type="number" id="custom-input" placeholder="Other amount" min="1" step="1" aria-label="Enter a custom donation amount" />
+    </div>
+
+    <!-- Notes -->
+    <div class="donate-note">
+      <span class="ni">🧾</span>
+      <span>You'll receive a tax receipt for making a donation. EIN 85-1992796 · 501(c)(3)</span>
+    </div>
+    <div class="donate-note">
+      <span class="ni">💛</span>
+      <span>We fundraise with Zeffy to ensure <b>100% of your donation</b> goes directly to our mission.</span>
+    </div>
+
+    <!-- CTA -->
+    <a class="btn btn-give btn-continue" id="continue-btn"
+       href="https://www.zeffy.com/en-US/donation-form/PENDING"
+       target="_blank" rel="noopener"
+       data-track="donation_completed">
+      Continue &rarr;
+    </a>
+
+    <!-- Zeffy branding -->
+    <div class="zeffy-badge">
+      zeffy
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4.09 12.5H11L10 22l8.91-10.5H13L13 2z"/></svg>
+    </div>
+  </div>
+</div>
+
+<script>
+if('scrollRestoration' in history){history.scrollRestoration='manual';}
+window.scrollTo(0,0);
+
+(function(){
+  var ZEFFY_BASE = 'https://www.zeffy.com/en-US/donation-form/PENDING';
+
+  var selectedAmount = null;
+  var selectedFreq = 'once';
+
+  // Read ?amount param from URL to pre-select
+  var params = new URLSearchParams(window.location.search);
+  var preAmount = params.get('amount');
+
+  function updateContinueBtn(){
+    var btn = document.getElementById('continue-btn');
+    var amt = selectedAmount || document.getElementById('custom-input').value;
+    var url = ZEFFY_BASE;
+    if(amt) url += '?amount=' + encodeURIComponent(amt);
+    if(selectedFreq !== 'once') url += (amt ? '&' : '?') + 'frequency=' + selectedFreq;
+    btn.href = url;
+  }
+
+  // Frequency tabs
+  document.querySelectorAll('.freq-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.freq-tab').forEach(function(t){t.classList.remove('active')});
+      tab.classList.add('active');
+      selectedFreq = tab.dataset.freq;
+      updateContinueBtn();
+    });
+  });
+
+  // Amount buttons
+  document.querySelectorAll('.amt-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.amt-btn').forEach(function(b){b.classList.remove('selected')});
+      document.getElementById('custom-wrap').classList.remove('selected');
+      document.getElementById('custom-input').value = '';
+      btn.classList.add('selected');
+      selectedAmount = btn.dataset.amount;
+      updateContinueBtn();
+    });
+  });
+
+  // Custom input
+  document.getElementById('custom-input').addEventListener('input', function(){
+    document.querySelectorAll('.amt-btn').forEach(function(b){b.classList.remove('selected')});
+    selectedAmount = null;
+    document.getElementById('custom-wrap').classList.toggle('selected', !!this.value);
+    updateContinueBtn();
+  });
+
+  // Pre-select from URL param
+  if(preAmount){
+    var match = document.querySelector('.amt-btn[data-amount="'+preAmount+'"]');
+    if(match){
+      match.classList.add('selected');
+      selectedAmount = preAmount;
+    } else {
+      document.getElementById('custom-input').value = preAmount;
+      document.getElementById('custom-wrap').classList.add('selected');
+    }
+    updateContinueBtn();
+  }
+
+  // Tracking
+  document.getElementById('continue-btn').addEventListener('click', function(){
+    var amt = selectedAmount || document.getElementById('custom-input').value || '0';
+    if(window.fbq) fbq('trackCustom','donation_completed',{amount:amt,frequency:selectedFreq});
+    if(window.gtag) gtag('event','donation_completed',{amount:amt,frequency:selectedFreq});
+    console.log('[track] donation_completed', amt, selectedFreq);
+  });
+})();
+</script>
+</body>
+</html>
