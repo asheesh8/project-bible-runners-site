@@ -37,7 +37,7 @@
   </div>
 </header>
 
-+<!-- JOURNEY PROGRESS -->
+<!-- JOURNEY PROGRESS -->
 <div class="journey" id="journeyProgress" role="progressbar" aria-label="Journey through this page" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
   <svg class="journey-dunes" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true">
     <path class="dune dune-back" d="M0 28C120 4 238 8 344 25C454 42 574 40 686 20C816 -3 940 7 1048 25C1100 34 1150 34 1200 25V40H0Z"/>
@@ -299,7 +299,6 @@
 <script>
 // Preserve readable layouts if a media request fails unexpectedly.
 (function(){
-  var lqip="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABMNDhEODBMRDxEVFBMXHTAfHRoaHToqLCMwRT1JR0Q9Q0FMVm1dTFFoUkFDX4JgaHF1e3x7SlyGkIV3j214e3b/2wBDARQVFR0ZHTgfHzh2T0NPdnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnb/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBd6sN3QjpUUJ80sXwSelJFFJKhZRlB1oDoGRVHU81yqGhSjdFoSuABmilylFYXFymfDOW3hGIUUseIxvJ60UV19C18JbE0WBzRRRWVjPmZ/9k=";
   document.querySelectorAll('img').forEach(function(img){
     img.addEventListener('error',function(){
       var frame=img.closest('.photo-card,.hero');

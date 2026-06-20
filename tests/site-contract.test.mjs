@@ -36,6 +36,7 @@ for (const page of pages) {
     assert.match(html, /<img[^>]+class="hero-media"[^>]+fetchpriority="high"/s);
     assert.match(html, /<img[^>]+class="hero-media"[^>]+width="1300"[^>]+height="1733"/s);
     assert.doesNotMatch(html, /new Image\(\)/);
+    assert.doesNotMatch(html, /data:image|var lqip=/);
   });
 
   test(`${page} uses portable local asset URLs and every asset exists`, () => {
@@ -64,6 +65,7 @@ for (const page of pages) {
   test(`${page} keeps presentation in stylesheets instead of inline rules`, () => {
     const html = read(page);
     assert.doesNotMatch(html, /\sstyle="/);
+    assert.doesNotMatch(html, /^\s*\+/m, 'patch markers must never leak into rendered text or scripts');
   });
 
   test(`${page} contains valid inline JavaScript`, () => {

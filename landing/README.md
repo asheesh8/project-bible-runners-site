@@ -1,8 +1,8 @@
 # Project Bible Runners — Facebook landing page
 
-A fast, conversion-focused landing page built as the destination for the Facebook ad
-traffic. One self-contained page (`index.html` + `img/`), no build step — open it,
-host it anywhere, or drop it into the Next.js site later.
+A fast, conversion-focused landing page built as the destination for Facebook ad
+traffic. It remains a dependency-free static site: two HTML variants, shared CSS,
+and an optimized WebP image bundle.
 
 Built to the `CLAUDE.md` doctrine: earthy palette, editorial serif (Fraunces) + clean
 sans (Hanken Grotesk), Matthew 24:14 + the 42% hook in the hero, the $7 → $500 → $4,400
@@ -16,9 +16,21 @@ python -m http.server 5577
 # open http://localhost:5577
 ```
 
+Vercel serves this directory as the site root through `../vercel.json`. Pushing the
+connected production branch deploys the HTML, CSS, and images as one immutable release,
+without depending on a temporary local server or tunnel.
+
 ## What's here
-- `index.html` — the whole page (inline CSS/JS, ~31 KB)
-- `img/*.webp` — 10 optimized photos pulled from the client PPTX (hero ~126 KB, all WebP)
+- `index.html` — primary Field Journal direction
+- `index-b.html` — Ember alternate, kept structurally in sync
+- `css/base.css` — shared spacing, typography, layout, media, and caravan system
+- `css/theme-ember.css` — Ember palette/type overrides
+- `img/*.webp` — optimized field and hardware photography
+
+The hero is a real high-priority `<img>` rather than a JavaScript-created background,
+so it remains visible if scripting is unavailable. Below-the-fold images use lazy
+loading, asynchronous decoding, and intrinsic dimensions. The inline SVG journey strip
+adds no network request and updates its accessible progress value on scroll.
 
 ## Wired and ready, but needs real values before launch
 1. **Donate links** — every "Give" button currently points to `https://www.projectbiblerunners.com`.
@@ -37,6 +49,6 @@ high-res field photo library (already an open question in the project brief). So
 images are kept in `../assets/raw/` for reuse.
 
 ## Performance
-Field-route doctrine respected: WebP only, lazy-loaded below-the-fold images, hero
-blur-up (LQIP) placeholder, count-up + reveal animations that honor
-`prefers-reduced-motion`. No heavy 3D/motion libraries on this page.
+Field-route doctrine respected: WebP only, lazy-loaded below-the-fold images, a
+preloaded semantic hero, count-up + reveal animations, and an SVG scroll journey that
+honors `prefers-reduced-motion`. No heavy 3D/motion libraries on this page.
