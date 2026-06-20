@@ -23,14 +23,14 @@ without depending on a temporary local server or tunnel.
 ## What's here
 - `index.html` — primary Field Journal direction
 - `index-b.html` — Ember alternate, kept structurally in sync
-- `css/base.css` — shared spacing, typography, layout, media, and caravan system
+- `css/base.css` — shared editorial spacing, typography, layout, and media system
 - `css/theme-ember.css` — Ember palette/type overrides
 - `img/*.webp` — optimized field and hardware photography
 
 The hero is a real high-priority `<img>` rather than a JavaScript-created background,
 so it remains visible if scripting is unavailable. Below-the-fold images use lazy
-loading, asynchronous decoding, and intrinsic dimensions. The inline SVG journey strip
-adds no network request and updates its accessible progress value on scroll.
+loading, asynchronous decoding, and intrinsic dimensions. A tiny inline SVG wave gives
+the hero an organic transition without adding a network request or scroll handler.
 
 ## Wired and ready, but needs real values before launch
 1. **Donate links** — every "Give" button currently points to `https://www.projectbiblerunners.com`.
@@ -50,5 +50,5 @@ images are kept in `../assets/raw/` for reuse.
 
 ## Performance
 Field-route doctrine respected: WebP only, lazy-loaded below-the-fold images, a
-preloaded semantic hero, count-up + reveal animations, and an SVG scroll journey that
-honors `prefers-reduced-motion`. No heavy 3D/motion libraries on this page.
+preloaded semantic hero and restrained count-up + reveal animations that honor
+`prefers-reduced-motion`. No heavy 3D/motion libraries on this page.

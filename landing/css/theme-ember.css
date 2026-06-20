@@ -1,63 +1,35 @@
-/* ============================================================
-   DIRECTION B — "EMBER"
-   Dark, cinematic, modern. Layered on top of base.css.
-   Bricolage Grotesque (display) + Newsreader italic + Hanken (body).
-   ============================================================ */
+/* Ember variation: the same editorial system with darker forest and brass accents. */
 :root{
-  --ink:#0f0b07;          /* page base — warm near-black */
-  --ink-soft:#c9bba1;     /* secondary light text (flipped from dark) */
-  --bone:#f1e8d8;         /* primary light text */
-  --paper:#17110b;        /* dark warm surface (flipped from light) */
-  --paper-2:#241a11;      /* dark surface 2 / chips */
-  --leather:#d9b888;      /* light tan label (flipped from brown) */
-  --terra:#d06a2f;        /* ember */
-  --terra-deep:#b5531f;
-  --gold:#dcae64;         /* brass */
-  --sky:#1b3a42;          /* deep teal accent */
-  --sky-deep:#102329;
-  --sand:#b8966a;
-  --line:rgba(241,232,216,.13);
-  --shadow:0 22px 60px -22px rgba(0,0,0,.72);
+  --ink:#181913;
+  --ink-soft:#57584c;
+  --bone:#f6f0e5;
+  --paper:#e9e1d2;
+  --paper-2:#dcd1be;
+  --leaf:#879458;
+  --leaf-deep:#4d5c32;
+  --ochre:#c1602d;
+  --ochre-soft:#dfa255;
+  --forest:#111a14;
+  --leather:#76583f;
+  --terra:var(--ochre);
+  --terra-deep:#9e4520;
+  --gold:var(--ochre-soft);
+  --sky:#3b5447;
+  --sky-deep:var(--forest);
+  --line:rgba(24,25,19,.15);
+  --shadow:0 28px 72px -38px rgba(15,17,12,.62);
   --serif:"Bricolage Grotesque",Georgia,serif;
 }
 
-body{background:var(--ink);color:var(--bone)}
-
-/* display type */
-h1,h2,h3{font-weight:700;letter-spacing:-.022em}
-.hero h1{font-weight:700}
+h1,h2,h3{font-weight:650;letter-spacing:-.038em}
+.hero h1{font-weight:650}
 .hero .verse,.quote blockquote{font-family:"Newsreader",Georgia,serif}
-
-/* nav → dark glass */
-header.nav{background:rgba(15,11,7,.82);border-bottom:1px solid var(--line)}
-.nav-links a.lnk{color:var(--ink-soft)}
-.brand b{color:var(--bone)}
-.brand span span{color:var(--leather)}
-
-/* journey strip */
-.journey{background:#17110b}
-.dune-back{fill:#2b1e12}.dune-front{fill:#5e4024;opacity:.72}
-.journey-route{stroke:var(--gold)}
-.caravan{fill:var(--gold);filter:drop-shadow(0 1px 0 rgba(15,11,7,.9))}
-
-/* hero — push the scrim a touch darker for legibility on the dark theme */
 .hero .scrim{background:
-  linear-gradient(180deg, rgba(12,8,5,.62) 0%, rgba(12,8,5,.22) 30%, rgba(12,8,5,.5) 62%, rgba(10,7,4,.96) 100%),
-  radial-gradient(120% 90% at 12% 100%, rgba(150,66,22,.4), transparent 60%)}
-
-/* the $7 section is dark now → fix the promise number chips */
-.promises .n{background:var(--terra);color:#fff}
-
-/* giving ladder → dark cards */
-.tier{background:#1a130c;color:var(--bone);border-color:var(--line)}
-.tier .tier-funds{color:var(--ink-soft)}
-.tier:hover{border-color:var(--gold)}
-.tier.feature{background:#241a10;border-color:rgba(220,174,100,.5)}
-.tier.feature .tier-funds{color:#d8c8ad}
-
-/* small text that was on light surfaces */
-.stat .lbl{color:var(--ink-soft)}
-.recurnote{color:var(--gold)}
-
-/* a hairline of warmth under section transitions */
-.seven,.ladder{box-shadow:inset 0 1px 0 var(--line)}
+  linear-gradient(90deg,rgba(8,13,9,.84) 0%,rgba(11,17,12,.56) 49%,rgba(8,13,9,.18) 82%),
+  linear-gradient(180deg,rgba(5,9,6,.54) 0%,rgba(6,10,7,.06) 43%,rgba(5,9,6,.72) 100%)}
+.hero h1 .hl{color:#e7b56f}
+.vs{background:#e7dfd1}
+.quote{background:#202d24}
+.final{background:#a84824}
+.tier.feature:nth-of-type(4){background:#a84824;border-color:#a84824}
+footer{background:#0c120e}

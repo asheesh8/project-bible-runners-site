@@ -26,7 +26,10 @@ test('the shared stylesheet exposes the spacing and typography system', () => {
   assert.match(css, /--measure-copy:/);
   assert.match(css, /--text-body:/);
   assert.match(css, /--nav-height:/);
-  assert.match(css, /--journey-height:/);
+  assert.match(css, /--leaf:/);
+  assert.match(css, /--ochre:/);
+  assert.match(css, /--radius-ui:/);
+  assert.doesNotMatch(css, /JOURNEY PROGRESS|\.journey|\.caravan|--journey-/);
 });
 
 for (const page of pages) {
@@ -37,6 +40,7 @@ for (const page of pages) {
     assert.match(html, /<img[^>]+class="hero-media"[^>]+width="1300"[^>]+height="1733"/s);
     assert.doesNotMatch(html, /new Image\(\)/);
     assert.doesNotMatch(html, /data:image|var lqip=/);
+    assert.match(html, /<svg[^>]+class="hero-wave"[^>]+aria-hidden="true"/s);
   });
 
   test(`${page} uses portable local asset URLs and every asset exists`, () => {
@@ -51,15 +55,9 @@ for (const page of pages) {
     }
   });
 
-  test(`${page} includes the accessible SVG caravan progress strip`, () => {
+  test(`${page} removes the temporary caravan journey concept`, () => {
     const html = read(page);
-    assert.match(html, /id="journeyProgress"[^>]+role="progressbar"[^>]+aria-valuemin="0"[^>]+aria-valuemax="100"[^>]+aria-valuenow="0"/s);
-    assert.match(html, /class="journey-dunes"/);
-    assert.match(html, /class="caravan"/);
-    assert.match(html, /function updateJourneyProgress\(\)/);
-    assert.match(html, /style\.setProperty\('--journey-progress'/);
-    assert.match(html, /setAttribute\('aria-valuenow'/);
-    assert.match(html, /requestAnimationFrame\(updateJourneyProgress\)/);
+    assert.doesNotMatch(html, /JOURNEY PROGRESS|journeyProgress|journey-dunes|class="caravan"|updateJourneyProgress|--journey-progress/);
   });
 
   test(`${page} keeps presentation in stylesheets instead of inline rules`, () => {
@@ -75,14 +73,3 @@ for (const page of pages) {
     for (const [, source] of scripts) new Function(source);
   });
 }
-
-test('both page variants keep identical journey markup', () => {
-  const snippets = pages.map((page) => {
-    const html = read(page);
-    const match = html.match(/<!-- JOURNEY PROGRESS -->([\s\S]+?)<!-- HERO -->/);
-    assert.ok(match, `${page} is missing the journey progress block`);
-    return match[1].trim();
-  });
-
-  assert.equal(snippets[0], snippets[1]);
-});

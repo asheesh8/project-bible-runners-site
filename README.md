@@ -39,15 +39,15 @@ node --test tests/site-contract.test.mjs
 git push origin main
 ```
 
-The contract test checks the Vercel output directory, both page variants, local asset paths, hero-image priority, inline JavaScript syntax, and synchronized caravan markup before deployment.
+The contract test checks the Vercel output directory, both page variants, local asset paths, hero-image priority, inline JavaScript syntax, the organic hero transition, and removal of temporary prototype UI before deployment.
 
 ## Design & performance doctrine
 
 - **Dual-audience:** rich for donors, lightweight for field users on slow connections.
-- **Earthy palette** (worn leather, savanna dust, deep sky, bone white) — no generic nonprofit blue.
+- **Editorial nonprofit palette** (forest, olive, ochre, warm ivory) — no generic nonprofit blue.
 - **Mobile-first**, accessible (reduced-motion respected, alt text, AA contrast).
 - **Resilient media:** the hero is a semantic, preloaded WebP; lower-page images lazy-load with intrinsic dimensions and layout-safe failure states.
-- **Story progress:** a dependency-free inline SVG camel caravan crosses the dune strip as the reader scrolls.
+- **Organic composition:** a lightweight inline SVG wave blends the photo-led hero into the open editorial body.
 - The `$7` give CTA appears in the nav, hero, and footer of every page.
 
 ## Conversion tracking
