@@ -58,12 +58,14 @@ header.nav{position:static;background:var(--forest)}
 .choose-label{font-weight:700;font-size:14px;color:var(--ink);margin:0 0 13px}
 .amounts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .amt-btn{
-  padding:15px 12px;border:1.5px solid var(--line);border-radius:var(--radius-ui);
+  padding:13px 12px;border:1.5px solid var(--line);border-radius:var(--radius-ui);
   background:var(--bone);font-family:var(--sans);font-size:18px;font-weight:700;
-  color:var(--ink);cursor:pointer;transition:all .18s;text-align:center
+  color:var(--ink);cursor:pointer;transition:all .18s;text-align:center;line-height:1.1
 }
 .amt-btn:hover{border-color:rgba(23,33,24,.35);color:var(--forest)}
 .amt-btn.selected{background:var(--forest);border-color:var(--forest);color:var(--bone)}
+.amt-btn .amt-sub{display:block;font-size:11px;font-weight:600;opacity:.62;margin-top:4px;letter-spacing:.01em}
+.amt-btn.selected .amt-sub{opacity:.75}
 
 /* ── Custom amount input ────────────────────────────────── */
 .custom-amt-wrap{
@@ -157,14 +159,9 @@ header.nav{position:static;background:var(--forest)}
       <button class="freq-tab" data-freq="yearly">Yearly</button>
     </div>
 
-    <!-- Amount grid -->
+    <!-- Amount grid (populated by JS per frequency) -->
     <p class="choose-label">Choose an amount:</p>
-    <div class="amounts-grid">
-      <button class="amt-btn" data-amount="7">$7</button>
-      <button class="amt-btn" data-amount="35">$35</button>
-      <button class="amt-btn" data-amount="70">$70</button>
-      <button class="amt-btn" data-amount="500">$500</button>
-    </div>
+    <div class="amounts-grid" id="amounts-grid"></div>
 
     <!-- Custom amount -->
     <div class="custom-amt-wrap" id="custom-wrap">
@@ -208,7 +205,28 @@ window.scrollTo(0,0);
   var selectedAmount = null;
   var selectedFreq = 'once';
 
-  // Read ?amount param from URL to pre-select
+  // Amount presets per frequency
+  var AMOUNTS = {
+    once: [
+      {value:7,   label:'$7',      sub:null},
+      {value:35,  label:'$35',     sub:null},
+      {value:70,  label:'$70',     sub:null},
+      {value:500, label:'$500',    sub:null}
+    ],
+    monthly: [
+      {value:7,   label:'$7/mo',   sub:'= $84/yr'},
+      {value:15,  label:'$15/mo',  sub:'= $180/yr'},
+      {value:30,  label:'$30/mo',  sub:'= $360/yr'},
+      {value:42,  label:'$42/mo',  sub:'= $504/yr'}
+    ],
+    yearly: [
+      {value:84,  label:'$84/yr',  sub:'≈ $7/mo'},
+      {value:180, label:'$180/yr', sub:'≈ $15/mo'},
+      {value:360, label:'$360/yr', sub:'≈ $30/mo'},
+      {value:500, label:'$500/yr', sub:'Fund a VillageServer'}
+    ]
+  };
+
   var params = new URLSearchParams(window.location.search);
   var preAmount = params.get('amount');
 
@@ -221,46 +239,57 @@ window.scrollTo(0,0);
     btn.href = url;
   }
 
+  function renderAmounts(freq, preselect){
+    var grid = document.getElementById('amounts-grid');
+    grid.innerHTML = '';
+    selectedAmount = null;
+    AMOUNTS[freq].forEach(function(a){
+      var btn = document.createElement('button');
+      btn.className = 'amt-btn';
+      btn.dataset.amount = a.value;
+      btn.innerHTML = a.label + (a.sub ? '<span class="amt-sub">'+a.sub+'</span>' : '');
+      if(preselect && String(a.value) === String(preselect)){
+        btn.classList.add('selected');
+        selectedAmount = String(a.value);
+      }
+      btn.addEventListener('click', function(){
+        grid.querySelectorAll('.amt-btn').forEach(function(b){b.classList.remove('selected')});
+        document.getElementById('custom-wrap').classList.remove('selected');
+        document.getElementById('custom-input').value = '';
+        btn.classList.add('selected');
+        selectedAmount = String(a.value);
+        updateContinueBtn();
+      });
+      grid.appendChild(btn);
+    });
+    updateContinueBtn();
+  }
+
   // Frequency tabs
   document.querySelectorAll('.freq-tab').forEach(function(tab){
     tab.addEventListener('click', function(){
       document.querySelectorAll('.freq-tab').forEach(function(t){t.classList.remove('active')});
       tab.classList.add('active');
       selectedFreq = tab.dataset.freq;
-      updateContinueBtn();
-    });
-  });
-
-  // Amount buttons
-  document.querySelectorAll('.amt-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      document.querySelectorAll('.amt-btn').forEach(function(b){b.classList.remove('selected')});
-      document.getElementById('custom-wrap').classList.remove('selected');
       document.getElementById('custom-input').value = '';
-      btn.classList.add('selected');
-      selectedAmount = btn.dataset.amount;
-      updateContinueBtn();
+      document.getElementById('custom-wrap').classList.remove('selected');
+      renderAmounts(selectedFreq, null);
     });
   });
 
   // Custom input
   document.getElementById('custom-input').addEventListener('input', function(){
-    document.querySelectorAll('.amt-btn').forEach(function(b){b.classList.remove('selected')});
+    document.getElementById('amounts-grid').querySelectorAll('.amt-btn').forEach(function(b){b.classList.remove('selected')});
     selectedAmount = null;
     document.getElementById('custom-wrap').classList.toggle('selected', !!this.value);
     updateContinueBtn();
   });
 
-  // Pre-select from URL param
-  if(preAmount){
-    var match = document.querySelector('.amt-btn[data-amount="'+preAmount+'"]');
-    if(match){
-      match.classList.add('selected');
-      selectedAmount = preAmount;
-    } else {
-      document.getElementById('custom-input').value = preAmount;
-      document.getElementById('custom-wrap').classList.add('selected');
-    }
+  // Initial render, pre-select from URL param if present
+  renderAmounts('once', preAmount);
+  if(preAmount && !selectedAmount){
+    document.getElementById('custom-input').value = preAmount;
+    document.getElementById('custom-wrap').classList.add('selected');
     updateContinueBtn();
   }
 
