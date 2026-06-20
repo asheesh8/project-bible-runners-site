@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project Bible Runners — Answer a prayer for $7 · Ember</title>
+<meta name="description" content="42% of the world has never heard that Jesus loves them. $7 places a Bible in the hands of a believer who has waited years for one — and $500 builds an offline, solar-powered Bible library for an entire village." />
+
+<!-- Open Graph (for the Facebook ad link preview) -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="$7 answers a prayer that's years old." />
+<meta property="og:description" content="42% of the world has never heard that Jesus loves them. Place a Bible in waiting hands — or power an entire village's offline Bible library." />
+<meta property="og:image" content="img/hero-field.webp" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz@1,6..72&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/theme-ember.css">
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top">
+      <span class="mark" aria-hidden="true"></span>
+      <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
+    </a>
+    <nav class="nav-links">
+      <a class="lnk" href="#why">The Need</a>
+      <a class="lnk" href="#villageserver">VillageServer</a>
+      <a class="lnk" href="#give">Ways to Give</a>
+      <a class="btn btn-give btn-sm" href="#give" data-track="donation_started" data-source="nav">Give a Bible · $7</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="bg lqip" id="heroLqip"></div>
+  <div class="bg" id="heroFull" style="opacity:0;transition:opacity .6s"></div>
+  <div class="scrim"></div>
+  <div class="wrap hero-in">
+    <p class="verse reveal">“…and this gospel of the kingdom will be proclaimed throughout the whole world as a testimony to all nations, and then the end will come.” &nbsp;<b>Matthew 24:14</b></p>
+    <h1 class="reveal">42% of the world has <span class="hl">never heard</span> that Jesus loves them.</h1>
+    <p class="sub reveal">In thousands of villages, believers have fasted and prayed for years for a single Bible. <b>$7 answers that prayer</b> — and $500 builds an entire village its own offline Bible library.</p>
+    <div class="hero-cta reveal">
+      <a class="btn btn-give" href="#give" data-track="donation_started" data-source="hero">Give a Bible · $7</a>
+      <a class="btn btn-ghost" href="#villageserver">See how it works</a>
+    </div>
+    <div class="hero-trust reveal">
+      <span><span class="dot"></span>Founded <b>2019</b> · Owen &amp; Jess Sweitzer</span>
+      <span><span class="dot"></span>14+ nations reached</span>
+      <span><span class="dot"></span>EIN <b>85-1992796</b> · 501(c)(3)</span>
+    </div>
+  </div>
+</section>
+
+<!-- STAT BAND -->
+<section class="stats" id="why" style="padding-top:54px;padding-bottom:54px">
+  <div class="wrap stats-grid">
+    <div class="stat reveal"><div class="num" data-to="7295">0</div><div class="lbl">unreached people groups worldwide (41.9%)</div></div>
+    <div class="stat reveal"><div class="num" data-to="97" data-suffix="%">0</div><div class="lbl">of them live in the 10/40 Window</div></div>
+    <div class="stat reveal"><div class="num" data-to="3.56" data-suffix="B" data-dec="2">0</div><div class="lbl">people still unreached, of 8.19B</div></div>
+    <div class="stat reveal"><div class="num"><small style="font-size:.6em;vertical-align:.12em">$</small><span data-to="7">0</span></div><div class="lbl">puts one Bible in waiting hands</div></div>
+  </div>
+</section>
+
+<!-- THE $7 -->
+<section class="seven">
+  <div class="wrap seven-grid">
+    <div class="reveal">
+      <p class="eyebrow">The promise of one Bible</p>
+      <div class="bignum"><small>$</small>7</div>
+      <p class="lead" style="margin-top:8px">A single native-language Bible, hand-delivered by runners who go two-by-two into rural villages. In many places, one Bible is read aloud and shared among <b>200–500 people</b>.</p>
+      <p style="font-weight:700;margin:26px 0 0;font-size:15px;color:var(--leather)">When a believer receives their Bible, they promise three things:</p>
+      <ul class="promises">
+        <li><span class="n">1</span><span>Read their Bible <b>every day</b> for the rest of their life.</span></li>
+        <li><span class="n">2</span><span>Obey Jesus' commands and the New Testament.</span></li>
+        <li><span class="n">3</span><span>Share the Gospel with the people they love.</span></li>
+      </ul>
+      <a class="btn btn-give" style="margin-top:30px" href="#give" data-track="donation_started" data-source="seven">Place a Bible for $7</a>
+    </div>
+    <div class="photo-card reveal" style="aspect-ratio:4/5">
+      <img src="img/receiving.webp" alt="A believer lifts an open Bible to the sky in a village" loading="lazy" />
+      <div class="cap">A believer lifts the Bible she prayed years to hold.</div>
+    </div>
+  </div>
+</section>
+
+<!-- VILLAGESERVER -->
+<section class="vs" id="villageserver">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">The VillageServer Initiative</p>
+      <h2>A whole village's Bible library. No internet required.</h2>
+      <p class="lead">Where a paper Bible reaches one set of hands, a VillageServer reaches a village. It's a solar-powered Raspberry Pi that creates its own local WiFi — so anyone nearby can open Scripture, audio Bibles, and video in their own language on the phone already in their pocket. Completely offline.</p>
+    </div>
+    <div class="vs-split">
+      <div class="vs-narr reveal">
+        <div class="steps">
+          <div class="step"><div class="si">☀️</div><div><h4>1 · Solar power</h4><p>A folding solar suitcase keeps the whole kit running through the day — no grid, no generator.</p></div></div>
+          <div class="step"><div class="si">🍓</div><div><h4>2 · Raspberry Pi server</h4><p>A palm-sized computer holds Bibles, audio, and video pre-loaded in local languages.</p></div></div>
+          <div class="step"><div class="si">📶</div><div><h4>3 · Local WiFi hotspot</h4><p>A travel router broadcasts a private network that covers the gathering — no data plan needed.</p></div></div>
+          <div class="step"><div class="si">📱</div><div><h4>4 · Every phone connects</h4><p>People join the hotspot and read, listen, and watch — then share phone-to-phone to neighbors.</p></div></div>
+        </div>
+        <div class="kit-badge">Full kit cost: ~$483–$550 &nbsp;·&nbsp; You fund it at $500</div>
+        <div><a class="btn btn-give" style="margin-top:24px" href="#give" data-track="donation_started" data-source="villageserver">Fund a VillageServer · $500</a></div>
+      </div>
+      <div class="vs-photos reveal">
+        <div class="photo-card" style="aspect-ratio:16/10">
+          <img src="img/kit-case.webp" alt="The VillageServer field kit — solar panels and equipment packed in a travel case" loading="lazy"/>
+          <div class="cap">The complete field kit: solar, server, router — packs into a single case.</div>
+        </div>
+        <div class="photo-card" style="aspect-ratio:1/1">
+          <img src="img/kit-pi.webp" alt="Raspberry Pi server that runs the offline Bible library" loading="lazy"/>
+          <div class="cap">The Raspberry Pi that holds the library.</div>
+        </div>
+        <div class="photo-card" style="aspect-ratio:1/1">
+          <img src="img/broadcast.webp" alt="Gospel broadcast playing on a screen in the field" loading="lazy"/>
+          <div class="cap">Free-to-air broadcast, captured in the field.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REACH / CREDIBILITY -->
+<section class="reach">
+  <div class="wrap reach-grid">
+    <div class="reveal">
+      <p class="eyebrow">Where the work is happening</p>
+      <h2 class="sec-head" style="font-size:clamp(28px,4.4vw,46px)">From rural Kenya to the 10/40 Window.</h2>
+      <p class="lead">Runners and partners are active across four continents — and a satellite strategy is opening doors to billions more.</p>
+      <div class="chips">
+        <span class="chip">Kenya</span><span class="chip">Uganda</span><span class="chip">Pakistan</span>
+        <span class="chip">India</span><span class="chip">Philippines</span><span class="chip">Rwanda</span>
+        <span class="chip">Tanzania</span><span class="chip">Malawi</span><span class="chip">Nigeria</span>
+        <span class="chip">South Sudan</span><span class="chip">Cambodia</span><span class="chip">Guinea</span>
+        <span class="chip">Zambia</span><span class="chip">Peru</span>
+      </div>
+      <ul class="cred">
+        <li><span class="ci">95–99%</span><span>Active meetings with <b>SES / Intelsat</b>, whose satellites cover nearly all of the populated Earth.</span></li>
+        <li><span class="ci">2–4B</span><span>People inside the footprint of <b>Gawahi TV</b> on AsiaSat-7 — free-to-air Gospel broadcast across South Asia.</span></li>
+        <li><span class="ci">1,190</span><span>People starting a relationship with Jesus, funded by a single church's VBS class.</span></li>
+      </ul>
+    </div>
+    <div class="reveal field-grid">
+      <div class="photo-card" style="aspect-ratio:1/1"><img src="img/field-distribute.webp" alt="Runners hand-delivering Bibles to a waiting community" loading="lazy"/><div class="cap">Hand-delivered, village by village.</div></div>
+      <div class="photo-card" style="aspect-ratio:1/1"><img src="img/field-prayer.webp" alt="A runner and a local believer praying together in a field" loading="lazy"/><div class="cap">Two-by-two — runner and believer.</div></div>
+      <div class="photo-card" style="aspect-ratio:1/1"><img src="img/field-reading.webp" alt="A young woman reading her Bible on the church steps" loading="lazy"/><div class="cap">The first promise: read it daily.</div></div>
+      <div class="photo-card" style="aspect-ratio:1/1"><img src="img/field-runner.webp" alt="A Bible Runner carrying a box of Bibles in the field" loading="lazy"/><div class="cap">800+ Bibles carried in per run.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- GIVING LADDER -->
+<section class="ladder" id="give">
+  <div class="wrap">
+    <div class="sec-head reveal" style="margin:0 auto;text-align:center">
+      <p class="eyebrow" style="text-align:center">Ways to give</p>
+      <h2>Choose how far your gift runs.</h2>
+      <p class="lead">Every gift is tax-deductible. Give once, or give monthly to keep Bibles moving all year.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier feature reveal">
+        <span class="pill">Most common</span>
+        <div class="amt"><small>$</small>7</div>
+        <div class="tier-name">Give a Bible</div>
+        <p class="tier-funds">One native-language Bible, hand-delivered to a believer who has been waiting and praying for one.</p>
+        <a class="btn btn-give" href="https://www.projectbiblerunners.com" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_7">Give $7</a>
+      </div>
+      <div class="tier reveal">
+        <span class="pill">Bundle</span>
+        <div class="amt"><small>$</small>35</div>
+        <div class="tier-name">Bible Bundle</div>
+        <p class="tier-funds">Five Bibles for a family or a small gathering of new believers.</p>
+        <a class="btn btn-dark" href="https://www.projectbiblerunners.com" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_35">Give $35</a>
+      </div>
+      <div class="tier reveal">
+        <span class="pill">Church pack</span>
+        <div class="amt"><small>$</small>70</div>
+        <div class="tier-name">Church Pack</div>
+        <p class="tier-funds">Ten Bibles — enough to seed a house church in a rural community.</p>
+        <a class="btn btn-dark" href="https://www.projectbiblerunners.com" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_70">Give $70</a>
+      </div>
+      <div class="tier feature reveal">
+        <span class="pill">Build a library</span>
+        <div class="amt"><small>$</small>500</div>
+        <div class="tier-name">VillageServer Kit</div>
+        <p class="tier-funds">A complete solar-powered, offline Bible library — Bibles, audio &amp; video — for one whole village.</p>
+        <a class="btn btn-give" href="https://www.projectbiblerunners.com" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_500">Fund a kit · $500</a>
+      </div>
+      <div class="tier reveal">
+        <span class="pill">Field team</span>
+        <div class="amt"><small>$</small>1,250</div>
+        <div class="tier-name">Satellite Run</div>
+        <p class="tier-funds">A full satellite-capture kit so a field team can receive and replay broadcasts anywhere.</p>
+        <a class="btn btn-dark" href="https://www.projectbiblerunners.com" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_1250">Give $1,250</a>
+      </div>
+      <div class="tier reveal">
+        <span class="pill">You go too</span>
+        <div class="amt"><small>$</small>4,400<small>+</small></div>
+        <div class="tier-name">Sponsor a Run</div>
+        <p class="tier-funds">Fund a 10-day Bible Run — 800+ Bibles hand-delivered. Come and carry them yourself.</p>
+        <a class="btn btn-dark" href="https://www.projectbiblerunners.com" target="_blank" rel="noopener" data-track="trip_inquiry" data-source="tier_4400">Plan a Run</a>
+      </div>
+    </div>
+    <p class="recurnote reveal">Prefer to give monthly? Every tier can be set as a recurring gift on the giving page. 💛</p>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote">
+  <div class="wrap reveal">
+    <blockquote>“The kingdom advances at the speed of connections, and revival moves at the speed of relationships.”</blockquote>
+    <cite>— Derrick Rhayn · Kingdom Impact Network</cite>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="wrap reveal">
+    <h2>Somewhere tonight, a believer is praying for <span class="hl">a Bible.</span></h2>
+    <p>You can answer that prayer before you close this page. $7 sends one. $500 lights up a village.</p>
+    <div class="hero-cta">
+      <a class="btn btn-give" href="https://www.projectbiblerunners.com" target="_blank" rel="noopener" data-track="donation_started" data-source="final">Give a Bible · $7</a>
+      <a class="btn btn-ghost" href="#villageserver">Fund a VillageServer</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#top" style="margin-bottom:18px">
+          <span class="mark" aria-hidden="true"></span>
+          <span><b style="color:var(--bone)">Project Bible Runners</b><span>VillageServer Initiative</span></span>
+        </a>
+        <p class="ms">“Gathering and running Bibles to nations, tribes and people until every follower of Jesus owns a Bible.”</p>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <p><a href="mailto:projectbiblerunners@gmail.com">projectbiblerunners@gmail.com</a></p>
+        <p><a href="https://www.facebook.com/projectbiblerunners" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.projectbiblerunners.com" target="_blank" rel="noopener">projectbiblerunners.com</a></p>
+        <p style="margin-top:14px">PO Box 422<br>Charleston, IL 61920</p>
+      </div>
+      <div>
+        <h5>Give</h5>
+        <p><a href="#give">Give a Bible — $7</a></p>
+        <p><a href="#give">Fund a VillageServer — $500</a></p>
+        <p><a href="#give">Sponsor a Bible Run</a></p>
+        <p style="margin-top:14px">Founded 2019<br>EIN 85-1992796 · 501(c)(3)</p>
+      </div>
+    </div>
+    <div class="foot-bar">
+      <span>© 2026 Project Bible Runners. All gifts tax-deductible.</span>
+      <span>Built by ArkiTech-Sol</span>
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY MOBILE GIVE BAR -->
+<div class="mbar">
+  <p><b>$7</b> answers a prayer that's years old.</p>
+  <a class="btn btn-give btn-sm" href="#give" data-track="donation_started" data-source="mobilebar">Give now</a>
+</div>
+
+<script>
+// Hero blur-up: swap LQIP → full webp once loaded
+(function(){
+  var lqip="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABMNDhEODBMRDxEVFBMXHTAfHRoaHToqLCMwRT1JR0Q9Q0FMVm1dTFFoUkFDX4JgaHF1e3x7SlyGkIV3j214e3b/2wBDARQVFR0ZHTgfHzh2T0NPdnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnb/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBd6sN3QjpUUJ80sXwSelJFFJKhZRlB1oDoGRVHU81yqGhSjdFoSuABmilylFYXFymfDOW3hGIUUseIxvJ60UV19C18JbE0WBzRRRWVjPmZ/9k=";
+  document.getElementById('heroLqip').style.backgroundImage="url('"+lqip+"')";
+  var full=document.getElementById('heroFull');
+  var img=new Image();
+  img.onload=function(){full.style.backgroundImage="url('img/hero-field.webp')";full.style.opacity=1;};
+  img.src="img/hero-field.webp";
+})();
+
+// Reveal on scroll
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
+  },{threshold:.14});
+  els.forEach(function(e){io.observe(e)});
+})();
+
+// Count-up stats
+(function(){
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function fmt(v,dec){return dec? v.toFixed(dec): Math.round(v).toLocaleString('en-US');}
+  function run(el){
+    var to=parseFloat(el.dataset.to), suf=el.dataset.suffix||'', dec=parseInt(el.dataset.dec||0);
+    if(reduce){el.textContent=fmt(to,dec)+suf;return;}
+    var start=performance.now(), dur=1300;
+    function tick(now){
+      var p=Math.min((now-start)/dur,1), e=1-Math.pow(1-p,3);
+      el.textContent=fmt(to*e,dec)+suf;
+      if(p<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){if(en.isIntersecting){run(en.target);io.unobserve(en.target);}});
+  },{threshold:.5});
+  document.querySelectorAll('[data-to]').forEach(function(e){io.observe(e)});
+})();
+
+// Conversion-event stubs — ready for Meta Pixel + GA4
+document.addEventListener('click',function(e){
+  var a=e.target.closest('[data-track]'); if(!a)return;
+  var ev=a.dataset.track, src=a.dataset.source||'';
+  if(window.fbq)fbq('trackCustom',ev,{source:src});
+  if(window.gtag)gtag('event',ev,{source:src});
+  console.log('[track]',ev,src);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+/* ============================================================
+   DIRECTION B — "EMBER"
+   Dark, cinematic, modern. Layered on top of base.css.
+   Bricolage Grotesque (display) + Newsreader italic + Hanken (body).
+   ============================================================ */
+:root{
+  --ink:#0f0b07;          /* page base — warm near-black */
+  --ink-soft:#c9bba1;     /* secondary light text (flipped from dark) */
+  --bone:#f1e8d8;         /* primary light text */
+  --paper:#17110b;        /* dark warm surface (flipped from light) */
+  --paper-2:#241a11;      /* dark surface 2 / chips */
+  --leather:#d9b888;      /* light tan label (flipped from brown) */
+  --terra:#d06a2f;        /* ember */
+  --terra-deep:#b5531f;
+  --gold:#dcae64;         /* brass */
+  --sky:#1b3a42;          /* deep teal accent */
+  --sky-deep:#102329;
+  --sand:#b8966a;
+  --line:rgba(241,232,216,.13);
+  --shadow:0 22px 60px -22px rgba(0,0,0,.72);
+  --serif:"Bricolage Grotesque",Georgia,serif;
+}
+
+body{background:var(--ink);color:var(--bone)}
+
+/* display type */
+h1,h2,h3{font-weight:700;letter-spacing:-.022em}
+.hero h1{font-weight:700}
+.hero .verse,.quote blockquote{font-family:"Newsreader",Georgia,serif}
+
+/* nav → dark glass */
+header.nav{background:rgba(15,11,7,.82);border-bottom:1px solid var(--line)}
+.nav-links a.lnk{color:var(--ink-soft)}
+.brand b{color:var(--bone)}
+.brand span span{color:var(--leather)}
+
+/* hero — push the scrim a touch darker for legibility on the dark theme */
+.hero .scrim{background:
+  linear-gradient(180deg, rgba(12,8,5,.62) 0%, rgba(12,8,5,.22) 30%, rgba(12,8,5,.5) 62%, rgba(10,7,4,.96) 100%),
+  radial-gradient(120% 90% at 12% 100%, rgba(150,66,22,.4), transparent 60%)}
+
+/* the $7 section is dark now → fix the promise number chips */
+.promises .n{background:var(--terra);color:#fff}
+
+/* giving ladder → dark cards */
+.tier{background:#1a130c;color:var(--bone);border-color:var(--line)}
+.tier .tier-funds{color:var(--ink-soft)}
+.tier:hover{border-color:var(--gold)}
+.tier.feature{background:#241a10;border-color:rgba(220,174,100,.5)}
+.tier.feature .tier-funds{color:#d8c8ad}
+
+/* small text that was on light surfaces */
+.stat .lbl{color:var(--ink-soft)}
+.recurnote{color:var(--gold)}
+
+/* a hairline of warmth under section transitions */
+.seven,.ladder{box-shadow:inset 0 1px 0 var(--line)}

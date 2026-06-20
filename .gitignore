@@ -1,0 +1,23 @@
+# --- Large source media (exceed GitHub's 100MB limit / not needed at runtime) ---
+*.pptx
+*.pdf
+
+# --- Raw + scraped originals (optimized WebP used by the site live in landing/img/) ---
+assets/
+
+# --- Internal brief / strategy docs (client-sensitive) ---
+project-bible-runners*.md
+_research/
+
+# --- Local dev & scratch ---
+*.log
+_*.txt
+_*.png
+.venv/
+node_modules/
+
+# --- Tooling / OS ---
+.claude/
+.DS_Store
+Thumbs.db
+desktop.ini
