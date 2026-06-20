@@ -10,14 +10,15 @@
 <meta property="og:type" content="website" />
 <meta property="og:title" content="$7 answers a prayer that's years old." />
 <meta property="og:description" content="42% of the world has never heard that Jesus loves them. Place a Bible in waiting hands — or power an entire village's offline Bible library." />
-<meta property="og:image" content="img/hero-field.webp" />
+<meta property="og:image" content="./img/hero-field.webp" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz@1,6..72&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/theme-ember.css">
+<link rel="preload" as="image" href="./img/hero-field.webp" type="image/webp" fetchpriority="high">
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/theme-ember.css">
 </head>
 <body>
 
@@ -39,8 +40,7 @@
 
 <!-- HERO -->
 <section class="hero" id="top">
-  <div class="bg lqip" id="heroLqip"></div>
-  <div class="bg" id="heroFull" style="opacity:0;transition:opacity .6s"></div>
+  <img class="hero-media" src="./img/hero-field.webp" alt="A Bible Runner traveling through a remote village landscape" width="1300" height="1733" fetchpriority="high" decoding="async" />
   <div class="scrim"></div>
   <div class="wrap hero-in">
     <p class="verse reveal">“…and this gospel of the kingdom will be proclaimed throughout the whole world as a testimony to all nations, and then the end will come.” &nbsp;<b>Matthew 24:14</b></p>
@@ -84,7 +84,7 @@
       <a class="btn btn-give" style="margin-top:30px" href="#give" data-track="donation_started" data-source="seven">Place a Bible for $7</a>
     </div>
     <div class="photo-card reveal" style="aspect-ratio:4/5">
-      <img src="img/receiving.webp" alt="A believer lifts an open Bible to the sky in a village" loading="lazy" />
+      <img src="./img/receiving.webp" alt="A believer lifts an open Bible to the sky in a village" width="900" height="1675" loading="lazy" decoding="async" />
       <div class="cap">A believer lifts the Bible she prayed years to hold.</div>
     </div>
   </div>
@@ -111,15 +111,15 @@
       </div>
       <div class="vs-photos reveal">
         <div class="photo-card" style="aspect-ratio:16/10">
-          <img src="img/kit-case.webp" alt="The VillageServer field kit — solar panels and equipment packed in a travel case" loading="lazy"/>
+          <img src="./img/kit-case.webp" alt="The VillageServer field kit — solar panels and equipment packed in a travel case" width="1300" height="975" loading="lazy" decoding="async"/>
           <div class="cap">The complete field kit: solar, server, router — packs into a single case.</div>
         </div>
         <div class="photo-card" style="aspect-ratio:1/1">
-          <img src="img/kit-pi.webp" alt="Raspberry Pi server that runs the offline Bible library" loading="lazy"/>
+          <img src="./img/kit-pi.webp" alt="Raspberry Pi server that runs the offline Bible library" width="1100" height="825" loading="lazy" decoding="async"/>
           <div class="cap">The Raspberry Pi that holds the library.</div>
         </div>
         <div class="photo-card" style="aspect-ratio:1/1">
-          <img src="img/broadcast.webp" alt="Gospel broadcast playing on a screen in the field" loading="lazy"/>
+          <img src="./img/broadcast.webp" alt="Gospel broadcast playing on a screen in the field" width="1200" height="680" loading="lazy" decoding="async"/>
           <div class="cap">Free-to-air broadcast, captured in the field.</div>
         </div>
       </div>
@@ -148,10 +148,10 @@
       </ul>
     </div>
     <div class="reveal field-grid">
-      <div class="photo-card" style="aspect-ratio:1/1"><img src="img/field-distribute.webp" alt="Runners hand-delivering Bibles to a waiting community" loading="lazy"/><div class="cap">Hand-delivered, village by village.</div></div>
-      <div class="photo-card" style="aspect-ratio:1/1"><img src="img/field-prayer.webp" alt="A runner and a local believer praying together in a field" loading="lazy"/><div class="cap">Two-by-two — runner and believer.</div></div>
-      <div class="photo-card" style="aspect-ratio:1/1"><img src="img/field-reading.webp" alt="A young woman reading her Bible on the church steps" loading="lazy"/><div class="cap">The first promise: read it daily.</div></div>
-      <div class="photo-card" style="aspect-ratio:1/1"><img src="img/field-runner.webp" alt="A Bible Runner carrying a box of Bibles in the field" loading="lazy"/><div class="cap">800+ Bibles carried in per run.</div></div>
+      <div class="photo-card" style="aspect-ratio:1/1"><img src="./img/field-distribute.webp" alt="Runners hand-delivering Bibles to a waiting community" width="780" height="585" loading="lazy" decoding="async"/><div class="cap">Hand-delivered, village by village.</div></div>
+      <div class="photo-card" style="aspect-ratio:1/1"><img src="./img/field-prayer.webp" alt="A runner and a local believer praying together in a field" width="780" height="779" loading="lazy" decoding="async"/><div class="cap">Two-by-two — runner and believer.</div></div>
+      <div class="photo-card" style="aspect-ratio:1/1"><img src="./img/field-reading.webp" alt="A young woman reading her Bible on the church steps" width="631" height="620" loading="lazy" decoding="async"/><div class="cap">The first promise: read it daily.</div></div>
+      <div class="photo-card" style="aspect-ratio:1/1"><img src="./img/field-runner.webp" alt="A Bible Runner carrying a box of Bibles in the field" width="780" height="1040" loading="lazy" decoding="async"/><div class="cap">800+ Bibles carried in per run.</div></div>
     </div>
   </div>
 </section>
@@ -271,14 +271,16 @@
 </div>
 
 <script>
-// Hero blur-up: swap LQIP → full webp once loaded
+// Preserve readable layouts if a media request fails unexpectedly.
 (function(){
   var lqip="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABMNDhEODBMRDxEVFBMXHTAfHRoaHToqLCMwRT1JR0Q9Q0FMVm1dTFFoUkFDX4JgaHF1e3x7SlyGkIV3j214e3b/2wBDARQVFR0ZHTgfHzh2T0NPdnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnb/wAARCAAYABIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwBd6sN3QjpUUJ80sXwSelJFFJKhZRlB1oDoGRVHU81yqGhSjdFoSuABmilylFYXFymfDOW3hGIUUseIxvJ60UV19C18JbE0WBzRRRWVjPmZ/9k=";
-  document.getElementById('heroLqip').style.backgroundImage="url('"+lqip+"')";
-  var full=document.getElementById('heroFull');
-  var img=new Image();
-  img.onload=function(){full.style.backgroundImage="url('img/hero-field.webp')";full.style.opacity=1;};
-  img.src="img/hero-field.webp";
+  document.querySelectorAll('img').forEach(function(img){
+    img.addEventListener('error',function(){
+      var frame=img.closest('.photo-card,.hero');
+      if(frame)frame.classList.add('media-missing');
+      img.hidden=true;
+    });
+  });
 })();
 
 // Reveal on scroll
