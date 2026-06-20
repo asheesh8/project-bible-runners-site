@@ -20,6 +20,15 @@ test('Vercel publishes the landing directory as the static site root', () => {
   assert.equal(config.cleanUrls, true);
 });
 
+test('the shared stylesheet exposes the spacing and typography system', () => {
+  const css = read('landing/css/base.css');
+  assert.match(css, /--space-section:/);
+  assert.match(css, /--measure-copy:/);
+  assert.match(css, /--text-body:/);
+  assert.match(css, /--nav-height:/);
+  assert.match(css, /--journey-height:/);
+});
+
 for (const page of pages) {
   test(`${page} uses a semantic, high-priority hero image`, () => {
     const html = read(page);
@@ -50,6 +59,18 @@ for (const page of pages) {
     assert.match(html, /style\.setProperty\('--journey-progress'/);
     assert.match(html, /setAttribute\('aria-valuenow'/);
     assert.match(html, /requestAnimationFrame\(updateJourneyProgress\)/);
+  });
+
+  test(`${page} keeps presentation in stylesheets instead of inline rules`, () => {
+    const html = read(page);
+    assert.doesNotMatch(html, /\sstyle="/);
+  });
+
+  test(`${page} contains valid inline JavaScript`, () => {
+    const html = read(page);
+    const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+    assert.ok(scripts.length > 0, 'expected an inline behavior script');
+    for (const [, source] of scripts) new Function(source);
   });
 }
 
