@@ -76,7 +76,7 @@ header.nav{position:absolute;inset:0 0 auto;z-index:50;color:var(--bone);backgro
   linear-gradient(180deg,rgba(7,15,10,.45) 0%,rgba(7,15,10,.04) 43%,rgba(7,15,10,.62) 100%)}
 .hero-in{position:relative;z-index:2;padding-top:155px;padding-bottom:126px;max-width:var(--wrap);width:100%;margin:0 auto}
 .hero .verse{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(14px,1.4vw,17px);color:#f2eedf;
-  max-width:600px;margin:0 0 23px;line-height:1.48}
+  max-width:600px;margin:22px 0 18px;line-height:1.48}
 .hero .verse b{font-style:normal;font-family:var(--sans);font-weight:700;letter-spacing:.12em;font-size:.72em;text-transform:uppercase;color:var(--ochre-soft)}
 .hero h1{font-size:clamp(44px,6.1vw,72px);font-weight:500;letter-spacing:-.045em;max-width:760px;text-wrap:balance}
 .hero h1 .hl{color:#c7d28f;font-style:italic;font-weight:400}
@@ -173,6 +173,8 @@ section:not(.hero):not(.stats){padding:var(--space-section) 0}
 .tier .btn{margin-top:19px}.tier.feature .btn-give{background:var(--ochre)}
 .tier.feature:nth-of-type(4) .btn-give{background:var(--forest)}
 .recurnote{text-align:center;margin-top:25px;font-size:13px;color:var(--leather)}
+.custom-give{text-align:center;margin-top:32px;padding:22px;border-top:1px solid var(--line)}
+.custom-give p{margin:0 0 14px;color:var(--ink-soft);font-size:14.5px}
 
 .quote{background:var(--leaf-deep);color:var(--bone);text-align:center;position:relative;overflow:hidden}
 .quote:after{content:"“";position:absolute;right:5%;top:-46px;font-family:var(--serif);font-size:260px;color:rgba(255,255,255,.06);line-height:1}
