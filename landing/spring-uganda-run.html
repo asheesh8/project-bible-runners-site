@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spring Uganda Run 2026 — Project Bible Runners</title>
+<meta name="description" content="A team of runners is carrying 800+ Bibles into northern Uganda this spring. Help close the gap before they leave." />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Spring Uganda Run 2026 — 800 Bibles. One deadline." />
+<meta property="og:description" content="Help us close the gap before the team leaves. Every $7 sends one more Bible into northern Uganda." />
+<meta property="og:image" content="./img/field-runner.webp" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/base.css">
+
+<style>
+body{background:var(--bone)}
+header.nav{background:var(--forest)}
+
+/* ── Hero ─────────────────────────────────────────────── */
+.run-hero{
+  position:relative;overflow:hidden;
+  background:var(--forest);min-height:560px;
+  display:flex;align-items:center;
+}
+.run-hero-img{position:absolute;inset:0}
+.run-hero-img img{
+  width:100%;height:100%;object-fit:cover;object-position:center 40%;
+  filter:saturate(.48) brightness(.3);
+}
+.run-hero-inner{
+  position:relative;z-index:1;
+  width:100%;max-width:1120px;margin:0 auto;
+  padding:88px 40px 72px;
+}
+.run-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  margin:0 0 20px;
+  font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ochre-soft);
+}
+.run-eyebrow-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--ochre);animation:pulse-dot 2s infinite;
+}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+.run-h1{
+  font-family:var(--serif);font-weight:500;
+  font-size:clamp(40px,6.5vw,72px);line-height:1.02;
+  color:#fff;margin:0 0 18px;letter-spacing:-.03em;max-width:700px;
+}
+.run-lead{
+  font-size:18px;line-height:1.58;
+  color:rgba(255,253,247,.68);margin:0 0 40px;max-width:520px;
+}
+.run-prog-block{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--radius-ui);
+  padding:28px 32px 24px;max-width:580px;margin-bottom:32px;
+}
+.run-stats-row{display:flex;gap:36px;margin-bottom:22px;flex-wrap:wrap}
+.run-stat .n{
+  font-size:30px;font-weight:700;color:#fff;line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.run-stat .l{
+  font-size:11px;color:rgba(255,253,247,.45);font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;margin-top:5px;
+}
+.run-bar-track{
+  height:9px;background:rgba(255,255,255,.14);
+  border-radius:99px;overflow:hidden;margin-bottom:10px;
+}
+.run-bar-fill{
+  height:100%;background:var(--ochre);
+  border-radius:99px;width:0;
+  transition:width 1.1s cubic-bezier(.4,0,.2,1);
+}
+.run-bar-labels{
+  display:flex;justify-content:space-between;
+  font-size:12px;color:rgba(255,253,247,.4);font-weight:600;
+}
+.run-give-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.run-give-main{padding:16px 36px;font-size:16px}
+.run-give-other{
+  font-size:14px;font-weight:700;
+  color:rgba(255,253,247,.5);text-decoration:none;
+  transition:color .15s;border:none;background:none;cursor:pointer;
+}
+.run-give-other:hover{color:#fff}
+
+/* ── About section ───────────────────────────────────── */
+.run-about{padding:88px 0;background:var(--bone)}
+.run-about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.run-about-text h2{
+  font-size:clamp(26px,3.5vw,40px);font-weight:500;
+  letter-spacing:-.03em;margin:0 0 20px;line-height:1.1;color:var(--forest);
+}
+.run-about-text p{
+  font-size:15.5px;line-height:1.68;color:var(--ink-soft);margin:0 0 16px;
+}
+.run-about-text p:last-child{margin:0}
+.run-about-img{border-radius:14px;overflow:hidden;aspect-ratio:4/3}
+.run-about-img img{
+  width:100%;height:100%;object-fit:cover;filter:saturate(.85);
+  transition:transform .5s ease;
+}
+.run-about-img:hover img{transform:scale(1.03)}
+
+/* ── Impact cards ────────────────────────────────────── */
+.run-impact{background:var(--paper);padding:72px 0}
+.run-impact .sec-head{margin-bottom:48px}
+.impact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.impact-card{
+  display:block;background:var(--bone);
+  border:1.5px solid var(--line);border-radius:var(--radius-ui);
+  padding:26px 22px;text-decoration:none;
+  transition:border-color .2s,transform .2s;
+}
+.impact-card:hover{border-color:var(--forest);transform:translateY(-4px)}
+.ic-amt{
+  font-size:32px;font-weight:700;color:var(--forest);
+  margin:0 0 8px;font-variant-numeric:tabular-nums;
+}
+.ic-label{font-size:14px;font-weight:700;color:var(--ink);margin:0 0 8px}
+.ic-desc{font-size:13px;color:var(--ink-soft);line-height:1.55;margin:0}
+
+/* ── Updates section ─────────────────────────────────── */
+.run-updates{padding:72px 0;background:var(--bone)}
+.updates-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.upd-card{
+  background:var(--paper);border-radius:var(--radius-ui);
+  border:1.5px solid var(--line);overflow:hidden;
+}
+.upd-img{aspect-ratio:16/9;overflow:hidden;background:var(--forest)}
+.upd-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.82)}
+.upd-body{padding:22px}
+.upd-date{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-soft);margin:0 0 9px;
+}
+.upd-title{font-size:16px;font-weight:700;color:var(--forest);margin:0 0 10px;line-height:1.3}
+.upd-excerpt{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin:0}
+.upd-empty{
+  text-align:center;padding:48px 24px;
+  grid-column:1/-1;
+  color:var(--ink-soft);font-size:14px;
+}
+
+/* ── Donate CTA ──────────────────────────────────────── */
+.run-cta{background:var(--forest);padding:88px 0;text-align:center}
+.run-cta h2{
+  font-size:clamp(28px,4vw,46px);font-weight:500;
+  color:#fff;letter-spacing:-.03em;margin:0 0 14px;
+}
+.run-cta-sub{
+  max-width:460px;margin:0 auto 40px;
+  font-size:16px;color:rgba(255,253,247,.62);line-height:1.58;
+}
+.run-tier-row{
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:28px;
+}
+.run-tier-btn{
+  min-width:108px;padding:15px 22px;
+  background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.22);
+  border-radius:var(--radius-ui);font-family:var(--sans);
+  font-size:18px;font-weight:700;color:#fff;text-decoration:none;
+  transition:background .15s,border-color .15s;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.run-tier-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.4)}
+.run-tier-btn small{font-size:10px;font-weight:700;opacity:.55;letter-spacing:.05em;text-transform:uppercase}
+.run-cta-or{color:rgba(255,253,247,.3);font-size:13px;margin-bottom:12px}
+.run-cta-main{display:inline-flex;padding:18px 48px;font-size:17px}
+.run-share-row{
+  display:flex;align-items:center;justify-content:center;gap:12px;margin-top:36px;
+  flex-wrap:wrap;
+}
+.run-share-row span{font-size:13px;color:rgba(255,253,247,.35);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.share-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;border-radius:99px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  font-size:13px;font-weight:700;color:rgba(255,253,247,.65);
+  text-decoration:none;transition:background .15s,color .15s;cursor:pointer;
+}
+.share-btn:hover{background:rgba(255,255,255,.17);color:#fff}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media(max-width:920px){
+  .run-about-grid{grid-template-columns:1fr;gap:40px}
+  .run-about-img{max-height:280px}
+  .impact-grid{grid-template-columns:1fr 1fr}
+  .updates-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .run-hero-inner{padding:68px 20px 56px}
+  .run-prog-block{padding:22px 20px 18px}
+  .run-stats-row{gap:20px}
+  .run-about{padding:56px 0}
+  .impact-grid{grid-template-columns:1fr}
+  .updates-grid{grid-template-columns:1fr}
+  .run-cta{padding:60px 0}
+  .run-tier-btn{min-width:88px;padding:13px 16px;font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="./index.html">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 28" fill="white" xmlns="http://www.w3.org/2000/svg" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg></span>
+      <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
+    </a>
+    <nav class="nav-links">
+      <a class="lnk" href="./index.html#why">The Need</a>
+      <a class="lnk" href="./index.html#give">Ways to Give</a>
+      <a class="btn btn-give btn-sm" href="./donate.html?amount=7" data-track="donation_started" data-source="run_nav">Give a Bible &middot; $7</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="run-hero">
+  <div class="run-hero-img">
+    <img src="./img/field-runner.webp" alt="A Bible Runner traveling through northern Uganda" width="1300" height="867" fetchpriority="high" decoding="async" />
+  </div>
+  <div class="run-hero-inner">
+    <p class="run-eyebrow">
+      <span class="run-eyebrow-dot" aria-hidden="true"></span>
+      Active Campaign &middot; Spring 2026
+    </p>
+    <h1 class="run-h1" id="run-title">Spring Uganda Run</h1>
+    <p class="run-lead" id="run-desc">A team of runners is preparing to carry 800+ Bibles into northern Uganda. Help us close the gap before they go.</p>
+
+    <div class="run-prog-block">
+      <div class="run-stats-row" id="run-stats-row">
+        <div class="run-stat">
+          <div class="n" id="stat-raised">$3,409</div>
+          <div class="l">Raised so far</div>
+        </div>
+        <div class="run-stat">
+          <div class="n" id="stat-goal">$4,400</div>
+          <div class="l">Goal</div>
+        </div>
+        <div class="run-stat">
+          <div class="n" id="stat-bibles">487</div>
+          <div class="l">Bibles funded</div>
+        </div>
+        <div class="run-stat">
+          <div class="n" id="stat-days">18</div>
+          <div class="l">Days left</div>
+        </div>
+      </div>
+      <div class="run-bar-track" aria-label="78% funded">
+        <div class="run-bar-fill" id="run-bar" data-target="78"></div>
+      </div>
+      <div class="run-bar-labels">
+        <span id="bar-raised">$3,409 raised</span>
+        <span id="bar-goal">Goal: $4,400 &nbsp;&middot;&nbsp; 800 Bibles</span>
+      </div>
+    </div>
+
+    <div class="run-give-row">
+      <a class="btn btn-give run-give-main" id="run-give-btn" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN" target="_blank" rel="noopener" data-track="donation_started" data-source="run_hero">
+        Give to This Run &rarr;
+      </a>
+      <a class="run-give-other" href="./donate.html">Or choose an amount &darr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT THE RUN -->
+<section class="run-about">
+  <div class="wrap">
+    <div class="run-about-grid">
+      <div class="run-about-text">
+        <p class="eyebrow">What is the Spring Uganda Run?</p>
+        <h2>A team. A load of Bibles. One mission.</h2>
+        <p>Every spring, a team of Project Bible Runners volunteers travels into northern Uganda — one of the most Bible-scarce regions in East Africa. They carry hundreds of printed Bibles, solar-powered VillageServer kits, and the good news that followers of Jesus across the world see them and want them to have God's Word.</p>
+        <p>Many believers in these communities have waited years — some over a decade — for a Bible in their own language. On this run, we aim to place 800 Bibles and deploy two VillageServer libraries, giving entire villages offline access to Scripture for the first time.</p>
+        <p>Every dollar you give before the team departs goes directly to Bibles and equipment. No overhead. The team covers their own travel.</p>
+      </div>
+      <div class="run-about-img">
+        <img src="./img/field-distribute.webp" alt="Bible Runners handing Bibles to a gathered congregation in Uganda" width="720" height="540" loading="lazy" decoding="async" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT BREAKDOWN -->
+<section class="run-impact">
+  <div class="wrap">
+    <div class="sec-head sec-head-centered reveal">
+      <p class="eyebrow">Your gift, deployed immediately</p>
+      <h2>Choose how far your gift runs.</h2>
+    </div>
+    <div class="impact-grid">
+      <a class="impact-card reveal" href="./donate.html?amount=7">
+        <div class="ic-amt">$7</div>
+        <div class="ic-label">One Bible</div>
+        <p class="ic-desc">A native-language Bible placed in the hands of a believer who has been praying for one for years.</p>
+      </a>
+      <a class="impact-card reveal" href="./donate.html?amount=35">
+        <div class="ic-amt">$35</div>
+        <div class="ic-label">Family Bundle</div>
+        <p class="ic-desc">Five Bibles — enough for an entire family or a small gathering of new believers.</p>
+      </a>
+      <a class="impact-card reveal" href="./donate.html?amount=70">
+        <div class="ic-amt">$70</div>
+        <div class="ic-label">Congregation Pack</div>
+        <p class="ic-desc">Ten Bibles for a rural congregation that has been sharing one torn copy between dozens of members.</p>
+      </a>
+      <a class="impact-card reveal" href="./donate.html?amount=500">
+        <div class="ic-amt">$500</div>
+        <div class="ic-label">VillageServer Kit</div>
+        <p class="ic-desc">A complete solar-powered offline Bible library for an entire village — no internet required.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CAMPAIGN UPDATES -->
+<section class="run-updates">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">Campaign updates</p>
+      <h2>From the field.</h2>
+    </div>
+    <div class="updates-grid" id="updates-grid">
+      <!-- Populated by JS from API, fallback below -->
+      <div class="upd-card reveal">
+        <div class="upd-img"><img src="./img/logistics.webp" alt="Bible shipment being prepared" width="640" height="360" loading="lazy" decoding="async" /></div>
+        <div class="upd-body">
+          <p class="upd-date">May 2026</p>
+          <p class="upd-title">Shipment confirmed — Bibles en route</p>
+          <p class="upd-excerpt">800 Lugbara-language Bibles have been printed and are now in transit to our staging point in Gulu. The team departs in 18 days.</p>
+        </div>
+      </div>
+      <div class="upd-card reveal">
+        <div class="upd-img"><img src="./img/kit-pi.webp" alt="VillageServer kit components" width="640" height="360" loading="lazy" decoding="async" /></div>
+        <div class="upd-body">
+          <p class="upd-date">April 2026</p>
+          <p class="upd-title">Two VillageServer kits assembled</p>
+          <p class="upd-excerpt">Both VillageServer kits for this run are built and loaded with the full YouVersion Bible library in 12 languages. Each one will serve a village of ~60 families.</p>
+        </div>
+      </div>
+      <div class="upd-card reveal">
+        <div class="upd-img"><img src="./img/field-prayer.webp" alt="Team praying before a run" width="640" height="360" loading="lazy" decoding="async" /></div>
+        <div class="upd-body">
+          <p class="upd-date">March 2026</p>
+          <p class="upd-title">Team commissioned</p>
+          <p class="upd-excerpt">Seven volunteers were commissioned and sent by their local churches to carry Bibles this spring. They are in active preparation. Please pray for them.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DONATE CTA -->
+<section class="run-cta" id="give">
+  <div class="wrap">
+    <h2>Ready to run with us?</h2>
+    <p class="run-cta-sub">Every dollar closes the gap before the team leaves. Give in the next <span id="cta-days">18</span> days and your gift goes on this run.</p>
+    <div class="run-tier-row">
+      <a class="run-tier-btn" href="./donate.html?amount=7"><span>$7</span><small>1 Bible</small></a>
+      <a class="run-tier-btn" href="./donate.html?amount=35"><span>$35</span><small>5 Bibles</small></a>
+      <a class="run-tier-btn" href="./donate.html?amount=70"><span>$70</span><small>10 Bibles</small></a>
+      <a class="run-tier-btn" href="./donate.html?amount=500"><span>$500</span><small>VillageServer</small></a>
+    </div>
+    <p class="run-cta-or">— or —</p>
+    <a class="btn btn-give run-cta-main" id="cta-give-btn" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN" target="_blank" rel="noopener" data-track="donation_started" data-source="run_cta">
+      Give to This Run on Zeffy &rarr;
+    </a>
+    <div class="run-share-row">
+      <span>Share</span>
+      <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.projectbiblerunners.com%2Fspring-uganda-run" target="_blank" rel="noopener" aria-label="Share on Facebook">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        Facebook
+      </a>
+      <a class="share-btn" href="https://twitter.com/intent/tweet?text=Help%20carry%20800%20Bibles%20into%20northern%20Uganda%20%E2%80%94%20every%20%247%20matters.%20Deadline%20is%20close.&url=https%3A%2F%2Fwww.projectbiblerunners.com%2Fspring-uganda-run" target="_blank" rel="noopener" aria-label="Share on Twitter">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </a>
+      <button class="share-btn" id="copy-link-btn" aria-label="Copy link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span id="copy-label">Copy link</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand footer-brand" href="./index.html">
+          <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 28" fill="white" xmlns="http://www.w3.org/2000/svg" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg></span>
+          <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
+        </a>
+        <p class="ms">"Gathering and running Bibles to nations, tribes and people until every follower of Jesus owns a Bible."</p>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <p><a href="mailto:projectbiblerunners@gmail.com">projectbiblerunners@gmail.com</a></p>
+        <p><a href="https://www.facebook.com/projectbiblerunners" target="_blank" rel="noopener">Facebook</a> &middot; <a href="https://www.projectbiblerunners.com" target="_blank" rel="noopener">projectbiblerunners.com</a></p>
+        <p class="footer-spaced">PO Box 422<br>Charleston, IL 61920</p>
+      </div>
+      <div>
+        <h5>Give &amp; Connect</h5>
+        <p><a href="./donate.html?amount=7">Give a Bible &mdash; $7</a></p>
+        <p><a href="./donate.html?amount=500">Fund a VillageServer &mdash; $500</a></p>
+        <p><a href="./spring-uganda-run">Spring Uganda Run</a></p>
+        <p><a href="./index.html#request">Request a Village Visit</a></p>
+        <p class="footer-spaced">Founded 2019<br>EIN 85-1992796 &middot; 501(c)(3)</p>
+      </div>
+    </div>
+    <div class="foot-bar">
+      <span>&copy; 2026 Project Bible Runners. All gifts tax-deductible.</span>
+      <span>Built by ArkiTech-Sol</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+if('scrollRestoration' in history){history.scrollRestoration='manual';}
+window.scrollTo(0,0);
+
+// ── Scroll reveal ────────────────────────────────────────
+(function(){
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');}});
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+})();
+
+// ── Progress bar animate on scroll ──────────────────────
+(function(){
+  var fill = document.getElementById('run-bar');
+  if(!fill) return;
+  var target = parseFloat(fill.dataset.target) || 78;
+  var io = new IntersectionObserver(function(es){
+    if(es[0].isIntersecting){fill.style.width = target + '%'; io.disconnect();}
+  },{threshold:.3});
+  io.observe(fill);
+})();
+
+// ── Days remaining countdown ─────────────────────────────
+(function(){
+  var endDate = '2026-06-09'; // 18 days from campaign reference date
+  var days = Math.max(0, Math.ceil((new Date(endDate) - Date.now()) / 86400000));
+  var els = document.querySelectorAll('#stat-days, #cta-days');
+  els.forEach(function(el){ el.textContent = days; });
+})();
+
+// ── Copy link ────────────────────────────────────────────
+(function(){
+  var btn = document.getElementById('copy-link-btn');
+  var lbl = document.getElementById('copy-label');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    navigator.clipboard.writeText(window.location.href).then(function(){
+      lbl.textContent = 'Copied!';
+      setTimeout(function(){ lbl.textContent = 'Copy link'; }, 2200);
+    });
+  });
+})();
+
+// ── Live data from Supabase API (graceful fallback) ──────
+(function(){
+  fetch('/api/content?type=campaigns&slug=spring-uganda-2026')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if(!data || !data.length) return;
+      var c = data[0];
+      // Update stats
+      if(c.raised_amount){
+        var raised = '$' + Number(c.raised_amount).toLocaleString();
+        document.getElementById('stat-raised').textContent = raised;
+        document.getElementById('bar-raised').textContent = raised + ' raised';
+      }
+      if(c.goal_amount){
+        var goal = '$' + Number(c.goal_amount).toLocaleString();
+        document.getElementById('stat-goal').textContent = goal;
+        document.getElementById('bar-goal').textContent = 'Goal: ' + goal + ' · 800 Bibles';
+      }
+      if(c.bibles_funded) document.getElementById('stat-bibles').textContent = c.bibles_funded;
+      if(c.end_date){
+        var days = Math.max(0, Math.ceil((new Date(c.end_date) - Date.now()) / 86400000));
+        document.querySelectorAll('#stat-days,#cta-days').forEach(function(el){ el.textContent = days; });
+      }
+      // Update progress bar
+      if(c.raised_amount && c.goal_amount){
+        var pct = Math.min(100, Math.round(c.raised_amount / c.goal_amount * 100));
+        var fill = document.getElementById('run-bar');
+        fill.dataset.target = pct;
+        fill.style.width = pct + '%';
+      }
+      // Update Zeffy link if stored
+      if(c.zeffy_url){
+        document.getElementById('run-give-btn').href = c.zeffy_url;
+        document.getElementById('cta-give-btn').href = c.zeffy_url;
+      }
+      // Update title/desc
+      if(c.name) document.getElementById('run-title').textContent = c.name;
+      if(c.description) document.getElementById('run-desc').textContent = c.description;
+    })
+    .catch(function(){ /* API not configured yet — static content remains */ });
+
+  // Load posts for updates section
+  fetch('/api/content?type=posts')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(posts){
+      if(!posts || !posts.length) return;
+      var grid = document.getElementById('updates-grid');
+      grid.innerHTML = '';
+      posts.slice(0,3).forEach(function(p){
+        var d = new Date(p.published_at || p.created_at);
+        var dateStr = d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+        grid.innerHTML += '<div class="upd-card reveal">' +
+          (p.image_url ? '<div class="upd-img"><img src="' + p.image_url + '" alt="" loading="lazy" /></div>' : '') +
+          '<div class="upd-body">' +
+          '<p class="upd-date">' + dateStr + '</p>' +
+          '<p class="upd-title">' + escHtml(p.title) + '</p>' +
+          '<p class="upd-excerpt">' + escHtml((p.body||'').substring(0,180)) + (p.body && p.body.length > 180 ? '...' : '') + '</p>' +
+          '</div></div>';
+      });
+    })
+    .catch(function(){});
+
+  function escHtml(s){ return String(s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
+})();
+</script>
+</body>
+</html>
