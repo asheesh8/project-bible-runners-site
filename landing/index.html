@@ -171,6 +171,124 @@
   </div>
 </section>
 
+<!-- WHERE DOES IT GO -->
+<section class="breakdown" id="breakdown">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">Full transparency</p>
+      <h2>Exactly where your money goes.</h2>
+      <p class="lead">Zero overhead, zero rounding. Here's the line-item cost of everything we buy — right down to the Raspberry Pi.</p>
+    </div>
+    <div class="breakdown-grid">
+
+      <!-- $7 Bible -->
+      <div class="bd-card reveal">
+        <div class="bd-tag">Most common gift</div>
+        <div class="bd-amt">$7</div>
+        <div class="bd-name">One Bible, hand-delivered</div>
+        <p class="bd-desc">A printed, native-language Bible carried in by a runner and placed directly into the hands of a believer who has been waiting and praying for one.</p>
+        <div class="bd-lines">
+          <div class="bd-line"><span>Printing &amp; binding</span><span>$5.00</span></div>
+          <div class="bd-line"><span>In-country shipping &amp; distribution</span><span>$1.20</span></div>
+          <div class="bd-line"><span>Field runner coordination</span><span>$0.80</span></div>
+          <div class="bd-total"><span>Per Bible</span><span>$7.00</span></div>
+        </div>
+        <a class="btn btn-give" href="./donate.html?amount=7" data-track="donation_started" data-source="breakdown_7">Give a Bible · $7</a>
+      </div>
+
+      <!-- $500 VillageServer -->
+      <div class="bd-card bd-card-vs reveal">
+        <div class="bd-tag">Whole village</div>
+        <div class="bd-amt">$500</div>
+        <div class="bd-name">VillageServer — full component list</div>
+        <p class="bd-desc">A solar-powered, offline Bible library that broadcasts to every phone in a village. Here's every part we buy:</p>
+        <div class="bd-lines">
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">🍓</span>
+              Raspberry Pi 4 Model B (4GB) — the server
+            </span>
+            <span>$55</span>
+          </div>
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">💾</span>
+              64GB microSD, pre-loaded — Bibles in 12 languages
+            </span>
+            <span>$20</span>
+          </div>
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">📶</span>
+              GL.iNet travel router — village-wide hotspot
+            </span>
+            <span>$65</span>
+          </div>
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">☀️</span>
+              Folding solar suitcase (20W) — off-grid power
+            </span>
+            <span>$295</span>
+          </div>
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">🧳</span>
+              Weatherproof field case, cables &amp; mounts
+            </span>
+            <span>$65</span>
+          </div>
+          <div class="bd-total"><span>Full kit cost</span><span>~$500</span></div>
+        </div>
+        <a class="btn btn-give" href="./donate.html?amount=500" data-track="donation_started" data-source="breakdown_500">Fund a VillageServer · $500</a>
+      </div>
+
+    </div>
+    <p class="breakdown-note reveal">Costs are real field averages. We fundraise through Zeffy so <b>100% of your gift</b> reaches the field — no platform fee.</p>
+  </div>
+</section>
+
+<!-- CAMPAIGN PROGRESS -->
+<section class="campaign">
+  <div class="wrap">
+    <div class="campaign-box reveal">
+      <div class="camp-header">
+        <div>
+          <span class="camp-eyebrow">Active Campaign</span>
+          <h3 class="camp-title">Spring Uganda Run — April 2026</h3>
+          <p class="camp-sub">Runners are preparing to carry 800+ Bibles into northern Uganda. Help us close the gap before we go.</p>
+        </div>
+        <a class="btn btn-give camp-btn-inline" href="./donate.html?amount=7" data-track="donation_started" data-source="campaign">Give to This Run &rarr;</a>
+      </div>
+      <div class="camp-stats">
+        <div class="camp-stat">
+          <span class="cs-num" data-to="487">0</span>
+          <span class="cs-lbl">Bibles funded</span>
+        </div>
+        <div class="camp-stat">
+          <span class="cs-num">313</span>
+          <span class="cs-lbl">Still needed</span>
+        </div>
+        <div class="camp-stat">
+          <span class="cs-num" id="camp-days">18</span>
+          <span class="cs-lbl">Days remaining</span>
+        </div>
+        <div class="camp-stat">
+          <span class="cs-num">$3,409</span>
+          <span class="cs-lbl">Raised so far</span>
+        </div>
+      </div>
+      <div class="camp-bar-track" aria-label="Campaign progress: 78% funded">
+        <div class="camp-bar-fill" data-target="78"></div>
+      </div>
+      <div class="camp-bar-labels">
+        <span>$3,409 raised</span>
+        <span>Goal: $4,400 &nbsp;·&nbsp; 800 Bibles</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- VILLAGE REQUEST FORM -->
 <section class="village-request" id="request">
   <div class="wrap">
@@ -432,6 +550,34 @@ if(!window.location.hash){window.scrollTo(0,0);}
     es.forEach(function(en){if(en.isIntersecting){run(en.target);io.unobserve(en.target);}});
   },{threshold:.5});
   document.querySelectorAll('[data-to]').forEach(function(e){io.observe(e)});
+})();
+
+// Campaign progress bar — animate fill on scroll into view
+(function(){
+  var fill=document.querySelector('.camp-bar-fill');
+  if(!fill)return;
+  var target=parseFloat(fill.dataset.target)||78;
+  var io=new IntersectionObserver(function(es){
+    if(es[0].isIntersecting){fill.style.width=target+'%';io.disconnect();}
+  },{threshold:.5});
+  io.observe(fill);
+  // Campaign count-up (Bibles funded stat only)
+  var cs=document.querySelector('.camp-stat .cs-num[data-to]');
+  if(cs){
+    var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    var io2=new IntersectionObserver(function(es){
+      if(!es[0].isIntersecting)return;
+      io2.disconnect();
+      if(reduce){cs.textContent=Math.round(parseFloat(cs.dataset.to)).toLocaleString('en-US');return;}
+      var to=parseFloat(cs.dataset.to),start=performance.now(),dur=1300;
+      (function tick(now){
+        var p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);
+        cs.textContent=Math.round(to*e).toLocaleString('en-US');
+        if(p<1)requestAnimationFrame(tick);
+      })(start);
+    },{threshold:.5});
+    io2.observe(cs);
+  }
 })();
 
 // ── Rotating Bible verses ────────────────────────────────
