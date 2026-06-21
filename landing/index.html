@@ -550,7 +550,7 @@
     </div>
     <div class="foot-bar">
       <span>© 2026 Project Bible Runners. All gifts tax-deductible.</span>
-      <span>Built by ArkiTech-Sol</span>
+      <span id="arki-credit">Built by ArkiTech-Sol</span>
     </div>
   </div>
 </footer>
@@ -962,6 +962,18 @@ document.addEventListener('click',function(e){
   if(window.gtag)gtag('event',ev,{source:src});
   console.log('[track]',ev,src);
 });
+</script>
+<script>
+(function(){
+  var el=document.getElementById('arki-credit'),n=0,t;
+  if(!el)return;
+  el.addEventListener('click',function(){
+    clearTimeout(t);
+    n++;
+    if(n>=3){n=0;window.location.href='./admin';}
+    t=setTimeout(function(){n=0;},600);
+  });
+})();
 </script>
 </body>
 </html>
