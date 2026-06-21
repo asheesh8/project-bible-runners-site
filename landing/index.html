@@ -32,6 +32,7 @@
       <a class="lnk" href="#why">The Need</a>
       <a class="lnk" href="#villageserver">VillageServer</a>
       <a class="lnk" href="#give">Ways to Give</a>
+      <a class="lnk" href="#request">Request a Visit</a>
       <a class="btn btn-give btn-sm" href="./donate.html?amount=7" data-track="donation_started" data-source="nav">Give a Bible · $7</a>
     </nav>
   </div>
@@ -170,6 +171,64 @@
   </div>
 </section>
 
+<!-- VILLAGE REQUEST FORM -->
+<section class="village-request" id="request">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">Request a visit</p>
+      <h2>Is your village waiting for Bibles?</h2>
+      <p class="lead">If you know of a community with believers who don't have Scripture in their language, tell us. Every request is prayed over and reviewed by our field team — no request too small, no village too far.</p>
+    </div>
+    <form class="vr-form reveal" id="vr-form" action="https://formspree.io/f/PENDING" method="POST">
+      <div class="vr-grid">
+        <div class="vr-field">
+          <label for="vr-name">Your name</label>
+          <input type="text" id="vr-name" name="name" placeholder="Full name" required />
+        </div>
+        <div class="vr-field">
+          <label for="vr-contact">Email or WhatsApp</label>
+          <input type="text" id="vr-contact" name="contact" placeholder="How we can reach you" required />
+        </div>
+        <div class="vr-field">
+          <label for="vr-country">Country</label>
+          <input type="text" id="vr-country" name="country" placeholder="Country" required />
+        </div>
+        <div class="vr-field">
+          <label for="vr-village">Village or region</label>
+          <input type="text" id="vr-village" name="village" placeholder="Name of village or nearest town" />
+        </div>
+        <div class="vr-field">
+          <label for="vr-language">Primary language spoken</label>
+          <input type="text" id="vr-language" name="language" placeholder="e.g. Swahili, Hindi, Amharic" />
+        </div>
+        <div class="vr-field">
+          <label for="vr-size">Estimated community size</label>
+          <select id="vr-size" name="community_size">
+            <option value="">Select an estimate</option>
+            <option value="under-50">Under 50 people</option>
+            <option value="50-200">50–200 people</option>
+            <option value="200-500">200–500 people</option>
+            <option value="500+">500 or more people</option>
+          </select>
+        </div>
+      </div>
+      <div class="vr-field vr-full">
+        <label for="vr-message">Tell us about the need</label>
+        <textarea id="vr-message" name="message" rows="4" placeholder="How did you hear about this community? Are there believers there without Bibles? Any context that helps our team pray and prepare."></textarea>
+      </div>
+      <div class="vr-foot">
+        <button type="submit" class="btn btn-give" data-track="village_request">Send Request</button>
+        <p class="vr-note">Every request is read by a real person on our field team.<br>We'll respond within a few days.</p>
+      </div>
+    </form>
+    <div class="vr-form vr-success" id="vr-success">
+      <div class="vr-check">&#9749;</div>
+      <h3>Your request is in our hands — and His.</h3>
+      <p>We've received your message and will be praying over it. Someone from our field team will reach out to you within a few days.</p>
+    </div>
+  </div>
+</section>
+
 <!-- GIVING LADDER -->
 <section class="ladder" id="give">
   <div class="wrap">
@@ -271,10 +330,11 @@
         <p class="footer-spaced">PO Box 422<br>Charleston, IL 61920</p>
       </div>
       <div>
-        <h5>Give</h5>
+        <h5>Give &amp; Connect</h5>
         <p><a href="#give">Give a Bible — $7</a></p>
         <p><a href="#give">Fund a VillageServer — $500</a></p>
         <p><a href="#give">Sponsor a Bible Run</a></p>
+        <p><a href="#request">Request a Village Visit</a></p>
         <p class="footer-spaced">Founded 2019<br>EIN 85-1992796 · 501(c)(3)</p>
       </div>
     </div>
@@ -401,6 +461,30 @@ if(!window.location.hash){window.scrollTo(0,0);}
       setTimeout(function(){slots[0].classList.remove('d-out');},50);
     },450);
   },18000);
+})();
+
+// Village request form — show inline success instead of redirecting
+(function(){
+  var form=document.getElementById('vr-form');
+  if(!form)return;
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var data=new FormData(form);
+    fetch(form.action,{method:'POST',body:data,headers:{'Accept':'application/json'}})
+      .then(function(r){
+        if(r.ok){
+          form.style.display='none';
+          document.getElementById('vr-success').style.display='block';
+          if(window.fbq)fbq('trackCustom','village_request');
+          if(window.gtag)gtag('event','village_request');
+        } else {
+          form.querySelector('[type=submit]').textContent='Something went wrong — try emailing us directly.';
+        }
+      })
+      .catch(function(){
+        form.querySelector('[type=submit]').textContent='Connection error — please try again.';
+      });
+  });
 })();
 
 // Conversion-event stubs — ready for Meta Pixel + GA4
