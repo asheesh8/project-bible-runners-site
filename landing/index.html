@@ -884,7 +884,6 @@ if(!window.location.hash){window.scrollTo(0,0);}
     slides[cur].classList.remove('rc-active');
     cur=(n+total)%total;
     slides[cur].classList.add('rc-active');
-    track.style.transform='translateX(-'+(cur*100)+'%)';
     dotsWrap.querySelectorAll('.rc-dot').forEach(function(dot,i){
       dot.classList.toggle('active',i===cur);
     });

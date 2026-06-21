@@ -226,14 +226,18 @@ section:not(.hero):not(.stats){padding:var(--space-section) 0}
   background:var(--forest);
 }
 .rc-track{
-  display:flex;
-  height:100%;
-  transition:transform .55s cubic-bezier(.4,0,.2,1);
-  will-change:transform;
+  position:absolute;inset:0;
 }
 .rc-slide{
-  min-width:100%;height:100%;
-  position:relative;overflow:hidden;flex-shrink:0;
+  position:absolute;inset:0;
+  opacity:0;
+  transition:opacity .65s ease;
+  pointer-events:none;
+}
+.rc-slide.rc-active{
+  opacity:1;
+  pointer-events:auto;
+  z-index:1;
 }
 .rc-img{
   width:100%;height:100%;object-fit:cover;display:block;
