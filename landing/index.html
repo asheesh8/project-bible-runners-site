@@ -247,33 +247,84 @@
 <!-- VILLAGE REQUEST FORM -->
 <section class="village-request" id="request">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">Request a visit</p>
-      <h2>Is your village waiting for Bibles?</h2>
-      <p class="lead">Select your country below. Every request is prayed over and reviewed by our field team — no village too small, no road too far.</p>
-    </div>
+    <div class="req-top-grid">
 
-    <!-- Country autocomplete combobox -->
-    <div class="cp-wrap reveal" id="cp-wrap">
-      <div class="cp-input-row" id="cp-input-row">
-        <svg class="cp-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
-          <path d="M14 14l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        <input type="text" id="cp-input" class="cp-input"
-          placeholder="Type or scroll to find your country..."
-          autocomplete="off" spellcheck="false"
-          role="combobox" aria-autocomplete="list"
-          aria-haspopup="listbox" aria-expanded="false" aria-controls="cp-dropdown" />
-        <button class="cp-clear" id="cp-clear" aria-label="Clear selection" style="display:none">&#x2715;</button>
-        <span class="cp-chevron" id="cp-chevron" aria-hidden="true">
-          <svg viewBox="0 0 10 6" fill="none" width="12" height="8"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
-      </div>
-      <div class="cp-dropdown" id="cp-dropdown" role="listbox" aria-label="Countries">
-        <!-- populated by JS -->
-      </div>
-    </div>
+      <!-- Left: heading + country picker -->
+      <div class="req-left">
+        <div class="sec-head reveal">
+          <p class="eyebrow">Request a visit</p>
+          <h2>Is your village waiting for Bibles?</h2>
+          <p class="lead">Select your country below. Every request is prayed over and reviewed by our field team — no village too small, no road too far.</p>
+        </div>
+
+        <!-- Country autocomplete combobox -->
+        <div class="cp-wrap reveal" id="cp-wrap">
+          <div class="cp-input-row" id="cp-input-row">
+            <svg class="cp-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M14 14l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <input type="text" id="cp-input" class="cp-input"
+              placeholder="Type or scroll to find your country..."
+              autocomplete="off" spellcheck="false"
+              role="combobox" aria-autocomplete="list"
+              aria-haspopup="listbox" aria-expanded="false" aria-controls="cp-dropdown" />
+            <button class="cp-clear" id="cp-clear" aria-label="Clear selection" style="display:none">&#x2715;</button>
+            <span class="cp-chevron" id="cp-chevron" aria-hidden="true">
+              <svg viewBox="0 0 10 6" fill="none" width="12" height="8"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+          <div class="cp-dropdown" id="cp-dropdown" role="listbox" aria-label="Countries">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </div><!-- /.req-left -->
+
+      <!-- Right: teaser photo carousel -->
+      <div class="req-carousel reveal" id="req-carousel" aria-label="Field stories">
+        <div class="rc-track" id="rc-track">
+
+          <div class="rc-slide">
+            <img class="rc-img" src="./img/field-distribute.webp" alt="Bible Runners distributing Bibles in a village" width="720" height="900" loading="lazy" decoding="async" />
+            <div class="rc-overlay">
+              <p class="rc-eyebrow">14+ nations reached</p>
+              <p class="rc-caption-text">Every village that asked — we showed up. No road has stopped us yet.</p>
+              <p class="rc-attr">Uganda &nbsp;&middot;&nbsp; Kenya &nbsp;&middot;&nbsp; India &nbsp;&middot;&nbsp; Tanzania</p>
+            </div>
+          </div>
+
+          <div class="rc-slide">
+            <img class="rc-img" src="./img/field-reading.webp" alt="A woman reading her first Bible" width="720" height="900" loading="lazy" decoding="async" />
+            <div class="rc-overlay">
+              <p class="rc-eyebrow">Grace N. &nbsp;&middot;&nbsp; Kisumu, Kenya</p>
+              <p class="rc-caption-text">"I prayed for a Bible for eleven years. The runner placed it in my hands and I did not sleep that night."</p>
+              <p class="rc-attr">2024 &nbsp;&middot;&nbsp; Kenya field run</p>
+            </div>
+          </div>
+
+          <div class="rc-slide">
+            <img class="rc-img" src="./img/field-prayer.webp" alt="A small group praying together in a village" width="720" height="900" loading="lazy" decoding="async" />
+            <div class="rc-overlay">
+              <p class="rc-eyebrow">Pastor Emmanuel &nbsp;&middot;&nbsp; Gulu, Uganda</p>
+              <p class="rc-caption-text">"Our congregation of 40 shared one torn Bible. When the runners came, we wept together."</p>
+              <p class="rc-attr">2025 &nbsp;&middot;&nbsp; Northern Uganda</p>
+            </div>
+          </div>
+
+          <div class="rc-slide rc-slide-cta">
+            <img class="rc-img" src="./img/hero-village.webp" alt="A remote village at dusk" width="720" height="900" loading="lazy" decoding="async" />
+            <div class="rc-overlay">
+              <p class="rc-eyebrow">Is your village next?</p>
+              <p class="rc-caption-text">No village is too small. No road is too far. Select your country and tell us about the need.</p>
+              <p class="rc-attr-cta">Search your country &nbsp;&#8592;</p>
+            </div>
+          </div>
+
+        </div><!-- /.rc-track -->
+        <div class="rc-dots" id="rc-dots" role="tablist" aria-label="Carousel indicators"></div>
+      </div><!-- /.req-carousel -->
+
+    </div><!-- /.req-top-grid -->
 
     <!-- Mac-style browser window -->
     <div class="mac-window" id="mac-window">
@@ -756,6 +807,8 @@ if(!window.location.hash){window.scrollTo(0,0);}
     // reset form if previously submitted
     if(form){form.style.display='';var btn=form.querySelector('[type=submit]');if(btn){btn.textContent='Send Request';btn.disabled=false;}}
     if(success)success.style.display='none';
+    // hide teaser carousel, show mac window
+    if(window._rcHide)window._rcHide();
     void win.offsetWidth;
     win.classList.add('open');
     setTimeout(function(){win.scrollIntoView({behavior:'smooth',block:'nearest'});},60);
@@ -782,11 +835,11 @@ if(!window.location.hash){window.scrollTo(0,0);}
     if(!document.getElementById('cp-wrap').contains(e.target))close();
   });
 
-  // Mac window close (X button and red dot)
+  // Mac window close (X button and red dot) — restore carousel
   var closeBtn=document.getElementById('mac-close');
-  closeBtn&&closeBtn.addEventListener('click',function(){win.classList.remove('open');});
+  closeBtn&&closeBtn.addEventListener('click',function(){win.classList.remove('open');if(window._rcShow)window._rcShow();});
   var redDot=win.querySelector('.mac-red');
-  redDot&&redDot.addEventListener('click',function(){win.classList.remove('open');});
+  redDot&&redDot.addEventListener('click',function(){win.classList.remove('open');if(window._rcShow)window._rcShow();});
 
   // Form submit
   form&&form.addEventListener('submit',function(e){
@@ -803,6 +856,50 @@ if(!window.location.hash){window.scrollTo(0,0);}
       })
       .catch(function(){btn.textContent='Connection error — please try again.';btn.disabled=false;});
   });
+})();
+
+// Request section teaser carousel
+(function(){
+  var carousel=document.getElementById('req-carousel');
+  var track=document.getElementById('rc-track');
+  var dotsWrap=document.getElementById('rc-dots');
+  if(!carousel||!track||!dotsWrap)return;
+  var slides=track.querySelectorAll('.rc-slide');
+  var total=slides.length, cur=0, timer;
+
+  // Build dot nav
+  for(var i=0;i<total;i++){
+    var d=document.createElement('button');
+    d.className='rc-dot'+(i===0?' active':'');
+    d.setAttribute('role','tab');
+    d.setAttribute('aria-label','Slide '+(i+1)+' of '+total);
+    d.dataset.idx=i;
+    d.addEventListener('click',function(){rcGo(parseInt(this.dataset.idx));});
+    dotsWrap.appendChild(d);
+  }
+
+  slides[0].classList.add('rc-active');
+
+  function rcGo(n){
+    slides[cur].classList.remove('rc-active');
+    cur=(n+total)%total;
+    slides[cur].classList.add('rc-active');
+    track.style.transform='translateX(-'+(cur*100)+'%)';
+    dotsWrap.querySelectorAll('.rc-dot').forEach(function(dot,i){
+      dot.classList.toggle('active',i===cur);
+    });
+  }
+
+  function rcStart(){timer=setInterval(function(){rcGo(cur+1);},4500);}
+  function rcStop(){clearInterval(timer);}
+
+  rcStart();
+  carousel.addEventListener('mouseenter',rcStop);
+  carousel.addEventListener('mouseleave',rcStart);
+
+  // Expose for pick() / close() to call
+  window._rcHide=function(){carousel.style.display='none';rcStop();};
+  window._rcShow=function(){carousel.style.display='';rcStart();};
 })();
 
 // Conversion-event stubs — ready for Meta Pixel + GA4

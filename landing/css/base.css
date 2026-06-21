@@ -207,8 +207,75 @@ section:not(.hero):not(.stats){padding:var(--space-section) 0}
 /* Village request — mac browser tab design */
 .village-request{background:var(--bone)}
 
+/* 2-col layout: left (text + input) | right (teaser carousel) */
+.req-top-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:56px;
+  align-items:start;
+  margin-bottom:40px;
+}
+.req-left{min-width:0}
+
+/* Teaser carousel */
+.req-carousel{
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+  aspect-ratio:3/4;
+  background:var(--forest);
+}
+.rc-track{
+  display:flex;
+  height:100%;
+  transition:transform .55s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+}
+.rc-slide{
+  min-width:100%;height:100%;
+  position:relative;overflow:hidden;flex-shrink:0;
+}
+.rc-img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:saturate(.65) brightness(.72);
+  transition:transform 6s ease;
+}
+.rc-slide.rc-active .rc-img{transform:scale(1.05)}
+.rc-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(8,17,10,.9) 0%,rgba(8,17,10,.3) 55%,transparent 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:28px 26px;
+}
+.rc-eyebrow{
+  font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ochre-soft);margin:0 0 10px;
+}
+.rc-caption-text{
+  font-family:var(--serif);font-style:italic;font-size:clamp(14px,1.6vw,17px);
+  color:#f0ece0;line-height:1.48;margin:0 0 14px;
+}
+.rc-attr{
+  font-size:11px;font-weight:700;letter-spacing:.05em;
+  color:rgba(255,253,247,.45);margin:0;
+}
+.rc-attr-cta{
+  font-size:13px;font-weight:800;color:var(--ochre-soft);
+  letter-spacing:.04em;margin:0;
+}
+.rc-dots{
+  position:absolute;bottom:14px;right:14px;
+  display:flex;gap:6px;
+}
+.rc-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.28);border:none;cursor:pointer;
+  transition:background .2s,transform .2s;padding:0;
+}
+.rc-dot.active{background:var(--ochre);transform:scale(1.5)}
+
 /* Country autocomplete combobox */
-.cp-wrap{margin-top:44px;position:relative;max-width:540px}
+.cp-wrap{margin-top:36px;position:relative;max-width:none}
 .cp-input-row{
   display:flex;align-items:center;gap:10px;
   border:1.5px solid #c7c7c7;border-radius:10px;
@@ -322,6 +389,10 @@ section:not(.hero):not(.stats){padding:var(--space-section) 0}
   .mac-body{padding:24px 20px 28px}
   .vr-grid{grid-template-columns:1fr}
   .ctab{font-size:12px;padding:7px 12px}
+}
+@media(max-width:860px){
+  .req-top-grid{grid-template-columns:1fr;gap:32px}
+  .req-carousel{aspect-ratio:16/9}
 }
 
 /* Cost breakdown */
