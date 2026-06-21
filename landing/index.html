@@ -180,23 +180,26 @@
       <p class="lead">Select your country below. Every request is prayed over and reviewed by our field team — no village too small, no road too far.</p>
     </div>
 
-    <!-- Country tabs -->
-    <div class="ctab-bar reveal" id="ctab-bar" role="tablist">
-      <button class="ctab" role="tab" data-country="Kenya">Kenya</button>
-      <button class="ctab" role="tab" data-country="Uganda">Uganda</button>
-      <button class="ctab" role="tab" data-country="Pakistan">Pakistan</button>
-      <button class="ctab" role="tab" data-country="India">India</button>
-      <button class="ctab" role="tab" data-country="Philippines">Philippines</button>
-      <button class="ctab" role="tab" data-country="Rwanda">Rwanda</button>
-      <button class="ctab" role="tab" data-country="Tanzania">Tanzania</button>
-      <button class="ctab" role="tab" data-country="Malawi">Malawi</button>
-      <button class="ctab" role="tab" data-country="Nigeria">Nigeria</button>
-      <button class="ctab" role="tab" data-country="South Sudan">S. Sudan</button>
-      <button class="ctab" role="tab" data-country="Cambodia">Cambodia</button>
-      <button class="ctab" role="tab" data-country="Guinea">Guinea</button>
-      <button class="ctab" role="tab" data-country="Zambia">Zambia</button>
-      <button class="ctab" role="tab" data-country="Peru">Peru</button>
-      <button class="ctab" role="tab" data-country="Other">Other country &#x2197;</button>
+    <!-- Country autocomplete combobox -->
+    <div class="cp-wrap reveal" id="cp-wrap">
+      <div class="cp-input-row" id="cp-input-row">
+        <svg class="cp-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M14 14l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="cp-input" class="cp-input"
+          placeholder="Type or scroll to find your country..."
+          autocomplete="off" spellcheck="false"
+          role="combobox" aria-autocomplete="list"
+          aria-haspopup="listbox" aria-expanded="false" aria-controls="cp-dropdown" />
+        <button class="cp-clear" id="cp-clear" aria-label="Clear selection" style="display:none">&#x2715;</button>
+        <span class="cp-chevron" id="cp-chevron" aria-hidden="true">
+          <svg viewBox="0 0 10 6" fill="none" width="12" height="8"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </div>
+      <div class="cp-dropdown" id="cp-dropdown" role="listbox" aria-label="Countries">
+        <!-- populated by JS -->
+      </div>
     </div>
 
     <!-- Mac-style browser window -->
@@ -231,10 +234,6 @@
               <label for="vr-language">Primary language spoken</label>
               <input type="text" id="vr-language" name="language" placeholder="e.g. Swahili, Hindi, Amharic" />
             </div>
-          </div>
-          <div class="vr-field vr-full" id="vr-other-wrap" style="display:none">
-            <label for="vr-other-country">Your country</label>
-            <input type="text" id="vr-other-country" name="country_other" placeholder="Enter your country" />
           </div>
           <div class="vr-field vr-full">
             <label for="vr-size">Estimated community size</label>
@@ -500,81 +499,170 @@ if(!window.location.hash){window.scrollTo(0,0);}
   },18000);
 })();
 
-// Village request — country tabs open a mac-style browser window
+// Country autocomplete → mac window
 (function(){
-  var tabs=document.querySelectorAll('.ctab');
+  var COUNTRIES=['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda',
+    'Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh',
+    'Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia',
+    'Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso',
+    'Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic',
+    'Chad','Chile','China','Colombia','Comoros','Congo (Republic)','Congo (Dem. Rep.)',
+    'Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti',
+    'Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea',
+    'Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon',
+    'Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea',
+    'Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia',
+    'Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan',
+    'Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho',
+    'Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi',
+    'Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius',
+    'Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco',
+    'Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand',
+    'Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman',
+    'Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru',
+    'Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda',
+    'Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines',
+    'Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia',
+    'Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands',
+    'Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan',
+    'Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania',
+    'Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey',
+    'Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom',
+    'United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela',
+    'Vietnam','Yemen','Zambia','Zimbabwe'];
+
+  var input=document.getElementById('cp-input');
+  var dropdown=document.getElementById('cp-dropdown');
+  var clearBtn=document.getElementById('cp-clear');
+  var chevron=document.getElementById('cp-chevron');
+  var inputRow=document.getElementById('cp-input-row');
   var win=document.getElementById('mac-window');
   var urlBar=document.getElementById('mac-url-bar');
   var countryDisplay=document.getElementById('vr-country-display');
   var countryInput=document.getElementById('vr-country');
-  var closeBtn=document.getElementById('mac-close');
   var form=document.getElementById('vr-form');
   var success=document.getElementById('vr-success');
-  var otherWrap=document.getElementById('vr-other-wrap');
-  if(!tabs.length||!win)return;
+  if(!input||!dropdown||!win)return;
 
-  function openFor(country){
-    var slug=country.toLowerCase().replace(/\s+/g,'-');
-    urlBar.textContent='projectbiblerunners.com/request/'+slug;
-    if(countryDisplay)countryDisplay.textContent=country;
-    if(countryInput)countryInput.value=country==='Other'?'':country;
-    if(otherWrap)otherWrap.style.display=country==='Other'?'flex':'none';
-    if(!win.classList.contains('open')){
-      win.classList.remove('open');
-      // force reflow so animation re-fires when switching tabs
-      void win.offsetWidth;
-      win.classList.add('open');
-    }
+  var activeIdx=-1, isOpen=false, selected=null;
+
+  function filtered(q){
+    if(!q)return COUNTRIES;
+    var lq=q.toLowerCase();
+    var a=COUNTRIES.filter(function(c){return c.toLowerCase().startsWith(lq);});
+    var b=COUNTRIES.filter(function(c){return !c.toLowerCase().startsWith(lq)&&c.toLowerCase().includes(lq);});
+    return a.concat(b);
   }
 
-  tabs.forEach(function(tab){
-    tab.addEventListener('click',function(){
-      tabs.forEach(function(t){t.classList.remove('active');});
-      tab.classList.add('active');
-      openFor(tab.dataset.country);
-      // scroll window into view smoothly
-      setTimeout(function(){
-        win.scrollIntoView({behavior:'smooth',block:'nearest'});
-      },60);
+  function hl(text,q){
+    if(!q)return text;
+    var i=text.toLowerCase().indexOf(q.toLowerCase());
+    if(i<0)return text;
+    return text.slice(0,i)+'<em>'+text.slice(i,i+q.length)+'</em>'+text.slice(i+q.length);
+  }
+
+  function renderList(q){
+    var list=filtered(q);
+    if(!list.length){dropdown.innerHTML='<div class="cp-empty">No countries found</div>';return;}
+    var html='<ul class="cp-list">';
+    list.forEach(function(c){
+      html+='<li class="cp-item'+(c===selected?' cp-selected':'')+'" data-country="'+c+'">'+hl(c,q)+'</li>';
     });
+    html+='</ul>';
+    dropdown.innerHTML=html;
+    activeIdx=-1;
+    dropdown.querySelectorAll('.cp-item').forEach(function(li){
+      li.addEventListener('mousedown',function(e){e.preventDefault();pick(li.dataset.country);});
+    });
+    // scroll active selection into view
+    var sel=dropdown.querySelector('.cp-selected');
+    if(sel)sel.scrollIntoView({block:'nearest'});
+  }
+
+  function open(){
+    if(isOpen)return;
+    isOpen=true;
+    renderList(input.value);
+    dropdown.classList.add('open');
+    inputRow.classList.add('open');
+    chevron.classList.add('open');
+    input.setAttribute('aria-expanded','true');
+  }
+
+  function close(){
+    if(!isOpen)return;
+    isOpen=false;
+    dropdown.classList.remove('open');
+    inputRow.classList.remove('open');
+    chevron.classList.remove('open');
+    input.setAttribute('aria-expanded','false');
+    activeIdx=-1;
+  }
+
+  function setActive(items,idx){
+    items.forEach(function(li,i){li.classList.toggle('cp-active',i===idx);});
+    if(idx>=0&&items[idx])items[idx].scrollIntoView({block:'nearest'});
+  }
+
+  function pick(country){
+    selected=country;
+    input.value=country;
+    clearBtn.style.display='block';
+    close();
+    // open mac window
+    var slug=country.toLowerCase().replace(/\s+/g,'-').replace(/[().]/g,'');
+    if(urlBar)urlBar.textContent='projectbiblerunners.com/request/'+slug;
+    if(countryDisplay)countryDisplay.textContent=country;
+    if(countryInput)countryInput.value=country;
+    // reset form if previously submitted
+    if(form){form.style.display='';var btn=form.querySelector('[type=submit]');if(btn){btn.textContent='Send Request';btn.disabled=false;}}
+    if(success)success.style.display='none';
+    void win.offsetWidth;
+    win.classList.add('open');
+    setTimeout(function(){win.scrollIntoView({behavior:'smooth',block:'nearest'});},60);
+  }
+
+  input.addEventListener('focus',function(){open();});
+  input.addEventListener('input',function(){
+    clearBtn.style.display=this.value?'block':'none';
+    if(!isOpen)open(); else renderList(this.value);
+  });
+  input.addEventListener('keydown',function(e){
+    var items=dropdown.querySelectorAll('.cp-item');
+    if(!isOpen){if(e.key==='ArrowDown'||e.key==='Enter')open();return;}
+    if(e.key==='ArrowDown'){e.preventDefault();activeIdx=Math.min(activeIdx+1,items.length-1);setActive(items,activeIdx);}
+    else if(e.key==='ArrowUp'){e.preventDefault();activeIdx=Math.max(activeIdx-1,0);setActive(items,activeIdx);}
+    else if(e.key==='Enter'){e.preventDefault();if(activeIdx>=0&&items[activeIdx])pick(items[activeIdx].dataset.country);}
+    else if(e.key==='Escape'){close();input.blur();}
+  });
+  clearBtn&&clearBtn.addEventListener('click',function(){
+    input.value='';selected=null;clearBtn.style.display='none';
+    input.focus();renderList('');
+  });
+  document.addEventListener('mousedown',function(e){
+    if(!document.getElementById('cp-wrap').contains(e.target))close();
   });
 
-  closeBtn&&closeBtn.addEventListener('click',function(){
-    win.classList.remove('open');
-    tabs.forEach(function(t){t.classList.remove('active');});
-  });
-
-  // Red dot also closes (mac convention)
+  // Mac window close (X button and red dot)
+  var closeBtn=document.getElementById('mac-close');
+  closeBtn&&closeBtn.addEventListener('click',function(){win.classList.remove('open');});
   var redDot=win.querySelector('.mac-red');
-  redDot&&redDot.addEventListener('click',function(){
-    win.classList.remove('open');
-    tabs.forEach(function(t){t.classList.remove('active');});
-  });
+  redDot&&redDot.addEventListener('click',function(){win.classList.remove('open');});
 
-  // Form submission
+  // Form submit
   form&&form.addEventListener('submit',function(e){
     e.preventDefault();
-    // If "Other" country, copy the text input to the hidden field
-    var otherField=document.getElementById('vr-other-country');
-    if(otherField&&otherField.value&&!countryInput.value){
-      countryInput.value=otherField.value;
-    }
     var btn=form.querySelector('[type=submit]');
     btn.textContent='Sending...';btn.disabled=true;
     fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}})
       .then(function(r){
         if(r.ok){
-          form.style.display='none';
-          success.style.display='block';
+          form.style.display='none';success.style.display='block';
           if(window.fbq)fbq('trackCustom','village_request',{country:countryInput.value});
           if(window.gtag)gtag('event','village_request',{country:countryInput.value});
-        } else {
-          btn.textContent='Something went wrong — email us directly.';btn.disabled=false;
-        }
+        } else{btn.textContent='Something went wrong — email us directly.';btn.disabled=false;}
       })
-      .catch(function(){
-        btn.textContent='Connection error — please try again.';btn.disabled=false;
-      });
+      .catch(function(){btn.textContent='Connection error — please try again.';btn.disabled=false;});
   });
 })();
 
