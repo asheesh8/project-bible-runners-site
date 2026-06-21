@@ -67,6 +67,19 @@
       <span class="hero-verse-ref" id="verse-ref"></span>
       <div class="verse-dots" id="verse-dots"></div>
     </div>
+
+    <!-- YTD Bibles placed counter -->
+    <div class="hero-ytd reveal" id="hero-ytd" aria-label="Year-to-date Bibles placed">
+      <div class="ytd-top">
+        <span class="ytd-label">Bibles placed in 2026</span>
+        <span class="ytd-pct"><span id="ytd-pct-num">0</span>% of goal</span>
+      </div>
+      <div class="ytd-count"><span id="ytd-num">0</span></div>
+      <div class="ytd-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ytd-bar">
+        <div class="ytd-bar-fill" id="ytd-bar-fill"></div>
+      </div>
+      <div class="ytd-subline">Goal: <b>8,000</b> Bibles this year &nbsp;·&nbsp; 14+ nations</div>
+    </div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 96" preserveAspectRatio="none" aria-hidden="true">
     <path d="M0 55C212 86 352 28 541 52C761 81 909 27 1110 52C1260 72 1360 62 1440 38V96H0Z" />
@@ -98,7 +111,7 @@
       </ul>
     </div>
     <div class="photo-card ratio-portrait reveal">
-      <img src="./img/receiving.webp" alt="A believer lifts an open Bible to the sky in a village" width="900" height="1675" loading="lazy" decoding="async" />
+      <img src="./img/receiving.webp" alt="A believer holds a Bible she received in Uganda" width="1536" height="1920" loading="lazy" decoding="async" />
       <div class="cap">A believer lifts the Bible she prayed years to hold.</div>
     </div>
   </div>
@@ -622,6 +635,47 @@ if(!window.location.hash){window.scrollTo(0,0);}
     },{threshold:.5});
     io2.observe(cs);
   }
+})();
+
+// ── YTD Bibles placed counter ───────────────────────────
+(function(){
+  var YTD_COUNT = 4892;
+  var YTD_GOAL  = 8000;
+  var pct = Math.round(YTD_COUNT / YTD_GOAL * 100);
+
+  var numEl  = document.getElementById('ytd-num');
+  var pctEl  = document.getElementById('ytd-pct-num');
+  var barEl  = document.getElementById('ytd-bar-fill');
+  var barAriaEl = document.getElementById('ytd-bar');
+  if(!numEl||!barEl) return;
+
+  var fired = false;
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  function fmt(n){ return n.toLocaleString('en-US'); }
+  function countUp(el, to, dur){
+    if(reduce){ el.textContent=fmt(to); return; }
+    var start=performance.now();
+    (function tick(now){
+      var p=Math.min((now-start)/dur,1), e=1-Math.pow(1-p,3);
+      el.textContent=fmt(Math.round(to*e));
+      if(p<1) requestAnimationFrame(tick);
+    })(start);
+  }
+
+  var io=new IntersectionObserver(function(es){
+    if(!es[0].isIntersecting||fired) return;
+    fired=true; io.disconnect();
+    countUp(numEl, YTD_COUNT, 2200);
+    countUp(pctEl, pct, 2200);
+    setTimeout(function(){
+      barEl.style.width = pct+'%';
+      if(barAriaEl) barAriaEl.setAttribute('aria-valuenow', pct);
+    }, 120);
+  },{threshold:0.3});
+
+  var ytdEl=document.getElementById('hero-ytd');
+  if(ytdEl) io.observe(ytdEl);
 })();
 
 // ── Rotating Bible verses ────────────────────────────────
