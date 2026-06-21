@@ -221,7 +221,7 @@ header.nav{background:var(--forest)}
     <nav class="nav-links">
       <a class="lnk" href="./index.html#why">The Need</a>
       <a class="lnk" href="./index.html#give">Ways to Give</a>
-      <a class="btn btn-give btn-sm" href="./donate.html?amount=7" data-track="donation_started" data-source="run_nav">Give a Bible &middot; $7</a>
+      <a class="btn btn-give btn-sm" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=7" target="_blank" rel="noopener" data-track="donation_started" data-source="run_nav">Give a Bible &middot; $7</a>
     </nav>
   </div>
 </header>
@@ -271,7 +271,7 @@ header.nav{background:var(--forest)}
       <a class="btn btn-give run-give-main" id="run-give-btn" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN" target="_blank" rel="noopener" data-track="donation_started" data-source="run_hero">
         Give to This Run &rarr;
       </a>
-      <a class="run-give-other" href="./donate.html">Or choose an amount &darr;</a>
+      <a class="run-give-other" href="#give">Or choose an amount &darr;</a>
     </div>
   </div>
 </section>
@@ -302,22 +302,22 @@ header.nav{background:var(--forest)}
       <h2>Choose how far your gift runs.</h2>
     </div>
     <div class="impact-grid">
-      <a class="impact-card reveal" href="./donate.html?amount=7">
+      <a class="impact-card reveal" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=7" target="_blank" rel="noopener" data-run-link="7">
         <div class="ic-amt">$7</div>
         <div class="ic-label">One Bible</div>
         <p class="ic-desc">A native-language Bible placed in the hands of a believer who has been praying for one for years.</p>
       </a>
-      <a class="impact-card reveal" href="./donate.html?amount=35">
+      <a class="impact-card reveal" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=35" target="_blank" rel="noopener" data-run-link="35">
         <div class="ic-amt">$35</div>
         <div class="ic-label">Family Bundle</div>
         <p class="ic-desc">Five Bibles — enough for an entire family or a small gathering of new believers.</p>
       </a>
-      <a class="impact-card reveal" href="./donate.html?amount=70">
+      <a class="impact-card reveal" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=70" target="_blank" rel="noopener" data-run-link="70">
         <div class="ic-amt">$70</div>
         <div class="ic-label">Congregation Pack</div>
         <p class="ic-desc">Ten Bibles for a rural congregation that has been sharing one torn copy between dozens of members.</p>
       </a>
-      <a class="impact-card reveal" href="./donate.html?amount=500">
+      <a class="impact-card reveal" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=500" target="_blank" rel="noopener" data-run-link="500">
         <div class="ic-amt">$500</div>
         <div class="ic-label">VillageServer Kit</div>
         <p class="ic-desc">A complete solar-powered offline Bible library for an entire village — no internet required.</p>
@@ -369,10 +369,10 @@ header.nav{background:var(--forest)}
     <h2>Ready to run with us?</h2>
     <p class="run-cta-sub">Every dollar closes the gap before the team leaves. Give in the next <span id="cta-days">18</span> days and your gift goes on this run.</p>
     <div class="run-tier-row">
-      <a class="run-tier-btn" href="./donate.html?amount=7"><span>$7</span><small>1 Bible</small></a>
-      <a class="run-tier-btn" href="./donate.html?amount=35"><span>$35</span><small>5 Bibles</small></a>
-      <a class="run-tier-btn" href="./donate.html?amount=70"><span>$70</span><small>10 Bibles</small></a>
-      <a class="run-tier-btn" href="./donate.html?amount=500"><span>$500</span><small>VillageServer</small></a>
+      <a class="run-tier-btn" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=7" target="_blank" rel="noopener" data-run-link="7"><span>$7</span><small>1 Bible</small></a>
+      <a class="run-tier-btn" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=35" target="_blank" rel="noopener" data-run-link="35"><span>$35</span><small>5 Bibles</small></a>
+      <a class="run-tier-btn" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=70" target="_blank" rel="noopener" data-run-link="70"><span>$70</span><small>10 Bibles</small></a>
+      <a class="run-tier-btn" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN?amount=500" target="_blank" rel="noopener" data-run-link="500"><span>$500</span><small>VillageServer</small></a>
     </div>
     <p class="run-cta-or">— or —</p>
     <a class="btn btn-give run-cta-main" id="cta-give-btn" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN" target="_blank" rel="noopener" data-track="donation_started" data-source="run_cta">
@@ -507,6 +507,13 @@ window.scrollTo(0,0);
       if(c.zeffy_url){
         document.getElementById('run-give-btn').href = c.zeffy_url;
         document.getElementById('cta-give-btn').href = c.zeffy_url;
+        // Update all amount-specific links to use the live Zeffy URL
+        document.querySelectorAll('[data-run-link]').forEach(function(el){
+          el.href = c.zeffy_url + '?amount=' + el.dataset.runLink;
+        });
+        // Nav button too
+        var navBtn = document.querySelector('.nav-links .btn-give');
+        if(navBtn) navBtn.href = c.zeffy_url + '?amount=7';
       }
       // Update title/desc
       if(c.name) document.getElementById('run-title').textContent = c.name;
