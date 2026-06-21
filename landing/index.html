@@ -177,55 +177,92 @@
     <div class="sec-head reveal">
       <p class="eyebrow">Request a visit</p>
       <h2>Is your village waiting for Bibles?</h2>
-      <p class="lead">If you know of a community with believers who don't have Scripture in their language, tell us. Every request is prayed over and reviewed by our field team — no request too small, no village too far.</p>
+      <p class="lead">Select your country below. Every request is prayed over and reviewed by our field team — no village too small, no road too far.</p>
     </div>
-    <form class="vr-form reveal" id="vr-form" action="https://formspree.io/f/PENDING" method="POST">
-      <div class="vr-grid">
-        <div class="vr-field">
-          <label for="vr-name">Your name</label>
-          <input type="text" id="vr-name" name="name" placeholder="Full name" required />
-        </div>
-        <div class="vr-field">
-          <label for="vr-contact">Email or WhatsApp</label>
-          <input type="text" id="vr-contact" name="contact" placeholder="How we can reach you" required />
-        </div>
-        <div class="vr-field">
-          <label for="vr-country">Country</label>
-          <input type="text" id="vr-country" name="country" placeholder="Country" required />
-        </div>
-        <div class="vr-field">
-          <label for="vr-village">Village or region</label>
-          <input type="text" id="vr-village" name="village" placeholder="Name of village or nearest town" />
-        </div>
-        <div class="vr-field">
-          <label for="vr-language">Primary language spoken</label>
-          <input type="text" id="vr-language" name="language" placeholder="e.g. Swahili, Hindi, Amharic" />
-        </div>
-        <div class="vr-field">
-          <label for="vr-size">Estimated community size</label>
-          <select id="vr-size" name="community_size">
-            <option value="">Select an estimate</option>
-            <option value="under-50">Under 50 people</option>
-            <option value="50-200">50–200 people</option>
-            <option value="200-500">200–500 people</option>
-            <option value="500+">500 or more people</option>
-          </select>
-        </div>
-      </div>
-      <div class="vr-field vr-full">
-        <label for="vr-message">Tell us about the need</label>
-        <textarea id="vr-message" name="message" rows="4" placeholder="How did you hear about this community? Are there believers there without Bibles? Any context that helps our team pray and prepare."></textarea>
-      </div>
-      <div class="vr-foot">
-        <button type="submit" class="btn btn-give" data-track="village_request">Send Request</button>
-        <p class="vr-note">Every request is read by a real person on our field team.<br>We'll respond within a few days.</p>
-      </div>
-    </form>
-    <div class="vr-form vr-success" id="vr-success">
-      <div class="vr-check">&#9749;</div>
-      <h3>Your request is in our hands — and His.</h3>
-      <p>We've received your message and will be praying over it. Someone from our field team will reach out to you within a few days.</p>
+
+    <!-- Country tabs -->
+    <div class="ctab-bar reveal" id="ctab-bar" role="tablist">
+      <button class="ctab" role="tab" data-country="Kenya">Kenya</button>
+      <button class="ctab" role="tab" data-country="Uganda">Uganda</button>
+      <button class="ctab" role="tab" data-country="Pakistan">Pakistan</button>
+      <button class="ctab" role="tab" data-country="India">India</button>
+      <button class="ctab" role="tab" data-country="Philippines">Philippines</button>
+      <button class="ctab" role="tab" data-country="Rwanda">Rwanda</button>
+      <button class="ctab" role="tab" data-country="Tanzania">Tanzania</button>
+      <button class="ctab" role="tab" data-country="Malawi">Malawi</button>
+      <button class="ctab" role="tab" data-country="Nigeria">Nigeria</button>
+      <button class="ctab" role="tab" data-country="South Sudan">S. Sudan</button>
+      <button class="ctab" role="tab" data-country="Cambodia">Cambodia</button>
+      <button class="ctab" role="tab" data-country="Guinea">Guinea</button>
+      <button class="ctab" role="tab" data-country="Zambia">Zambia</button>
+      <button class="ctab" role="tab" data-country="Peru">Peru</button>
+      <button class="ctab" role="tab" data-country="Other">Other country &#x2197;</button>
     </div>
+
+    <!-- Mac-style browser window -->
+    <div class="mac-window" id="mac-window">
+      <div class="mac-chrome">
+        <div class="mac-dots" aria-hidden="true">
+          <span class="mac-dot mac-red"></span>
+          <span class="mac-dot mac-yellow"></span>
+          <span class="mac-dot mac-green"></span>
+        </div>
+        <div class="mac-url-bar" id="mac-url-bar">projectbiblerunners.com/request</div>
+        <button class="mac-close-btn" id="mac-close" aria-label="Close form">&#x2715;</button>
+      </div>
+      <div class="mac-body">
+        <form id="vr-form" action="https://formspree.io/f/PENDING" method="POST">
+          <p class="vr-country-head">Request a visit to <span id="vr-country-display"></span></p>
+          <input type="hidden" id="vr-country" name="country" />
+          <div class="vr-grid">
+            <div class="vr-field">
+              <label for="vr-name">Your name</label>
+              <input type="text" id="vr-name" name="name" placeholder="Full name" required />
+            </div>
+            <div class="vr-field">
+              <label for="vr-contact">Email or WhatsApp</label>
+              <input type="text" id="vr-contact" name="contact" placeholder="How we can reach you" required />
+            </div>
+            <div class="vr-field">
+              <label for="vr-village">Village or region</label>
+              <input type="text" id="vr-village" name="village" placeholder="Name of village or nearest town" />
+            </div>
+            <div class="vr-field">
+              <label for="vr-language">Primary language spoken</label>
+              <input type="text" id="vr-language" name="language" placeholder="e.g. Swahili, Hindi, Amharic" />
+            </div>
+          </div>
+          <div class="vr-field vr-full" id="vr-other-wrap" style="display:none">
+            <label for="vr-other-country">Your country</label>
+            <input type="text" id="vr-other-country" name="country_other" placeholder="Enter your country" />
+          </div>
+          <div class="vr-field vr-full">
+            <label for="vr-size">Estimated community size</label>
+            <select id="vr-size" name="community_size">
+              <option value="">Select an estimate</option>
+              <option value="under-50">Under 50 people</option>
+              <option value="50-200">50–200 people</option>
+              <option value="200-500">200–500 people</option>
+              <option value="500+">500 or more people</option>
+            </select>
+          </div>
+          <div class="vr-field vr-full">
+            <label for="vr-message">Tell us about the need</label>
+            <textarea id="vr-message" name="message" rows="4" placeholder="How did you hear about this community? Are there believers there without Bibles? Any context that helps our team pray and prepare."></textarea>
+          </div>
+          <div class="vr-foot">
+            <button type="submit" class="btn btn-give" data-track="village_request">Send Request</button>
+            <p class="vr-note">Every request is read by a real person on our field team.<br>We respond within a few days.</p>
+          </div>
+        </form>
+        <div class="vr-success" id="vr-success" style="display:none">
+          <div class="vr-check">&#9749;</div>
+          <h3>Your request is in our hands — and His.</h3>
+          <p>We received your message and will be praying over it. Someone from our field team will reach out within a few days.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -463,26 +500,80 @@ if(!window.location.hash){window.scrollTo(0,0);}
   },18000);
 })();
 
-// Village request form — show inline success instead of redirecting
+// Village request — country tabs open a mac-style browser window
 (function(){
+  var tabs=document.querySelectorAll('.ctab');
+  var win=document.getElementById('mac-window');
+  var urlBar=document.getElementById('mac-url-bar');
+  var countryDisplay=document.getElementById('vr-country-display');
+  var countryInput=document.getElementById('vr-country');
+  var closeBtn=document.getElementById('mac-close');
   var form=document.getElementById('vr-form');
-  if(!form)return;
-  form.addEventListener('submit',function(e){
+  var success=document.getElementById('vr-success');
+  var otherWrap=document.getElementById('vr-other-wrap');
+  if(!tabs.length||!win)return;
+
+  function openFor(country){
+    var slug=country.toLowerCase().replace(/\s+/g,'-');
+    urlBar.textContent='projectbiblerunners.com/request/'+slug;
+    if(countryDisplay)countryDisplay.textContent=country;
+    if(countryInput)countryInput.value=country==='Other'?'':country;
+    if(otherWrap)otherWrap.style.display=country==='Other'?'flex':'none';
+    if(!win.classList.contains('open')){
+      win.classList.remove('open');
+      // force reflow so animation re-fires when switching tabs
+      void win.offsetWidth;
+      win.classList.add('open');
+    }
+  }
+
+  tabs.forEach(function(tab){
+    tab.addEventListener('click',function(){
+      tabs.forEach(function(t){t.classList.remove('active');});
+      tab.classList.add('active');
+      openFor(tab.dataset.country);
+      // scroll window into view smoothly
+      setTimeout(function(){
+        win.scrollIntoView({behavior:'smooth',block:'nearest'});
+      },60);
+    });
+  });
+
+  closeBtn&&closeBtn.addEventListener('click',function(){
+    win.classList.remove('open');
+    tabs.forEach(function(t){t.classList.remove('active');});
+  });
+
+  // Red dot also closes (mac convention)
+  var redDot=win.querySelector('.mac-red');
+  redDot&&redDot.addEventListener('click',function(){
+    win.classList.remove('open');
+    tabs.forEach(function(t){t.classList.remove('active');});
+  });
+
+  // Form submission
+  form&&form.addEventListener('submit',function(e){
     e.preventDefault();
-    var data=new FormData(form);
-    fetch(form.action,{method:'POST',body:data,headers:{'Accept':'application/json'}})
+    // If "Other" country, copy the text input to the hidden field
+    var otherField=document.getElementById('vr-other-country');
+    if(otherField&&otherField.value&&!countryInput.value){
+      countryInput.value=otherField.value;
+    }
+    var btn=form.querySelector('[type=submit]');
+    btn.textContent='Sending...';btn.disabled=true;
+    fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}})
       .then(function(r){
         if(r.ok){
           form.style.display='none';
-          document.getElementById('vr-success').style.display='block';
-          if(window.fbq)fbq('trackCustom','village_request');
-          if(window.gtag)gtag('event','village_request');
+          success.style.display='block';
+          if(window.fbq)fbq('trackCustom','village_request',{country:countryInput.value});
+          if(window.gtag)gtag('event','village_request',{country:countryInput.value});
         } else {
-          form.querySelector('[type=submit]').textContent='Something went wrong — try emailing us directly.';
+          btn.textContent='Something went wrong — email us directly.';btn.disabled=false;
         }
       })
       .catch(function(){
-        form.querySelector('[type=submit]').textContent='Connection error — please try again.';
+        btn.textContent='Connection error — please try again.';btn.disabled=false;
       });
   });
 })();
