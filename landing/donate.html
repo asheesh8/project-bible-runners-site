@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Give — Project Bible Runners</title>
+<meta name="description" content="Place a Bible in waiting hands or power an entire village's offline Bible library. 100% of your gift goes to the mission." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/base.css">
+
+<style>
+/* ── Page shell ─────────────────────────────────────────── */
+body{background:var(--bone)}
+header.nav{position:static;background:var(--forest)}
+.donate-wrap{max-width:480px;margin:0 auto;padding:0 0 100px}
+
+/* ── Org banner ─────────────────────────────────────────── */
+.donate-banner{position:relative;height:210px;overflow:hidden;background:var(--forest);flex-shrink:0}
+.donate-banner img{width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:saturate(.72) brightness(.78)}
+.donate-banner-meta{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:52px 20px 15px;
+  background:linear-gradient(transparent,rgba(8,17,10,.75));
+  display:flex;align-items:center;gap:9px
+}
+.donate-banner-meta .mark{
+  width:26px;height:26px;border-radius:5px;background:var(--ochre);
+  position:relative;flex:0 0 auto
+}
+.donate-banner-meta .mark:before{content:"";position:absolute;inset:6px 12px;background:var(--bone);border-radius:1px}
+.donate-banner-meta .mark:after{content:"";position:absolute;inset:6px 6px;border-left:2.5px solid var(--bone);border-radius:1px}
+.donate-banner-meta span{font-size:13px;font-weight:700;color:rgba(255,253,247,.9);letter-spacing:.04em}
+
+/* ── Content area ───────────────────────────────────────── */
+.donate-content{padding:26px 24px 0}
+.donate-content h1{font-size:clamp(24px,6vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1.1;color:var(--forest);margin:0 0 10px}
+.donate-desc{font-size:14.5px;color:var(--ink-soft);line-height:1.52;margin:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.donate-more{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:13px;font-weight:700;color:var(--ochre);text-decoration:none}
+.donate-more:hover{color:var(--terra-deep)}
+
+.donate-divider{height:1px;background:var(--line);margin:22px 0}
+
+/* ── Frequency tabs ─────────────────────────────────────── */
+.freq-row{display:flex;gap:8px;margin-bottom:24px}
+.freq-tab{
+  flex:1;padding:10px 8px;
+  border:1.5px solid var(--line);border-radius:var(--radius-ui);
+  background:transparent;font-family:var(--sans);font-size:14px;font-weight:700;
+  color:var(--ink-soft);cursor:pointer;transition:all .18s;line-height:1
+}
+.freq-tab.active{background:var(--forest);border-color:var(--forest);color:var(--bone)}
+.freq-tab[data-freq="monthly"].active{background:transparent;border-color:var(--ochre);color:var(--ochre)}
+
+/* ── Amount grid ────────────────────────────────────────── */
+.choose-label{font-weight:700;font-size:14px;color:var(--ink);margin:0 0 13px}
+.amounts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.amt-btn{
+  padding:13px 12px;border:1.5px solid var(--line);border-radius:var(--radius-ui);
+  background:var(--bone);font-family:var(--sans);font-size:18px;font-weight:700;
+  color:var(--ink);cursor:pointer;transition:all .18s;text-align:center;line-height:1.1
+}
+.amt-btn:hover{border-color:rgba(23,33,24,.35);color:var(--forest)}
+.amt-btn.selected{background:var(--forest);border-color:var(--forest);color:var(--bone)}
+.amt-btn .amt-sub{display:block;font-size:11px;font-weight:600;opacity:.62;margin-top:4px;letter-spacing:.01em}
+.amt-btn.selected .amt-sub{opacity:.75}
+
+/* ── Custom amount input ────────────────────────────────── */
+.custom-amt-wrap{
+  display:flex;align-items:center;
+  border:1.5px solid var(--line);border-radius:var(--radius-ui);
+  background:var(--bone);padding:0 16px;margin-bottom:22px;
+  transition:border-color .18s
+}
+.custom-amt-wrap:focus-within{border-color:var(--forest)}
+.custom-amt-wrap.selected{border-color:var(--forest)}
+.currency-sign{font-size:22px;font-weight:600;color:var(--ink-soft);margin-right:5px;line-height:1}
+.custom-amt-wrap input{
+  flex:1;border:none;background:transparent;
+  font-family:var(--sans);font-size:22px;font-weight:500;color:var(--ink);
+  padding:13px 0;outline:none;width:100%;min-width:0
+}
+.custom-amt-wrap input::placeholder{color:var(--paper-2);font-weight:400}
+
+/* ── Info notes ─────────────────────────────────────────── */
+.donate-note{
+  display:flex;align-items:flex-start;gap:11px;
+  background:var(--paper);border-radius:var(--radius-ui);
+  padding:13px 15px;margin-bottom:10px;
+  font-size:13px;color:var(--ink-soft);line-height:1.5
+}
+.ni{font-size:17px;flex:0 0 auto;line-height:1.2}
+
+/* ── CTA ────────────────────────────────────────────────── */
+.btn-continue{
+  display:flex;width:100%;justify-content:center;
+  margin-top:20px;padding:17px;font-size:16px;
+  border-radius:var(--radius-ui);letter-spacing:.01em
+}
+
+/* ── Zeffy badge ────────────────────────────────────────── */
+.zeffy-badge{
+  text-align:center;margin-top:18px;
+  font-size:13px;font-weight:800;color:var(--ink-soft);
+  letter-spacing:.05em;display:flex;align-items:center;justify-content:center;gap:4px
+}
+.zeffy-badge svg{width:14px;height:14px;fill:currentColor;opacity:.6}
+
+/* ── Mobile ─────────────────────────────────────────────── */
+@media(max-width:600px){
+  .donate-content{padding:22px 20px 0}
+  .donate-banner{height:185px}
+  .btn-continue{padding:16px}
+}
+
+/* ── Testimonial carousel ───────────────────────────────── */
+.tc-section{background:var(--forest);padding:56px 0 64px;overflow:hidden}
+.tc-inner{max-width:820px;margin:0 auto;padding:0 24px}
+.tc-eyebrow{
+  font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ochre-soft);text-align:center;margin:0 0 28px
+}
+.tc-stage{overflow:hidden;border-radius:14px}
+.tc-slides{
+  display:flex;
+  transition:transform .46s cubic-bezier(.4,0,.2,1);
+  will-change:transform
+}
+.tc-slide{
+  min-width:100%;display:grid;grid-template-columns:1fr 1.2fr;
+  background:rgba(255,253,247,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;overflow:hidden
+}
+.tc-img{overflow:hidden}
+.tc-img img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:saturate(.78) brightness(.82)
+}
+.tc-body{
+  padding:38px 36px;display:flex;flex-direction:column;justify-content:center
+}
+.tc-quote{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:clamp(16px,2vw,20px);line-height:1.5;
+  color:#f0ece0;margin:0 0 22px;quotes:none
+}
+.tc-attr{font-size:13px;font-weight:700;color:rgba(255,253,247,.5);letter-spacing:.05em}
+.tc-attr span{color:var(--ochre-soft)}
+.tc-controls{
+  display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px
+}
+.tc-arrow{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,253,247,.65);font-size:16px;cursor:pointer;
+  transition:background .15s,color .15s
+}
+.tc-arrow:hover{background:rgba(255,255,255,.18);color:#fff}
+.tc-dots{display:flex;gap:7px;align-items:center}
+.tc-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.25);cursor:pointer;border:none;
+  transition:background .2s,transform .2s;padding:0
+}
+.tc-dot.active{background:var(--ochre-soft);transform:scale(1.4)}
+.tc-note{
+  text-align:center;margin:32px auto 0;max-width:480px;
+  font-size:12.5px;color:rgba(255,253,247,.38);line-height:1.5
+}
+@media(max-width:600px){
+  .tc-slide{grid-template-columns:1fr}
+  .tc-img{aspect-ratio:16/9}
+  .tc-body{padding:24px 20px}
+  .tc-quote{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="./index.html">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 28" fill="white" xmlns="http://www.w3.org/2000/svg" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg></span>
+      <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
+    </a>
+    <nav class="nav-links">
+      <a class="lnk" href="./index.html#why">The Need</a>
+      <a class="lnk" href="./index.html#villageserver">VillageServer</a>
+    </nav>
+  </div>
+</header>
+
+<!-- DONATION FORM -->
+<div class="donate-wrap">
+
+  <!-- Org banner image -->
+  <div class="donate-banner">
+    <img src="./img/receiving.webp" alt="A believer lifting a Bible she prayed years to hold" width="900" height="1675" fetchpriority="high" decoding="async" />
+    <div class="donate-banner-meta">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 28" fill="white" xmlns="http://www.w3.org/2000/svg" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg></span>
+      <span>Project Bible Runners</span>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="donate-content">
+    <h1>A Bible for Every Believer</h1>
+    <p class="donate-desc">Thank you so much for partnering with us to ensure faithful followers of Jesus have access to His Word. $7 places a Bible in waiting hands — $500 lights up an entire village.</p>
+    <a class="donate-more" href="./index.html">More details ↗</a>
+
+    <div class="donate-divider"></div>
+
+    <!-- Frequency -->
+    <div class="freq-row">
+      <button class="freq-tab active" data-freq="once">One-time</button>
+      <button class="freq-tab" data-freq="monthly">&#9829; Monthly</button>
+      <button class="freq-tab" data-freq="yearly">Yearly</button>
+    </div>
+
+    <!-- Amount grid (populated by JS per frequency) -->
+    <p class="choose-label">Choose an amount:</p>
+    <div class="amounts-grid" id="amounts-grid"></div>
+
+    <!-- Custom amount -->
+    <div class="custom-amt-wrap" id="custom-wrap">
+      <span class="currency-sign">$</span>
+      <input type="number" id="custom-input" placeholder="Other amount" min="1" step="1" aria-label="Enter a custom donation amount" />
+    </div>
+
+    <!-- Notes -->
+    <div class="donate-note">
+      <span class="ni">🧾</span>
+      <span>You'll receive a tax receipt for making a donation. EIN 85-1992796 · 501(c)(3)</span>
+    </div>
+    <div class="donate-note">
+      <span class="ni">💛</span>
+      <span>We fundraise with Zeffy to ensure <b>100% of your donation</b> goes directly to our mission.</span>
+    </div>
+
+    <!-- CTA -->
+    <a class="btn btn-give btn-continue" id="continue-btn"
+       href="https://www.zeffy.com/en-US/donation-form/PENDING"
+       target="_blank" rel="noopener"
+       data-track="donation_completed">
+      Continue &rarr;
+    </a>
+
+    <!-- Zeffy branding -->
+    <div class="zeffy-badge">
+      zeffy
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4.09 12.5H11L10 22l8.91-10.5H13L13 2z"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIAL CAROUSEL -->
+<section class="tc-section" aria-label="Stories from the field">
+  <div class="tc-inner">
+    <p class="tc-eyebrow">Stories from the field</p>
+
+    <div class="tc-stage" id="tc-stage">
+      <div class="tc-slides" id="tc-slides">
+
+        <!-- Slide 1 -->
+        <div class="tc-slide" role="group" aria-label="Testimonial 1 of 4">
+          <div class="tc-img">
+            <img src="./img/field-reading.webp" alt="A woman reading her first Bible" width="480" height="540" loading="lazy" decoding="async" />
+          </div>
+          <div class="tc-body">
+            <p class="tc-quote">"I prayed for a Bible for eleven years. When the runner placed it in my hands, I did not sleep that night — I read until morning. God is not silent."</p>
+            <p class="tc-attr"><span>Grace N.</span> &mdash; Kisumu, Kenya</p>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="tc-slide" role="group" aria-label="Testimonial 2 of 4">
+          <div class="tc-img">
+            <img src="./img/field-distribute.webp" alt="Bibles being distributed to a gathered congregation" width="480" height="540" loading="lazy" decoding="async" />
+          </div>
+          <div class="tc-body">
+            <p class="tc-quote">"Our congregation shared one torn Bible among forty people. The day Project Bible Runners came, our church wept together. Every family has the Word now."</p>
+            <p class="tc-attr"><span>Pastor Emmanuel K.</span> &mdash; Gulu, Uganda</p>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="tc-slide" role="group" aria-label="Testimonial 3 of 4">
+          <div class="tc-img">
+            <img src="./img/field-prayer.webp" alt="A small group praying together in a village" width="480" height="540" loading="lazy" decoding="async" />
+          </div>
+          <div class="tc-body">
+            <p class="tc-quote">"The VillageServer was like a library appearing overnight. Children study the Scriptures now. I have seen young people memorize whole chapters in weeks."</p>
+            <p class="tc-attr"><span>Asha M.</span> &mdash; Rajasthan, India</p>
+          </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="tc-slide" role="group" aria-label="Testimonial 4 of 4">
+          <div class="tc-img">
+            <img src="./img/kit-case.webp" alt="A VillageServer kit case open and ready to deploy" width="480" height="540" loading="lazy" decoding="async" />
+          </div>
+          <div class="tc-body">
+            <p class="tc-quote">"We loaded the VillageServer with every book we could. No electricity needed. Sixty families in our village now read the Bible on their phones every evening."</p>
+            <p class="tc-attr"><span>James O.</span> &mdash; Mwanza, Tanzania</p>
+          </div>
+        </div>
+
+      </div><!-- /.tc-slides -->
+    </div><!-- /.tc-stage -->
+
+    <div class="tc-controls" role="group" aria-label="Carousel controls">
+      <button class="tc-arrow" id="tc-prev" aria-label="Previous testimonial">&#8592;</button>
+      <div class="tc-dots" id="tc-dots" role="tablist" aria-label="Slide indicators"></div>
+      <button class="tc-arrow" id="tc-next" aria-label="Next testimonial">&#8594;</button>
+    </div>
+
+    <p class="tc-note">Names may have been shortened to protect privacy. Photos taken with permission during field operations.</p>
+  </div>
+</section>
+
+<script>
+if('scrollRestoration' in history){history.scrollRestoration='manual';}
+window.scrollTo(0,0);
+
+(function(){
+  var ZEFFY_BASE = 'https://www.zeffy.com/en-US/donation-form/PENDING';
+
+  var selectedAmount = null;
+  var selectedFreq = 'once';
+
+  // Amount presets per frequency
+  var AMOUNTS = {
+    once: [
+      {value:7,   label:'$7',      sub:null},
+      {value:35,  label:'$35',     sub:null},
+      {value:70,  label:'$70',     sub:null},
+      {value:500, label:'$500',    sub:null}
+    ],
+    monthly: [
+      {value:7,   label:'$7/mo',   sub:'= $84/yr'},
+      {value:15,  label:'$15/mo',  sub:'= $180/yr'},
+      {value:30,  label:'$30/mo',  sub:'= $360/yr'},
+      {value:42,  label:'$42/mo',  sub:'= $504/yr'}
+    ],
+    yearly: [
+      {value:84,  label:'$84/yr',  sub:'12 Bibles placed'},
+      {value:180, label:'$180/yr', sub:'25 Bibles placed'},
+      {value:360, label:'$360/yr', sub:'51 Bibles placed'},
+      {value:500, label:'$500/yr', sub:'A whole village library'}
+    ]
+  };
+
+  var params = new URLSearchParams(window.location.search);
+  var preAmount = params.get('amount');
+
+  function updateContinueBtn(){
+    var btn = document.getElementById('continue-btn');
+    var amt = selectedAmount || document.getElementById('custom-input').value;
+    var url = ZEFFY_BASE;
+    if(amt) url += '?amount=' + encodeURIComponent(amt);
+    if(selectedFreq !== 'once') url += (amt ? '&' : '?') + 'frequency=' + selectedFreq;
+    btn.href = url;
+  }
+
+  function renderAmounts(freq, preselect){
+    var grid = document.getElementById('amounts-grid');
+    grid.innerHTML = '';
+    selectedAmount = null;
+    AMOUNTS[freq].forEach(function(a){
+      var btn = document.createElement('button');
+      btn.className = 'amt-btn';
+      btn.dataset.amount = a.value;
+      btn.innerHTML = a.label + (a.sub ? '<span class="amt-sub">'+a.sub+'</span>' : '');
+      if(preselect && String(a.value) === String(preselect)){
+        btn.classList.add('selected');
+        selectedAmount = String(a.value);
+      }
+      btn.addEventListener('click', function(){
+        grid.querySelectorAll('.amt-btn').forEach(function(b){b.classList.remove('selected')});
+        document.getElementById('custom-wrap').classList.remove('selected');
+        document.getElementById('custom-input').value = '';
+        btn.classList.add('selected');
+        selectedAmount = String(a.value);
+        updateContinueBtn();
+      });
+      grid.appendChild(btn);
+    });
+    updateContinueBtn();
+  }
+
+  // Frequency tabs
+  document.querySelectorAll('.freq-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      document.querySelectorAll('.freq-tab').forEach(function(t){t.classList.remove('active')});
+      tab.classList.add('active');
+      selectedFreq = tab.dataset.freq;
+      document.getElementById('custom-input').value = '';
+      document.getElementById('custom-wrap').classList.remove('selected');
+      renderAmounts(selectedFreq, null);
+    });
+  });
+
+  // Custom input
+  document.getElementById('custom-input').addEventListener('input', function(){
+    document.getElementById('amounts-grid').querySelectorAll('.amt-btn').forEach(function(b){b.classList.remove('selected')});
+    selectedAmount = null;
+    document.getElementById('custom-wrap').classList.toggle('selected', !!this.value);
+    updateContinueBtn();
+  });
+
+  // Initial render, pre-select from URL param if present
+  renderAmounts('once', preAmount);
+  if(preAmount && !selectedAmount){
+    document.getElementById('custom-input').value = preAmount;
+    document.getElementById('custom-wrap').classList.add('selected');
+    updateContinueBtn();
+  }
+
+  // Tracking
+  document.getElementById('continue-btn').addEventListener('click', function(){
+    var amt = selectedAmount || document.getElementById('custom-input').value || '0';
+    if(window.fbq) fbq('trackCustom','donation_completed',{amount:amt,frequency:selectedFreq});
+    if(window.gtag) gtag('event','donation_completed',{amount:amt,frequency:selectedFreq});
+    console.log('[track] donation_completed', amt, selectedFreq);
+  });
+})();
+
+// Testimonial carousel
+(function(){
+  var slides = document.getElementById('tc-slides');
+  var dotsWrap = document.getElementById('tc-dots');
+  var total = document.querySelectorAll('.tc-slide').length;
+  var cur = 0;
+  var timer;
+
+  // Build dots
+  for(var i = 0; i < total; i++){
+    var d = document.createElement('button');
+    d.className = 'tc-dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('role','tab');
+    d.setAttribute('aria-label','Go to slide ' + (i + 1));
+    d.dataset.idx = i;
+    d.addEventListener('click', function(){go(parseInt(this.dataset.idx));});
+    dotsWrap.appendChild(d);
+  }
+
+  function go(n){
+    cur = (n + total) % total;
+    slides.style.transform = 'translateX(-' + (cur * 100) + '%)';
+    dotsWrap.querySelectorAll('.tc-dot').forEach(function(d, i){
+      d.classList.toggle('active', i === cur);
+    });
+  }
+
+  function advance(){ go(cur + 1); }
+
+  function startTimer(){ timer = setInterval(advance, 6000); }
+  function stopTimer(){ clearInterval(timer); }
+
+  document.getElementById('tc-prev').addEventListener('click', function(){ stopTimer(); go(cur - 1); startTimer(); });
+  document.getElementById('tc-next').addEventListener('click', function(){ stopTimer(); go(cur + 1); startTimer(); });
+
+  // Pause on hover
+  var stage = document.getElementById('tc-stage');
+  stage.addEventListener('mouseenter', stopTimer);
+  stage.addEventListener('mouseleave', startTimer);
+  stage.addEventListener('focusin', stopTimer);
+  stage.addEventListener('focusout', startTimer);
+
+  startTimer();
+})();
+</script>
+</body>
+</html>

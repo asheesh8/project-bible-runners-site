@@ -25,14 +25,15 @@
 <header class="nav">
   <div class="wrap nav-in">
     <a class="brand" href="#top">
-      <span class="mark" aria-hidden="true"></span>
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 28" fill="white" xmlns="http://www.w3.org/2000/svg" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg></span>
       <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
     </a>
     <nav class="nav-links">
       <a class="lnk" href="#why">The Need</a>
       <a class="lnk" href="#villageserver">VillageServer</a>
       <a class="lnk" href="#give">Ways to Give</a>
-      <a class="btn btn-give btn-sm" href="#give" data-track="donation_started" data-source="nav">Give a Bible · $7</a>
+      <a class="lnk" href="#request">Request a Visit</a>
+      <a class="btn btn-give btn-sm" href="./donate.html?amount=7" data-track="donation_started" data-source="nav">Give a Bible · $7</a>
     </nav>
   </div>
 </header>
@@ -41,18 +42,30 @@
 <section class="hero" id="top">
   <img class="hero-media" src="./img/hero-field.webp" alt="A Bible Runner traveling through a remote village landscape" width="1300" height="1733" fetchpriority="high" decoding="async" />
   <div class="scrim"></div>
-  <div class=”wrap hero-in”>
-    <h1 class=”reveal”>42% of the world has <span class=”hl”>never heard</span> that Jesus loves them.</h1>
-    <p class=”sub reveal”>In thousands of villages, believers have fasted and prayed for years for a single Bible. <b>$7 answers that prayer</b> — and $500 builds an entire village its own offline Bible library.</p>
-    <p class=”verse reveal”>”…and this gospel of the kingdom will be proclaimed throughout the whole world as a testimony to all nations, and then the end will come.” &nbsp;<b>Matthew 24:14</b></p>
-    <div class=”hero-cta reveal”>
-      <a class=”btn btn-give” href=”#give” data-track=”donation_started” data-source=”hero”>Give a Bible · $7</a>
-      <a class=”btn btn-ghost” href=”#villageserver”>See how it works</a>
+
+  <!-- Recent donors — desktop only, top-right float -->
+  <div class="hero-donors" id="donor-feed" aria-label="Recent donors">
+    <div class="donor-card" id="donor-0"></div>
+    <div class="donor-card" id="donor-1"></div>
+  </div>
+
+  <div class="wrap hero-in">
+    <h1 class="reveal">42% of the world has <span class="hl">never heard</span> that Jesus loves them.</h1>
+    <p class="sub reveal">In thousands of villages, believers have fasted and prayed for years for a single Bible. <b>$7 answers that prayer</b> — and $500 builds an entire village its own offline Bible library.</p>
+    <div class="hero-cta reveal">
+      <a class="btn btn-give" href="./donate.html?amount=7" data-track="donation_started" data-source="hero">Give a Bible · $7</a>
+      <a class="btn btn-ghost" href="#villageserver">See how it works</a>
     </div>
-    <div class=”hero-trust reveal”>
-      <span><span class=”dot”></span>Founded <b>2019</b> · Owen &amp; Jess Sweitzer</span>
-      <span><span class=”dot”></span>14+ nations reached</span>
-      <span><span class=”dot”></span>EIN <b>85-1992796</b> · 501(c)(3)</span>
+    <div class="hero-trust reveal">
+      <span><span class="dot"></span>Founded <b>2019</b> · Owen &amp; Jess Sweitzer</span>
+      <span><span class="dot"></span>14+ nations reached</span>
+      <span><span class="dot"></span>EIN <b>85-1992796</b> · 501(c)(3)</span>
+    </div>
+    <!-- Rotating Bible verse box -->
+    <div class="hero-verse-box reveal">
+      <p class="hero-verse-text" id="verse-text"></p>
+      <span class="hero-verse-ref" id="verse-ref"></span>
+      <div class="verse-dots" id="verse-dots"></div>
     </div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 96" preserveAspectRatio="none" aria-hidden="true">
@@ -83,7 +96,6 @@
         <li><span class="n">2</span><span>Obey Jesus' commands and the New Testament.</span></li>
         <li><span class="n">3</span><span>Share the Gospel with the people they love.</span></li>
       </ul>
-      <a class="btn btn-give section-cta" href="#give" data-track="donation_started" data-source="seven">Place a Bible for $7</a>
     </div>
     <div class="photo-card ratio-portrait reveal">
       <img src="./img/receiving.webp" alt="A believer lifts an open Bible to the sky in a village" width="900" height="1675" loading="lazy" decoding="async" />
@@ -109,7 +121,6 @@
           <div class="step"><div class="si">📱</div><div><h4>4 · Every phone connects</h4><p>People join the hotspot and read, listen, and watch — then share phone-to-phone to neighbors.</p></div></div>
         </div>
         <div class="kit-badge">Full kit cost: ~$483–$550 &nbsp;·&nbsp; You fund it at $500</div>
-        <div><a class="btn btn-give section-cta" href="#give" data-track="donation_started" data-source="villageserver">Fund a VillageServer · $500</a></div>
       </div>
       <div class="vs-photos reveal">
         <div class="photo-card ratio-wide">
@@ -158,9 +169,216 @@
   </div>
 </section>
 
+<!-- WHERE DOES IT GO -->
+<section class="breakdown" id="breakdown">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">Full transparency</p>
+      <h2>Exactly where your money goes.</h2>
+      <p class="lead">Zero overhead, zero rounding. Here's the line-item cost of everything we buy — right down to the Raspberry Pi.</p>
+    </div>
+    <div class="breakdown-grid">
+
+      <!-- $7 Bible -->
+      <div class="bd-card reveal">
+        <div class="bd-tag">Most common gift</div>
+        <div class="bd-amt">$7</div>
+        <div class="bd-name">One Bible, hand-delivered</div>
+        <p class="bd-desc">A printed, native-language Bible carried in by a runner and placed directly into the hands of a believer who has been waiting and praying for one.</p>
+        <div class="bd-lines">
+          <div class="bd-line"><span>Printing &amp; binding</span><span>$5.00</span></div>
+          <div class="bd-line"><span>In-country shipping &amp; distribution</span><span>$1.20</span></div>
+          <div class="bd-line"><span>Field runner coordination</span><span>$0.80</span></div>
+          <div class="bd-total"><span>Per Bible</span><span>$7.00</span></div>
+        </div>
+      </div>
+
+      <!-- $500 VillageServer -->
+      <div class="bd-card bd-card-vs reveal">
+        <div class="bd-tag">Whole village</div>
+        <div class="bd-amt">$500</div>
+        <div class="bd-name">VillageServer — full component list</div>
+        <p class="bd-desc">A solar-powered, offline Bible library that broadcasts to every phone in a village. Here's every part we buy:</p>
+        <div class="bd-lines">
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">🍓</span>
+              Raspberry Pi 4 Model B (4GB) — the server
+            </span>
+            <span>$55</span>
+          </div>
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">💾</span>
+              64GB microSD, pre-loaded — Bibles in 12 languages
+            </span>
+            <span>$20</span>
+          </div>
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">📶</span>
+              GL.iNet travel router — village-wide hotspot
+            </span>
+            <span>$65</span>
+          </div>
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">☀️</span>
+              Folding solar suitcase (20W) — off-grid power
+            </span>
+            <span>$295</span>
+          </div>
+          <div class="bd-line">
+            <span>
+              <span class="bd-ico">🧳</span>
+              Weatherproof field case, cables &amp; mounts
+            </span>
+            <span>$65</span>
+          </div>
+          <div class="bd-total"><span>Full kit cost</span><span>~$500</span></div>
+        </div>
+      </div>
+
+    </div>
+    <p class="breakdown-note reveal">Costs are real field averages. We fundraise through Zeffy so <b>100% of your gift</b> reaches the field — no platform fee. <a class="breakdown-link" href="#give">Ready to give? ↓</a></p>
+  </div>
+</section>
+
+<!-- VILLAGE REQUEST FORM -->
+<section class="village-request" id="request">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow">Request a visit</p>
+      <h2>Is your village waiting for Bibles?</h2>
+      <p class="lead">Select your country below. Every request is prayed over and reviewed by our field team — no village too small, no road too far.</p>
+    </div>
+
+    <!-- Country autocomplete combobox -->
+    <div class="cp-wrap reveal" id="cp-wrap">
+      <div class="cp-input-row" id="cp-input-row">
+        <svg class="cp-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M14 14l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="cp-input" class="cp-input"
+          placeholder="Type or scroll to find your country..."
+          autocomplete="off" spellcheck="false"
+          role="combobox" aria-autocomplete="list"
+          aria-haspopup="listbox" aria-expanded="false" aria-controls="cp-dropdown" />
+        <button class="cp-clear" id="cp-clear" aria-label="Clear selection" style="display:none">&#x2715;</button>
+        <span class="cp-chevron" id="cp-chevron" aria-hidden="true">
+          <svg viewBox="0 0 10 6" fill="none" width="12" height="8"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </div>
+      <div class="cp-dropdown" id="cp-dropdown" role="listbox" aria-label="Countries">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- Mac-style browser window -->
+    <div class="mac-window" id="mac-window">
+      <div class="mac-chrome">
+        <div class="mac-dots" aria-hidden="true">
+          <span class="mac-dot mac-red"></span>
+          <span class="mac-dot mac-yellow"></span>
+          <span class="mac-dot mac-green"></span>
+        </div>
+        <div class="mac-url-bar" id="mac-url-bar">projectbiblerunners.com/request</div>
+        <button class="mac-close-btn" id="mac-close" aria-label="Close form">&#x2715;</button>
+      </div>
+      <div class="mac-body">
+        <form id="vr-form" action="https://formspree.io/f/PENDING" method="POST">
+          <p class="vr-country-head">Request a visit to <span id="vr-country-display"></span></p>
+          <input type="hidden" id="vr-country" name="country" />
+          <div class="vr-grid">
+            <div class="vr-field">
+              <label for="vr-name">Your name</label>
+              <input type="text" id="vr-name" name="name" placeholder="Full name" required />
+            </div>
+            <div class="vr-field">
+              <label for="vr-contact">Email or WhatsApp</label>
+              <input type="text" id="vr-contact" name="contact" placeholder="How we can reach you" required />
+            </div>
+            <div class="vr-field">
+              <label for="vr-village">Village or region</label>
+              <input type="text" id="vr-village" name="village" placeholder="Name of village or nearest town" />
+            </div>
+            <div class="vr-field">
+              <label for="vr-language">Primary language spoken</label>
+              <input type="text" id="vr-language" name="language" placeholder="e.g. Swahili, Hindi, Amharic" />
+            </div>
+          </div>
+          <div class="vr-field vr-full">
+            <label for="vr-size">Estimated community size</label>
+            <select id="vr-size" name="community_size">
+              <option value="">Select an estimate</option>
+              <option value="under-50">Under 50 people</option>
+              <option value="50-200">50–200 people</option>
+              <option value="200-500">200–500 people</option>
+              <option value="500+">500 or more people</option>
+            </select>
+          </div>
+          <div class="vr-field vr-full">
+            <label for="vr-message">Tell us about the need</label>
+            <textarea id="vr-message" name="message" rows="4" placeholder="How did you hear about this community? Are there believers there without Bibles? Any context that helps our team pray and prepare."></textarea>
+          </div>
+          <div class="vr-foot">
+            <button type="submit" class="btn btn-give" data-track="village_request">Send Request</button>
+            <p class="vr-note">Every request is read by a real person on our field team.<br>We respond within a few days.</p>
+          </div>
+        </form>
+        <div class="vr-success" id="vr-success" style="display:none">
+          <div class="vr-check">&#9749;</div>
+          <h3>Your request is in our hands — and His.</h3>
+          <p>We received your message and will be praying over it. Someone from our field team will reach out within a few days.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- GIVING LADDER -->
 <section class="ladder" id="give">
   <div class="wrap">
+
+    <!-- Active campaign card — sits above the giving tiers as context -->
+    <div class="camp-card reveal">
+      <div class="camp-header">
+        <div>
+          <span class="camp-eyebrow">Active Campaign</span>
+          <h3 class="camp-title">Spring Uganda Run — April 2026</h3>
+          <p class="camp-sub">Runners are preparing to carry 800+ Bibles into northern Uganda. Help us close the gap before they go.</p>
+        </div>
+        <a class="btn btn-give camp-btn-inline" href="https://www.zeffy.com/en-US/donation-form/PENDING-UGANDA-RUN" target="_blank" rel="noopener" data-track="donation_started" data-source="campaign">Give to This Run &rarr;</a>
+      </div>
+      <div class="camp-stats">
+        <div class="camp-stat">
+          <span class="cs-num" data-to="487">0</span>
+          <span class="cs-lbl">Bibles funded</span>
+        </div>
+        <div class="camp-stat">
+          <span class="cs-num">313</span>
+          <span class="cs-lbl">Still needed</span>
+        </div>
+        <div class="camp-stat">
+          <span class="cs-num">18</span>
+          <span class="cs-lbl">Days remaining</span>
+        </div>
+        <div class="camp-stat">
+          <span class="cs-num">$3,409</span>
+          <span class="cs-lbl">Raised so far</span>
+        </div>
+      </div>
+      <div class="camp-bar-track" aria-label="Campaign progress: 78% funded">
+        <div class="camp-bar-fill" data-target="78"></div>
+      </div>
+      <div class="camp-bar-labels">
+        <span>$3,409 raised</span>
+        <span>Goal: $4,400 &nbsp;·&nbsp; 800 Bibles</span>
+      </div>
+    </div>
+
     <div class="sec-head sec-head-centered reveal">
       <p class="eyebrow">Ways to give</p>
       <h2>Choose how far your gift runs.</h2>
@@ -172,47 +390,50 @@
         <div class="amt"><small>$</small>7</div>
         <div class="tier-name">Give a Bible</div>
         <p class="tier-funds">One native-language Bible, hand-delivered to a believer who has been waiting and praying for one.</p>
-        <a class="btn btn-give" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_7">Give $7</a>
+        <a class="btn btn-give" href="./donate.html?amount=7" data-track="donation_started" data-source="tier_7">Give $7</a>
       </div>
       <div class="tier reveal">
         <span class="pill">Bundle</span>
         <div class="amt"><small>$</small>35</div>
         <div class="tier-name">Bible Bundle</div>
         <p class="tier-funds">Five Bibles for a family or a small gathering of new believers.</p>
-        <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_35">Give $35</a>
+        <a class="btn btn-dark" href="./donate.html?amount=35" data-track="donation_started" data-source="tier_35">Give $35</a>
       </div>
       <div class="tier reveal">
         <span class="pill">Church pack</span>
         <div class="amt"><small>$</small>70</div>
         <div class="tier-name">Church Pack</div>
         <p class="tier-funds">Ten Bibles — enough to seed a house church in a rural community.</p>
-        <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_70">Give $70</a>
+        <a class="btn btn-dark" href="./donate.html?amount=70" data-track="donation_started" data-source="tier_70">Give $70</a>
       </div>
       <div class="tier feature reveal">
         <span class="pill">Build a library</span>
         <div class="amt"><small>$</small>500</div>
         <div class="tier-name">VillageServer Kit</div>
         <p class="tier-funds">A complete solar-powered, offline Bible library — Bibles, audio &amp; video — for one whole village.</p>
-        <a class="btn btn-give" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_500">Fund a kit · $500</a>
+        <a class="btn btn-give" href="./donate.html?amount=500" data-track="donation_started" data-source="tier_500">Fund a kit · $500</a>
       </div>
       <div class="tier reveal">
         <span class="pill">Field team</span>
         <div class="amt"><small>$</small>1,250</div>
         <div class="tier-name">Satellite Run</div>
         <p class="tier-funds">A full satellite-capture kit so a field team can receive and replay broadcasts anywhere.</p>
-        <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_1250">Give $1,250</a>
+        <a class="btn btn-dark" href="./donate.html?amount=1250" data-track="donation_started" data-source="tier_1250">Give $1,250</a>
       </div>
       <div class="tier reveal">
         <span class="pill">You go too</span>
         <div class="amt"><small>$</small>4,400<small>+</small></div>
         <div class="tier-name">Sponsor a Run</div>
         <p class="tier-funds">Fund a 10-day Bible Run — 800+ Bibles hand-delivered. Come and carry them yourself.</p>
-        <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="trip_inquiry" data-source="tier_4400">Plan a Run</a>
+        <a class="btn btn-dark" href="./donate.html?amount=4400" data-track="trip_inquiry" data-source="tier_4400">Plan a Run</a>
       </div>
     </div>
     <div class="custom-give reveal">
-      <p>Want to give a different amount?</p>
-      <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="custom_amount">Give a custom amount</a>
+      <div class="custom-give-text">
+        <p>Give any amount</p>
+        <span>Every dollar goes to Bibles and field teams — no preset required.</span>
+      </div>
+      <a class="btn btn-give" href="./donate.html" data-track="donation_started" data-source="custom_amount">Choose my amount</a>
     </div>
     <p class="recurnote reveal">Prefer to give monthly? Every tier can be set as a recurring gift on the giving page. 💛</p>
   </div>
@@ -221,7 +442,7 @@
 <!-- QUOTE -->
 <section class="quote">
   <div class="wrap reveal">
-    <blockquote>“The kingdom advances at the speed of connections, and revival moves at the speed of relationships.”</blockquote>
+    <blockquote>"The kingdom advances at the speed of connections, and revival moves at the speed of relationships."</blockquote>
     <cite>— Derrick Rhayn · Kingdom Impact Network</cite>
   </div>
 </section>
@@ -232,7 +453,7 @@
     <h2>Somewhere tonight, a believer is praying for <span class="hl">a Bible.</span></h2>
     <p>You can answer that prayer before you close this page. $7 sends one. $500 lights up a village.</p>
     <div class="hero-cta">
-      <a class="btn btn-give" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="final">Give a Bible · $7</a>
+      <a class="btn btn-give" href="./donate.html?amount=7" data-track="donation_started" data-source="final">Give a Bible · $7</a>
       <a class="btn btn-ghost" href="#villageserver">Fund a VillageServer</a>
     </div>
   </div>
@@ -244,10 +465,10 @@
     <div class="foot-grid">
       <div>
         <a class="brand footer-brand" href="#top">
-          <span class="mark" aria-hidden="true"></span>
+          <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 28" fill="white" xmlns="http://www.w3.org/2000/svg" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg></span>
           <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
         </a>
-        <p class="ms">“Gathering and running Bibles to nations, tribes and people until every follower of Jesus owns a Bible.”</p>
+        <p class="ms">"Gathering and running Bibles to nations, tribes and people until every follower of Jesus owns a Bible."</p>
       </div>
       <div>
         <h5>Contact</h5>
@@ -256,10 +477,11 @@
         <p class="footer-spaced">PO Box 422<br>Charleston, IL 61920</p>
       </div>
       <div>
-        <h5>Give</h5>
+        <h5>Give &amp; Connect</h5>
         <p><a href="#give">Give a Bible — $7</a></p>
         <p><a href="#give">Fund a VillageServer — $500</a></p>
         <p><a href="#give">Sponsor a Bible Run</a></p>
+        <p><a href="#request">Request a Village Visit</a></p>
         <p class="footer-spaced">Founded 2019<br>EIN 85-1992796 · 501(c)(3)</p>
       </div>
     </div>
@@ -273,10 +495,14 @@
 <!-- STICKY MOBILE GIVE BAR -->
 <div class="mbar">
   <p><b>$7</b> answers a prayer that's years old.</p>
-  <a class="btn btn-give btn-sm" href="#give" data-track="donation_started" data-source="mobilebar">Give now</a>
+  <a class="btn btn-give btn-sm" href="./donate.html" data-track="donation_started" data-source="mobilebar">Give now</a>
 </div>
 
 <script>
+// Always start at the top on fresh load; let browser handle in-page hash links normally.
+if('scrollRestoration' in history){history.scrollRestoration='manual';}
+if(!window.location.hash){window.scrollTo(0,0);}
+
 // Preserve readable layouts if a media request fails unexpectedly.
 (function(){
   document.querySelectorAll('img').forEach(function(img){
@@ -317,6 +543,266 @@
     es.forEach(function(en){if(en.isIntersecting){run(en.target);io.unobserve(en.target);}});
   },{threshold:.5});
   document.querySelectorAll('[data-to]').forEach(function(e){io.observe(e)});
+})();
+
+// Campaign progress bar — animate fill on scroll into view
+(function(){
+  var fill=document.querySelector('.camp-bar-fill');
+  if(!fill)return;
+  var target=parseFloat(fill.dataset.target)||78;
+  var io=new IntersectionObserver(function(es){
+    if(es[0].isIntersecting){fill.style.width=target+'%';io.disconnect();}
+  },{threshold:.5});
+  io.observe(fill);
+  // Campaign count-up (Bibles funded stat only)
+  var cs=document.querySelector('.camp-stat .cs-num[data-to]');
+  if(cs){
+    var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    var io2=new IntersectionObserver(function(es){
+      if(!es[0].isIntersecting)return;
+      io2.disconnect();
+      if(reduce){cs.textContent=Math.round(parseFloat(cs.dataset.to)).toLocaleString('en-US');return;}
+      var to=parseFloat(cs.dataset.to),start=performance.now(),dur=1300;
+      (function tick(now){
+        var p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,3);
+        cs.textContent=Math.round(to*e).toLocaleString('en-US');
+        if(p<1)requestAnimationFrame(tick);
+      })(start);
+    },{threshold:.5});
+    io2.observe(cs);
+  }
+})();
+
+// ── Rotating Bible verses ────────────────────────────────
+(function(){
+  var verses=[
+    {t:'"And this gospel of the kingdom will be proclaimed throughout the whole world as a testimony to all nations, and then the end will come."',r:'Matthew 24:14'},
+    {t:'"For I know the plans I have for you, declares the Lord, plans for welfare and not for evil, to give you a future and a hope."',r:'Jeremiah 29:11'},
+    {t:'"Go into all the world and proclaim the gospel to the whole creation."',r:'Mark 16:15'},
+    {t:'"Your word is a lamp to my feet and a light to my path."',r:'Psalm 119:105'},
+    {t:'"How then will they call on him in whom they have not believed? And how are they to believe in him of whom they have never heard?"',r:'Romans 10:14'},
+    {t:'"So shall my word be that goes out from my mouth; it shall not return to me empty, but it shall accomplish that which I purpose."',r:'Isaiah 55:11'},
+  ];
+  var tEl=document.getElementById('verse-text');
+  var rEl=document.getElementById('verse-ref');
+  var dotsEl=document.getElementById('verse-dots');
+  if(!tEl)return;
+  var idx=0;
+  // Build dots
+  verses.forEach(function(_,i){var d=document.createElement('span');d.className='vd'+(i===0?' active':'');dotsEl.appendChild(d);});
+  var dots=dotsEl.querySelectorAll('.vd');
+  function set(i){tEl.textContent=verses[i].t;rEl.textContent=verses[i].r;dots.forEach(function(d,j){d.classList.toggle('active',j===i);});}
+  set(0);
+  setInterval(function(){
+    tEl.classList.add('v-out');rEl.classList.add('v-out');
+    setTimeout(function(){idx=(idx+1)%verses.length;set(idx);tEl.classList.remove('v-out');rEl.classList.remove('v-out');},520);
+  },7000);
+})();
+
+// ── Recent donors (simulated — replace array with live Zeffy webhook data when available) ──
+(function(){
+  var donors=[
+    {n:'Sarah M.',loc:'Illinois',amt:7,i:'S'},
+    {n:'James & Ruth T.',loc:'Texas',amt:35,i:'J'},
+    {n:'Emily R.',loc:'California',amt:7,i:'E'},
+    {n:'First Baptist Church',loc:'Ohio',amt:70,i:'F'},
+    {n:'Mike & Dana',loc:'',amt:35,i:'M'},
+    {n:'Anonymous',loc:'',amt:500,i:'A'},
+    {n:'Grace Community',loc:'Tennessee',amt:70,i:'G'},
+    {n:'David K.',loc:'Colorado',amt:7,i:'D'},
+    {n:'The Wilson Family',loc:'',amt:35,i:'T'},
+    {n:'Pastor John W.',loc:'',amt:70,i:'P'},
+  ];
+  var slots=[document.getElementById('donor-0'),document.getElementById('donor-1')];
+  if(!slots[0])return;
+  var offsets=[2,9];
+  function card(d,mins){
+    var t=mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
+    var loc=d.loc?' · '+d.loc:'';
+    return '<div class="donor-row"><div class="d-avatar">'+d.i+'</div>'
+      +'<div class="d-info"><strong>'+d.n+'</strong>'+loc+' gave <span class="d-amt">$'+d.amt+'</span>'
+      +'<div class="d-time">'+t+'</div></div></div>';
+  }
+  slots[0].innerHTML=card(donors[0],2);
+  slots[1].innerHTML=card(donors[1],9);
+  var next=2;
+  setInterval(function(){
+    var d=donors[next%donors.length]; next++;
+    slots[1].classList.add('d-out');
+    setTimeout(function(){
+      slots[1].innerHTML=slots[0].innerHTML;slots[1].classList.remove('d-out');
+      slots[0].classList.add('d-out');
+      slots[0].innerHTML=card(d,1);
+      setTimeout(function(){slots[0].classList.remove('d-out');},50);
+    },450);
+  },18000);
+})();
+
+// Country autocomplete → mac window
+(function(){
+  var COUNTRIES=['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda',
+    'Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh',
+    'Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia',
+    'Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso',
+    'Burundi','Cabo Verde','Cambodia','Cameroon','Canada','Central African Republic',
+    'Chad','Chile','China','Colombia','Comoros','Congo (Republic)','Congo (Dem. Rep.)',
+    'Costa Rica','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti',
+    'Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea',
+    'Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon',
+    'Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea',
+    'Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia',
+    'Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan',
+    'Kenya','Kiribati','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho',
+    'Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi',
+    'Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius',
+    'Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco',
+    'Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand',
+    'Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman',
+    'Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru',
+    'Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda',
+    'Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines',
+    'Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia',
+    'Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands',
+    'Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan',
+    'Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania',
+    'Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey',
+    'Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom',
+    'United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela',
+    'Vietnam','Yemen','Zambia','Zimbabwe'];
+
+  var input=document.getElementById('cp-input');
+  var dropdown=document.getElementById('cp-dropdown');
+  var clearBtn=document.getElementById('cp-clear');
+  var chevron=document.getElementById('cp-chevron');
+  var inputRow=document.getElementById('cp-input-row');
+  var win=document.getElementById('mac-window');
+  var urlBar=document.getElementById('mac-url-bar');
+  var countryDisplay=document.getElementById('vr-country-display');
+  var countryInput=document.getElementById('vr-country');
+  var form=document.getElementById('vr-form');
+  var success=document.getElementById('vr-success');
+  if(!input||!dropdown||!win)return;
+
+  var activeIdx=-1, isOpen=false, selected=null;
+
+  function filtered(q){
+    if(!q)return COUNTRIES;
+    var lq=q.toLowerCase();
+    var a=COUNTRIES.filter(function(c){return c.toLowerCase().startsWith(lq);});
+    var b=COUNTRIES.filter(function(c){return !c.toLowerCase().startsWith(lq)&&c.toLowerCase().includes(lq);});
+    return a.concat(b);
+  }
+
+  function hl(text,q){
+    if(!q)return text;
+    var i=text.toLowerCase().indexOf(q.toLowerCase());
+    if(i<0)return text;
+    return text.slice(0,i)+'<em>'+text.slice(i,i+q.length)+'</em>'+text.slice(i+q.length);
+  }
+
+  function renderList(q){
+    var list=filtered(q);
+    if(!list.length){dropdown.innerHTML='<div class="cp-empty">No countries found</div>';return;}
+    var html='<ul class="cp-list">';
+    list.forEach(function(c){
+      html+='<li class="cp-item'+(c===selected?' cp-selected':'')+'" data-country="'+c+'">'+hl(c,q)+'</li>';
+    });
+    html+='</ul>';
+    dropdown.innerHTML=html;
+    activeIdx=-1;
+    dropdown.querySelectorAll('.cp-item').forEach(function(li){
+      li.addEventListener('mousedown',function(e){e.preventDefault();pick(li.dataset.country);});
+    });
+    // scroll active selection into view
+    var sel=dropdown.querySelector('.cp-selected');
+    if(sel)sel.scrollIntoView({block:'nearest'});
+  }
+
+  function open(){
+    if(isOpen)return;
+    isOpen=true;
+    renderList(input.value);
+    dropdown.classList.add('open');
+    inputRow.classList.add('open');
+    chevron.classList.add('open');
+    input.setAttribute('aria-expanded','true');
+  }
+
+  function close(){
+    if(!isOpen)return;
+    isOpen=false;
+    dropdown.classList.remove('open');
+    inputRow.classList.remove('open');
+    chevron.classList.remove('open');
+    input.setAttribute('aria-expanded','false');
+    activeIdx=-1;
+  }
+
+  function setActive(items,idx){
+    items.forEach(function(li,i){li.classList.toggle('cp-active',i===idx);});
+    if(idx>=0&&items[idx])items[idx].scrollIntoView({block:'nearest'});
+  }
+
+  function pick(country){
+    selected=country;
+    input.value=country;
+    clearBtn.style.display='block';
+    close();
+    // open mac window
+    var slug=country.toLowerCase().replace(/\s+/g,'-').replace(/[().]/g,'');
+    if(urlBar)urlBar.textContent='projectbiblerunners.com/request/'+slug;
+    if(countryDisplay)countryDisplay.textContent=country;
+    if(countryInput)countryInput.value=country;
+    // reset form if previously submitted
+    if(form){form.style.display='';var btn=form.querySelector('[type=submit]');if(btn){btn.textContent='Send Request';btn.disabled=false;}}
+    if(success)success.style.display='none';
+    void win.offsetWidth;
+    win.classList.add('open');
+    setTimeout(function(){win.scrollIntoView({behavior:'smooth',block:'nearest'});},60);
+  }
+
+  input.addEventListener('focus',function(){open();});
+  input.addEventListener('input',function(){
+    clearBtn.style.display=this.value?'block':'none';
+    if(!isOpen)open(); else renderList(this.value);
+  });
+  input.addEventListener('keydown',function(e){
+    var items=dropdown.querySelectorAll('.cp-item');
+    if(!isOpen){if(e.key==='ArrowDown'||e.key==='Enter')open();return;}
+    if(e.key==='ArrowDown'){e.preventDefault();activeIdx=Math.min(activeIdx+1,items.length-1);setActive(items,activeIdx);}
+    else if(e.key==='ArrowUp'){e.preventDefault();activeIdx=Math.max(activeIdx-1,0);setActive(items,activeIdx);}
+    else if(e.key==='Enter'){e.preventDefault();if(activeIdx>=0&&items[activeIdx])pick(items[activeIdx].dataset.country);}
+    else if(e.key==='Escape'){close();input.blur();}
+  });
+  clearBtn&&clearBtn.addEventListener('click',function(){
+    input.value='';selected=null;clearBtn.style.display='none';
+    input.focus();renderList('');
+  });
+  document.addEventListener('mousedown',function(e){
+    if(!document.getElementById('cp-wrap').contains(e.target))close();
+  });
+
+  // Mac window close (X button and red dot)
+  var closeBtn=document.getElementById('mac-close');
+  closeBtn&&closeBtn.addEventListener('click',function(){win.classList.remove('open');});
+  var redDot=win.querySelector('.mac-red');
+  redDot&&redDot.addEventListener('click',function(){win.classList.remove('open');});
+
+  // Form submit
+  form&&form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var btn=form.querySelector('[type=submit]');
+    btn.textContent='Sending...';btn.disabled=true;
+    fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}})
+      .then(function(r){
+        if(r.ok){
+          form.style.display='none';success.style.display='block';
+          if(window.fbq)fbq('trackCustom','village_request',{country:countryInput.value});
+          if(window.gtag)gtag('event','village_request',{country:countryInput.value});
+        } else{btn.textContent='Something went wrong — email us directly.';btn.disabled=false;}
+      })
+      .catch(function(){btn.textContent='Connection error — please try again.';btn.disabled=false;});
+  });
 })();
 
 // Conversion-event stubs — ready for Meta Pixel + GA4
