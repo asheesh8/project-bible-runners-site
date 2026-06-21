@@ -355,18 +355,18 @@ section:not(.hero):not(.stats){padding:var(--space-section) 0}
   display:flex;justify-content:space-between;align-items:center;
   padding:13px 0 2px;font-weight:700;font-size:15.5px;color:var(--forest)
 }
-.bd-card .btn{margin-top:auto}
 .bd-card-vs .bd-line span:first-child{display:flex;align-items:flex-start;gap:2px}
 .breakdown-note{
   text-align:center;margin:36px auto 0;font-size:13.5px;color:var(--ink-soft);
   max-width:560px;line-height:1.5
 }
+.breakdown-link{color:var(--ochre);font-weight:700;text-decoration:none;white-space:nowrap}
+.breakdown-link:hover{color:var(--terra-deep)}
 
-/* Active campaign */
-.campaign{background:var(--forest);padding:var(--space-section) 0}
-.campaign-box{
-  background:rgba(255,253,247,.05);border:1px solid rgba(255,255,255,.13);
-  border-radius:var(--radius-ui);padding:44px 50px;
+/* Active campaign card — lives inside the giving section */
+.camp-card{
+  background:var(--forest);border-radius:var(--radius-ui);
+  padding:44px 50px;margin-bottom:64px;
 }
 .camp-header{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;margin-bottom:36px;flex-wrap:wrap}
 .camp-eyebrow{
@@ -400,7 +400,7 @@ section:not(.hero):not(.stats){padding:var(--space-section) 0}
 }
 @media(max-width:760px){
   .breakdown-grid{grid-template-columns:1fr}
-  .campaign-box{padding:28px 24px}
+  .camp-card{padding:28px 24px;margin-bottom:44px}
   .camp-header{flex-direction:column;gap:20px}
   .camp-stats{gap:24px 36px}
 }

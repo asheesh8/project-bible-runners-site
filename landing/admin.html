@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin — Project Bible Runners</title>
+<meta name="robots" content="noindex, nofollow" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f8fa;
+  --sidebar:#24292f;
+  --sidebar-hover:#2d333b;
+  --sidebar-active:#316dca;
+  --card:#fff;
+  --border:#d0d7de;
+  --text:#1f2328;
+  --muted:#636c76;
+  --accent:#1a7f37;
+  --accent-hover:#116329;
+  --danger:#d1242f;
+  --danger-hover:#a40e26;
+  --input-bg:#fff;
+  --radius:8px;
+  --sans:'Hanken Grotesk',system-ui,sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+
+/* ── Login screen ─────────────────────────────────────── */
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--sidebar);
+}
+.login-box{
+  background:var(--card);border-radius:14px;padding:44px 40px;
+  width:100%;max-width:380px;text-align:center;
+  box-shadow:0 8px 32px rgba(0,0,0,.25);
+}
+.login-logo{
+  width:40px;height:40px;background:#1a2e1a;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+}
+.login-box h1{font-size:20px;font-weight:700;margin:0 0 6px}
+.login-box p{font-size:14px;color:var(--muted);margin:0 0 28px}
+.login-box input{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);
+  border-radius:var(--radius);font-family:var(--sans);font-size:15px;
+  background:var(--input-bg);margin-bottom:12px;outline:none;
+  transition:border-color .15s;
+}
+.login-box input:focus{border-color:#316dca}
+.login-err{font-size:13px;color:var(--danger);margin:0 0 12px;display:none}
+.btn-primary{
+  width:100%;padding:11px;background:var(--accent);border:none;
+  border-radius:var(--radius);font-family:var(--sans);font-size:15px;
+  font-weight:700;color:#fff;cursor:pointer;transition:background .15s;
+}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed}
+
+/* ── App shell ────────────────────────────────────────── */
+#app{display:none;min-height:100vh;flex-direction:column}
+
+/* Topbar */
+.topbar{
+  height:48px;background:var(--sidebar);display:flex;
+  align-items:center;padding:0 20px;gap:16px;
+  position:sticky;top:0;z-index:100;
+}
+.topbar-logo{
+  width:26px;height:26px;background:#2d5a2d;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+}
+.topbar-title{
+  font-size:14px;font-weight:700;color:#fff;
+  display:flex;align-items:center;gap:8px;
+}
+.topbar-badge{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);
+  padding:2px 8px;border-radius:99px;
+}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.topbar-link{
+  font-size:13px;color:rgba(255,255,255,.55);text-decoration:none;
+  font-weight:600;transition:color .15s;
+}
+.topbar-link:hover{color:#fff}
+.btn-logout{
+  padding:6px 14px;border-radius:var(--radius);background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.18);font-family:var(--sans);
+  font-size:13px;font-weight:700;color:rgba(255,255,255,.7);
+  cursor:pointer;transition:background .15s,color .15s;
+}
+.btn-logout:hover{background:rgba(255,255,255,.2);color:#fff}
+
+/* Body layout */
+.app-body{display:flex;flex:1}
+
+/* Sidebar */
+.sidebar{
+  width:220px;flex:0 0 220px;background:var(--sidebar);
+  padding:16px 0;position:sticky;top:48px;height:calc(100vh - 48px);
+  overflow-y:auto;
+}
+.sidebar-section{
+  padding:0 12px;margin-bottom:4px;
+}
+.sidebar-label{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);padding:12px 10px 6px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:6px;
+  font-size:14px;font-weight:600;color:rgba(255,255,255,.65);
+  cursor:pointer;transition:background .12s,color .12s;
+  user-select:none;
+}
+.nav-item:hover{background:var(--sidebar-hover);color:#fff}
+.nav-item.active{background:var(--sidebar-active);color:#fff}
+.nav-item svg{flex:0 0 auto;opacity:.7}
+.nav-item.active svg{opacity:1}
+
+/* Main content */
+.main-content{flex:1;padding:32px 36px;overflow-y:auto;min-width:0}
+
+/* Page header */
+.page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:28px;gap:16px;flex-wrap:wrap;
+}
+.page-title{font-size:22px;font-weight:700}
+.btn-new{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;border-radius:var(--radius);
+  background:var(--accent);border:none;
+  font-family:var(--sans);font-size:14px;font-weight:700;
+  color:#fff;cursor:pointer;transition:background .15s;
+}
+.btn-new:hover{background:var(--accent-hover)}
+
+/* API status banner */
+#api-status{
+  padding:10px 16px;border-radius:var(--radius);margin-bottom:24px;
+  font-size:13px;font-weight:600;display:none;
+}
+#api-status.warn{background:#fff8c5;border:1px solid #d4a72c;color:#7d4e00}
+#api-status.err{background:#ffebe9;border:1px solid #ff8182;color:#82071e}
+#api-status.ok{background:#dafbe1;border:1px solid #52a55d;color:#1a4731}
+
+/* Modal / slide-in form */
+.form-panel{
+  display:none;background:var(--card);border:1.5px solid var(--border);
+  border-radius:12px;padding:28px 28px 24px;margin-bottom:28px;
+}
+.form-panel.open{display:block}
+.form-panel h3{font-size:17px;font-weight:700;margin:0 0 22px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-row.full{grid-template-columns:1fr}
+.field label{font-size:13px;font-weight:700;display:block;margin:0 0 6px;color:var(--text)}
+.field input,.field textarea,.field select{
+  width:100%;padding:9px 12px;border:1.5px solid var(--border);
+  border-radius:var(--radius);font-family:var(--sans);font-size:14px;
+  background:var(--input-bg);outline:none;transition:border-color .15s;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:#316dca}
+.field textarea{resize:vertical;min-height:100px}
+.field input[type="checkbox"]{width:auto;margin-right:8px}
+.form-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn-save{
+  padding:10px 22px;background:var(--accent);border:none;
+  border-radius:var(--radius);font-family:var(--sans);font-size:14px;
+  font-weight:700;color:#fff;cursor:pointer;transition:background .15s;
+}
+.btn-save:hover{background:var(--accent-hover)}
+.btn-cancel{
+  padding:10px 22px;background:transparent;border:1.5px solid var(--border);
+  border-radius:var(--radius);font-family:var(--sans);font-size:14px;
+  font-weight:600;color:var(--muted);cursor:pointer;transition:background .15s,color .15s;
+}
+.btn-cancel:hover{background:var(--bg);color:var(--text)}
+.form-msg{font-size:13px;margin-top:10px;display:none}
+.form-msg.ok{color:var(--accent)}
+.form-msg.err{color:var(--danger)}
+
+/* Table */
+.items-table{width:100%;border-collapse:collapse}
+.items-table th{
+  font-size:12px;font-weight:700;text-align:left;
+  padding:10px 14px;border-bottom:2px solid var(--border);
+  color:var(--muted);text-transform:uppercase;letter-spacing:.06em;
+}
+.items-table td{
+  padding:12px 14px;border-bottom:1px solid var(--border);
+  font-size:14px;vertical-align:middle;
+}
+.items-table tr:last-child td{border-bottom:none}
+.items-table tr:hover td{background:var(--bg)}
+.td-badge{
+  display:inline-flex;padding:2px 10px;border-radius:99px;
+  font-size:11px;font-weight:700;letter-spacing:.04em;
+}
+.td-badge.active{background:#dafbe1;color:#1a4731}
+.td-badge.draft{background:#fff8c5;color:#7d4e00}
+.td-actions{display:flex;gap:8px}
+.btn-edit{
+  padding:5px 12px;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:var(--radius);font-family:var(--sans);font-size:12px;
+  font-weight:700;color:var(--text);cursor:pointer;transition:background .15s;
+}
+.btn-edit:hover{background:#e8ecf0}
+.btn-del{
+  padding:5px 12px;background:transparent;border:1.5px solid transparent;
+  border-radius:var(--radius);font-family:var(--sans);font-size:12px;
+  font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.btn-del:hover{background:#ffebe9;border-color:#ff8182;color:var(--danger)}
+.empty-state{
+  text-align:center;padding:56px 24px;
+  color:var(--muted);font-size:14px;
+}
+.empty-state svg{margin-bottom:12px;opacity:.35}
+
+/* Photo grid */
+.photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+.photo-item{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+}
+.photo-item img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--bg)}
+.photo-meta{padding:10px 12px}
+.photo-caption{font-size:12px;color:var(--muted);margin:0 0 8px;line-height:1.4}
+.photo-actions{display:flex;gap:6px}
+
+/* Setup guide card */
+.setup-card{
+  background:var(--card);border:1.5px solid #d4a72c;border-radius:12px;
+  padding:24px 28px;margin-bottom:24px;
+}
+.setup-card h3{font-size:16px;font-weight:700;color:#7d4e00;margin:0 0 12px}
+.setup-card ol{padding-left:18px;font-size:14px;color:var(--text);line-height:1.7}
+.setup-card code{
+  background:var(--bg);border:1px solid var(--border);border-radius:4px;
+  padding:1px 6px;font-size:12px;font-family:monospace;
+}
+.setup-card a{color:#316dca;font-weight:600}
+
+/* Tabs (tab panels inside a section) */
+.tab-view{display:none}
+.tab-view.active{display:block}
+
+/* Responsive */
+@media(max-width:760px){
+  .sidebar{display:none}
+  .main-content{padding:20px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 20 28" fill="white" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg>
+    </div>
+    <h1>PBR Admin</h1>
+    <p>Project Bible Runners &mdash; Content panel</p>
+    <input type="password" id="pw-input" placeholder="Admin password" autocomplete="current-password" />
+    <p class="login-err" id="login-err">Incorrect password. Try again.</p>
+    <button class="btn-primary" id="login-btn">Sign in</button>
+  </div>
+</div>
+
+<!-- APP (shown after auth) -->
+<div id="app">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <svg viewBox="0 0 20 28" fill="white" width="12" height="17"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg>
+    </div>
+    <div class="topbar-title">
+      Project Bible Runners
+      <span class="topbar-badge">Admin</span>
+    </div>
+    <div class="topbar-right">
+      <a class="topbar-link" href="./index.html" target="_blank">View site ↗</a>
+      <button class="btn-logout" id="logout-btn">Sign out</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Content</div>
+        <div class="nav-item active" data-tab="campaigns">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
+          Campaigns
+        </div>
+        <div class="nav-item" data-tab="posts">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Blog &amp; Updates
+        </div>
+        <div class="nav-item" data-tab="photos">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Photos
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Links</div>
+        <div class="nav-item" data-tab="setup">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07m14.14 0A10 10 0 0 0 4.93 4.93"/></svg>
+          Setup guide
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main content area -->
+    <main class="main-content">
+
+      <div id="api-status"></div>
+
+      <!-- ── CAMPAIGNS ──────────────────────────────── -->
+      <div class="tab-view active" id="tab-campaigns">
+        <div class="page-header">
+          <h2 class="page-title">Campaigns</h2>
+          <button class="btn-new" id="new-campaign-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New campaign
+          </button>
+        </div>
+
+        <div class="form-panel" id="campaign-form-panel">
+          <h3 id="campaign-form-title">New campaign</h3>
+          <input type="hidden" id="campaign-id" />
+          <div class="form-row">
+            <div class="field"><label>Campaign name</label><input type="text" id="cf-name" placeholder="Spring Uganda Run 2026" /></div>
+            <div class="field"><label>URL slug</label><input type="text" id="cf-slug" placeholder="spring-uganda-2026" /></div>
+          </div>
+          <div class="form-row full">
+            <div class="field"><label>Short description (shown in hero)</label><input type="text" id="cf-desc" /></div>
+          </div>
+          <div class="form-row full">
+            <div class="field"><label>Full story (shown in About section)</label><textarea id="cf-story" rows="4"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Goal amount ($)</label><input type="number" id="cf-goal" min="0" step="1" /></div>
+            <div class="field"><label>Raised so far ($)</label><input type="number" id="cf-raised" min="0" step="1" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Bibles funded</label><input type="number" id="cf-bibles-funded" min="0" /></div>
+            <div class="field"><label>Bibles still needed</label><input type="number" id="cf-bibles-needed" min="0" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>End date</label><input type="date" id="cf-enddate" /></div>
+            <div class="field"><label>Zeffy fundraiser URL</label><input type="url" id="cf-zeffy" placeholder="https://www.zeffy.com/en-US/..." /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Header image URL</label><input type="url" id="cf-img" placeholder="https://..." /></div>
+            <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px">
+              <label style="display:flex;align-items:center;font-size:14px;cursor:pointer">
+                <input type="checkbox" id="cf-active" /> Mark as active campaign
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" id="save-campaign-btn">Save campaign</button>
+            <button class="btn-cancel" id="cancel-campaign-btn">Cancel</button>
+          </div>
+          <p class="form-msg" id="campaign-msg"></p>
+        </div>
+
+        <div id="campaigns-list">
+          <div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v18H3z"/></svg><div>No campaigns yet. Create one above.</div></div>
+        </div>
+      </div>
+
+      <!-- ── POSTS ──────────────────────────────────── -->
+      <div class="tab-view" id="tab-posts">
+        <div class="page-header">
+          <h2 class="page-title">Blog &amp; Updates</h2>
+          <button class="btn-new" id="new-post-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New post
+          </button>
+        </div>
+
+        <div class="form-panel" id="post-form-panel">
+          <h3 id="post-form-title">New post</h3>
+          <input type="hidden" id="post-id" />
+          <div class="form-row full">
+            <div class="field"><label>Title</label><input type="text" id="pf-title" /></div>
+          </div>
+          <div class="form-row full">
+            <div class="field"><label>Body</label><textarea id="pf-body" rows="6"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Author</label><input type="text" id="pf-author" value="Project Bible Runners" /></div>
+            <div class="field"><label>Image URL (optional)</label><input type="url" id="pf-img" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Publish date</label><input type="datetime-local" id="pf-date" /></div>
+            <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px">
+              <label style="display:flex;align-items:center;font-size:14px;cursor:pointer">
+                <input type="checkbox" id="pf-published" /> Publish immediately
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" id="save-post-btn">Save post</button>
+            <button class="btn-cancel" id="cancel-post-btn">Cancel</button>
+          </div>
+          <p class="form-msg" id="post-msg"></p>
+        </div>
+
+        <div id="posts-list">
+          <div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div>No posts yet. Write a field update above.</div></div>
+        </div>
+      </div>
+
+      <!-- ── PHOTOS ─────────────────────────────────── -->
+      <div class="tab-view" id="tab-photos">
+        <div class="page-header">
+          <h2 class="page-title">Photos</h2>
+          <button class="btn-new" id="new-photo-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add photo
+          </button>
+        </div>
+
+        <div class="form-panel" id="photo-form-panel">
+          <h3>Add photo by URL</h3>
+          <input type="hidden" id="photo-id" />
+          <div class="form-row full">
+            <div class="field"><label>Image URL</label><input type="url" id="phf-url" placeholder="https://..." /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Caption</label><input type="text" id="phf-caption" /></div>
+            <div class="field"><label>Alt text (for screen readers)</label><input type="text" id="phf-alt" /></div>
+          </div>
+          <div class="form-row full">
+            <div class="field">
+              <label>Category</label>
+              <select id="phf-category">
+                <option value="field">Field — general</option>
+                <option value="distribute">Field — distribution</option>
+                <option value="prayer">Field — prayer</option>
+                <option value="kit">VillageServer kit</option>
+                <option value="team">Team</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" id="save-photo-btn">Save photo</button>
+            <button class="btn-cancel" id="cancel-photo-btn">Cancel</button>
+          </div>
+          <p class="form-msg" id="photo-msg"></p>
+        </div>
+
+        <div class="photos-grid" id="photos-grid">
+          <div class="empty-state" style="grid-column:1/-1"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><div>No photos yet.</div></div>
+        </div>
+      </div>
+
+      <!-- ── SETUP GUIDE ────────────────────────────── -->
+      <div class="tab-view" id="tab-setup">
+        <div class="page-header"><h2 class="page-title">Setup guide</h2></div>
+        <div class="setup-card">
+          <h3>⚠ Connect Supabase to enable content management</h3>
+          <ol>
+            <li>Create a free project at <a href="https://supabase.com" target="_blank">supabase.com</a></li>
+            <li>In the Supabase SQL editor, run the schema below to create the tables</li>
+            <li>Go to Project Settings → API and copy your <strong>Project URL</strong> and <strong>service_role key</strong></li>
+            <li>In <a href="https://vercel.com" target="_blank">Vercel</a> → your project → Settings → Environment Variables, add:
+              <ul style="list-style:disc;margin:8px 0 0 16px;line-height:2">
+                <li><code>SUPABASE_URL</code> = your project URL</li>
+                <li><code>SUPABASE_SERVICE_KEY</code> = your service role key</li>
+                <li><code>ADMIN_PASSWORD</code> = a strong password for this admin panel</li>
+              </ul>
+            </li>
+            <li>Redeploy the site once env vars are set</li>
+          </ol>
+        </div>
+        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:24px 28px">
+          <h3 style="font-size:16px;font-weight:700;margin:0 0 14px">Supabase SQL schema — paste into SQL editor</h3>
+          <pre style="background:#161b22;color:#e6edf3;border-radius:8px;padding:20px;font-size:12px;overflow-x:auto;line-height:1.7"><code>create table campaigns (
+  id uuid default gen_random_uuid() primary key,
+  slug text unique not null,
+  name text not null,
+  description text,
+  story text,
+  goal_amount numeric default 0,
+  raised_amount numeric default 0,
+  bibles_funded integer default 0,
+  bibles_needed integer default 0,
+  end_date date,
+  zeffy_url text,
+  image_url text,
+  active boolean default false,
+  created_at timestamptz default now()
+);
+
+create table posts (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  body text not null,
+  image_url text,
+  author text default 'Project Bible Runners',
+  published boolean default false,
+  published_at timestamptz default now(),
+  created_at timestamptz default now()
+);
+
+create table photos (
+  id uuid default gen_random_uuid() primary key,
+  url text not null,
+  caption text,
+  alt text,
+  category text default 'field',
+  created_at timestamptz default now()
+);
+
+-- Allow public reads
+alter table campaigns enable row level security;
+alter table posts enable row level security;
+alter table photos enable row level security;
+
+create policy "Public reads" on campaigns for select using (true);
+create policy "Public reads published" on posts for select using (published = true);
+create policy "Public reads photos" on photos for select using (true);</code></pre>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /.app-body -->
+</div><!-- /#app -->
+
+<script>
+var AUTH_TOKEN = null;
+
+// ── Login ────────────────────────────────────────────────
+(function(){
+  var pw = document.getElementById('pw-input');
+  var btn = document.getElementById('login-btn');
+  var err = document.getElementById('login-err');
+
+  function doLogin(){
+    var password = pw.value.trim();
+    if(!password) return;
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+    fetch('/api/auth', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({password})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.token){
+        AUTH_TOKEN = data.token;
+        sessionStorage.setItem('pbr_admin_token', AUTH_TOKEN);
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        loadTab('campaigns');
+      } else {
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+        pw.focus();
+      }
+    })
+    .catch(function(){
+      err.textContent = 'Could not reach the server. Check your connection.';
+      err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Sign in';
+    });
+  }
+
+  btn.addEventListener('click', doLogin);
+  pw.addEventListener('keydown', function(e){ if(e.key === 'Enter') doLogin(); });
+
+  // Restore session
+  var saved = sessionStorage.getItem('pbr_admin_token');
+  if(saved){
+    AUTH_TOKEN = saved;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    loadTab('campaigns');
+  }
+})();
+
+// ── Logout ───────────────────────────────────────────────
+document.getElementById('logout-btn').addEventListener('click', function(){
+  AUTH_TOKEN = null;
+  sessionStorage.removeItem('pbr_admin_token');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+});
+
+// ── Sidebar navigation ───────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(function(item){
+  item.addEventListener('click', function(){
+    var tab = item.dataset.tab;
+    document.querySelectorAll('.nav-item').forEach(function(i){ i.classList.remove('active'); });
+    document.querySelectorAll('.tab-view').forEach(function(t){ t.classList.remove('active'); });
+    item.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    loadTab(tab);
+  });
+});
+
+// ── API helper ───────────────────────────────────────────
+function api(method, type, body, id){
+  var url = '/api/content?type=' + type;
+  if(id) url += '&id=' + encodeURIComponent(id);
+  var opts = {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + AUTH_TOKEN
+    }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  return fetch(url, opts).then(function(r){
+    if(r.status === 204) return null;
+    return r.json();
+  });
+}
+
+function apiGet(type, slug){
+  var url = '/api/content?type=' + type;
+  if(slug) url += '&slug=' + encodeURIComponent(slug);
+  // Pass auth to get drafts too
+  return fetch(url, {headers:{'Authorization':'Bearer ' + AUTH_TOKEN}}).then(function(r){ return r.json(); });
+}
+
+function showStatus(msg, level){
+  var el = document.getElementById('api-status');
+  el.textContent = msg;
+  el.className = level;
+  el.style.display = 'block';
+  setTimeout(function(){ el.style.display = 'none'; }, 5000);
+}
+
+function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
+function fmtDate(d){ if(!d) return '—'; return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+
+// ── Load tab ─────────────────────────────────────────────
+function loadTab(tab){
+  if(tab === 'campaigns') loadCampaigns();
+  else if(tab === 'posts') loadPosts();
+  else if(tab === 'photos') loadPhotos();
+}
+
+// ════════════════════════════════════════════════════════
+// CAMPAIGNS
+// ════════════════════════════════════════════════════════
+var editingCampaign = null;
+
+document.getElementById('new-campaign-btn').addEventListener('click', function(){
+  editingCampaign = null;
+  clearCampaignForm();
+  document.getElementById('campaign-form-title').textContent = 'New campaign';
+  document.getElementById('campaign-form-panel').classList.add('open');
+});
+document.getElementById('cancel-campaign-btn').addEventListener('click', function(){
+  document.getElementById('campaign-form-panel').classList.remove('open');
+});
+
+function clearCampaignForm(){
+  ['campaign-id','cf-name','cf-slug','cf-desc','cf-story','cf-goal','cf-raised',
+   'cf-bibles-funded','cf-bibles-needed','cf-enddate','cf-zeffy','cf-img'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('cf-active').checked = false;
+  document.getElementById('campaign-msg').style.display = 'none';
+}
+
+function fillCampaignForm(c){
+  document.getElementById('campaign-id').value = c.id || '';
+  document.getElementById('cf-name').value = c.name || '';
+  document.getElementById('cf-slug').value = c.slug || '';
+  document.getElementById('cf-desc').value = c.description || '';
+  document.getElementById('cf-story').value = c.story || '';
+  document.getElementById('cf-goal').value = c.goal_amount || '';
+  document.getElementById('cf-raised').value = c.raised_amount || '';
+  document.getElementById('cf-bibles-funded').value = c.bibles_funded || '';
+  document.getElementById('cf-bibles-needed').value = c.bibles_needed || '';
+  document.getElementById('cf-enddate').value = c.end_date || '';
+  document.getElementById('cf-zeffy').value = c.zeffy_url || '';
+  document.getElementById('cf-img').value = c.image_url || '';
+  document.getElementById('cf-active').checked = !!c.active;
+}
+
+document.getElementById('save-campaign-btn').addEventListener('click', function(){
+  var body = {
+    name: document.getElementById('cf-name').value.trim(),
+    slug: document.getElementById('cf-slug').value.trim(),
+    description: document.getElementById('cf-desc').value.trim(),
+    story: document.getElementById('cf-story').value.trim(),
+    goal_amount: parseFloat(document.getElementById('cf-goal').value)||0,
+    raised_amount: parseFloat(document.getElementById('cf-raised').value)||0,
+    bibles_funded: parseInt(document.getElementById('cf-bibles-funded').value)||0,
+    bibles_needed: parseInt(document.getElementById('cf-bibles-needed').value)||0,
+    end_date: document.getElementById('cf-enddate').value||null,
+    zeffy_url: document.getElementById('cf-zeffy').value.trim()||null,
+    image_url: document.getElementById('cf-img').value.trim()||null,
+    active: document.getElementById('cf-active').checked,
+  };
+  if(!body.name||!body.slug){ showMsg('campaign-msg','Name and slug are required','err'); return; }
+  var id = document.getElementById('campaign-id').value;
+  var method = id ? 'PATCH' : 'POST';
+  api(method,'campaigns',body,id||null)
+    .then(function(data){
+      if(data && data.error){ showMsg('campaign-msg','Error: '+data.error,'err'); return; }
+      document.getElementById('campaign-form-panel').classList.remove('open');
+      clearCampaignForm();
+      loadCampaigns();
+      showStatus(id ? 'Campaign updated.' : 'Campaign created.','ok');
+    })
+    .catch(function(){ showMsg('campaign-msg','Save failed — is Supabase configured?','err'); });
+});
+
+function loadCampaigns(){
+  apiGet('campaigns').then(function(data){
+    var list = document.getElementById('campaigns-list');
+    if(!data || !data.length){
+      list.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v18H3z"/></svg><div>No campaigns yet. Create one above.</div></div>';
+      return;
+    }
+    var html = '<table class="items-table"><thead><tr><th>Name</th><th>Raised / Goal</th><th>End date</th><th>Status</th><th></th></tr></thead><tbody>';
+    data.forEach(function(c){
+      html += '<tr>' +
+        '<td><strong>' + esc(c.name) + '</strong><br><span style="font-size:12px;color:var(--muted)">/'+esc(c.slug)+'</span></td>' +
+        '<td>$' + Number(c.raised_amount||0).toLocaleString() + ' / $' + Number(c.goal_amount||0).toLocaleString() + '</td>' +
+        '<td>' + fmtDate(c.end_date) + '</td>' +
+        '<td><span class="td-badge ' + (c.active?'active':'draft') + '">' + (c.active?'Active':'Draft') + '</span></td>' +
+        '<td><div class="td-actions">' +
+          '<button class="btn-edit" onclick="editCampaign(' + JSON.stringify(c).replace(/"/g,'&quot;') + ')">Edit</button>' +
+          '<button class="btn-del" onclick="deleteCampaign(\'' + c.id + '\')">Delete</button>' +
+        '</div></td>' +
+        '</tr>';
+    });
+    html += '</tbody></table>';
+    list.innerHTML = html;
+  }).catch(function(){
+    showStatus('Could not load campaigns — Supabase may not be configured yet.','warn');
+  });
+}
+
+function editCampaign(c){
+  editingCampaign = c;
+  fillCampaignForm(c);
+  document.getElementById('campaign-form-title').textContent = 'Edit campaign';
+  document.getElementById('campaign-form-panel').classList.add('open');
+  document.getElementById('campaign-form-panel').scrollIntoView({behavior:'smooth'});
+}
+
+function deleteCampaign(id){
+  if(!confirm('Delete this campaign? This cannot be undone.')) return;
+  api('DELETE','campaigns',null,id).then(function(){ loadCampaigns(); showStatus('Campaign deleted.','ok'); });
+}
+
+// ════════════════════════════════════════════════════════
+// POSTS
+// ════════════════════════════════════════════════════════
+document.getElementById('new-post-btn').addEventListener('click', function(){
+  clearPostForm();
+  document.getElementById('post-form-title').textContent = 'New post';
+  document.getElementById('post-form-panel').classList.add('open');
+});
+document.getElementById('cancel-post-btn').addEventListener('click', function(){
+  document.getElementById('post-form-panel').classList.remove('open');
+});
+
+function clearPostForm(){
+  ['post-id','pf-title','pf-body','pf-img','pf-date'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('pf-author').value = 'Project Bible Runners';
+  document.getElementById('pf-published').checked = false;
+  document.getElementById('post-msg').style.display = 'none';
+}
+
+function fillPostForm(p){
+  document.getElementById('post-id').value = p.id||'';
+  document.getElementById('pf-title').value = p.title||'';
+  document.getElementById('pf-body').value = p.body||'';
+  document.getElementById('pf-author').value = p.author||'Project Bible Runners';
+  document.getElementById('pf-img').value = p.image_url||'';
+  document.getElementById('pf-published').checked = !!p.published;
+  document.getElementById('pf-date').value = p.published_at ? p.published_at.slice(0,16) : '';
+}
+
+document.getElementById('save-post-btn').addEventListener('click', function(){
+  var body = {
+    title: document.getElementById('pf-title').value.trim(),
+    body: document.getElementById('pf-body').value.trim(),
+    author: document.getElementById('pf-author').value.trim()||'Project Bible Runners',
+    image_url: document.getElementById('pf-img').value.trim()||null,
+    published: document.getElementById('pf-published').checked,
+    published_at: document.getElementById('pf-date').value ? new Date(document.getElementById('pf-date').value).toISOString() : new Date().toISOString(),
+  };
+  if(!body.title||!body.body){ showMsg('post-msg','Title and body are required','err'); return; }
+  var id = document.getElementById('post-id').value;
+  api(id?'PATCH':'POST','posts',body,id||null)
+    .then(function(data){
+      if(data && data.error){ showMsg('post-msg','Error: '+data.error,'err'); return; }
+      document.getElementById('post-form-panel').classList.remove('open');
+      clearPostForm();
+      loadPosts();
+      showStatus(id?'Post updated.':'Post published.','ok');
+    })
+    .catch(function(){ showMsg('post-msg','Save failed — is Supabase configured?','err'); });
+});
+
+function loadPosts(){
+  apiGet('posts').then(function(data){
+    var list = document.getElementById('posts-list');
+    if(!data||!data.length){
+      list.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div>No posts yet. Write a field update above.</div></div>';
+      return;
+    }
+    var html = '<table class="items-table"><thead><tr><th>Title</th><th>Author</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody>';
+    data.forEach(function(p){
+      html += '<tr>' +
+        '<td><strong>'+esc(p.title)+'</strong></td>' +
+        '<td>'+esc(p.author||'—')+'</td>' +
+        '<td>'+fmtDate(p.published_at||p.created_at)+'</td>' +
+        '<td><span class="td-badge '+(p.published?'active':'draft')+'">'+(p.published?'Published':'Draft')+'</span></td>' +
+        '<td><div class="td-actions">' +
+          '<button class="btn-edit" onclick="editPost(\''+p.id+'\')">Edit</button>' +
+          '<button class="btn-del" onclick="deletePost(\''+p.id+'\')">Delete</button>' +
+        '</div></td></tr>';
+    });
+    html += '</tbody></table>';
+    list.innerHTML = html;
+    window._postsCache = data;
+  }).catch(function(){ showStatus('Could not load posts — Supabase may not be configured yet.','warn'); });
+}
+
+function editPost(id){
+  var p = (window._postsCache||[]).find(function(x){ return x.id===id; });
+  if(!p) return;
+  fillPostForm(p);
+  document.getElementById('post-form-title').textContent = 'Edit post';
+  document.getElementById('post-form-panel').classList.add('open');
+  document.getElementById('post-form-panel').scrollIntoView({behavior:'smooth'});
+}
+
+function deletePost(id){
+  if(!confirm('Delete this post? This cannot be undone.')) return;
+  api('DELETE','posts',null,id).then(function(){ loadPosts(); showStatus('Post deleted.','ok'); });
+}
+
+// ════════════════════════════════════════════════════════
+// PHOTOS
+// ════════════════════════════════════════════════════════
+document.getElementById('new-photo-btn').addEventListener('click', function(){
+  clearPhotoForm();
+  document.getElementById('photo-form-panel').classList.add('open');
+});
+document.getElementById('cancel-photo-btn').addEventListener('click', function(){
+  document.getElementById('photo-form-panel').classList.remove('open');
+});
+
+function clearPhotoForm(){
+  ['photo-id','phf-url','phf-caption','phf-alt'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('phf-category').value = 'field';
+  document.getElementById('photo-msg').style.display = 'none';
+}
+
+document.getElementById('save-photo-btn').addEventListener('click', function(){
+  var body = {
+    url: document.getElementById('phf-url').value.trim(),
+    caption: document.getElementById('phf-caption').value.trim()||null,
+    alt: document.getElementById('phf-alt').value.trim()||null,
+    category: document.getElementById('phf-category').value,
+  };
+  if(!body.url){ showMsg('photo-msg','Image URL is required','err'); return; }
+  var id = document.getElementById('photo-id').value;
+  api(id?'PATCH':'POST','photos',body,id||null)
+    .then(function(data){
+      if(data && data.error){ showMsg('photo-msg','Error: '+data.error,'err'); return; }
+      document.getElementById('photo-form-panel').classList.remove('open');
+      clearPhotoForm();
+      loadPhotos();
+      showStatus('Photo saved.','ok');
+    })
+    .catch(function(){ showMsg('photo-msg','Save failed — is Supabase configured?','err'); });
+});
+
+function loadPhotos(){
+  apiGet('photos').then(function(data){
+    var grid = document.getElementById('photos-grid');
+    if(!data||!data.length){
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><div>No photos yet.</div></div>';
+      return;
+    }
+    grid.innerHTML = data.map(function(ph){
+      return '<div class="photo-item">' +
+        '<img src="'+esc(ph.url)+'" alt="'+esc(ph.alt||'')+'" loading="lazy" onerror="this.style.opacity=.3;this.alt=\'Load failed\'" />' +
+        '<div class="photo-meta">' +
+        '<p class="photo-caption">'+(ph.caption ? esc(ph.caption) : '<em style="opacity:.5">No caption</em>')+'</p>' +
+        '<div class="photo-actions">' +
+        '<button class="btn-edit" onclick="editPhoto(\''+ph.id+'\')">Edit</button>' +
+        '<button class="btn-del" onclick="deletePhoto(\''+ph.id+'\')">Delete</button>' +
+        '</div></div></div>';
+    }).join('');
+    window._photosCache = data;
+  }).catch(function(){ showStatus('Could not load photos — Supabase may not be configured yet.','warn'); });
+}
+
+function editPhoto(id){
+  var ph = (window._photosCache||[]).find(function(x){ return x.id===id; });
+  if(!ph) return;
+  document.getElementById('photo-id').value = ph.id;
+  document.getElementById('phf-url').value = ph.url||'';
+  document.getElementById('phf-caption').value = ph.caption||'';
+  document.getElementById('phf-alt').value = ph.alt||'';
+  document.getElementById('phf-category').value = ph.category||'field';
+  document.getElementById('photo-form-panel').classList.add('open');
+  document.getElementById('photo-form-panel').scrollIntoView({behavior:'smooth'});
+}
+
+function deletePhoto(id){
+  if(!confirm('Delete this photo?')) return;
+  api('DELETE','photos',null,id).then(function(){ loadPhotos(); showStatus('Photo deleted.','ok'); });
+}
+
+// ── Shared helpers ───────────────────────────────────────
+function showMsg(elId, msg, level){
+  var el = document.getElementById(elId);
+  el.textContent = msg;
+  el.className = 'form-msg ' + level;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>
