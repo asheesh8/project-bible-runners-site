@@ -43,10 +43,22 @@
   <img class="hero-media" src="./img/hero-field.webp" alt="A Bible Runner traveling through a remote village landscape" width="1300" height="1733" fetchpriority="high" decoding="async" />
   <div class="scrim"></div>
 
-  <!-- Recent donors — desktop only, top-right float -->
+  <!-- Recent donors + YTD counter — desktop only, top-right float -->
   <div class="hero-donors" id="donor-feed" aria-label="Recent donors">
     <div class="donor-card" id="donor-0"></div>
     <div class="donor-card" id="donor-1"></div>
+    <!-- YTD Bibles placed counter -->
+    <div class="hero-ytd" id="hero-ytd" aria-label="Year-to-date Bibles placed">
+      <div class="ytd-top">
+        <span class="ytd-label">Bibles placed in 2026</span>
+        <span class="ytd-pct"><span id="ytd-pct-num">0</span>% of goal</span>
+      </div>
+      <div class="ytd-count"><span id="ytd-num">0</span></div>
+      <div class="ytd-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ytd-bar">
+        <div class="ytd-bar-fill" id="ytd-bar-fill"></div>
+      </div>
+      <div class="ytd-subline">Goal: <b>8,000</b> Bibles this year &nbsp;·&nbsp; 14+ nations</div>
+    </div>
   </div>
 
   <div class="wrap hero-in">
@@ -66,19 +78,6 @@
       <p class="hero-verse-text" id="verse-text"></p>
       <span class="hero-verse-ref" id="verse-ref"></span>
       <div class="verse-dots" id="verse-dots"></div>
-    </div>
-
-    <!-- YTD Bibles placed counter -->
-    <div class="hero-ytd reveal" id="hero-ytd" aria-label="Year-to-date Bibles placed">
-      <div class="ytd-top">
-        <span class="ytd-label">Bibles placed in 2026</span>
-        <span class="ytd-pct"><span id="ytd-pct-num">0</span>% of goal</span>
-      </div>
-      <div class="ytd-count"><span id="ytd-num">0</span></div>
-      <div class="ytd-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ytd-bar">
-        <div class="ytd-bar-fill" id="ytd-bar-fill"></div>
-      </div>
-      <div class="ytd-subline">Goal: <b>8,000</b> Bibles this year &nbsp;·&nbsp; 14+ nations</div>
     </div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 96" preserveAspectRatio="none" aria-hidden="true">

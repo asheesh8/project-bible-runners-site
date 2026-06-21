@@ -110,30 +110,28 @@ header.nav{position:absolute;inset:0 0 auto;z-index:50;color:var(--bone);backgro
 .vd{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .3s}
 .vd.active{background:var(--ochre-soft)}
 
-/* YTD Bibles placed counter */
+/* YTD Bibles placed counter — sits inside .hero-donors column */
 .hero-ytd{
-  margin-top:22px;
-  background:rgba(8,17,10,.58);
-  border:1px solid rgba(212,175,100,.22);
-  border-radius:12px;
-  padding:16px 20px 14px;
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  max-width:340px
+  background:rgba(8,17,10,.68);
+  border:1px solid rgba(212,175,100,.28);
+  border-radius:10px;
+  padding:13px 14px 11px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)
 }
-.ytd-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.ytd-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px}
 .ytd-label{
   font-family:var(--serif);font-style:italic;
-  font-size:clamp(11px,1vw,13px);color:var(--ochre-soft);letter-spacing:.02em
+  font-size:11.5px;color:var(--ochre-soft);letter-spacing:.02em
 }
-.ytd-pct{font-size:10.5px;color:rgba(255,253,247,.45);letter-spacing:.06em}
+.ytd-pct{font-size:10px;color:rgba(255,253,247,.42);letter-spacing:.05em}
 .ytd-count{
   font-family:var(--serif);font-weight:600;
-  font-size:clamp(2rem,3.6vw,2.6rem);
-  color:var(--bone);line-height:1;margin-bottom:10px
+  font-size:1.7rem;
+  color:var(--bone);line-height:1;margin-bottom:8px
 }
 .ytd-bar-track{
   height:3px;background:rgba(255,255,255,.1);
-  border-radius:3px;overflow:hidden;margin-bottom:8px
+  border-radius:3px;overflow:hidden;margin-bottom:6px
 }
 .ytd-bar-fill{
   height:100%;width:0%;
@@ -141,9 +139,8 @@ header.nav{position:absolute;inset:0 0 auto;z-index:50;color:var(--bone);backgro
   border-radius:3px;
   transition:width 2s cubic-bezier(.22,1,.36,1)
 }
-.ytd-subline{font-size:10.5px;color:rgba(255,253,247,.38);letter-spacing:.04em}
-.ytd-subline b{color:rgba(255,253,247,.6);font-weight:600}
-@media(max-width:600px){.hero-ytd{display:none}}
+.ytd-subline{font-size:10px;color:rgba(255,253,247,.35);letter-spacing:.03em}
+.ytd-subline b{color:rgba(255,253,247,.55);font-weight:600}
 
 /* Recent donor feed — absolute, top-right of hero */
 .hero-donors{
