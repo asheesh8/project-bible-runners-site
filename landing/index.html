@@ -25,7 +25,7 @@
 <header class="nav">
   <div class="wrap nav-in">
     <a class="brand" href="#top">
-      <span class="mark" aria-hidden="true"></span>
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 28" fill="white" xmlns="http://www.w3.org/2000/svg" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg></span>
       <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
     </a>
     <nav class="nav-links">
@@ -38,9 +38,16 @@
 </header>
 
 <!-- HERO -->
-<section class="hero" id="top">
-  <img class="hero-media" src="./img/hero-field.webp" alt="A Bible Runner traveling through a remote village landscape" width="1300" height="1733" fetchpriority="high" decoding="async" />
-  <div class="scrim"></div>
+<section class=”hero” id=”top”>
+  <img class=”hero-media” src=”./img/hero-field.webp” alt=”A Bible Runner traveling through a remote village landscape” width=”1300” height=”1733” fetchpriority=”high” decoding=”async” />
+  <div class=”scrim”></div>
+
+  <!-- Recent donors — desktop only, top-right float -->
+  <div class=”hero-donors” id=”donor-feed” aria-label=”Recent donors”>
+    <div class=”donor-card” id=”donor-0”></div>
+    <div class=”donor-card” id=”donor-1”></div>
+  </div>
+
   <div class=”wrap hero-in”>
     <h1 class=”reveal”>42% of the world has <span class=”hl”>never heard</span> that Jesus loves them.</h1>
     <p class=”sub reveal”>In thousands of villages, believers have fasted and prayed for years for a single Bible. <b>$7 answers that prayer</b> — and $500 builds an entire village its own offline Bible library.</p>
@@ -53,7 +60,12 @@
       <span><span class=”dot”></span>14+ nations reached</span>
       <span><span class=”dot”></span>EIN <b>85-1992796</b> · 501(c)(3)</span>
     </div>
-    <p class=”verse reveal”>”…and this gospel of the kingdom will be proclaimed throughout the whole world as a testimony to all nations, and then the end will come.” &nbsp;<b>Matthew 24:14</b></p>
+    <!-- Rotating Bible verse box -->
+    <div class=”hero-verse-box reveal”>
+      <p class=”hero-verse-text” id=”verse-text”></p>
+      <span class=”hero-verse-ref” id=”verse-ref”></span>
+      <div class=”verse-dots” id=”verse-dots”></div>
+    </div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 96" preserveAspectRatio="none" aria-hidden="true">
     <path d="M0 55C212 86 352 28 541 52C761 81 909 27 1110 52C1260 72 1360 62 1440 38V96H0Z" />
@@ -247,7 +259,7 @@
     <div class="foot-grid">
       <div>
         <a class="brand footer-brand" href="#top">
-          <span class="mark" aria-hidden="true"></span>
+          <span class="mark" aria-hidden="true"><svg viewBox="0 0 20 28" fill="white" xmlns="http://www.w3.org/2000/svg" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg></span>
           <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
         </a>
         <p class="ms">“Gathering and running Bibles to nations, tribes and people until every follower of Jesus owns a Bible.”</p>
@@ -324,6 +336,71 @@ if(!window.location.hash){window.scrollTo(0,0);}
     es.forEach(function(en){if(en.isIntersecting){run(en.target);io.unobserve(en.target);}});
   },{threshold:.5});
   document.querySelectorAll('[data-to]').forEach(function(e){io.observe(e)});
+})();
+
+// ── Rotating Bible verses ────────────────────────────────
+(function(){
+  var verses=[
+    {t:'“And this gospel of the kingdom will be proclaimed throughout the whole world as a testimony to all nations, and then the end will come.”',r:'Matthew 24:14'},
+    {t:'“For I know the plans I have for you, declares the Lord, plans for welfare and not for evil, to give you a future and a hope.”',r:'Jeremiah 29:11'},
+    {t:'“Go into all the world and proclaim the gospel to the whole creation.”',r:'Mark 16:15'},
+    {t:'“Your word is a lamp to my feet and a light to my path.”',r:'Psalm 119:105'},
+    {t:'“How then will they call on him in whom they have not believed? And how are they to believe in him of whom they have never heard?”',r:'Romans 10:14'},
+    {t:'“So shall my word be that goes out from my mouth; it shall not return to me empty, but it shall accomplish that which I purpose.”',r:'Isaiah 55:11'},
+  ];
+  var tEl=document.getElementById('verse-text');
+  var rEl=document.getElementById('verse-ref');
+  var dotsEl=document.getElementById('verse-dots');
+  if(!tEl)return;
+  var idx=0;
+  // Build dots
+  verses.forEach(function(_,i){var d=document.createElement('span');d.className='vd'+(i===0?' active':'');dotsEl.appendChild(d);});
+  var dots=dotsEl.querySelectorAll('.vd');
+  function set(i){tEl.textContent=verses[i].t;rEl.textContent=verses[i].r;dots.forEach(function(d,j){d.classList.toggle('active',j===i);});}
+  set(0);
+  setInterval(function(){
+    tEl.classList.add('v-out');rEl.classList.add('v-out');
+    setTimeout(function(){idx=(idx+1)%verses.length;set(idx);tEl.classList.remove('v-out');rEl.classList.remove('v-out');},520);
+  },7000);
+})();
+
+// ── Recent donors (simulated — replace array with live Zeffy webhook data when available) ──
+(function(){
+  var donors=[
+    {n:'Sarah M.',loc:'Illinois',amt:7,i:'S'},
+    {n:'James & Ruth T.',loc:'Texas',amt:35,i:'J'},
+    {n:'Emily R.',loc:'California',amt:7,i:'E'},
+    {n:'First Baptist Church',loc:'Ohio',amt:70,i:'F'},
+    {n:'Mike & Dana',loc:'',amt:35,i:'M'},
+    {n:'Anonymous',loc:'',amt:500,i:'A'},
+    {n:'Grace Community',loc:'Tennessee',amt:70,i:'G'},
+    {n:'David K.',loc:'Colorado',amt:7,i:'D'},
+    {n:'The Wilson Family',loc:'',amt:35,i:'T'},
+    {n:'Pastor John W.',loc:'',amt:70,i:'P'},
+  ];
+  var slots=[document.getElementById('donor-0'),document.getElementById('donor-1')];
+  if(!slots[0])return;
+  var offsets=[2,9];
+  function card(d,mins){
+    var t=mins<60?mins+'m ago':Math.floor(mins/60)+'h ago';
+    var loc=d.loc?' · '+d.loc:'';
+    return '<div class="donor-row"><div class="d-avatar">'+d.i+'</div>'
+      +'<div class="d-info"><strong>'+d.n+'</strong>'+loc+' gave <span class="d-amt">$'+d.amt+'</span>'
+      +'<div class="d-time">'+t+'</div></div></div>';
+  }
+  slots[0].innerHTML=card(donors[0],2);
+  slots[1].innerHTML=card(donors[1],9);
+  var next=2;
+  setInterval(function(){
+    var d=donors[next%donors.length]; next++;
+    slots[1].classList.add('d-out');
+    setTimeout(function(){
+      slots[1].innerHTML=slots[0].innerHTML;slots[1].classList.remove('d-out');
+      slots[0].classList.add('d-out');
+      slots[0].innerHTML=card(d,1);
+      setTimeout(function(){slots[0].classList.remove('d-out');},50);
+    },450);
+  },18000);
 })();
 
 // Conversion-event stubs — ready for Meta Pixel + GA4
