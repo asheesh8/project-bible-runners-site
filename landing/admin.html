@@ -550,11 +550,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       <div class="tab-view" id="tab-traffic">
         <div class="page-header">
           <div><h2 class="page-title">Traffic &amp; Ad Sources</h2><p class="domain-stream"><span aria-hidden="true"></span>Combined live stream · villageserver.com + villageserver.org</p></div>
-          <button class="btn-new" id="refresh-traffic-btn" style="background:var(--muted)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
-          </button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-new" id="test-visit-btn" style="background:var(--accent)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+              Send test visit
+            </button>
+            <button class="btn-new" id="refresh-traffic-btn" style="background:var(--muted)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              Refresh
+            </button>
+          </div>
         </div>
+
+        <!-- Pipeline health / diagnostics banner -->
+        <div id="traffic-health" style="display:none;margin-bottom:20px"></div>
 
         <!-- Summary cards -->
         <div id="traffic-summary-cards" class="stat-grid"><div class="loading-state">Loading traffic summary…</div></div>
@@ -1405,7 +1414,53 @@ function renderStatCard(label, value, sub){
     '</div>';
 }
 
+// ── Tracking pipeline health + self-test ─────────────────
+var _lastHealthAt = 0;
+function maybeHealth(){ if(Date.now() - _lastHealthAt > 12000){ _lastHealthAt = Date.now(); renderTrafficHealth(); } }
+function timeAgo(iso){ if(!iso) return ''; var s=Math.floor((Date.now()-new Date(iso).getTime())/1000); if(s<60) return s+'s ago'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+function _healthBanner(bg,bd,fg,title,body){ return '<div style="padding:13px 16px;border-radius:10px;background:'+bg+';border:1px solid '+bd+';color:'+fg+';font-size:13px;line-height:1.55"><strong>'+title+'</strong>'+(body?'<br>'+body:'')+'</div>'; }
+function renderTrafficHealth(){
+  var el=document.getElementById('traffic-health');
+  if(!el) return Promise.resolve();
+  if(IS_LOCAL_PREVIEW){ el.innerHTML=_healthBanner('#ddf4ff','#54aeff','#0a3069','Preview mode — sample data','Deploy with Supabase env vars set to see live visit tracking here.'); el.style.display='block'; return Promise.resolve(); }
+  return trackGet('health').then(function(h){
+    h=h||{};
+    var html;
+    if(!h.supabase_configured){
+      html=_healthBanner('#ffebe9','#ff8182','#82071e','⚠ Supabase isn’t connected — visits cannot be saved.','Add <code>SUPABASE_URL</code> and <code>SUPABASE_SERVICE_KEY</code> in Vercel → Settings → Environment Variables, then redeploy. (Full steps in the Setup guide tab.)');
+    } else {
+      var pv=(h.tables&&h.tables.page_visits)||{};
+      if(!pv.ok){
+        html=_healthBanner('#fff8c5','#d4a72c','#7d4e00','⚠ The page_visits table isn’t ready.','Supabase responded: <code>'+esc(pv.error||'unknown error')+'</code>. Open the Setup guide tab, run the SQL schema, then reload this page.');
+      } else if(!pv.count){
+        html=_healthBanner('#ddf4ff','#54aeff','#0a3069','✓ Connected — waiting for the first visit.','The pipeline is healthy, but no visits are recorded yet. Click “Send test visit”, or open your public site on another phone/browser.');
+      } else {
+        html=_healthBanner('#dafbe1','#52a55d','#1a4731','✓ Live — tracking is working.',h.visit_count+' visit'+(h.visit_count===1?'':'s')+' recorded'+(h.latest_visit_at?' · latest '+timeAgo(h.latest_visit_at):'')+'.');
+      }
+    }
+    el.innerHTML=html; el.style.display='block';
+  }).catch(function(){ el.style.display='none'; });
+}
+(function(){
+  var b=document.getElementById('test-visit-btn');
+  if(!b) return;
+  b.addEventListener('click', function(){
+    b.disabled=true; var orig=b.innerHTML; b.textContent='Sending…';
+    fetch(apiUrl('/api/track?type=visit'),{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({site_host:(location.hostname||'').replace(/^www\./,''),path:'/admin-self-test',referrer:'admin-dashboard',utm_source:'admin-test',utm_medium:'diagnostic',utm_campaign:'pipeline-check'})})
+      .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d}; }); })
+      .then(function(res){
+        if(res.ok && res.d && res.d.ok===true && !res.d.note) showStatus('Test visit saved ✓ — refreshing the dashboard…','ok');
+        else showStatus('Visit not saved: '+esc((res.d&&(res.d.note||res.d.error))||'server error')+'.','err');
+        return new Promise(function(rs){ setTimeout(rs,1000); });
+      })
+      .then(function(){ _lastHealthAt=0; return Promise.all([loadTraffic(), renderTrafficHealth()]); })
+      .catch(function(){ showStatus('Could not reach /api/track — confirm the site is deployed with its API functions.','err'); })
+      .finally(function(){ b.disabled=false; b.innerHTML=orig; });
+  });
+})();
+
 function loadTraffic(){
+  maybeHealth();
   return trackGet('summary')
     .then(function(data){
       var visits = data.visits || [];

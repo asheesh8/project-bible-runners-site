@@ -20,8 +20,42 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { type } = req.query;
-  const VALID = ['visit', 'visits', 'interest', 'interests', 'availability', 'availabilities', 'summary'];
+  const VALID = ['visit', 'visits', 'interest', 'interests', 'availability', 'availabilities', 'summary', 'health'];
   if (!VALID.includes(type)) return res.status(400).json({ error: 'Invalid type' });
+
+  // ── Admin health check: report pipeline status without exposing secrets ──
+  if (type === 'health') {
+    const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
+    if (!ADMIN_PASSWORD || authHeader !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
+    const configured = !!(SUPABASE_URL && SUPABASE_SERVICE_KEY);
+    const out = { supabase_configured: configured, admin_password_set: !!ADMIN_PASSWORD, tables: {}, visit_count: null, latest_visit_at: null };
+    if (!configured) return res.status(200).json(out);
+    const probeH = { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` };
+    for (const t of ['page_visits', 'donation_interests', 'availability_requests']) {
+      try {
+        const rr = await fetch(`${SUPABASE_URL}/rest/v1/${t}?select=id`, { headers: { ...probeH, Prefer: 'count=exact', Range: '0-0' } });
+        if (rr.ok || rr.status === 206) {
+          const cr = rr.headers.get('content-range') || '';
+          const cnt = cr.includes('/') ? Number(cr.split('/')[1]) : null;
+          out.tables[t] = { ok: true, count: Number.isFinite(cnt) ? cnt : null };
+        } else {
+          const body = await rr.json().catch(() => ({}));
+          out.tables[t] = { ok: false, error: body.message || body.error || `HTTP ${rr.status}` };
+        }
+      } catch (e) {
+        out.tables[t] = { ok: false, error: String((e && e.message) || e) };
+      }
+    }
+    if (out.tables.page_visits && out.tables.page_visits.ok) {
+      out.visit_count = out.tables.page_visits.count;
+      try {
+        const lv = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=created_at&order=created_at.desc&limit=1`, { headers: probeH });
+        const arr = await lv.json();
+        out.latest_visit_at = Array.isArray(arr) && arr[0] ? arr[0].created_at : null;
+      } catch (e) { /* ignore */ }
+    }
+    return res.status(200).json(out);
+  }
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
     if (req.method === 'GET') return res.status(200).json([]);
