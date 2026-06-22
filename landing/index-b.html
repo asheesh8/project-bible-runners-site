@@ -1,333 +1,124 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Project Bible Runners — Answer a prayer for $7 · Ember</title>
-<meta name="description" content="42% of the world has never heard that Jesus loves them. $7 places a Bible in the hands of a believer who has waited years for one — and $500 builds an offline, solar-powered Bible library for an entire village." />
-
-<!-- Open Graph (for the Facebook ad link preview) -->
-<meta property="og:type" content="website" />
-<meta property="og:title" content="$7 answers a prayer that's years old." />
-<meta property="og:description" content="42% of the world has never heard that Jesus loves them. Place a Bible in waiting hands — or power an entire village's offline Bible library." />
-<meta property="og:image" content="./img/hero-field.webp" />
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz@1,6..72&display=swap" rel="stylesheet">
-
-<link rel="preload" as="image" href="./img/hero-field.webp" type="image/webp" fetchpriority="high">
-<link rel="stylesheet" href="./css/base.css">
-<link rel="stylesheet" href="./css/theme-ember.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>VillageServer Initiative | Start here</title>
+  <meta name="description" content="Learn what VillageServer does, check kit availability, choose a setup guide, and see how the offline system works.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="VillageServer Initiative">
+  <meta property="og:description" content="A portable digital library for communities beyond reliable internet.">
+  <meta property="og:image" content="./img/hero-field.webp">
+  <link rel="canonical" href="https://villageserver.org/">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="./img/hero-field.webp" type="image/webp" fetchpriority="high">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/home.css">
 </head>
 <body>
+  <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap nav-row">
+      <a class="brand official-brand" href="#top" aria-label="VillageServer Initiative home"><img class="official-logo" src="./img/villageserver-logo.png" alt="VillageServer Initiative"></a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" data-i18n="menu">Menu</button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
+        <a href="#initiative" data-i18n="navWhat">What we do</a><a href="#availability" data-i18n="navFind">Find a kit</a><a href="#setup" data-i18n="navSetup">Set up</a><a href="#system" data-i18n="navHow">How it works</a><a class="nav-support" href="./initiative.html" data-i18n="navAbout">About the initiative</a>
+      </nav>
+    </div>
+  </header>
+  <section class="language-bar" aria-label="Language selection">
+    <div class="wrap language-row"><div><span class="language-globe" aria-hidden="true">文</span><span><b data-i18n="languageLabel">View in your language</b><small data-i18n="languageHelp">Translate this entire resource page</small></span></div><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="fr">Français</option><option value="sw">Kiswahili</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="ne">नेपाली</option><option value="bn">বাংলা</option></select></div>
+  </section>
 
-<!-- NAV -->
-<header class="nav">
-  <div class="wrap nav-in">
-    <a class="brand" href="#top">
-      <span class="mark" aria-hidden="true"></span>
-      <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
-    </a>
-    <nav class="nav-links">
-      <a class="lnk" href="#why">The Need</a>
-      <a class="lnk" href="#villageserver">VillageServer</a>
-      <a class="lnk" href="#give">Ways to Give</a>
-      <a class="btn btn-give btn-sm" href="#give" data-track="donation_started" data-source="nav">Give a Bible · $7</a>
+  <main id="main">
+    <section class="hero home-hero" id="top">
+      <img class="hero-media" src="./img/hero-field.webp" alt="A VillageServer field leader in a remote community" width="1300" height="1733" fetchpriority="high" decoding="async">
+      <div class="hero-shade"></div>
+      <div class="wrap hero-copy">
+        <p class="kicker light" data-i18n="heroKicker">The VillageServer Initiative</p>
+        <h1 data-i18n-html="heroTitle">Start with what <em>you need.</em></h1>
+        <p class="hero-lead" data-i18n="heroLead">Understand the initiative, find out whether kits are available near you, or jump directly into a field setup guide.</p>
+        <div class="hero-actions"><a class="button button-primary" href="#journey" data-i18n="heroStart">Show me where to start</a><a class="button button-glass" href="./guide.html?part=wifi" data-i18n="heroHave">I already have a kit</a></div>
+      </div>
+      <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 42C220 85 393 17 590 48c190 29 373-11 552 15 125 18 218 12 298-18v45H0Z"/></svg>
+    </section>
+
+    <nav class="journey wrap" id="journey" aria-label="VillageServer getting started steps">
+      <a href="#initiative"><span>1</span><b data-i18n="journeyUnderstand">Understand</b><small data-i18n="journeyWhat">What we do</small></a>
+      <a href="#availability"><span>2</span><b data-i18n="journeyFind">Find a kit</b><small data-i18n="journeyCheck">Check your area</small></a>
+      <a href="#setup"><span>3</span><b data-i18n="journeySet">Set it up</b><small data-i18n="journeyComponent">Choose a component</small></a>
+      <a href="#system"><span>4</span><b data-i18n="journeySee">See the system</b><small data-i18n="journeyConnect">How it connects</small></a>
     </nav>
-  </div>
-</header>
 
-<!-- HERO -->
-<section class="hero" id="top">
-  <img class="hero-media" src="./img/hero-field.webp" alt="A Bible Runner traveling through a remote village landscape" width="1300" height="1733" fetchpriority="high" decoding="async" />
-  <div class="scrim"></div>
-  <div class=”wrap hero-in”>
-    <h1 class=”reveal”>42% of the world has <span class=”hl”>never heard</span> that Jesus loves them.</h1>
-    <p class=”sub reveal”>In thousands of villages, believers have fasted and prayed for years for a single Bible. <b>$7 answers that prayer</b> — and $500 builds an entire village its own offline Bible library.</p>
-    <p class=”verse reveal”>”…and this gospel of the kingdom will be proclaimed throughout the whole world as a testimony to all nations, and then the end will come.” &nbsp;<b>Matthew 24:14</b></p>
-    <div class=”hero-cta reveal”>
-      <a class=”btn btn-give” href=”#give” data-track=”donation_started” data-source=”hero”>Give a Bible · $7</a>
-      <a class=”btn btn-ghost” href=”#villageserver”>See how it works</a>
-    </div>
-    <div class=”hero-trust reveal”>
-      <span><span class=”dot”></span>Founded <b>2019</b> · Owen &amp; Jess Sweitzer</span>
-      <span><span class=”dot”></span>14+ nations reached</span>
-      <span><span class=”dot”></span>EIN <b>85-1992796</b> · 501(c)(3)</span>
-    </div>
-  </div>
-  <svg class="hero-wave" viewBox="0 0 1440 96" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 55C212 86 352 28 541 52C761 81 909 27 1110 52C1260 72 1360 62 1440 38V96H0Z" />
-  </svg>
-</section>
-
-<!-- STAT BAND -->
-<section class="stats" id="why">
-  <div class="wrap stats-grid">
-    <div class="stat reveal"><div class="num" data-to="7295">0</div><div class="lbl">unreached people groups worldwide (41.9%)</div></div>
-    <div class="stat reveal"><div class="num" data-to="97" data-suffix="%">0</div><div class="lbl">of them live in the 10/40 Window</div></div>
-    <div class="stat reveal"><div class="num" data-to="3.56" data-suffix="B" data-dec="2">0</div><div class="lbl">people still unreached, of 8.19B</div></div>
-    <div class="stat reveal"><div class="num"><small class="currency">$</small><span data-to="7">0</span></div><div class="lbl">puts one Bible in waiting hands</div></div>
-  </div>
-</section>
-
-<!-- THE $7 -->
-<section class="seven">
-  <div class="wrap seven-grid">
-    <div class="reveal">
-      <p class="eyebrow">The promise of one Bible</p>
-      <div class="bignum"><small>$</small>7</div>
-      <p class="lead lead-tight">A single native-language Bible, hand-delivered by runners who go two-by-two into rural villages. In many places, one Bible is read aloud and shared among <b>200–500 people</b>.</p>
-      <p class="promise-intro">When a believer receives their Bible, they promise three things:</p>
-      <ul class="promises">
-        <li><span class="n">1</span><span>Read their Bible <b>every day</b> for the rest of their life.</span></li>
-        <li><span class="n">2</span><span>Obey Jesus' commands and the New Testament.</span></li>
-        <li><span class="n">3</span><span>Share the Gospel with the people they love.</span></li>
-      </ul>
-      <a class="btn btn-give section-cta" href="#give" data-track="donation_started" data-source="seven">Place a Bible for $7</a>
-    </div>
-    <div class="photo-card ratio-portrait reveal">
-      <img src="./img/receiving.webp" alt="A believer holds a Bible she received in Uganda" width="1536" height="1920" loading="lazy" decoding="async" />
-      <div class="cap">A believer lifts the Bible she prayed years to hold.</div>
-    </div>
-  </div>
-</section>
-
-<!-- VILLAGESERVER -->
-<section class="vs" id="villageserver">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow">The VillageServer Initiative</p>
-      <h2>A whole village's Bible library. No internet required.</h2>
-      <p class="lead">Where a paper Bible reaches one set of hands, a VillageServer reaches a village. It's a solar-powered Raspberry Pi that creates its own local WiFi — so anyone nearby can open Scripture, audio Bibles, and video in their own language on the phone already in their pocket. Completely offline.</p>
-    </div>
-    <div class="vs-split">
-      <div class="vs-narr reveal">
-        <div class="steps">
-          <div class="step"><div class="si">☀️</div><div><h4>1 · Solar power</h4><p>A folding solar suitcase keeps the whole kit running through the day — no grid, no generator.</p></div></div>
-          <div class="step"><div class="si">🍓</div><div><h4>2 · Raspberry Pi server</h4><p>A palm-sized computer holds Bibles, audio, and video pre-loaded in local languages.</p></div></div>
-          <div class="step"><div class="si">📶</div><div><h4>3 · Local WiFi hotspot</h4><p>A travel router broadcasts a private network that covers the gathering — no data plan needed.</p></div></div>
-          <div class="step"><div class="si">📱</div><div><h4>4 · Every phone connects</h4><p>People join the hotspot and read, listen, and watch — then share phone-to-phone to neighbors.</p></div></div>
-        </div>
-        <div class="kit-badge">Full kit cost: ~$483–$550 &nbsp;·&nbsp; You fund it at $500</div>
-        <div><a class="btn btn-give section-cta" href="#give" data-track="donation_started" data-source="villageserver">Fund a VillageServer · $500</a></div>
+    <section class="home-step initiative-step" id="initiative">
+      <div class="wrap split-story">
+        <div class="story-copy"><p class="step-kicker"><span data-i18n="step1">Step 1</span><i data-i18n="step1Label">Understand the initiative</i></p><h2 data-i18n="step1Heading">A local library where the internet cannot reliably go.</h2><p data-i18n="step1Copy">VillageServer is a portable Raspberry Pi 5 system that creates its own Wi-Fi network. Nearby phones can open Bible text, audio Scripture, gospel films, children’s resources, and training without mobile data.</p><div class="mini-benefits"><span><b data-i18n="benefitOff">Offline first</b><i data-i18n="benefitOffCopy">No internet required</i></span><span><b data-i18n="benefitLang">Language ready</b><i data-i18n="benefitLangCopy">Swap resource cards</i></span><span><b data-i18n="benefitPower">Field powered</b><i data-i18n="benefitPowerCopy">Solar-ready system</i></span></div><a class="inline-cta" href="./initiative.html" data-i18n="initiativeLink">Explore the initiative and rollout →</a></div>
+        <figure class="story-photo"><img src="./img/kit-case.webp" alt="The portable VillageServer kit in its field case" width="1300" height="975" loading="lazy"><figcaption data-i18n="kitCaption">Server, content, power, projection, charging, and optional satellite tools.</figcaption></figure>
       </div>
-      <div class="vs-photos reveal">
-        <div class="photo-card ratio-wide">
-          <img src="./img/kit-case.webp" alt="The VillageServer field kit — solar panels and equipment packed in a travel case" width="1300" height="975" loading="lazy" decoding="async"/>
-          <div class="cap">The complete field kit: solar, server, router — packs into a single case.</div>
-        </div>
-        <div class="photo-card ratio-square">
-          <img src="./img/kit-pi.webp" alt="Raspberry Pi server that runs the offline Bible library" width="1100" height="825" loading="lazy" decoding="async"/>
-          <div class="cap">The Raspberry Pi that holds the library.</div>
-        </div>
-        <div class="photo-card ratio-square">
-          <img src="./img/broadcast.webp" alt="Gospel broadcast playing on a screen in the field" width="1200" height="680" loading="lazy" decoding="async"/>
-          <div class="cap">Free-to-air broadcast, captured in the field.</div>
+    </section>
+
+    <section class="home-step availability-step" id="availability">
+      <div class="wrap availability-grid">
+        <div><p class="step-kicker"><span data-i18n="step2">Step 2</span><i data-i18n="step2Label">Find a kit</i></p><h2 data-i18n="step2Heading">Can I order a kit near me?</h2><p data-i18n="step2Copy">VillageServer is entering field pilots rather than public retail distribution. Check your area for the clearest current path.</p></div>
+        <div class="availability-widget">
+          <label for="region-select" data-i18n="regionLabel">Where will the kit be used?</label>
+          <div class="select-row"><select id="region-select"><option value="" data-i18n="regionChoose">Choose a location</option><option value="kenya" data-i18n="regionKenya">Kenya</option><option value="peru" data-i18n="regionPeru">Peruvian Amazon / Peru</option><option value="africa" data-i18n="regionAfrica">Elsewhere in Africa</option><option value="latin" data-i18n="regionLatin">Elsewhere in Latin America</option><option value="asia" data-i18n="regionAsia">Asia</option><option value="other" data-i18n="regionOther">Another region</option></select><button type="button" id="check-region" data-i18n="checkAvailability">Check availability</button></div>
+          <div class="availability-result" id="availability-result" aria-live="polite">
+            <span class="status-dot"></span><div><b data-i18n="regionInitial">Select a location to begin.</b><p data-i18n="regionInitialCopy">We’ll show whether it is a pilot area or a future deployment request.</p></div>
+          </div>
+          <p class="honesty-note" data-i18n="honesty">VillageServer kits are not yet available through public online checkout. Pilot access is coordinated with field partners.</p>
         </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- REACH / CREDIBILITY -->
-<section class="reach">
-  <div class="wrap reach-grid">
-    <div class="reveal">
-      <p class="eyebrow">Where the work is happening</p>
-      <h2 class="reach-title">From rural Kenya to the 10/40 Window.</h2>
-      <p class="lead">Runners and partners are active across four continents — and a satellite strategy is opening doors to billions more.</p>
-      <div class="chips">
-        <span class="chip">Kenya</span><span class="chip">Uganda</span><span class="chip">Pakistan</span>
-        <span class="chip">India</span><span class="chip">Philippines</span><span class="chip">Rwanda</span>
-        <span class="chip">Tanzania</span><span class="chip">Malawi</span><span class="chip">Nigeria</span>
-        <span class="chip">South Sudan</span><span class="chip">Cambodia</span><span class="chip">Guinea</span>
-        <span class="chip">Zambia</span><span class="chip">Peru</span>
+    <section class="home-step setup-step" id="setup">
+      <div class="wrap">
+        <div class="step-heading"><div><p class="step-kicker"><span data-i18n="step3">Step 3</span><i data-i18n="step3Label">Set it up</i></p><h2 data-i18n="step3Heading">What is in front of you?</h2></div><p data-i18n="step3Copy">Choose one item. The widget gives you the quick path; the full guide opens only when you need it.</p></div>
+        <div class="setup-widget">
+          <div class="setup-choices" role="tablist" aria-label="Choose setup component">
+            <button role="tab" aria-selected="true" data-setup="wifi" data-i18n="tabWifi">Phone + Wi-Fi</button><button role="tab" aria-selected="false" data-setup="pi" data-i18n="tabPi" tabindex="-1">Raspberry Pi</button><button role="tab" aria-selected="false" data-setup="microsd" data-i18n="tabSd" tabindex="-1">microSD</button><button role="tab" aria-selected="false" data-setup="usb" data-i18n="tabUsb" tabindex="-1">USB drive</button><button role="tab" aria-selected="false" data-setup="solar" data-i18n="tabSolar" tabindex="-1">Solar suitcase</button><button role="tab" aria-selected="false" data-setup="projector" data-i18n="tabProjector" tabindex="-1">Projector</button><button role="tab" aria-selected="false" data-setup="charging" data-i18n="tabCharging" tabindex="-1">Phone charging</button><button role="tab" aria-selected="false" data-setup="satellite" data-i18n="tabSatellite" tabindex="-1">Satellite</button>
+          </div>
+          <div class="setup-preview" aria-live="polite">
+            <div class="setup-preview-icon" id="setup-icon">◉</div><p class="preview-type" id="setup-type">Use the library</p><h3 id="setup-title">Connect a phone</h3><p id="setup-summary">Join VillageServer Wi-Fi, open the local library, and save one resource for offline use.</p>
+            <ol id="setup-quick"><li>Open Wi-Fi settings</li><li>Join VillageServer</li><li>Open and save a resource</li></ol>
+            <a class="button button-primary" id="setup-link" href="./guide.html?part=wifi">Open the full phone guide</a>
+          </div>
+        </div>
       </div>
-      <ul class="cred">
-        <li><span class="ci">95–99%</span><span>Active meetings with <b>SES / Intelsat</b>, whose satellites cover nearly all of the populated Earth.</span></li>
-        <li><span class="ci">2–4B</span><span>People inside the footprint of <b>Gawahi TV</b> on AsiaSat-7 — free-to-air Gospel broadcast across South Asia.</span></li>
-        <li><span class="ci">1,190</span><span>People starting a relationship with Jesus, funded by a single church's VBS class.</span></li>
-      </ul>
-    </div>
-    <div class="reveal field-grid">
-      <div class="photo-card ratio-square"><img src="./img/field-distribute.webp" alt="Runners hand-delivering Bibles to a waiting community" width="780" height="585" loading="lazy" decoding="async"/><div class="cap">Hand-delivered, village by village.</div></div>
-      <div class="photo-card ratio-square"><img src="./img/field-prayer.webp" alt="A runner and a local believer praying together in a field" width="780" height="779" loading="lazy" decoding="async"/><div class="cap">Two-by-two — runner and believer.</div></div>
-      <div class="photo-card ratio-square"><img src="./img/field-reading.webp" alt="A young woman reading her Bible on the church steps" width="631" height="620" loading="lazy" decoding="async"/><div class="cap">The first promise: read it daily.</div></div>
-      <div class="photo-card ratio-square"><img src="./img/field-runner.webp" alt="A Bible Runner carrying a box of Bibles in the field" width="780" height="1040" loading="lazy" decoding="async"/><div class="cap">800+ Bibles carried in per run.</div></div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- GIVING LADDER -->
-<section class="ladder" id="give">
-  <div class="wrap">
-    <div class="sec-head sec-head-centered reveal">
-      <p class="eyebrow">Ways to give</p>
-      <h2>Choose how far your gift runs.</h2>
-      <p class="lead">Every gift is tax-deductible. Give once, or give monthly to keep Bibles moving all year.</p>
-    </div>
-    <div class="tiers">
-      <div class="tier feature reveal">
-        <span class="pill">Most common</span>
-        <div class="amt"><small>$</small>7</div>
-        <div class="tier-name">Give a Bible</div>
-        <p class="tier-funds">One native-language Bible, hand-delivered to a believer who has been waiting and praying for one.</p>
-        <a class="btn btn-give" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_7">Give $7</a>
+    <section class="home-step system-step" id="system">
+      <div class="wrap">
+        <div class="step-heading inverse"><div><p class="step-kicker light-step"><span data-i18n="step4">Step 4</span><i data-i18n="step4Label">See the whole system</i></p><h2 data-i18n="step4Heading">Power in. Library out.</h2></div><p data-i18n="step4Copy">Every field tool supports one simple flow. Optional parts can be added without making the offline library depend on them.</p></div>
+        <div class="system-flow" aria-label="VillageServer system flow">
+          <article><span>01</span><b data-i18n="flowPower">Power</b><p data-i18n="flowPowerCopy">Solar suitcase, battery, or reliable local power.</p></article><i>→</i><article><span>02</span><b>VillageServer</b><p data-i18n="flowServerCopy">Raspberry Pi stores and serves the local library.</p></article><i>→</i><article><span>03</span><b data-i18n="flowAccess">Local access</b><p data-i18n="flowAccessCopy">Wi-Fi, microSD, and USB deliver the resources.</p></article><i>→</i><article><span>04</span><b data-i18n="flowPeople">People</b><p data-i18n="flowPeopleCopy">Read, listen, watch, save, and share.</p></article>
+        </div>
+        <div class="optional-tools"><span data-i18n="optional">Optional additions</span><a href="./guide.html?part=projector" data-i18n="optionalProjector">Pico projector</a><a href="./guide.html?part=charging" data-i18n="optionalCharging">20-phone charging</a><a href="./guide.html?part=satellite" data-i18n="optionalSatellite">Satellite connection</a></div>
       </div>
-      <div class="tier reveal">
-        <span class="pill">Bundle</span>
-        <div class="amt"><small>$</small>35</div>
-        <div class="tier-name">Bible Bundle</div>
-        <p class="tier-funds">Five Bibles for a family or a small gathering of new believers.</p>
-        <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_35">Give $35</a>
-      </div>
-      <div class="tier reveal">
-        <span class="pill">Church pack</span>
-        <div class="amt"><small>$</small>70</div>
-        <div class="tier-name">Church Pack</div>
-        <p class="tier-funds">Ten Bibles — enough to seed a house church in a rural community.</p>
-        <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_70">Give $70</a>
-      </div>
-      <div class="tier feature reveal">
-        <span class="pill">Build a library</span>
-        <div class="amt"><small>$</small>500</div>
-        <div class="tier-name">VillageServer Kit</div>
-        <p class="tier-funds">A complete solar-powered, offline Bible library — Bibles, audio &amp; video — for one whole village.</p>
-        <a class="btn btn-give" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_500">Fund a kit · $500</a>
-      </div>
-      <div class="tier reveal">
-        <span class="pill">Field team</span>
-        <div class="amt"><small>$</small>1,250</div>
-        <div class="tier-name">Satellite Run</div>
-        <p class="tier-funds">A full satellite-capture kit so a field team can receive and replay broadcasts anywhere.</p>
-        <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="tier_1250">Give $1,250</a>
-      </div>
-      <div class="tier reveal">
-        <span class="pill">You go too</span>
-        <div class="amt"><small>$</small>4,400<small>+</small></div>
-        <div class="tier-name">Sponsor a Run</div>
-        <p class="tier-funds">Fund a 10-day Bible Run — 800+ Bibles hand-delivered. Come and carry them yourself.</p>
-        <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="trip_inquiry" data-source="tier_4400">Plan a Run</a>
-      </div>
-    </div>
-    <div class="custom-give reveal">
-      <p>Want to give a different amount?</p>
-      <a class="btn btn-dark" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="custom_amount">Give a custom amount</a>
-    </div>
-    <p class="recurnote reveal">Prefer to give monthly? Every tier can be set as a recurring gift on the giving page. 💛</p>
-  </div>
-</section>
+    </section>
 
-<!-- QUOTE -->
-<section class="quote">
-  <div class="wrap reveal">
-    <blockquote>“The kingdom advances at the speed of connections, and revival moves at the speed of relationships.”</blockquote>
-    <cite>— Derrick Rhayn · Kingdom Impact Network</cite>
-  </div>
-</section>
+    <section class="resource-section" id="resources">
+      <div class="wrap"><div class="resource-heading"><p class="kicker" data-i18n="resourceKicker">Go deeper when you need to</p><h2 data-i18n="resourceHeading">Shorter pages. Clearer jobs.</h2></div><div class="resource-grid">
+        <a href="./initiative.html"><img src="./img/hero-village.webp" alt="A village landscape" width="1400" height="933" loading="lazy"><div><small data-i18n="resourceLearn">Learn</small><h3 data-i18n="resourceInitiative">Initiative, pilots, and rollout</h3><span data-i18n="resourceStory">Read the story →</span></div></a>
+        <a href="./access.html"><img src="./img/field-reading.webp" alt="A person reading a resource outdoors" width="631" height="620" loading="lazy"><div><small data-i18n="resourceUse">Use</small><h3 data-i18n="resourceAccess">Get, save, and share resources</h3><span data-i18n="resourceAccessLink">Open access guide →</span></div></a>
+        <a href="./guide.html?part=wifi"><img src="./img/kit-pi.webp" alt="The VillageServer Raspberry Pi" width="1100" height="825" loading="lazy"><div><small data-i18n="resourceSetup">Set up</small><h3 data-i18n="resourceGuides">All field setup guides</h3><span data-i18n="resourceGuideLink">Choose a guide →</span></div></a>
+      </div></div>
+    </section>
+  </main>
 
-<!-- FINAL CTA -->
-<section class="final">
-  <div class="wrap reveal">
-    <h2>Somewhere tonight, a believer is praying for <span class="hl">a Bible.</span></h2>
-    <p>You can answer that prayer before you close this page. $7 sends one. $500 lights up a village.</p>
-    <div class="hero-cta">
-      <a class="btn btn-give" href="https://www.zeffy.com/en-US/donation-form/PENDING" target="_blank" rel="noopener" data-track="donation_started" data-source="final">Give a Bible · $7</a>
-      <a class="btn btn-ghost" href="#villageserver">Fund a VillageServer</a>
-    </div>
-  </div>
-</section>
+  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 28 24 16l16 12v13H8Z"/><path d="M14 21V9M9 14h10M28 10c6 1 10 5 11 11M29 16c3 .5 5 2.5 6 5"/></svg></span><span><b>VillageServer</b><small>Initiative</small></span></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b data-i18n="footerResources">Resources</b><a href="./initiative.html" data-i18n="footerInitiative">The initiative</a><a href="./access.html" data-i18n="footerAccess">Access resources</a><a href="./guide.html?part=wifi" data-i18n="footerGuides">Setup guides</a></div><div><b data-i18n="footerInvolved">Get involved</b><a href="#availability" data-i18n="footerAvailability">Kit availability</a><a href="./donate.html" data-i18n="footerSupport">Support the work</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span></div></footer>
 
-<!-- FOOTER -->
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <a class="brand footer-brand" href="#top">
-          <span class="mark" aria-hidden="true"></span>
-          <span><b>Project Bible Runners</b><span>VillageServer Initiative</span></span>
-        </a>
-        <p class="ms">“Gathering and running Bibles to nations, tribes and people until every follower of Jesus owns a Bible.”</p>
-      </div>
-      <div>
-        <h5>Contact</h5>
-        <p><a href="mailto:projectbiblerunners@gmail.com">projectbiblerunners@gmail.com</a></p>
-        <p><a href="https://www.facebook.com/projectbiblerunners" target="_blank" rel="noopener">Facebook</a> · <a href="https://www.projectbiblerunners.com" target="_blank" rel="noopener">projectbiblerunners.com</a></p>
-        <p class="footer-spaced">PO Box 422<br>Charleston, IL 61920</p>
-      </div>
-      <div>
-        <h5>Give</h5>
-        <p><a href="#give">Give a Bible — $7</a></p>
-        <p><a href="#give">Fund a VillageServer — $500</a></p>
-        <p><a href="#give">Sponsor a Bible Run</a></p>
-        <p class="footer-spaced">Founded 2019<br>EIN 85-1992796 · 501(c)(3)</p>
-      </div>
-    </div>
-    <div class="foot-bar">
-      <span>© 2026 Project Bible Runners. All gifts tax-deductible.</span>
-      <span>Built by ArkiTech-Sol</span>
-    </div>
-  </div>
-</footer>
+  <script src="./js/i18n.js?v=2"></script>
+  <script>
+    const menuButton=document.querySelector('.menu-button');const siteNav=document.querySelector('.site-nav');menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-expanded',String(!open));siteNav.classList.toggle('open',!open)});siteNav.addEventListener('click',event=>{if(event.target.matches('a')){menuButton.setAttribute('aria-expanded','false');siteNav.classList.remove('open')}});
 
-<!-- STICKY MOBILE GIVE BAR -->
-<div class="mbar">
-  <p><b>$7</b> answers a prayer that's years old.</p>
-  <a class="btn btn-give btn-sm" href="#give" data-track="donation_started" data-source="mobilebar">Give now</a>
-</div>
+    const regionSelect=document.getElementById('region-select');const regionResult=document.getElementById('availability-result');function renderAvailability(){const item=window.VSI18N.availability(regionSelect.value);if(!regionSelect.value){regionResult.innerHTML=`<span class="status-dot warning"></span><div><b>${item.status}</b><p>${item.copy}</p></div>`;return}regionResult.innerHTML=`<span class="status-dot ready"></span><div><b>${item.status}</b><p>${item.copy}</p><a href="${item.link}">${item.label} →</a></div>`}document.getElementById('check-region').addEventListener('click',renderAvailability);
 
-<script>
-// Preserve readable layouts if a media request fails unexpectedly.
-(function(){
-  document.querySelectorAll('img').forEach(function(img){
-    img.addEventListener('error',function(){
-      var frame=img.closest('.photo-card,.hero');
-      if(frame)frame.classList.add('media-missing');
-      img.hidden=true;
-    });
-  });
-})();
-
-// Reveal on scroll
-(function(){
-  var els=document.querySelectorAll('.reveal');
-  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
-  var io=new IntersectionObserver(function(es){
-    es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
-  },{threshold:.14});
-  els.forEach(function(e){io.observe(e)});
-})();
-
-// Count-up stats
-(function(){
-  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function fmt(v,dec){return dec? v.toFixed(dec): Math.round(v).toLocaleString('en-US');}
-  function run(el){
-    var to=parseFloat(el.dataset.to), suf=el.dataset.suffix||'', dec=parseInt(el.dataset.dec||0);
-    if(reduce){el.textContent=fmt(to,dec)+suf;return;}
-    var start=performance.now(), dur=1300;
-    function tick(now){
-      var p=Math.min((now-start)/dur,1), e=1-Math.pow(1-p,3);
-      el.textContent=fmt(to*e,dec)+suf;
-      if(p<1)requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }
-  var io=new IntersectionObserver(function(es){
-    es.forEach(function(en){if(en.isIntersecting){run(en.target);io.unobserve(en.target);}});
-  },{threshold:.5});
-  document.querySelectorAll('[data-to]').forEach(function(e){io.observe(e)});
-})();
-
-// Conversion-event stubs — ready for Meta Pixel + GA4
-document.addEventListener('click',function(e){
-  var a=e.target.closest('[data-track]'); if(!a)return;
-  var ev=a.dataset.track, src=a.dataset.source||'';
-  if(window.fbq)fbq('trackCustom',ev,{source:src});
-  if(window.gtag)gtag('event',ev,{source:src});
-  console.log('[track]',ev,src);
-});
-</script>
+    const setupData={wifi:{icon:'◉',type:'Use the library',title:'Connect a phone',summary:'Join VillageServer Wi-Fi, open the local library, and save one resource for offline use.',quick:['Open Wi-Fi settings','Join VillageServer','Open and save a resource'],label:'Open the full phone guide'},pi:{icon:'▣',type:'Core system',title:'Start the Raspberry Pi',summary:'Power the server, wait for the local network, and verify it from a phone.',quick:['Check the system card','Connect approved power','Verify the Wi-Fi library'],label:'Open the Raspberry Pi guide'},microsd:{icon:'SD',type:'Language library',title:'Use a microSD card',summary:'Open or swap a language-specific library on VillageServer, a phone, or a computer.',quick:['Check the language label','Insert with the correct adapter','Open START HERE'],label:'Open the microSD guide'},usb:{icon:'USB',type:'Portable files',title:'Use a USB drive',summary:'Connect a portable resource library and copy selected files safely.',quick:['Connect the labeled drive','Open START HERE','Copy, then safely eject'],label:'Open the USB guide'},solar:{icon:'☀',type:'Off-grid power',title:'Set up the solar suitcase',summary:'Position the panels and power the field system using the kit-specific connection order.',quick:['Place panels in clear sun','Follow the cable labels','Check charge before starting'],label:'Open the solar guide'},projector:{icon:'▶',type:'Group media',title:'Set up the projector',summary:'Connect a source, choose the correct input, and prepare a clear group showing.',quick:['Place and power the projector','Connect the media source','Focus and test sound'],label:'Open the projector guide'},charging:{icon:'⚡',type:'Practical service',title:'Set up phone charging',summary:'Build a supervised charging station without overloading the field power system.',quick:['Check available power','Add phones gradually','Track and monitor devices'],label:'Open the charging guide'},satellite:{icon:'⌁',type:'Optional connection',title:'Set up satellite',summary:'Add a live connection for updates or streams while keeping local access independent.',quick:['Choose clear open sky','Assemble by printed labels','Align and confirm signal'],label:'Open the satellite guide'}};
+    const setupTabs=[...document.querySelectorAll('[data-setup]')];function chooseSetup(tab){setupTabs.forEach(item=>{const selected=item===tab;item.setAttribute('aria-selected',String(selected));item.tabIndex=selected?0:-1});const key=tab.dataset.setup;const item=window.VSI18N.setup(key,setupData[key]);document.getElementById('setup-icon').textContent=item.icon;document.getElementById('setup-type').textContent=item.type;document.getElementById('setup-title').textContent=item.title;document.getElementById('setup-summary').textContent=item.summary;document.getElementById('setup-quick').innerHTML=item.quick.map(step=>`<li>${step}</li>`).join('');const link=document.getElementById('setup-link');link.href=`./guide.html?part=${key}`;link.textContent=item.label}setupTabs.forEach((tab,index)=>{tab.addEventListener('click',()=>chooseSetup(tab));tab.addEventListener('keydown',event=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();const forward=['ArrowDown','ArrowRight'].includes(event.key);const next=(index+(forward?1:-1)+setupTabs.length)%setupTabs.length;setupTabs[next].focus();chooseSetup(setupTabs[next])})});window.addEventListener('vsi:languagechange',()=>{const selected=document.querySelector('[data-setup][aria-selected="true"]');chooseSetup(selected);if(regionSelect.value)renderAvailability()});
+  </script>
 </body>
 </html>

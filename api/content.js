@@ -3,16 +3,17 @@
 //
 // Public endpoints (no auth):
 //   GET /api/content?type=campaigns
-//   GET /api/content?type=campaigns&slug=spring-uganda-2026
+//   GET /api/content?type=campaigns&slug=kenya-field-pilot
 //   GET /api/content?type=posts
 //   GET /api/content?type=photos
+//   GET /api/content?type=affiliates
 //
 // Admin endpoints (Authorization: Bearer <ADMIN_PASSWORD>):
 //   POST   /api/content?type=campaigns   body={}
 //   PATCH  /api/content?type=campaigns&id=uuid  body={}
 //   DELETE /api/content?type=campaigns&id=uuid
 
-const TABLES = { campaigns: true, posts: true, photos: true };
+const TABLES = { campaigns: true, posts: true, photos: true, affiliates: true };
 
 export default async function handler(req, res) {
   const { SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD } = process.env;
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
   }
 
   const { type, slug, id } = req.query;
-  if (!TABLES[type]) return res.status(400).json({ error: 'Invalid type. Use: campaigns | posts | photos' });
+  if (!TABLES[type]) return res.status(400).json({ error: 'Invalid type. Use: campaigns | posts | photos | affiliates' });
 
   const sbHeaders = {
     'Content-Type': 'application/json',
@@ -44,6 +45,7 @@ export default async function handler(req, res) {
     if (id)   url += `&id=eq.${encodeURIComponent(id)}`;
     // Only return published posts to public
     if (type === 'posts' && !req.headers.authorization) url += '&published=eq.true';
+    if (type === 'affiliates' && !req.headers.authorization) url += '&active=eq.true';
 
     const r = await fetch(url, { headers: sbHeaders });
     const data = await r.json();
