@@ -86,6 +86,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   padding:2px 8px;border-radius:99px;
 }
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.poll-status{display:flex;align-items:center;gap:7px;padding:5px 10px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:rgba(255,255,255,.72);font-size:11px;white-space:nowrap}.poll-status>span{width:7px;height:7px;border-radius:50%;background:#d9df7b;box-shadow:0 0 0 4px rgba(217,223,123,.1)}.poll-status.syncing>span{animation:poll-pulse .8s ease-in-out infinite}.poll-status.paused>span{background:#e7b94f;box-shadow:none}.poll-status.error>span{background:#ff8182;box-shadow:none}.poll-status b{color:#fff;font-size:11px}.poll-status small{color:rgba(255,255,255,.45);font-size:10px}@keyframes poll-pulse{50%{transform:scale(1.55);opacity:.55}}
 .topbar-link{
   font-size:13px;color:rgba(255,255,255,.55);text-decoration:none;
   font-weight:600;transition:color .15s;
@@ -264,7 +265,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
 /* Responsive */
 @media(max-width:760px){
-  .topbar{height:58px;padding:0 13px}.topbar-title{font-size:12px}.topbar-badge,.topbar-link{display:none}.app-body{display:block}.sidebar{display:flex;width:100%;height:auto;position:sticky;top:58px;z-index:90;padding:8px 10px;overflow-x:auto}.sidebar-section{display:contents}.sidebar-label{display:none}.nav-item{flex:0 0 auto;padding:8px 12px;font-size:12px}.main-content{padding:20px 13px}
+  .topbar{height:58px;padding:0 13px}.topbar-title{font-size:12px}.topbar-badge,.topbar-link,.poll-status small{display:none}.poll-status{padding:5px 8px}.app-body{display:block}.sidebar{display:flex;width:100%;height:auto;position:sticky;top:58px;z-index:90;padding:8px 10px;overflow-x:auto}.sidebar-section{display:contents}.sidebar-label{display:none}.nav-item{flex:0 0 auto;padding:8px 12px;font-size:12px}.main-content{padding:20px 13px}
   .form-row{grid-template-columns:1fr}
   .dashboard-hero,.dashboard-grid{grid-template-columns:1fr}.dashboard-stats{grid-template-columns:1fr 1fr}.stat-grid{grid-template-columns:1fr 1fr!important}.analytics-grid{grid-template-columns:1fr!important}.preview-banner{align-items:flex-start;flex-direction:column}.tracking-flow,.faq-grid{grid-template-columns:1fr}.flow-card:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-17px}.faq-article.wide{grid-column:auto}.privacy-list{grid-template-columns:1fr}
 }
@@ -300,6 +301,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       <span class="topbar-badge" id="environment-badge">Admin</span>
     </div>
     <div class="topbar-right">
+      <div class="poll-status" id="poll-status" role="status" aria-live="polite"><span aria-hidden="true"></span><b id="poll-state">Live</b><small id="poll-detail">refreshes every 4s</small></div>
       <a class="topbar-link" href="./index.html" target="_blank">View site ↗</a>
       <button class="btn-logout" id="logout-btn">Sign out</button>
     </div>
@@ -978,10 +980,10 @@ function api(method, type, body, id){
 
 function apiGet(type, slug){
   if(IS_LOCAL_PREVIEW) return Promise.resolve(previewCopy(PREVIEW_STORE[type] || []));
-  var url = '/api/content?type=' + type;
+  var url = '/api/content?type=' + type + '&_ts=' + Date.now();
   if(slug) url += '&slug=' + encodeURIComponent(slug);
   // Pass auth to get drafts too
-  return fetch(url, {headers:{'Authorization':'Bearer ' + AUTH_TOKEN}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
+  return fetch(url, {cache:'no-store',headers:{'Authorization':'Bearer ' + AUTH_TOKEN,'Cache-Control':'no-cache'}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
 }
 
 function trackGet(type){
@@ -990,7 +992,7 @@ function trackGet(type){
     if(type === 'interests') return Promise.resolve(previewCopy(PREVIEW_STORE.interests));
     if(type === 'availability') return Promise.resolve(previewCopy(PREVIEW_STORE.availability));
   }
-  return fetch('/api/track?type=' + type, {headers:{'Authorization':'Bearer '+AUTH_TOKEN}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
+  return fetch('/api/track?type=' + type + '&_ts=' + Date.now(), {cache:'no-store',headers:{'Authorization':'Bearer '+AUTH_TOKEN,'Cache-Control':'no-cache'}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
 }
 
 function showStatus(msg, level){
@@ -1006,18 +1008,19 @@ function fmtDate(d){ if(!d) return '—'; return new Date(d).toLocaleDateString(
 
 // ── Load tab ─────────────────────────────────────────────
 function loadTab(tab){
-  if(tab === 'overview') loadOverview();
-  else if(tab === 'campaigns') loadCampaigns();
-  else if(tab === 'posts') loadPosts();
-  else if(tab === 'photos') loadPhotos();
-  else if(tab === 'affiliates') loadAffiliates();
-  else if(tab === 'traffic') loadTraffic();
-  else if(tab === 'interests') loadInterests();
-  else if(tab === 'kitrequests') loadKitRequests();
+  if(tab === 'overview') return loadOverview();
+  if(tab === 'campaigns') return loadCampaigns();
+  if(tab === 'posts') return loadPosts();
+  if(tab === 'photos') return loadPhotos();
+  if(tab === 'affiliates') return loadAffiliates();
+  if(tab === 'traffic') return loadTraffic();
+  if(tab === 'interests') return loadInterests();
+  if(tab === 'kitrequests') return loadKitRequests();
+  return Promise.resolve();
 }
 
 function loadOverview(){
-  Promise.all([apiGet('campaigns'),apiGet('posts'),apiGet('photos'),apiGet('affiliates'),trackGet('summary'),trackGet('availability')]).then(function(results){
+  return Promise.all([apiGet('campaigns'),apiGet('posts'),apiGet('photos'),apiGet('affiliates'),trackGet('summary'),trackGet('availability')]).then(function(results){
     var contentTotal = results[0].length + results[1].length + results[2].length + results[3].length;
     var summary = results[4] || {};
     document.getElementById('overview-content-count').textContent = contentTotal;
@@ -1100,7 +1103,7 @@ document.getElementById('save-campaign-btn').addEventListener('click', function(
 });
 
 function loadCampaigns(){
-  apiGet('campaigns').then(function(data){
+  return apiGet('campaigns').then(function(data){
     var list = document.getElementById('campaigns-list');
     if(!data || !data.length){
       list.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v18H3z"/></svg><div>No campaigns yet. Create one above.</div></div>';
@@ -1191,7 +1194,7 @@ document.getElementById('save-post-btn').addEventListener('click', function(){
 });
 
 function loadPosts(){
-  apiGet('posts').then(function(data){
+  return apiGet('posts').then(function(data){
     var list = document.getElementById('posts-list');
     if(!data||!data.length){
       list.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div>No posts yet. Write a field update above.</div></div>';
@@ -1267,7 +1270,7 @@ document.getElementById('save-photo-btn').addEventListener('click', function(){
 });
 
 function loadPhotos(){
-  apiGet('photos').then(function(data){
+  return apiGet('photos').then(function(data){
     var grid = document.getElementById('photos-grid');
     if(!data||!data.length){
       grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><div>No photos yet.</div></div>';
@@ -1315,7 +1318,7 @@ document.getElementById('save-affiliate-btn').addEventListener('click',function(
   if(!body.name){showMsg('affiliate-msg','Organization name is required.','err');return;}
   var id=document.getElementById('affiliate-id').value;api(id?'PATCH':'POST','affiliates',body,id||null).then(function(data){if(data&&data.error){showMsg('affiliate-msg','Error: '+data.error,'err');return;}document.getElementById('affiliate-form-panel').classList.remove('open');clearAffiliateForm();loadAffiliates();showStatus(id?'Affiliate updated.':'Affiliate added.','ok');}).catch(function(){showMsg('affiliate-msg','Save failed — is Supabase configured?','err');});
 });
-function loadAffiliates(){apiGet('affiliates').then(function(data){var list=document.getElementById('affiliates-list');if(!data||!data.length){list.innerHTML='<div class="empty-state"><div>No affiliates added through the admin yet.</div></div>';return;}window._affiliatesCache=data;list.innerHTML='<table class="items-table"><thead><tr><th>Organization</th><th>Website</th><th>Status</th><th></th></tr></thead><tbody>'+data.map(function(a){return '<tr><td><strong>'+esc(a.name)+'</strong><br><span style="font-size:12px;color:var(--muted)">'+esc(a.description||'')+'</span></td><td>'+esc(a.website_url||'—')+'</td><td><span class="td-badge '+(a.active?'active':'draft')+'">'+(a.active?'Public':'Hidden')+'</span></td><td><div class="td-actions"><button class="btn-edit" onclick="editAffiliate(\''+a.id+'\')">Edit</button><button class="btn-del" onclick="deleteAffiliate(\''+a.id+'\')">Delete</button></div></td></tr>';}).join('')+'</tbody></table>';}).catch(function(){showStatus('Could not load affiliates — Supabase may not be configured yet.','warn');});}
+function loadAffiliates(){return apiGet('affiliates').then(function(data){var list=document.getElementById('affiliates-list');if(!data||!data.length){list.innerHTML='<div class="empty-state"><div>No affiliates added through the admin yet.</div></div>';return;}window._affiliatesCache=data;list.innerHTML='<table class="items-table"><thead><tr><th>Organization</th><th>Website</th><th>Status</th><th></th></tr></thead><tbody>'+data.map(function(a){return '<tr><td><strong>'+esc(a.name)+'</strong><br><span style="font-size:12px;color:var(--muted)">'+esc(a.description||'')+'</span></td><td>'+esc(a.website_url||'—')+'</td><td><span class="td-badge '+(a.active?'active':'draft')+'">'+(a.active?'Public':'Hidden')+'</span></td><td><div class="td-actions"><button class="btn-edit" onclick="editAffiliate(\''+a.id+'\')">Edit</button><button class="btn-del" onclick="deleteAffiliate(\''+a.id+'\')">Delete</button></div></td></tr>';}).join('')+'</tbody></table>';}).catch(function(){showStatus('Could not load affiliates — Supabase may not be configured yet.','warn');});}
 function editAffiliate(id){var a=(window._affiliatesCache||[]).find(function(x){return x.id===id;});if(!a)return;document.getElementById('affiliate-id').value=a.id;document.getElementById('af-name').value=a.name||'';document.getElementById('af-url').value=a.website_url||'';document.getElementById('af-desc').value=a.description||'';document.getElementById('af-logo').value=a.logo_url||'';document.getElementById('af-sort').value=a.sort_order||0;document.getElementById('af-active').checked=a.active!==false;document.getElementById('affiliate-form-title').textContent='Edit affiliate';document.getElementById('affiliate-form-panel').classList.add('open');}
 function deleteAffiliate(id){if(!confirm('Delete this affiliate?'))return;api('DELETE','affiliates',null,id).then(function(){loadAffiliates();showStatus('Affiliate deleted.','ok');});}
 
@@ -1379,7 +1382,7 @@ function renderStatCard(label, value, sub){
 }
 
 function loadTraffic(){
-  trackGet('summary')
+  return trackGet('summary')
     .then(function(data){
       var visits = data.visits || [];
       var interests = data.interests || [];
@@ -1446,7 +1449,7 @@ function loadTraffic(){
 var FLAG_MAP = {Kenya:'🇰🇪',Peru:'🇵🇪',Uganda:'🇺🇬','Amazon Basin':'🌿','Where most needed':'🌍','Future deployment':'📍'};
 
 function loadInterests(){
-  trackGet('interests')
+  return trackGet('interests')
     .then(function(data){
       var rows = data || [];
       var total = rows.length;
@@ -1478,7 +1481,7 @@ function loadInterests(){
 // KIT AVAILABILITY REQUESTS
 // ════════════════════════════════════════════════════════
 function loadKitRequests(){
-  trackGet('availability')
+  return trackGet('availability')
     .then(function(data){
       var rows = data || [];
       var total = rows.length;
@@ -1508,6 +1511,59 @@ function loadKitRequests(){
     })
     .catch(function(){ showStatus('Could not load kit requests — check Supabase config.','warn'); });
 }
+
+// ── Live data polling ────────────────────────────────────
+// Polls VillageServer's own API endpoints. It does not inspect packets,
+// browser history, or any data outside this dashboard's configured tables.
+var POLL_INTERVAL_MS = 4000;
+var AUTO_POLL_TABS = ['overview','campaigns','posts','photos','affiliates','traffic','interests','kitrequests'];
+var pollTimer = null;
+var pollBusy = false;
+
+function setPollStatus(state, detail){
+  var wrap = document.getElementById('poll-status');
+  var label = document.getElementById('poll-state');
+  var small = document.getElementById('poll-detail');
+  if(!wrap || !label || !small) return;
+  wrap.className = 'poll-status ' + (state || '');
+  label.textContent = IS_LOCAL_PREVIEW ? 'Preview' : state === 'syncing' ? 'Syncing' : state === 'paused' ? 'Paused' : state === 'error' ? 'Retrying' : 'Live';
+  small.textContent = detail || 'refreshes every 4s';
+}
+
+function pollActiveTab(){
+  if(document.hidden){ setPollStatus('paused','tab hidden'); return Promise.resolve(false); }
+  if(getComputedStyle(document.getElementById('app')).display === 'none') return Promise.resolve(false);
+  var active = document.querySelector('.tab-view.active');
+  var tab = active ? active.id.replace('tab-','') : '';
+  if(AUTO_POLL_TABS.indexOf(tab) < 0){ setPollStatus('paused','reference page'); return Promise.resolve(false); }
+  if(active.querySelector('.form-panel.open')){ setPollStatus('paused','editing in progress'); return Promise.resolve(false); }
+  if(pollBusy) return Promise.resolve(false);
+  pollBusy = true;
+  setPollStatus('syncing','updating ' + tab);
+  return Promise.resolve(loadTab(tab)).then(function(){
+    var now = new Date();
+    var count = Number(document.body.dataset.pollCount || 0) + 1;
+    document.body.dataset.pollCount = String(count);
+    document.body.dataset.pollTab = tab;
+    setPollStatus('','updated ' + now.toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'}) + ' · every 4s');
+    return true;
+  }).catch(function(){
+    setPollStatus('error','next retry in 4s');
+    return false;
+  }).finally(function(){ pollBusy = false; });
+}
+
+function startAutoPolling(){
+  if(pollTimer) return;
+  setPollStatus('','refreshes every 4s');
+  pollTimer = setInterval(pollActiveTab, POLL_INTERVAL_MS);
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden) setPollStatus('paused','tab hidden');
+    else pollActiveTab();
+  });
+}
+
+startAutoPolling();
 
 // ── Shared helpers ───────────────────────────────────────
 function showMsg(elId, msg, level){

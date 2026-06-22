@@ -70,6 +70,7 @@
   </main>
   <footer class="site-footer resource-footer"><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span><a href="./pamphlets.html">Printable pamphlets &amp; FAQ</a> · <a href="./access.html">Return to access guide</a></span></div></footer>
   <script src="./js/site-language.js?v=1"></script>
+  <script src="./js/site-tracking.js?v=1"></script>
   <script>
     const routes=[...document.querySelectorAll('.transfer-route')];
     routes.forEach(route=>route.addEventListener('toggle',()=>{if(!route.open)return;routes.forEach(other=>{if(other!==route)other.open=false});history.replaceState(null,'','#'+route.id)}));

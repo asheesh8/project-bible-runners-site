@@ -392,8 +392,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--ink);b
     fbclid:       params.get('fbclid')       || '',
     ttclid:       params.get('ttclid')       || '',
   };
-  fetch('/api/track?type=visit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({path:'/donate',referrer:document.referrer},utm))}).catch(function(){});
-
   // ── State ─────────────────────────────────────────────────────────
   var answers = {country:'',initiative:'',need:''};
   var current = 0;
@@ -554,5 +552,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--ink);b
 })();
 </script>
 <script src="./js/site-language.js?v=1"></script>
+<script src="./js/site-tracking.js?v=1"></script>
 </body>
 </html>

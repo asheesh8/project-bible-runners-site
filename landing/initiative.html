@@ -17,6 +17,7 @@
   </main>
   <footer class="site-footer resource-footer"><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative · villageserver.org · villageserver.com</span><span><a href="./pamphlets.html">Pamphlets &amp; FAQ</a> · <a href="./index.html">Return home</a></span></div></footer>
   <script src="./js/site-language.js?v=1"></script>
+  <script src="./js/site-tracking.js?v=1"></script>
   <script>
   fetch('/api/content?type=affiliates').then(function(r){return r.ok?r.json():[]}).then(function(items){if(!Array.isArray(items)||!items.length)return;var grid=document.getElementById('affiliate-grid');items.filter(function(x){return x.active!==false}).forEach(function(x){var a=document.createElement('article');var initials=(x.name||'Affiliate').split(/\s+/).map(function(w){return w[0]}).join('').slice(0,3).toUpperCase();a.innerHTML='<span>'+initials+'</span><h3></h3><p></p>';a.querySelector('h3').textContent=x.name||'Affiliate';a.querySelector('p').textContent=x.description||'VillageServer affiliate organization.';if(x.website_url){a.tabIndex=0;a.addEventListener('click',function(){window.open(x.website_url,'_blank','noopener')})}grid.appendChild(a)})}).catch(function(){});
   </script>

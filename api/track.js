@@ -16,6 +16,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Cache-Control', 'no-store, max-age=0');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { type } = req.query;
@@ -91,7 +92,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET' && type === 'summary') {
     const [visitsR, interestsR] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH }),
+      fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' }),
       fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, { headers: sbH }),
     ]);
     const [visits, interests] = await Promise.all([visitsR.json(), interestsR.json()]);

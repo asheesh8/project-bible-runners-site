@@ -139,6 +139,22 @@ test('language choice persists across every public page and dynamic UI', () => {
   new Function(languageScript);
 });
 
+test('every public page records a fresh visit for live admin analytics', () => {
+  const trackedPages = ['landing/index.html', 'landing/index-b.html', 'landing/initiative.html', 'landing/access.html', 'landing/guide.html', 'landing/donate.html', 'landing/transfer.html', 'landing/pamphlets.html'];
+  for (const page of trackedPages) assert.match(read(page), /\.\/js\/site-tracking\.js/);
+  const tracker = read('landing/js/site-tracking.js');
+  assert.match(tracker, /type=visit/);
+  assert.match(tracker, /cache: 'no-store'/);
+  assert.match(tracker, /keepalive: true/);
+  assert.match(tracker, /location\.pathname/);
+  assert.match(tracker, /data-visit-tracked/);
+  new Function(tracker);
+  assert.doesNotMatch(read('landing/index.html'), /Home-page visit logging/);
+  assert.doesNotMatch(read('landing/donate.html'), /Object\.assign\(\{path:'\/donate'/);
+  assert.match(read('api/content.js'), /Cache-Control', 'no-store/);
+  assert.match(read('api/track.js'), /Cache-Control', 'no-store/);
+});
+
 test('the setup widget launches a focused guide for every component', () => {
   const html = read('landing/index.html');
   assert.ok(existsSync(join(root, 'landing/guide.html')));
@@ -200,6 +216,13 @@ test('admin includes an accurate traffic-attribution FAQ', () => {
   assert.match(admin, /PREVIEW_STORE/);
   assert.match(admin, /Everything the initiative needs in one place/);
   assert.match(admin, /Open copy-paste schema/);
+  assert.match(admin, /POLL_INTERVAL_MS = 4000/);
+  assert.match(admin, /setInterval\(pollActiveTab, POLL_INTERVAL_MS\)/);
+  assert.match(admin, /&_ts=' \+ Date\.now\(\)/);
+  assert.match(admin, /cache:'no-store'/);
+  assert.match(admin, /visibilitychange/);
+  assert.match(admin, /form-panel\.open/);
+  assert.match(admin, /does not inspect packets/);
   assert.match(admin, /data-tab="analyticsfaq"/);
   assert.match(admin, /id="tab-analyticsfaq"/);
   assert.match(admin, /this is not packet scraping/i);
