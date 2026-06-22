@@ -69,6 +69,7 @@
           <div class="availability-result" id="availability-result" aria-live="polite">
             <span class="status-dot"></span><div><b data-i18n="regionInitial">Select a location to begin.</b><p data-i18n="regionInitialCopy">We’ll show whether it is a pilot area or a future deployment request.</p></div>
           </div>
+          <button type="button" class="request-kit-btn" id="open-kit-form" data-i18n="requestKit">Request a kit for your country →</button>
           <p class="honesty-note" data-i18n="honesty">VillageServer kits are not yet available through public online checkout. Pilot access is coordinated with field partners.</p>
         </div>
       </div>
@@ -148,7 +149,38 @@
     </section>
   </main>
 
-  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 28 24 16l16 12v13H8Z"/><path d="M14 21V9M9 14h10M28 10c6 1 10 5 11 11M29 16c3 .5 5 2.5 6 5"/></svg></span><span><b>VillageServer</b><small>Initiative</small></span></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b data-i18n="footerResources">Resources</b><a href="./initiative.html" data-i18n="footerInitiative">The initiative</a><a href="./access.html" data-i18n="footerAccess">Access resources</a><a href="./guide.html?part=wifi" data-i18n="footerGuides">Setup guides</a></div><div><b data-i18n="footerInvolved">Get involved</b><a href="#availability" data-i18n="footerAvailability">Kit availability</a><a href="./donate.html" data-i18n="footerSupport">Support the work</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span></div></footer>
+  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 28 24 16l16 12v13H8Z"/><path d="M14 21V9M9 14h10M28 10c6 1 10 5 11 11M29 16c3 .5 5 2.5 6 5"/></svg></span><span><b>VillageServer</b><small>Initiative</small></span></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b data-i18n="footerResources">Resources</b><a href="./initiative.html" data-i18n="footerInitiative">The initiative</a><a href="./access.html" data-i18n="footerAccess">Access resources</a><a href="./guide.html?part=wifi" data-i18n="footerGuides">Setup guides</a></div><div><b data-i18n="footerInvolved">Get involved</b><a href="#availability" data-i18n="footerAvailability">Kit availability</a><a href="./donate.html" data-i18n="footerSupport">Support the work</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
+
+  <!-- Kit availability request modal (browser-window styled) -->
+  <div class="kit-modal" id="kit-modal" hidden>
+    <div class="kit-modal-backdrop" data-kit-close></div>
+    <div class="kit-window" role="dialog" aria-modal="true" aria-labelledby="kit-hero-title">
+      <div class="kit-chrome">
+        <span class="kit-dots"><i></i><i></i><i></i></span>
+        <span class="kit-filename">request-availability.html</span>
+        <button type="button" class="kit-close" data-kit-close aria-label="Close">&times;</button>
+      </div>
+      <div class="kit-hero">
+        <p class="kit-hero-kicker">VILLAGESERVER · FIELD PILOT</p>
+        <h3 class="kit-hero-title" id="kit-hero-title">Request a kit</h3>
+        <p class="kit-hero-sub">Tell us where you serve. We’ll follow up about pilot access and the nearest field partners for your area.</p>
+      </div>
+      <form class="kit-form" id="kit-form" autocomplete="off">
+        <div class="kit-field kit-combo">
+          <label for="kit-country-input">Country</label>
+          <input type="text" id="kit-country-input" placeholder="Search all countries…" aria-expanded="false" aria-autocomplete="list" role="combobox">
+          <input type="hidden" id="kit-country-value">
+          <ul class="kit-suggest" id="kit-suggest" role="listbox" hidden></ul>
+        </div>
+        <div class="kit-field"><label for="kit-name">Name</label><input type="text" id="kit-name" autocomplete="name"></div>
+        <div class="kit-field"><label for="kit-email">Email</label><input type="email" id="kit-email" autocomplete="email"></div>
+        <div class="kit-field"><label for="kit-org">Organization / role <span style="text-transform:none;opacity:.6">(optional)</span></label><input type="text" id="kit-org"></div>
+        <div class="kit-field"><label for="kit-message">Anything we should know? <span style="text-transform:none;opacity:.6">(optional)</span></label><textarea id="kit-message" rows="3"></textarea></div>
+        <button type="submit" class="kit-submit" id="kit-submit">Send request</button>
+        <p class="kit-msg" id="kit-msg"></p>
+      </form>
+    </div>
+  </div>
 
   <script src="./js/i18n.js?v=2"></script>
   <script>
@@ -175,6 +207,46 @@
       document.getElementById('give-progress').hidden=false;
       requestAnimationFrame(()=>{document.getElementById('give-progress-fill').style.width=pct+'%';});
     }).catch(()=>{});
+
+    // ── Home-page visit logging (ad-source attribution) ───────────────
+    (function(){
+      var p=new URLSearchParams(location.search);
+      fetch('/api/track?type=visit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:'/',referrer:document.referrer,utm_source:p.get('utm_source')||'',utm_medium:p.get('utm_medium')||'',utm_campaign:p.get('utm_campaign')||'',utm_content:p.get('utm_content')||'',utm_term:p.get('utm_term')||'',fbclid:p.get('fbclid')||'',ttclid:p.get('ttclid')||''})}).catch(function(){});
+    })();
+
+    // ── ArkiTech-Sol footer credit: hover scale + triple-click → admin ─
+    (function(){
+      var el=document.getElementById('arki-credit'),n=0,t;
+      if(!el)return;
+      el.addEventListener('click',function(){clearTimeout(t);n++;if(n>=3){n=0;window.location.href='./admin.html';}t=setTimeout(function(){n=0;},600);});
+    })();
+
+    // ── Kit availability request modal + fuzzy country search ─────────
+    (function(){
+      var COUNTRIES=['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cambodia','Cameroon','Canada','Cape Verde','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo (Brazzaville)','Congo (Kinshasa)','Costa Rica','Croatia','Cuba','Cyprus','Czechia','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Ivory Coast','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'];
+      var REGION_TO_COUNTRY={kenya:'Kenya',peru:'Peru'};
+      var modal=document.getElementById('kit-modal'),input=document.getElementById('kit-country-input'),hidden=document.getElementById('kit-country-value'),suggest=document.getElementById('kit-suggest'),form=document.getElementById('kit-form'),msg=document.getElementById('kit-msg'),submitBtn=document.getElementById('kit-submit'),activeIdx=-1,matches=[];
+
+      function openModal(){modal.hidden=false;document.body.style.overflow='hidden';var sel=document.getElementById('region-select');var pre=sel&&REGION_TO_COUNTRY[sel.value];if(pre){input.value=pre;hidden.value=pre;}setTimeout(function(){input.focus();},60);}
+      function closeModal(){modal.hidden=true;document.body.style.overflow='';hideSuggest();}
+      document.getElementById('open-kit-form').addEventListener('click',openModal);
+      [].forEach.call(modal.querySelectorAll('[data-kit-close]'),function(b){b.addEventListener('click',closeModal);});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)closeModal();});
+
+      function fuzzyRank(q,name){var nl=name.toLowerCase();if(nl===q)return 1000;if(nl.indexOf(q)===0)return 800-nl.length;var idx=nl.indexOf(q);if(idx>0)return 600-idx-nl.length*0.1;var qi=0;for(var i=0;i<nl.length&&qi<q.length;i++){if(nl[i]===q[qi])qi++;}if(qi===q.length)return 300-nl.length*0.1;return -1;}
+      function hideSuggest(){suggest.hidden=true;input.setAttribute('aria-expanded','false');activeIdx=-1;}
+      function renderSuggest(raw){var q=raw.toLowerCase();if(!q){hideSuggest();return;}matches=COUNTRIES.map(function(c){return{c:c,r:fuzzyRank(q,c)};}).filter(function(x){return x.r>=0;}).sort(function(a,b){return b.r-a.r;}).slice(0,8).map(function(x){return x.c;});if(!matches.length){suggest.innerHTML='<li class="empty">No match — type the full country name</li>';suggest.hidden=false;input.setAttribute('aria-expanded','true');activeIdx=-1;return;}suggest.innerHTML=matches.map(function(c,i){return '<li role="option" data-i="'+i+'">'+c+'</li>';}).join('');suggest.hidden=false;input.setAttribute('aria-expanded','true');activeIdx=-1;}
+      function paint(){[].forEach.call(suggest.children,function(li,i){li.classList.toggle('active',i===activeIdx);});}
+      function choose(c){input.value=c;hidden.value=c;hideSuggest();}
+
+      input.addEventListener('input',function(){hidden.value='';renderSuggest(input.value.trim());});
+      input.addEventListener('keydown',function(e){if(suggest.hidden)return;if(e.key==='ArrowDown'){e.preventDefault();activeIdx=Math.min(activeIdx+1,matches.length-1);paint();}else if(e.key==='ArrowUp'){e.preventDefault();activeIdx=Math.max(activeIdx-1,0);paint();}else if(e.key==='Enter'){if(matches.length){e.preventDefault();choose(matches[activeIdx>=0?activeIdx:0]);}}});
+      suggest.addEventListener('click',function(e){var li=e.target.closest('li[data-i]');if(li)choose(matches[+li.dataset.i]);});
+      document.addEventListener('click',function(e){if(modal.hidden)return;if(!e.target.closest('.kit-combo'))hideSuggest();});
+
+      form.addEventListener('submit',function(e){e.preventDefault();var country=hidden.value||input.value.trim();if(!country){showMsg('Please choose a country.','err');input.focus();return;}var p=new URLSearchParams(location.search);submitBtn.disabled=true;submitBtn.textContent='Sending…';fetch('/api/track?type=availability',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country:country,region:(document.getElementById('region-select')||{}).value||null,name:document.getElementById('kit-name').value.trim()||null,email:document.getElementById('kit-email').value.trim()||null,organization:document.getElementById('kit-org').value.trim()||null,message:document.getElementById('kit-message').value.trim()||null,utm_source:p.get('utm_source')||null,utm_medium:p.get('utm_medium')||null,utm_campaign:p.get('utm_campaign')||null})}).then(function(r){return r.json();}).then(function(d){if(d&&d.error){showMsg('Error: '+d.error,'err');submitBtn.disabled=false;submitBtn.textContent='Send request';return;}var safe=country.replace(/[<>&"']/g,'');form.innerHTML='<div class="kit-success"><h3>Request received ✓</h3><p>Thank you. We’ll be in touch about pilot access for <b>'+safe+'</b>.</p></div>';}).catch(function(){showMsg('Could not send — please try again.','err');submitBtn.disabled=false;submitBtn.textContent='Send request';});});
+      function showMsg(t,cls){msg.textContent=t;msg.className='kit-msg '+cls;}
+    })();
   </script>
 </body>
 </html>

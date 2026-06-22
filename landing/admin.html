@@ -331,6 +331,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           Donation Interests
         </div>
+        <div class="nav-item" data-tab="kitrequests">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Kit Requests
+        </div>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-label">Links</div>
@@ -570,6 +574,33 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
       </div>
 
+      <!-- ── KIT REQUESTS ───────────────────────────── -->
+      <div class="tab-view" id="tab-kitrequests">
+        <div class="page-header">
+          <h2 class="page-title">Kit Availability Requests</h2>
+          <button class="btn-new" id="refresh-kitrequests-btn" style="background:var(--muted)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
+          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+            <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Requests by Country</h3>
+            <div id="kitrequests-country-bars"></div>
+          </div>
+          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+            <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Requests by Ad Source</h3>
+            <div id="kitrequests-source-bars"></div>
+          </div>
+        </div>
+
+        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+          <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">All Requests</h3>
+          <div id="kitrequests-table" style="overflow-x:auto"></div>
+        </div>
+      </div>
+
       <!-- ── SETUP GUIDE ────────────────────────────── -->
       <div class="tab-view" id="tab-setup">
         <div class="page-header"><h2 class="page-title">Setup guide</h2></div>
@@ -666,6 +697,20 @@ create table donation_interests (
   created_at timestamptz default now()
 );
 
+create table availability_requests (
+  id uuid default gen_random_uuid() primary key,
+  country text not null,
+  region text,
+  name text,
+  email text,
+  organization text,
+  message text,
+  utm_source text,
+  utm_medium text,
+  utm_campaign text,
+  created_at timestamptz default now()
+);
+
 -- Allow public reads
 alter table campaigns enable row level security;
 alter table posts enable row level security;
@@ -673,6 +718,7 @@ alter table photos enable row level security;
 alter table affiliates enable row level security;
 alter table page_visits enable row level security;
 alter table donation_interests enable row level security;
+alter table availability_requests enable row level security;
 
 create policy "Public reads" on campaigns for select using (true);
 create policy "Public reads published" on posts for select using (published = true);
@@ -683,7 +729,10 @@ create policy "Public reads active affiliates" on affiliates for select using (a
 create policy "Public insert visits" on page_visits for insert with check (true);
 
 -- donation_interests: public insert, admin select via service key
-create policy "Public insert interests" on donation_interests for insert with check (true);</code></pre>
+create policy "Public insert interests" on donation_interests for insert with check (true);
+
+-- availability_requests: public insert, admin select via service key
+create policy "Public insert availability" on availability_requests for insert with check (true);</code></pre>
         </div>
       </div>
 
@@ -810,6 +859,7 @@ function loadTab(tab){
   else if(tab === 'affiliates') loadAffiliates();
   else if(tab === 'traffic') loadTraffic();
   else if(tab === 'interests') loadInterests();
+  else if(tab === 'kitrequests') loadKitRequests();
 }
 
 // ════════════════════════════════════════════════════════
@@ -1106,6 +1156,7 @@ function deleteAffiliate(id){if(!confirm('Delete this affiliate?'))return;api('D
 // ════════════════════════════════════════════════════════
 document.getElementById('refresh-traffic-btn').addEventListener('click', loadTraffic);
 document.getElementById('refresh-interests-btn').addEventListener('click', loadInterests);
+document.getElementById('refresh-kitrequests-btn').addEventListener('click', loadKitRequests);
 
 var SOURCE_COLORS = {
   facebook:  '#1877f2', fb: '#1877f2',
@@ -1255,6 +1306,42 @@ function loadInterests(){
       el.innerHTML = html;
     })
     .catch(function(){ showStatus('Could not load interests — check Supabase config.','warn'); });
+}
+
+// ════════════════════════════════════════════════════════
+// KIT AVAILABILITY REQUESTS
+// ════════════════════════════════════════════════════════
+function loadKitRequests(){
+  fetch('/api/track?type=availability', {headers:{'Authorization':'Bearer '+AUTH_TOKEN}})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var rows = data || [];
+      var total = rows.length;
+      rows.forEach(function(r){ if(!r.utm_source){ if(r.fbclid) r.utm_source='facebook'; else if(r.ttclid) r.utm_source='tiktok'; } });
+      renderBars('kitrequests-country-bars', countBy(rows,'country'), total, null);
+      var srcEntries = countBy(rows,'utm_source').map(function(e){ return [friendlySource(e[0]==='(none)'?'':e[0]),e[1]]; });
+      renderBars('kitrequests-source-bars', srcEntries, total, null);
+
+      var el = document.getElementById('kitrequests-table');
+      if(!rows.length){ el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0">No kit requests submitted yet.</p>'; return; }
+      var html = '<table class="items-table"><thead><tr><th>Date</th><th>Country</th><th>Region</th><th>Name</th><th>Email</th><th>Organization</th><th>Message</th><th>Ad Source</th></tr></thead><tbody>';
+      rows.forEach(function(r){
+        var flag = FLAG_MAP[r.country] || '📍';
+        html += '<tr>' +
+          '<td style="white-space:nowrap;font-size:12px;color:var(--muted)">'+fmtDate(r.created_at)+'</td>' +
+          '<td><strong>'+flag+' '+esc(r.country||'—')+'</strong></td>' +
+          '<td style="font-size:13px;color:var(--muted)">'+esc(r.region||'—')+'</td>' +
+          '<td style="font-size:13px">'+esc(r.name||'—')+'</td>' +
+          '<td style="font-size:13px">'+esc(r.email||'—')+'</td>' +
+          '<td style="font-size:13px">'+esc(r.organization||'—')+'</td>' +
+          '<td style="font-size:12px;color:var(--muted);max-width:220px">'+esc(r.message||'—')+'</td>' +
+          '<td>'+(r.utm_source?'<span style="background:var(--bg);color:'+sourceColor(r.utm_source)+';padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">'+esc(friendlySource(r.utm_source))+'</span>':'<span style="color:var(--muted);font-size:12px">—</span>')+'</td>' +
+        '</tr>';
+      });
+      html += '</tbody></table>';
+      el.innerHTML = html;
+    })
+    .catch(function(){ showStatus('Could not load kit requests — check Supabase config.','warn'); });
 }
 
 // ── Shared helpers ───────────────────────────────────────

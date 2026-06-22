@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { type } = req.query;
-  const VALID = ['visit', 'visits', 'interest', 'interests', 'summary'];
+  const VALID = ['visit', 'visits', 'interest', 'interests', 'availability', 'availabilities', 'summary'];
   if (!VALID.includes(type)) return res.status(400).json({ error: 'Invalid type' });
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
@@ -57,9 +57,27 @@ export default async function handler(req, res) {
     return res.status(r.status).json(data);
   }
 
+  // ── Public POST: kit availability / interest request ─────────────
+  if (req.method === 'POST' && type === 'availability') {
+    const { country, region, name, email, organization, message, utm_source, utm_medium, utm_campaign } = req.body || {};
+    if (!country) return res.status(400).json({ error: 'country is required' });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/availability_requests`, {
+      method: 'POST',
+      headers: { ...sbH, Prefer: 'return=representation' },
+      body: JSON.stringify({ country, region, name, email, organization, message, utm_source, utm_medium, utm_campaign }),
+    });
+    const data = await r.json();
+    return res.status(r.status).json(data);
+  }
+
   // ── Admin reads ──────────────────────────────────────────────────
   const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
   if (authHeader !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
+
+  if (req.method === 'GET' && (type === 'availability' || type === 'availabilities')) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/availability_requests?select=*&order=created_at.desc`, { headers: sbH });
+    return res.status(r.status).json(await r.json());
+  }
 
   if (req.method === 'GET' && type === 'visits') {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=*&order=created_at.desc&limit=200`, { headers: sbH });
