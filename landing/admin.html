@@ -251,6 +251,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 }
 .setup-card a{color:#316dca;font-weight:600}
 
+/* Analytics FAQ / internal knowledge base */
+.faq-hero{padding:34px;border-radius:16px;background:linear-gradient(135deg,#102a43,#1f6f54);color:#fff;margin-bottom:24px;overflow:hidden;position:relative}.faq-hero::after{content:'?';position:absolute;right:24px;top:-42px;font-size:180px;font-weight:700;color:rgba(255,255,255,.06);line-height:1}.faq-eyebrow{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#a7f3d0;margin-bottom:12px}.faq-hero h2{font-size:clamp(26px,4vw,42px);line-height:1.05;max-width:720px;margin-bottom:14px}.faq-hero>p:last-child{max-width:760px;color:rgba(255,255,255,.72);font-size:15px}.truth-note{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;padding:20px 22px;background:#fff8c5;border:1px solid #d4a72c;border-radius:12px;margin-bottom:24px}.truth-note>span{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#7d4e00;color:#fff;font-weight:800}.truth-note h3{font-size:15px;margin:0 0 4px;color:#7d4e00}.truth-note p{font-size:13px;color:#5d4700;margin:0}.tracking-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:30px}.flow-card{position:relative;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:20px;min-height:155px}.flow-card:not(:last-child)::after{content:'→';position:absolute;right:-12px;top:50%;z-index:2;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--sidebar);color:#fff;font-size:12px}.flow-number{font-size:10px;font-weight:700;letter-spacing:.12em;color:#316dca}.flow-card h3{font-size:15px;margin:28px 0 6px}.flow-card p{font-size:12px;color:var(--muted)}.faq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.faq-article{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:26px;min-width:0}.faq-article.wide{grid-column:1/-1}.faq-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:22px}.faq-number{font-size:11px;font-weight:700;color:#316dca}.faq-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:4px 9px;border-radius:99px;background:#ddf4ff;color:#0969da}.faq-article h3{font-size:19px;line-height:1.25;margin-bottom:12px}.faq-article p{font-size:14px;color:var(--muted);margin:0 0 12px}.faq-article p:last-child{margin-bottom:0}.faq-article ul{padding-left:18px;color:var(--muted);font-size:14px}.faq-article li{padding:4px 0}.faq-code{display:block;padding:14px 16px;border-radius:8px;background:#161b22;color:#a7f3d0;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere;margin:14px 0}.field-map{width:100%;border-collapse:collapse;margin-top:12px}.field-map th,.field-map td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}.field-map th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}.field-map code{font-size:11px;color:#0969da}.privacy-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;list-style:none!important;padding:0!important}.privacy-list li{padding:10px 12px!important;border-radius:8px;background:#f6f8fa}.privacy-list .yes::before{content:'✓';color:var(--accent);font-weight:800;margin-right:8px}.privacy-list .no::before{content:'×';color:var(--danger);font-weight:800;margin-right:8px}
+
 /* Tabs (tab panels inside a section) */
 .tab-view{display:none}
 .tab-view.active{display:block}
@@ -260,6 +263,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   .sidebar{display:none}
   .main-content{padding:20px}
   .form-row{grid-template-columns:1fr}
+  .tracking-flow,.faq-grid{grid-template-columns:1fr}.flow-card:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-17px}.faq-article.wide{grid-column:auto}.privacy-list{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -271,7 +275,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
     <div class="login-logo">
       <svg viewBox="0 0 20 28" fill="white" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg>
     </div>
-    <h1>PBR Admin</h1>
+    <h1>VillageServer Admin</h1>
     <p>VillageServer Initiative &mdash; Content panel</p>
     <input type="password" id="pw-input" placeholder="Admin password" autocomplete="current-password" />
     <p class="login-err" id="login-err">Incorrect password. Try again.</p>
@@ -334,6 +338,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         <div class="nav-item" data-tab="kitrequests">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           Kit Requests
+        </div>
+        <div class="nav-item" data-tab="analyticsfaq">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 1 1 5.8 1c0 2-3 2-3 4"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          Analytics FAQ
         </div>
       </div>
       <div class="sidebar-section">
@@ -599,6 +607,42 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">All Requests</h3>
           <div id="kitrequests-table" style="overflow-x:auto"></div>
         </div>
+      </div>
+
+      <!-- ── SETUP GUIDE ────────────────────────────── -->
+      <div class="tab-view" id="tab-analyticsfaq">
+        <section class="faq-hero">
+          <p class="faq-eyebrow">Admin knowledge base · Traffic attribution</p>
+          <h2>How VillageServer knows where a visit came from</h2>
+          <p>A plain-language guide to the data path behind Traffic &amp; Sources—what enters the system, where it goes, and what the dashboard can honestly conclude.</p>
+        </section>
+
+        <aside class="truth-note"><span>!</span><div><h3>First: this is not packet scraping.</h3><p>VillageServer does not capture Wi-Fi packets, inspect network payloads, read another website's traffic, or watch a visitor's browsing history. It records attribution values that the visitor's browser sends to this site.</p></div></aside>
+
+        <section class="tracking-flow" aria-label="Traffic attribution flow">
+          <article class="flow-card"><span class="flow-number">01 · SOURCE</span><h3>A link is clicked</h3><p>An ad, email, social post, search result, or another website sends someone to VillageServer.</p></article>
+          <article class="flow-card"><span class="flow-number">02 · BROWSER</span><h3>Context arrives</h3><p>The URL may contain UTM tags or a click ID. The browser may also provide a referrer URL.</p></article>
+          <article class="flow-card"><span class="flow-number">03 · DESTINATION</span><h3>Our endpoint receives it</h3><p>The page sends those fields and its destination path to <code>/api/track?type=visit</code>.</p></article>
+          <article class="flow-card"><span class="flow-number">04 · REPORT</span><h3>Supabase stores a row</h3><p>The admin dashboard groups rows by source, medium, campaign, destination, and date.</p></article>
+        </section>
+
+        <section class="faq-grid">
+          <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 01</span><span class="faq-tag">Basics</span></div><h3>What are “source” and “destination”?</h3><p><strong>Source</strong> means the channel that led someone here—for example Facebook, TikTok, Google, email, or a referring website. <strong>Destination</strong> means the VillageServer page they opened, such as <code>/</code> or <code>/donate</code>.</p><p>They are marketing attribution labels, not packet-level network addresses.</p></article>
+
+          <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 02</span><span class="faq-tag">Attribution</span></div><h3>How does it identify an ad campaign?</h3><p>The strongest signal is a tagged link created for the campaign:</p><code class="faq-code">villageserver.org/?utm_source=facebook&amp;utm_medium=paid-social&amp;utm_campaign=kenya-pilot</code><p>The dashboard reads <code>utm_source</code>, <code>utm_medium</code>, and <code>utm_campaign</code> exactly as they appear in that URL.</p></article>
+
+          <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 03</span><span class="faq-tag">Click IDs</span></div><h3>What are <code>fbclid</code> and <code>ttclid</code>?</h3><p>Facebook and TikTok may append a unique click identifier when someone follows an ad. If a visit has no explicit UTM source, the dashboard uses <code>fbclid</code> as a Facebook clue and <code>ttclid</code> as a TikTok clue.</p><p>A click ID indicates the platform path; it does not expose the person's social account or packet contents.</p></article>
+
+          <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 04</span><span class="faq-tag">Referrers</span></div><h3>What does the referrer tell us?</h3><p><code>document.referrer</code> can identify the previous webpage when the browser and that website permit it. Privacy settings, apps, HTTPS rules, and redirects may remove or shorten it.</p><p>A blank referrer is labeled direct/unknown; it does not prove that the visitor typed the address manually.</p></article>
+
+          <article class="faq-article wide"><div class="faq-meta"><span class="faq-number">QUESTION 05</span><span class="faq-tag">Stored fields</span></div><h3>What exactly is saved for a page visit?</h3><table class="field-map"><thead><tr><th>Field</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td><code>path</code></td><td>VillageServer destination page</td><td><code>/donate</code></td></tr><tr><td><code>referrer</code></td><td>Previous page when supplied</td><td><code>facebook.com/…</code></td></tr><tr><td><code>utm_source</code></td><td>Platform or publisher</td><td><code>facebook</code></td></tr><tr><td><code>utm_medium</code></td><td>Traffic type</td><td><code>paid-social</code></td></tr><tr><td><code>utm_campaign</code></td><td>Campaign label</td><td><code>kenya-pilot</code></td></tr><tr><td><code>fbclid / ttclid</code></td><td>Platform click clue</td><td>Opaque identifier</td></tr><tr><td><code>created_at</code></td><td>Time Supabase created the row</td><td>UTC timestamp</td></tr></tbody></table></article>
+
+          <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 06</span><span class="faq-tag">Privacy</span></div><h3>What can and can’t the tracker see?</h3><ul class="privacy-list"><li class="yes">Tagged campaign values</li><li class="yes">VillageServer page path</li><li class="yes">Allowed referrer value</li><li class="yes">Submission fields a person enters</li><li class="no">Network packet payloads</li><li class="no">Browsing history</li><li class="no">Social passwords or accounts</li><li class="no">Files on the visitor's device</li></ul></article>
+
+          <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 07</span><span class="faq-tag">Troubleshooting</span></div><h3>Why does traffic appear as Direct / Unknown?</h3><ul><li>The link had no UTM tags.</li><li>The browser or app removed the referrer.</li><li>A redirect stripped query parameters.</li><li>The visitor opened a bookmark or copied link.</li><li>An ad platform did not append its click ID.</li></ul><p>Use consistent tagged campaign links and test the final landing URL before publishing an ad.</p></article>
+
+          <article class="faq-article wide"><div class="faq-meta"><span class="faq-number">QUESTION 08</span><span class="faq-tag">Reading reports</span></div><h3>What conclusions are safe to make?</h3><p>The dashboard can say, “This many tracked visits arrived with the source label Facebook,” or “This form was submitted after a Kenya campaign link.” It cannot prove that every untagged visitor was direct, that one person equals one visit, or that a marketing channel caused a donation.</p><p>Treat these reports as directional attribution. Compare them with campaign-platform reports and confirmed donations before making budget decisions.</p></article>
+        </section>
       </div>
 
       <!-- ── SETUP GUIDE ────────────────────────────── -->

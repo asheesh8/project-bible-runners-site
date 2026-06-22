@@ -15,3 +15,7 @@
 .optional-label{text-transform:none;opacity:.6}@media(max-width:620px){.kit-hero{padding:24px 20px}.kit-hero-title{font-size:1.7rem}.kit-form{padding:18px 20px 22px}}
 /* ── ArkiTech-Sol footer credit (springy hover, triple-click → admin) ── */
 #arki-credit{display:inline-block;transition:transform .3s cubic-bezier(.34,1.56,.64,1);cursor:default;user-select:none}#arki-credit:hover{transform:scale(1.18)}
+
+/* Single-column layouts need fixed row gaps; percentage gaps can overflow their backgrounds. */
+@media(max-width:900px){.split-story,.availability-grid,.step-heading{gap:40px}.support-card{gap:38px}.inline-cta{display:inline-block}}
+@media(max-width:620px){.support-card{gap:30px;padding:34px 26px}.support-list{width:100%;min-width:0}.support-list span{min-width:0;overflow-wrap:anywhere;word-break:normal}}

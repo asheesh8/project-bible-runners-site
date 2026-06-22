@@ -30,6 +30,7 @@ test('the shared stylesheet exposes the spacing and typography system', () => {
   assert.match(css, /--ochre:/);
   assert.match(css, /--radius-ui:/);
   assert.doesNotMatch(css, /JOURNEY PROGRESS|\.journey|\.caravan|--journey-/);
+  assert.match(css, /\.site-header\{position:relative;top:auto\}/);
 });
 
 test('the access resource teaches every supported access path', () => {
@@ -42,6 +43,51 @@ test('the access resource teaches every supported access path', () => {
   assert.match(html, /Quick Share/);
   assert.match(html, /AirDrop/);
   assert.match(html, /airplane mode/i);
+  assert.match(html, /transfer\.html#ios-android/);
+});
+
+test('the transfer center covers every device-to-device route', () => {
+  const html = read('landing/transfer.html');
+  for (const id of ['phone-phone', 'ios-android', 'computer-phone', 'card-phone']) {
+    assert.match(html, new RegExp(`id="${id}"`));
+  }
+  for (const method of ['LocalSend', 'Quick Share', 'AirDrop', 'Apple Devices', 'Finder', 'USB', 'microSD']) {
+    assert.match(html, new RegExp(method));
+  }
+  assert.match(html, /Android → Android/);
+  assert.match(html, /iPhone → iPhone/);
+  assert.match(html, /iPhone ↔ Android/);
+  assert.match(html, /Windows → Android/);
+  assert.match(html, /Mac → iPhone/);
+  assert.match(html, /\.\/js\/site-language\.js/);
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+  for (const [, source] of scripts) new Function(source);
+});
+
+test('the missionary pamphlet library exposes every printable field route', () => {
+  const html = read('landing/pamphlets.html');
+  const files = [
+    'villageserver-initiative-overview.pdf',
+    'villageserver-transfer-iphone-to-iphone.pdf',
+    'villageserver-transfer-android-to-android.pdf',
+    'villageserver-transfer-iphone-to-android.pdf',
+    'villageserver-transfer-android-to-iphone.pdf',
+    'villageserver-transfer-computer-to-phone.pdf',
+    'villageserver-transfer-microsd-to-phone.pdf',
+  ];
+  for (const file of files) {
+    assert.match(html, new RegExp(`\\./downloads/${file.replaceAll('.', '\\.')}"`));
+    assert.ok(existsSync(join(root, 'landing/downloads', file)), `${file} should be deployed`);
+    assert.ok(existsSync(join(root, 'output/pdf', file)), `${file} should be retained as a final PDF`);
+  }
+  assert.match(html, /Missionary field FAQ/);
+  assert.match(html, /LocalSend/);
+  assert.match(html, /Quick Share/);
+  assert.match(html, /AirDrop/);
+  assert.match(html, /field-faq details/);
+  assert.match(read('landing/index.html'), /\.\/pamphlets\.html/);
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+  for (const [, source] of scripts) new Function(source);
 });
 
 test('the homepage follows the four-step consumer journey', () => {
@@ -54,6 +100,13 @@ test('the homepage follows the four-step consumer journey', () => {
   assert.ok(html.indexOf('id="setup"') < html.indexOf('id="system"'));
   assert.match(html, /Can I order a kit near me\?/);
   assert.match(html, /not yet available through public online checkout/i);
+});
+
+test('stacked homepage sections keep links and gift amounts inside their backgrounds', () => {
+  const css = read('landing/css/home.css');
+  assert.match(css, /\.split-story,\.availability-grid,\.step-heading\{gap:40px\}/);
+  assert.match(css, /\.support-card\{gap:30px;padding:34px 26px\}/);
+  assert.match(css, /\.support-list span\{min-width:0;overflow-wrap:anywhere/);
 });
 
 test('the homepage can fully localize into major field languages', () => {
@@ -69,6 +122,21 @@ test('the homepage can fully localize into major field languages', () => {
   assert.match(i18n, /setupLocal/);
   assert.match(i18n, /availability\(region\)/);
   new Function(i18n);
+});
+
+test('language choice persists across every public page and dynamic UI', () => {
+  const languageScript = read('landing/js/site-language.js');
+  for (const page of ['landing/index.html', 'landing/index-b.html', 'landing/initiative.html', 'landing/access.html', 'landing/guide.html', 'landing/donate.html', 'landing/transfer.html', 'landing/pamphlets.html']) {
+    assert.match(read(page), /\.\/js\/site-language\.js/);
+  }
+  for (const language of ['en', 'fr', 'sw', 'es', 'hi', 'ne', 'bn']) {
+    assert.match(languageScript, new RegExp("\\['" + language + "',"));
+  }
+  assert.match(languageScript, /localStorage\.setItem\('vsi-language'/);
+  assert.match(languageScript, /googtrans/);
+  assert.match(languageScript, /window\.location\.reload/);
+  assert.match(languageScript, /Mutation|later popup|newly opened|every later popup/i);
+  new Function(languageScript);
 });
 
 test('the setup widget launches a focused guide for every component', () => {
@@ -122,6 +190,19 @@ test('initiative checklist content is present and honest about launch status', (
   assert.ok(existsSync(join(root, 'landing/img/villageserver-logo.png')));
   assert.ok(existsSync(join(root, 'docs/vermont-nonprofit-readiness.md')));
   assert.ok(existsSync(join(root, 'docs/domain-setup.md')));
+});
+
+test('admin includes an accurate traffic-attribution FAQ', () => {
+  const admin = read('landing/admin.html');
+  assert.match(admin, /data-tab="analyticsfaq"/);
+  assert.match(admin, /id="tab-analyticsfaq"/);
+  assert.match(admin, /this is not packet scraping/i);
+  assert.match(admin, /utm_source/);
+  assert.match(admin, /fbclid/);
+  assert.match(admin, /ttclid/);
+  assert.match(admin, /document\.referrer/);
+  assert.match(admin, /Network packet payloads/);
+  assert.match(admin, /Direct \/ Unknown/);
 });
 
 for (const page of pages) {

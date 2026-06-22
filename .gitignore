@@ -1,6 +1,11 @@
 # --- Large source media (exceed GitHub's 100MB limit / not needed at runtime) ---
 *.pptx
 *.pdf
+!landing/downloads/
+!landing/downloads/villageserver-*.pdf
+!output/
+!output/pdf/
+!output/pdf/villageserver-*.pdf
 
 # --- Raw + scraped originals (optimized WebP used by the site live in landing/img/) ---
 assets/
