@@ -117,6 +117,7 @@ test('the homepage can fully localize into major field languages', () => {
     assert.match(html, new RegExp(`<option value="${language}">`));
     assert.match(i18n, new RegExp(`(?:const ${language}=|${language}:\\{)`));
   }
+  for (const translatedLanguage of ['ur', 'sd']) assert.match(html, new RegExp(`<option value="${translatedLanguage}">`));
   assert.match(i18n, /localStorage\.setItem\('vsi-language'/);
   assert.match(i18n, /vsi:languagechange/);
   assert.match(i18n, /setupLocal/);
@@ -129,7 +130,7 @@ test('language choice persists across every public page and dynamic UI', () => {
   for (const page of ['landing/index.html', 'landing/index-b.html', 'landing/initiative.html', 'landing/access.html', 'landing/guide.html', 'landing/donate.html', 'landing/transfer.html', 'landing/pamphlets.html']) {
     assert.match(read(page), /\.\/js\/site-language\.js/);
   }
-  for (const language of ['en', 'fr', 'sw', 'es', 'hi', 'ne', 'bn']) {
+  for (const language of ['en', 'fr', 'sw', 'es', 'hi', 'ur', 'sd', 'ne', 'bn']) {
     assert.match(languageScript, new RegExp("\\['" + language + "',"));
   }
   assert.match(languageScript, /localStorage\.setItem\('vsi-language'/);
@@ -147,6 +148,8 @@ test('every public page records a fresh visit for live admin analytics', () => {
   assert.match(tracker, /cache: 'no-store'/);
   assert.match(tracker, /keepalive: true/);
   assert.match(tracker, /location\.pathname/);
+  assert.match(tracker, /site_host/);
+  assert.match(tracker, /location\.hostname/);
   assert.match(tracker, /data-visit-tracked/);
   new Function(tracker);
   assert.doesNotMatch(read('landing/index.html'), /Home-page visit logging/);
@@ -180,11 +183,24 @@ test('the setup guide contains complete data and valid behavior for every path',
 
 test('deep content is split into resource pages and old campaign branding is gone', () => {
   const html = read('landing/index.html');
-  assert.doesNotMatch(html, /Project Bible Runners|Give a Bible|\$7 answers|Spring Uganda/i);
+  assert.doesNotMatch(html, /Give a Bible|\$7 answers|Spring Uganda/i);
   for (const page of ['landing/initiative.html', 'landing/access.html', 'landing/guide.html']) {
     assert.ok(existsSync(join(root, page)), `${page} should exist`);
   }
   assert.match(html, /Shorter pages\. Clearer jobs\./);
+});
+
+test('kit requests preserve itemized equipment choices end to end', () => {
+  const html = read('landing/index.html');
+  const api = read('api/track.js');
+  const schema = read('supabase/schema.sql');
+  const admin = read('landing/admin.html');
+  for (const item of ['VillageServer core', 'Language microSD', 'USB library', 'Projector', 'Solar power', 'Satellite kit', 'Phone charging']) assert.match(html, new RegExp(item));
+  for (const partner of ['store.dbs.org', 'projectbiblerunners.com', 'techsoup.org']) assert.match(html, new RegExp(partner.replaceAll('.', '\\.')));
+  assert.match(html, /requested_items:items/);
+  assert.match(api, /requested_items: cleanItems/);
+  assert.match(schema, /requested_items jsonb/);
+  assert.match(admin, /Requested kit/);
 });
 
 test('initiative checklist content is present and honest about launch status', () => {
@@ -203,13 +219,15 @@ test('initiative checklist content is present and honest about launch status', (
   assert.match(donate, /data-val="Digital Bible Society"/);
   assert.match(donate, /data-val="Language microSD"/);
   assert.match(api, /affiliates: true/);
-  assert.ok(existsSync(join(root, 'landing/img/villageserver-logo.png')));
+  assert.ok(existsSync(join(root, 'landing/img/villageserver-initiative-logo.png')));
   assert.ok(existsSync(join(root, 'docs/vermont-nonprofit-readiness.md')));
   assert.ok(existsSync(join(root, 'docs/domain-setup.md')));
 });
 
 test('admin includes an accurate traffic-attribution FAQ', () => {
   const admin = read('landing/admin.html');
+  const trackApi = read('api/track.js');
+  const schema = read('supabase/schema.sql');
   assert.match(admin, /id="tab-overview"/);
   assert.match(admin, /Local preview mode/);
   assert.match(admin, /IS_LOCAL_PREVIEW/);
@@ -218,6 +236,12 @@ test('admin includes an accurate traffic-attribution FAQ', () => {
   assert.match(admin, /Open copy-paste schema/);
   assert.match(admin, /POLL_INTERVAL_MS = 4000/);
   assert.match(admin, /setInterval\(pollActiveTab, POLL_INTERVAL_MS\)/);
+  assert.match(admin, /project-bible-runners-site\.vercel\.app/);
+  assert.match(admin, /villageserver\.com \+ villageserver\.org/);
+  assert.match(admin, /function setLiveHtml/);
+  assert.match(admin, /COM \+ ORG/);
+  assert.match(trackApi, /site_host/);
+  assert.match(schema, /site_host text/);
   assert.match(admin, /&_ts=' \+ Date\.now\(\)/);
   assert.match(admin, /cache:'no-store'/);
   assert.match(admin, /visibilitychange/);

@@ -60,6 +60,7 @@ create table if not exists public.affiliates (
 -- ── Analytics and public-interest forms ─────────────────────────────
 create table if not exists public.page_visits (
   id uuid primary key default gen_random_uuid(),
+  site_host text,
   path text,
   referrer text,
   utm_source text,
@@ -93,6 +94,7 @@ create table if not exists public.availability_requests (
   email text,
   organization text,
   message text,
+  requested_items jsonb not null default '[]'::jsonb,
   utm_source text,
   utm_medium text,
   utm_campaign text,
@@ -104,6 +106,8 @@ alter table public.campaigns add column if not exists updated_at timestamptz not
 alter table public.posts add column if not exists updated_at timestamptz not null default now();
 alter table public.photos add column if not exists updated_at timestamptz not null default now();
 alter table public.affiliates add column if not exists updated_at timestamptz not null default now();
+alter table public.page_visits add column if not exists site_host text;
+alter table public.availability_requests add column if not exists requested_items jsonb not null default '[]'::jsonb;
 
 -- Keep updated_at correct for admin edits.
 create or replace function public.set_updated_at()
@@ -140,6 +144,7 @@ create index if not exists photos_created_idx on public.photos (created_at desc)
 create index if not exists affiliates_active_sort_idx on public.affiliates (active, sort_order, created_at desc);
 create index if not exists page_visits_created_idx on public.page_visits (created_at desc);
 create index if not exists page_visits_utm_source_idx on public.page_visits (utm_source);
+create index if not exists page_visits_site_host_idx on public.page_visits (site_host);
 create index if not exists donation_interests_created_idx on public.donation_interests (created_at desc);
 create index if not exists donation_interests_country_idx on public.donation_interests (country);
 create index if not exists availability_requests_created_idx on public.availability_requests (created_at desc);

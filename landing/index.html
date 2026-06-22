@@ -15,14 +15,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="./img/hero-field.webp" type="image/webp" fetchpriority="high">
-  <link rel="stylesheet" href="./css/base.css">
-  <link rel="stylesheet" href="./css/home.css">
+  <link rel="stylesheet" href="./css/base.css?v=3">
+  <link rel="stylesheet" href="./css/home.css?v=3">
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
   <header class="site-header">
     <div class="wrap nav-row">
-      <a class="brand official-brand" href="#top" aria-label="VillageServer Initiative home"><img class="official-logo" src="./img/villageserver-logo.png" alt="VillageServer Initiative"></a>
+      <a class="brand official-brand" href="#top" aria-label="VillageServer Initiative home"><img class="official-logo" src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative"></a>
       <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" data-i18n="menu">Menu</button>
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
         <a href="#initiative" data-i18n="navWhat">What we do</a><a href="#availability" data-i18n="navFind">Find a kit</a><a href="#setup" data-i18n="navSetup">Set up</a><a href="#system" data-i18n="navHow">How it works</a><a href="#support" data-i18n="navGive">Give</a><a class="nav-support" href="./initiative.html" data-i18n="navAbout">About the initiative</a>
@@ -30,7 +30,7 @@
     </div>
   </header>
   <section class="language-bar" aria-label="Language selection">
-    <div class="wrap language-row"><div><span class="language-globe" aria-hidden="true">文</span><span><b data-i18n="languageLabel">View in your language</b><small data-i18n="languageHelp">Translate this entire resource page</small></span></div><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="fr">Français</option><option value="sw">Kiswahili</option><option value="es">Español</option><option value="hi">हिन्दी</option><option value="ne">नेपाली</option><option value="bn">বাংলা</option></select></div>
+    <div class="wrap language-row"><div><span class="language-globe" aria-hidden="true">文</span><span><b data-i18n="languageLabel">View in your language</b><small data-i18n="languageHelp">Translate this entire resource page</small></span></div><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="fr">Français</option><option value="sw">Kiswahili / Swahili</option><option value="es">Español</option><option value="hi">हिन्दी / Hindi</option><option value="ur">اردو / Urdu</option><option value="sd">سنڌي / Sindhi</option><option value="ne">नेपाली</option><option value="bn">বাংলা</option></select></div>
   </section>
 
   <main id="main">
@@ -149,7 +149,7 @@
     </section>
   </main>
 
-  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M8 28 24 16l16 12v13H8Z"/><path d="M14 21V9M9 14h10M28 10c6 1 10 5 11 11M29 16c3 .5 5 2.5 6 5"/></svg></span><span><b>VillageServer</b><small>Initiative</small></span></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b data-i18n="footerResources">Resources</b><a href="./initiative.html" data-i18n="footerInitiative">The initiative</a><a href="./access.html" data-i18n="footerAccess">Access resources</a><a href="./guide.html?part=wifi" data-i18n="footerGuides">Setup guides</a><a href="./pamphlets.html">Missionary pamphlets &amp; FAQ</a></div><div><b data-i18n="footerInvolved">Get involved</b><a href="#availability" data-i18n="footerAvailability">Kit availability</a><a href="./donate.html" data-i18n="footerSupport">Support the work</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
+  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand official-brand footer-brand" href="#top"><img class="official-logo" src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative"></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b data-i18n="footerResources">Resources</b><a href="./initiative.html" data-i18n="footerInitiative">The initiative</a><a href="./access.html" data-i18n="footerAccess">Access resources</a><a href="./guide.html?part=wifi" data-i18n="footerGuides">Setup guides</a><a href="./pamphlets.html">Missionary pamphlets &amp; FAQ</a></div><div><b data-i18n="footerInvolved">Get involved</b><a href="#availability" data-i18n="footerAvailability">Kit availability</a><a href="./donate.html" data-i18n="footerSupport">Support the work</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
 
   <!-- Kit availability request modal (browser-window styled) -->
   <div class="kit-modal" id="kit-modal" hidden>
@@ -166,17 +166,49 @@
         <p class="kit-hero-sub">Tell us where you serve. We’ll follow up about pilot access and the nearest field partners for your area.</p>
       </div>
       <form class="kit-form" id="kit-form" autocomplete="off">
-        <div class="kit-field kit-combo">
-          <label for="kit-country-input">Country</label>
-          <input type="text" id="kit-country-input" placeholder="Search all countries…" aria-expanded="false" aria-autocomplete="list" role="combobox">
-          <input type="hidden" id="kit-country-value">
-          <ul class="kit-suggest" id="kit-suggest" role="listbox" hidden></ul>
+        <div class="kit-builder-grid">
+          <fieldset class="kit-paths">
+            <legend><span>1</span> Choose what you need</legend>
+            <p class="kit-step-copy">Select one path or build a complete field kit. These are planning choices—not an online purchase.</p>
+            <div class="kit-product-grid">
+              <label class="kit-product"><input type="checkbox" name="kit-item" value="Raspberry Pi VillageServer" data-min="95" data-max="95"><img src="./img/kit-pi.webp" alt="Raspberry Pi VillageServer" loading="lazy"><span><b>VillageServer core</b><small>Raspberry Pi local Wi-Fi library</small><em>Planning reference · $95</em></span></label>
+              <label class="kit-product"><input type="checkbox" name="kit-item" value="Language microSD card" data-min="15" data-max="25"><img src="./img/field-reading.webp" alt="Language library on microSD" loading="lazy"><span><b>Language microSD</b><small>Portable offline Scripture library</small><em>Planning range · $15–$25</em></span></label>
+              <label class="kit-product"><input type="checkbox" name="kit-item" value="USB resource library" data-quote="true"><img src="./img/receiving.webp" alt="USB resource handoff" loading="lazy"><span><b>USB library</b><small>Files for computers and phones</small><em>Quote after content review</em></span></label>
+              <label class="kit-product"><input type="checkbox" name="kit-item" value="Pico projector" data-quote="true"><img src="./img/projector.webp" alt="Portable field projector" loading="lazy"><span><b>Projector</b><small>Group films and teaching media</small><em>Quote after field review</em></span></label>
+              <label class="kit-product"><input type="checkbox" name="kit-item" value="Solar suitcase" data-quote="true"><img src="./img/solar-field.webp" alt="Solar field power" loading="lazy"><span><b>Solar power</b><small>Off-grid power and storage</small><em>Quote after power review</em></span></label>
+              <label class="kit-product"><input type="checkbox" name="kit-item" value="Satellite connection kit" data-min="199" data-max="249"><img src="./img/dish.webp" alt="Satellite dish kit" loading="lazy"><span><b>Satellite kit</b><small>Optional updates and live access</small><em>Hardware reference · $199–$249</em></span></label>
+              <label class="kit-product"><input type="checkbox" name="kit-item" value="Phone charging station" data-quote="true"><img src="./img/field-distribute.webp" alt="Phone charging and distribution" loading="lazy"><span><b>Phone charging</b><small>Supervised multi-phone service</small><em>Quote after capacity review</em></span></label>
+            </div>
+          </fieldset>
+          <aside class="kit-cart" aria-live="polite">
+            <p class="kit-cart-kicker">Your field plan</p>
+            <h4 id="kit-cart-title">Nothing selected yet</h4>
+            <ul id="kit-cart-list"><li>Choose at least one path to continue.</li></ul>
+            <div class="kit-estimate"><span>Planning estimate</span><b id="kit-cart-total">—</b><small id="kit-cart-note">Final cost depends on content, power, shipping, service, and partner eligibility.</small></div>
+            <div class="kit-sources">
+              <p>Explore partner resources</p>
+              <a href="https://store.dbs.org/" target="_blank" rel="noopener"><b>Digital Bible Society</b><span>Language libraries, cards, and players ↗</span></a>
+              <a href="https://www.projectbiblerunners.com/" target="_blank" rel="noopener"><b>Project Bible Runners</b><span>Field relationships and Bible access ↗</span></a>
+              <a href="https://page.techsoup.org/refurbished-hardware-nonprofits" target="_blank" rel="noopener"><b>TechSoup</b><span>Discounted nonprofit technology; eligibility applies ↗</span></a>
+            </div>
+          </aside>
         </div>
-        <div class="kit-field"><label for="kit-name">Name</label><input type="text" id="kit-name" autocomplete="name"></div>
-        <div class="kit-field"><label for="kit-email">Email</label><input type="email" id="kit-email" autocomplete="email"></div>
-        <div class="kit-field"><label for="kit-org">Organization / role <span class="optional-label">(optional)</span></label><input type="text" id="kit-org"></div>
-        <div class="kit-field"><label for="kit-message">Anything we should know? <span class="optional-label">(optional)</span></label><textarea id="kit-message" rows="3"></textarea></div>
-        <button type="submit" class="kit-submit" id="kit-submit">Send request</button>
+        <fieldset class="kit-contact">
+          <legend><span>2</span> Tell us where it is going</legend>
+          <div class="kit-contact-grid">
+            <div class="kit-field kit-combo">
+              <label for="kit-country-input">Country</label>
+              <input type="text" id="kit-country-input" placeholder="Search all countries…" aria-expanded="false" aria-autocomplete="list" role="combobox">
+              <input type="hidden" id="kit-country-value">
+              <ul class="kit-suggest" id="kit-suggest" role="listbox" hidden></ul>
+            </div>
+            <div class="kit-field"><label for="kit-name">Name</label><input type="text" id="kit-name" autocomplete="name"></div>
+            <div class="kit-field"><label for="kit-email">Email</label><input type="email" id="kit-email" autocomplete="email"></div>
+            <div class="kit-field"><label for="kit-org">Organization / role <span class="optional-label">(optional)</span></label><input type="text" id="kit-org"></div>
+            <div class="kit-field kit-field-wide"><label for="kit-message">Anything we should know? <span class="optional-label">(optional)</span></label><textarea id="kit-message" rows="3"></textarea></div>
+          </div>
+        </fieldset>
+        <button type="submit" class="kit-submit" id="kit-submit">Send itemized request</button>
         <p class="kit-msg" id="kit-msg"></p>
       </form>
     </div>
@@ -220,9 +252,9 @@
     (function(){
       var COUNTRIES=['Afghanistan','Albania','Algeria','Andorra','Angola','Antigua and Barbuda','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahamas','Bahrain','Bangladesh','Barbados','Belarus','Belgium','Belize','Benin','Bhutan','Bolivia','Bosnia and Herzegovina','Botswana','Brazil','Brunei','Bulgaria','Burkina Faso','Burundi','Cambodia','Cameroon','Canada','Cape Verde','Central African Republic','Chad','Chile','China','Colombia','Comoros','Congo (Brazzaville)','Congo (Kinshasa)','Costa Rica','Croatia','Cuba','Cyprus','Czechia','Denmark','Djibouti','Dominica','Dominican Republic','Ecuador','Egypt','El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon','Gambia','Georgia','Germany','Ghana','Greece','Grenada','Guatemala','Guinea','Guinea-Bissau','Guyana','Haiti','Honduras','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Ivory Coast','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kiribati','Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania','Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Marshall Islands','Mauritania','Mauritius','Mexico','Micronesia','Moldova','Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nauru','Nepal','Netherlands','New Zealand','Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palau','Palestine','Panama','Papua New Guinea','Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saint Kitts and Nevis','Saint Lucia','Saint Vincent and the Grenadines','Samoa','San Marino','Sao Tome and Principe','Saudi Arabia','Senegal','Serbia','Seychelles','Sierra Leone','Singapore','Slovakia','Slovenia','Solomon Islands','Somalia','South Africa','South Korea','South Sudan','Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand','Timor-Leste','Togo','Tonga','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','Tuvalu','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Vanuatu','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe'];
       var REGION_TO_COUNTRY={kenya:'Kenya',peru:'Peru'};
-      var modal=document.getElementById('kit-modal'),input=document.getElementById('kit-country-input'),hidden=document.getElementById('kit-country-value'),suggest=document.getElementById('kit-suggest'),form=document.getElementById('kit-form'),msg=document.getElementById('kit-msg'),submitBtn=document.getElementById('kit-submit'),activeIdx=-1,matches=[];
+      var modal=document.getElementById('kit-modal'),input=document.getElementById('kit-country-input'),hidden=document.getElementById('kit-country-value'),suggest=document.getElementById('kit-suggest'),form=document.getElementById('kit-form'),msg=document.getElementById('kit-msg'),submitBtn=document.getElementById('kit-submit'),itemInputs=[].slice.call(document.querySelectorAll('input[name="kit-item"]')),cartTitle=document.getElementById('kit-cart-title'),cartList=document.getElementById('kit-cart-list'),cartTotal=document.getElementById('kit-cart-total'),cartNote=document.getElementById('kit-cart-note'),activeIdx=-1,matches=[];
 
-      function openModal(){modal.hidden=false;document.body.style.overflow='hidden';var sel=document.getElementById('region-select');var pre=sel&&REGION_TO_COUNTRY[sel.value];if(pre){input.value=pre;hidden.value=pre;}setTimeout(function(){input.focus();},60);}
+      function openModal(){modal.hidden=false;document.body.style.overflow='hidden';var sel=document.getElementById('region-select');var pre=sel&&REGION_TO_COUNTRY[sel.value];if(pre){input.value=pre;hidden.value=pre;}var scroller=form;scroller.scrollTop=0;setTimeout(function(){itemInputs[0].focus({preventScroll:true});},60);}
       function closeModal(){modal.hidden=true;document.body.style.overflow='';hideSuggest();}
       document.getElementById('open-kit-form').addEventListener('click',openModal);
       [].forEach.call(modal.querySelectorAll('[data-kit-close]'),function(b){b.addEventListener('click',closeModal);});
@@ -234,12 +266,18 @@
       function paint(){[].forEach.call(suggest.children,function(li,i){li.classList.toggle('active',i===activeIdx);});}
       function choose(c){input.value=c;hidden.value=c;hideSuggest();}
 
+      function selectedItems(){return itemInputs.filter(function(el){return el.checked;}).map(function(el){return{name:el.value,min_price:el.dataset.min?Number(el.dataset.min):null,max_price:el.dataset.max?Number(el.dataset.max):null,quote_required:el.dataset.quote==='true'};});}
+      function money(value){return '$'+Number(value).toLocaleString();}
+      function updateCart(){var items=selectedItems(),priced=items.filter(function(item){return item.min_price!==null;}),min=priced.reduce(function(sum,item){return sum+item.min_price;},0),max=priced.reduce(function(sum,item){return sum+item.max_price;},0),quotes=items.filter(function(item){return item.quote_required;}).length;cartTitle.textContent=items.length?items.length+' item'+(items.length===1?'':'s')+' selected':'Nothing selected yet';cartList.innerHTML=items.length?items.map(function(item){return '<li>'+item.name.replace(/[<>&"']/g,'')+'</li>';}).join(''):'<li>Choose at least one path to continue.</li>';if(!items.length){cartTotal.textContent='—';cartNote.textContent='Final cost depends on content, power, shipping, service, and partner eligibility.';return;}cartTotal.textContent=priced.length?(min===max?money(min):money(min)+'–'+money(max))+(quotes?' + quote':''):'Quote after review';cartNote.textContent=quotes?quotes+' selected item'+(quotes===1?' needs':'s need')+' a field-specific quote. Shipping and recurring satellite service are not included.':'Shipping and recurring satellite service are not included.';}
+      itemInputs.forEach(function(el){el.addEventListener('change',updateCart);});
+      updateCart();
+
       input.addEventListener('input',function(){hidden.value='';renderSuggest(input.value.trim());});
       input.addEventListener('keydown',function(e){if(suggest.hidden)return;if(e.key==='ArrowDown'){e.preventDefault();activeIdx=Math.min(activeIdx+1,matches.length-1);paint();}else if(e.key==='ArrowUp'){e.preventDefault();activeIdx=Math.max(activeIdx-1,0);paint();}else if(e.key==='Enter'){if(matches.length){e.preventDefault();choose(matches[activeIdx>=0?activeIdx:0]);}}});
       suggest.addEventListener('click',function(e){var li=e.target.closest('li[data-i]');if(li)choose(matches[+li.dataset.i]);});
       document.addEventListener('click',function(e){if(modal.hidden)return;if(!e.target.closest('.kit-combo'))hideSuggest();});
 
-      form.addEventListener('submit',function(e){e.preventDefault();var country=hidden.value||input.value.trim();if(!country){showMsg('Please choose a country.','err');input.focus();return;}var p=new URLSearchParams(location.search);submitBtn.disabled=true;submitBtn.textContent='Sending…';fetch('/api/track?type=availability',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country:country,region:(document.getElementById('region-select')||{}).value||null,name:document.getElementById('kit-name').value.trim()||null,email:document.getElementById('kit-email').value.trim()||null,organization:document.getElementById('kit-org').value.trim()||null,message:document.getElementById('kit-message').value.trim()||null,utm_source:p.get('utm_source')||null,utm_medium:p.get('utm_medium')||null,utm_campaign:p.get('utm_campaign')||null})}).then(function(r){return r.json();}).then(function(d){if(d&&d.error){showMsg('Error: '+d.error,'err');submitBtn.disabled=false;submitBtn.textContent='Send request';return;}var safe=country.replace(/[<>&"']/g,'');form.innerHTML='<div class="kit-success"><h3>Request received ✓</h3><p>Thank you. We’ll be in touch about pilot access for <b>'+safe+'</b>.</p></div>';}).catch(function(){showMsg('Could not send — please try again.','err');submitBtn.disabled=false;submitBtn.textContent='Send request';});});
+      form.addEventListener('submit',function(e){e.preventDefault();var items=selectedItems(),country=hidden.value||input.value.trim();if(!items.length){showMsg('Please choose at least one kit path.','err');itemInputs[0].focus();return;}if(!country){showMsg('Please choose a country.','err');input.focus();return;}var p=new URLSearchParams(location.search);submitBtn.disabled=true;submitBtn.textContent='Sending…';fetch('/api/track?type=availability',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country:country,region:(document.getElementById('region-select')||{}).value||null,name:document.getElementById('kit-name').value.trim()||null,email:document.getElementById('kit-email').value.trim()||null,organization:document.getElementById('kit-org').value.trim()||null,message:document.getElementById('kit-message').value.trim()||null,requested_items:items,utm_source:p.get('utm_source')||null,utm_medium:p.get('utm_medium')||null,utm_campaign:p.get('utm_campaign')||null})}).then(function(r){return r.json();}).then(function(d){if(d&&d.error){showMsg('Error: '+d.error,'err');submitBtn.disabled=false;submitBtn.textContent='Send itemized request';return;}var safe=country.replace(/[<>&"']/g,'');form.innerHTML='<div class="kit-success"><h3>Itemized request received ✓</h3><p>Thank you. We’ll review your '+items.length+' selected path'+(items.length===1?'':'s')+' and follow up about pilot access for <b>'+safe+'</b>.</p></div>';}).catch(function(){showMsg('Could not send — please try again.','err');submitBtn.disabled=false;submitBtn.textContent='Send itemized request';});});
       function showMsg(t,cls){msg.textContent=t;msg.className='kit-msg '+cls;}
     })();
   </script>

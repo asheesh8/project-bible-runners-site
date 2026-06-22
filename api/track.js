@@ -2,7 +2,7 @@
 // Env vars: SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD
 //
 // Public (no auth):
-//   POST /api/track?type=visit     { path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
+//   POST /api/track?type=visit     { site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
 //   POST /api/track?type=interest  { name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
 //
 // Admin (Authorization: Bearer <ADMIN_PASSWORD>):
@@ -36,13 +36,26 @@ export default async function handler(req, res) {
 
   // ── Public POST: log visit ───────────────────────────────────────
   if (req.method === 'POST' && type === 'visit') {
-    const { path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid } = req.body || {};
-    await fetch(`${SUPABASE_URL}/rest/v1/page_visits`, {
+    const { site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid } = req.body || {};
+    const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+    const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
+    const payload = { site_host: cleanHost, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid };
+    let visitResponse = await fetch(`${SUPABASE_URL}/rest/v1/page_visits`, {
       method: 'POST',
       headers: { ...sbH, Prefer: 'return=minimal' },
-      body: JSON.stringify({ path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }),
+      body: JSON.stringify(payload),
     });
-    return res.status(200).json({ ok: true });
+    // Keep tracking alive during the short window before the site_host migration is applied.
+    if (!visitResponse.ok) {
+      const legacyPayload = { ...payload };
+      delete legacyPayload.site_host;
+      visitResponse = await fetch(`${SUPABASE_URL}/rest/v1/page_visits`, {
+        method: 'POST',
+        headers: { ...sbH, Prefer: 'return=minimal' },
+        body: JSON.stringify(legacyPayload),
+      });
+    }
+    return res.status(visitResponse.ok ? 200 : 502).json({ ok: visitResponse.ok });
   }
 
   // ── Public POST: log donation interest ──────────────────────────
@@ -60,12 +73,18 @@ export default async function handler(req, res) {
 
   // ── Public POST: kit availability / interest request ─────────────
   if (req.method === 'POST' && type === 'availability') {
-    const { country, region, name, email, organization, message, utm_source, utm_medium, utm_campaign } = req.body || {};
+    const { country, region, name, email, organization, message, requested_items, utm_source, utm_medium, utm_campaign } = req.body || {};
     if (!country) return res.status(400).json({ error: 'country is required' });
+    const cleanItems = Array.isArray(requested_items) ? requested_items.slice(0, 12).map((item) => ({
+      name: String((item && item.name) || '').slice(0, 120),
+      min_price: Number.isFinite(Number(item && item.min_price)) ? Number(item.min_price) : null,
+      max_price: Number.isFinite(Number(item && item.max_price)) ? Number(item.max_price) : null,
+      quote_required: Boolean(item && item.quote_required),
+    })).filter((item) => item.name) : [];
     const r = await fetch(`${SUPABASE_URL}/rest/v1/availability_requests`, {
       method: 'POST',
       headers: { ...sbH, Prefer: 'return=representation' },
-      body: JSON.stringify({ country, region, name, email, organization, message, utm_source, utm_medium, utm_campaign }),
+      body: JSON.stringify({ country, region, name, email, organization, message, requested_items: cleanItems, utm_source, utm_medium, utm_campaign }),
     });
     const data = await r.json();
     return res.status(r.status).json(data);
@@ -91,10 +110,11 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET' && type === 'summary') {
-    const [visitsR, interestsR] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' }),
+    let [visitsR, interestsR] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' }),
       fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, { headers: sbH }),
     ]);
+    if (!visitsR.ok) visitsR = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' });
     const [visits, interests] = await Promise.all([visitsR.json(), interestsR.json()]);
     return res.status(200).json({ visits: visits || [], interests: interests || [] });
   }

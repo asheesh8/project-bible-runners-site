@@ -8,6 +8,7 @@
 
   var params = new URLSearchParams(location.search);
   var payload = {
+    site_host: (location.hostname || '').toLowerCase().replace(/^www\./, ''),
     path: location.pathname || '/',
     referrer: document.referrer || '',
     utm_source: params.get('utm_source') || '',

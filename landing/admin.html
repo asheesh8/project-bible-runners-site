@@ -42,9 +42,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   box-shadow:0 8px 32px rgba(0,0,0,.25);
 }
 .login-logo{
-  width:40px;height:40px;background:#1a2e1a;border-radius:8px;
+  width:260px;height:76px;background:#fff;border-radius:8px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
 }
+.login-logo img{width:100%;height:100%;object-fit:cover;object-position:center 61%}
 .login-box h1{font-size:20px;font-weight:700;margin:0 0 6px}
 .login-box p{font-size:14px;color:var(--muted);margin:0 0 28px}
 .login-box input{
@@ -73,9 +74,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   position:sticky;top:0;z-index:100;
 }
 .topbar-logo{
-  width:26px;height:26px;background:#2d5a2d;border-radius:5px;
+  width:146px;height:34px;background:#fff;border-radius:4px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;flex:0 0 auto;
 }
+.topbar-logo img{width:100%;height:100%;object-fit:cover;object-position:center 61%}
 .topbar-title{
   font-size:14px;font-weight:700;color:#fff;
   display:flex;align-items:center;gap:8px;
@@ -230,6 +232,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
 /* Dashboard shell and useful non-blank states */
 .preview-banner{display:none;align-items:center;justify-content:space-between;gap:20px;padding:13px 16px;border-radius:12px;background:#edf1df;border:1px solid #cbd59a;color:#31451d;font-size:13px;margin-bottom:24px}.preview-banner b{color:var(--forest,#123e31)}body.preview-mode .preview-banner{display:flex}.dashboard-hero{display:grid;grid-template-columns:1.3fr .7fr;gap:40px;padding:36px;border-radius:20px;background:linear-gradient(135deg,#0b2e25,#17483a);color:#fff;margin-bottom:22px;overflow:hidden;position:relative}.dashboard-hero::after{content:'VS';position:absolute;right:28px;bottom:-54px;font-size:180px;font-weight:800;color:rgba(255,255,255,.04);line-height:1}.dashboard-hero>*{position:relative;z-index:1}.dashboard-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#d9df7b;margin-bottom:12px}.dashboard-hero h2{font-size:clamp(30px,4vw,50px);line-height:1;margin-bottom:14px}.dashboard-hero p{max-width:700px;color:rgba(255,255,255,.7);font-size:15px}.dashboard-focus{align-self:end;padding:22px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(255,255,255,.07)}.dashboard-focus span,.dashboard-focus strong{display:block}.dashboard-focus span{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#d9df7b;font-weight:700}.dashboard-focus strong{font-size:20px;margin:9px 0 5px}.dashboard-focus small{color:rgba(255,255,255,.6)}.dashboard-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}.dashboard-stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;min-width:0}.dashboard-stat span,.dashboard-stat strong,.dashboard-stat small{display:block}.dashboard-stat span{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}.dashboard-stat strong{font-size:30px;line-height:1;margin:12px 0 7px;color:var(--accent)}.dashboard-stat small{font-size:12px;color:var(--muted)}.dashboard-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.dashboard-panel,.panel-card,#campaigns-list,#posts-list,#affiliates-list{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}.dashboard-panel{padding:24px}.dashboard-panel h3{font-size:16px;margin-bottom:6px}.dashboard-panel>p{font-size:13px;color:var(--muted);margin-bottom:18px}.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.quick-action{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font:700 13px var(--sans);cursor:pointer;text-align:left}.quick-action:hover{background:#edf1df;border-color:#cbd59a}.readiness-list{display:grid;gap:9px}.readiness-item{display:grid;grid-template-columns:34px 1fr;gap:11px;align-items:start;padding:12px;background:var(--bg);border-radius:10px}.readiness-item>span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#d9df7b;font-size:11px;font-weight:800}.readiness-item b,.readiness-item small{display:block}.readiness-item b{font-size:13px}.readiness-item small{font-size:11px;color:var(--muted);margin-top:2px}.analytics-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:20px!important;margin-bottom:28px!important}.panel-card{padding:22px}.panel-card h3{font-size:12px!important;font-weight:700!important;margin:0 0 18px!important;color:var(--muted)!important;text-transform:uppercase;letter-spacing:.08em}.stat-grid{display:grid!important;grid-template-columns:repeat(4,minmax(150px,1fr))!important;gap:12px!important;margin-bottom:22px!important}.loading-state{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:12px 0}.loading-state::before{content:'';width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:admin-spin .8s linear infinite}@keyframes admin-spin{to{transform:rotate(360deg)}}.items-table-wrap{overflow-x:auto}.items-table{min-width:720px}.page-title{font-size:26px}.page-header{padding-bottom:18px;border-bottom:1px solid var(--border)}
+.domain-stream{display:flex;align-items:center;gap:9px;margin-top:6px;color:var(--muted);font-size:12px}.domain-stream span{width:8px;height:8px;border-radius:50%;background:#42b883;box-shadow:0 0 0 4px rgba(66,184,131,.12)}.live-updated{animation:liveUpdate .3s ease}@keyframes liveUpdate{from{opacity:.72}to{opacity:1}}
 
 /* Photo grid */
 .photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
@@ -269,7 +272,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   .form-row{grid-template-columns:1fr}
   .dashboard-hero,.dashboard-grid{grid-template-columns:1fr}.dashboard-stats{grid-template-columns:1fr 1fr}.stat-grid{grid-template-columns:1fr 1fr!important}.analytics-grid{grid-template-columns:1fr!important}.preview-banner{align-items:flex-start;flex-direction:column}.tracking-flow,.faq-grid{grid-template-columns:1fr}.flow-card:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-17px}.faq-article.wide{grid-column:auto}.privacy-list{grid-template-columns:1fr}
 }
-@media(max-width:460px){.dashboard-stats,.stat-grid,.quick-actions{grid-template-columns:1fr!important}.dashboard-hero{padding:26px 22px}.dashboard-hero h2{font-size:34px}.topbar-right{gap:5px}.btn-logout{padding:6px 9px}}
+@media(max-width:460px){.dashboard-stats,.stat-grid,.quick-actions{grid-template-columns:1fr!important}.dashboard-hero{padding:26px 22px}.dashboard-hero h2{font-size:34px}.topbar{padding:0 10px;gap:8px}.topbar-logo{width:112px;height:30px}.topbar-title{display:none}.topbar-right{gap:5px}.poll-status small,.topbar-link{display:none}.btn-logout{padding:6px 9px}}
 </style>
 </head>
 <body>
@@ -278,10 +281,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <svg viewBox="0 0 20 28" fill="white" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg>
+      <img src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative">
     </div>
     <h1>VillageServer Admin</h1>
-    <p>VillageServer Initiative &mdash; Content panel</p>
+    <p>Live content and combined .com + .org analytics</p>
     <input type="password" id="pw-input" placeholder="Admin password" autocomplete="current-password" />
     <p class="login-err" id="login-err">Incorrect password. Try again.</p>
     <button class="btn-primary" id="login-btn">Sign in</button>
@@ -294,7 +297,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   <!-- Top bar -->
   <div class="topbar">
     <div class="topbar-logo">
-      <svg viewBox="0 0 20 28" fill="white" width="12" height="17"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg>
+      <img src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative">
     </div>
     <div class="topbar-title">
       VillageServer Initiative
@@ -546,7 +549,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       <!-- ── TRAFFIC ──────────────────────────────────── -->
       <div class="tab-view" id="tab-traffic">
         <div class="page-header">
-          <h2 class="page-title">Traffic &amp; Ad Sources</h2>
+          <div><h2 class="page-title">Traffic &amp; Ad Sources</h2><p class="domain-stream"><span aria-hidden="true"></span>Combined live stream · villageserver.com + villageserver.org</p></div>
           <button class="btn-new" id="refresh-traffic-btn" style="background:var(--muted)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             Refresh
@@ -663,7 +666,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
           <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 04</span><span class="faq-tag">Referrers</span></div><h3>What does the referrer tell us?</h3><p><code>document.referrer</code> can identify the previous webpage when the browser and that website permit it. Privacy settings, apps, HTTPS rules, and redirects may remove or shorten it.</p><p>A blank referrer is labeled direct/unknown; it does not prove that the visitor typed the address manually.</p></article>
 
-          <article class="faq-article wide"><div class="faq-meta"><span class="faq-number">QUESTION 05</span><span class="faq-tag">Stored fields</span></div><h3>What exactly is saved for a page visit?</h3><table class="field-map"><thead><tr><th>Field</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td><code>path</code></td><td>VillageServer destination page</td><td><code>/donate</code></td></tr><tr><td><code>referrer</code></td><td>Previous page when supplied</td><td><code>facebook.com/…</code></td></tr><tr><td><code>utm_source</code></td><td>Platform or publisher</td><td><code>facebook</code></td></tr><tr><td><code>utm_medium</code></td><td>Traffic type</td><td><code>paid-social</code></td></tr><tr><td><code>utm_campaign</code></td><td>Campaign label</td><td><code>kenya-pilot</code></td></tr><tr><td><code>fbclid / ttclid</code></td><td>Platform click clue</td><td>Opaque identifier</td></tr><tr><td><code>created_at</code></td><td>Time Supabase created the row</td><td>UTC timestamp</td></tr></tbody></table></article>
+          <article class="faq-article wide"><div class="faq-meta"><span class="faq-number">QUESTION 05</span><span class="faq-tag">Stored fields</span></div><h3>What exactly is saved for a page visit?</h3><table class="field-map"><thead><tr><th>Field</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td><code>site_host</code></td><td>Public VillageServer domain; both domains feed one stream</td><td><code>villageserver.org</code></td></tr><tr><td><code>path</code></td><td>VillageServer destination page</td><td><code>/donate</code></td></tr><tr><td><code>referrer</code></td><td>Previous page when supplied</td><td><code>facebook.com/…</code></td></tr><tr><td><code>utm_source</code></td><td>Platform or publisher</td><td><code>facebook</code></td></tr><tr><td><code>utm_medium</code></td><td>Traffic type</td><td><code>paid-social</code></td></tr><tr><td><code>utm_campaign</code></td><td>Campaign label</td><td><code>kenya-pilot</code></td></tr><tr><td><code>fbclid / ttclid</code></td><td>Platform click clue</td><td>Opaque identifier</td></tr><tr><td><code>created_at</code></td><td>Time Supabase created the row</td><td>UTC timestamp</td></tr></tbody></table></article>
 
           <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 06</span><span class="faq-tag">Privacy</span></div><h3>What can and can’t the tracker see?</h3><ul class="privacy-list"><li class="yes">Tagged campaign values</li><li class="yes">VillageServer page path</li><li class="yes">Allowed referrer value</li><li class="yes">Submission fields a person enters</li><li class="no">Network packet payloads</li><li class="no">Browsing history</li><li class="no">Social passwords or accounts</li><li class="no">Files on the visitor's device</li></ul></article>
 
@@ -746,6 +749,7 @@ create table affiliates (
 
 create table page_visits (
   id uuid default gen_random_uuid() primary key,
+  site_host text,
   path text,
   referrer text,
   utm_source text,
@@ -779,6 +783,7 @@ create table availability_requests (
   email text,
   organization text,
   message text,
+  requested_items jsonb not null default '[]'::jsonb,
   utm_source text,
   utm_medium text,
   utm_campaign text,
@@ -791,8 +796,10 @@ alter table posts enable row level security;
 alter table photos enable row level security;
 alter table affiliates enable row level security;
 alter table page_visits enable row level security;
+alter table page_visits add column if not exists site_host text;
 alter table donation_interests enable row level security;
 alter table availability_requests enable row level security;
+alter table availability_requests add column if not exists requested_items jsonb not null default '[]'::jsonb;
 
 create policy "Public reads" on campaigns for select using (true);
 create policy "Public reads published" on posts for select using (published = true);
@@ -816,7 +823,10 @@ create policy "Public insert availability" on availability_requests for insert w
 
 <script>
 var AUTH_TOKEN = null;
-var IS_LOCAL_PREVIEW = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+var LOCAL_ADMIN = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+var IS_LOCAL_PREVIEW = new URLSearchParams(location.search).get('preview') === '1';
+var API_ORIGIN = LOCAL_ADMIN && !IS_LOCAL_PREVIEW ? 'https://project-bible-runners-site.vercel.app' : '';
+function apiUrl(path){ return API_ORIGIN + path; }
 var PREVIEW_STORE = {
   campaigns: [
     {id:'preview-campaign-1',name:'Kenya Field Pilot',slug:'kenya-field-pilot',description:'Test the complete VillageServer field kit with local ministry partners.',story:'A first field pilot for offline Scripture access, charging, projection, and training.',goal_amount:12500,raised_amount:4200,bibles_funded:0,bibles_needed:0,end_date:'2026-09-30',zeffy_url:null,image_url:'./img/hero-village.webp',active:true,created_at:'2026-06-10T14:00:00Z'},
@@ -836,12 +846,12 @@ var PREVIEW_STORE = {
     {id:'preview-affiliate-2',name:'Digital Bible Society',website_url:'https://digitalbiblesociety.org',description:'Digital Bible resources and library support.',logo_url:null,active:true,sort_order:20,created_at:'2026-06-01T12:00:00Z'}
   ],
   visits: [
-    {id:'v1',path:'/',referrer:'https://facebook.com/',utm_source:'facebook',utm_medium:'paid-social',utm_campaign:'kenya-pilot',fbclid:'preview-fb-1',ttclid:null,created_at:'2026-06-22T13:10:00Z'},
-    {id:'v2',path:'/initiative',referrer:'https://google.com/',utm_source:'google',utm_medium:'organic',utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-22T11:40:00Z'},
-    {id:'v3',path:'/pamphlets',referrer:'https://instagram.com/',utm_source:'instagram',utm_medium:'social',utm_campaign:'missionary-library',fbclid:null,ttclid:null,created_at:'2026-06-21T18:20:00Z'},
-    {id:'v4',path:'/donate',referrer:'',utm_source:'email',utm_medium:'newsletter',utm_campaign:'pilot-update',fbclid:null,ttclid:null,created_at:'2026-06-20T16:00:00Z'},
-    {id:'v5',path:'/access',referrer:'',utm_source:null,utm_medium:null,utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-19T16:00:00Z'},
-    {id:'v6',path:'/transfer',referrer:'https://tiktok.com/',utm_source:'tiktok',utm_medium:'paid-social',utm_campaign:'offline-sharing',fbclid:null,ttclid:'preview-tt-1',created_at:'2026-06-18T16:00:00Z'}
+    {id:'v1',site_host:'villageserver.com',path:'/',referrer:'https://facebook.com/',utm_source:'facebook',utm_medium:'paid-social',utm_campaign:'kenya-pilot',fbclid:'preview-fb-1',ttclid:null,created_at:'2026-06-22T13:10:00Z'},
+    {id:'v2',site_host:'villageserver.org',path:'/initiative',referrer:'https://google.com/',utm_source:'google',utm_medium:'organic',utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-22T11:40:00Z'},
+    {id:'v3',site_host:'villageserver.com',path:'/pamphlets',referrer:'https://instagram.com/',utm_source:'instagram',utm_medium:'social',utm_campaign:'missionary-library',fbclid:null,ttclid:null,created_at:'2026-06-21T18:20:00Z'},
+    {id:'v4',site_host:'villageserver.org',path:'/donate',referrer:'',utm_source:'email',utm_medium:'newsletter',utm_campaign:'pilot-update',fbclid:null,ttclid:null,created_at:'2026-06-20T16:00:00Z'},
+    {id:'v5',site_host:'villageserver.com',path:'/access',referrer:'',utm_source:null,utm_medium:null,utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-19T16:00:00Z'},
+    {id:'v6',site_host:'villageserver.org',path:'/transfer',referrer:'https://tiktok.com/',utm_source:'tiktok',utm_medium:'paid-social',utm_campaign:'offline-sharing',fbclid:null,ttclid:'preview-tt-1',created_at:'2026-06-18T16:00:00Z'}
   ],
   interests: [
     {id:'i1',name:'Grace M.',email:'grace@example.org',country:'Kenya',initiative:'VillageServer Initiative',practical_need:'Language microSD',utm_source:'facebook',created_at:'2026-06-21T12:00:00Z'},
@@ -849,9 +859,9 @@ var PREVIEW_STORE = {
     {id:'i3',name:'Maya K.',email:'maya@example.org',country:'Where most needed',initiative:'VillageServer Initiative',practical_need:'Complete field kit',utm_source:'google',created_at:'2026-06-19T12:00:00Z'}
   ],
   availability: [
-    {id:'a1',country:'Kenya',region:'Nakuru County',name:'Samuel K.',email:'samuel@example.org',organization:'Field Church Network',message:'Interested in a pilot kit and local-leader training.',utm_source:'facebook',created_at:'2026-06-22T10:00:00Z'},
-    {id:'a2',country:'Peru',region:'Loreto',name:'Ana P.',email:'ana@example.org',organization:'River Community Mission',message:'Need an offline library with solar power and projection.',utm_source:'email',created_at:'2026-06-20T10:00:00Z'},
-    {id:'a3',country:'Uganda',region:'Northern Region',name:'Peter O.',email:'peter@example.org',organization:'Local Ministry Partner',message:'Requesting availability information for a future deployment.',utm_source:'google',created_at:'2026-06-18T10:00:00Z'}
+    {id:'a1',country:'Kenya',region:'Nakuru County',name:'Samuel K.',email:'samuel@example.org',organization:'Field Church Network',message:'Interested in a pilot kit and local-leader training.',requested_items:[{name:'VillageServer core',min_price:95,max_price:95,quote_required:false},{name:'Language microSD card',min_price:15,max_price:25,quote_required:false}],utm_source:'facebook',created_at:'2026-06-22T10:00:00Z'},
+    {id:'a2',country:'Peru',region:'Loreto',name:'Ana P.',email:'ana@example.org',organization:'River Community Mission',message:'Need an offline library with solar power and projection.',requested_items:[{name:'Solar suitcase',min_price:null,max_price:null,quote_required:true},{name:'Pico projector',min_price:null,max_price:null,quote_required:true}],utm_source:'email',created_at:'2026-06-20T10:00:00Z'},
+    {id:'a3',country:'Uganda',region:'Northern Region',name:'Peter O.',email:'peter@example.org',organization:'Local Ministry Partner',message:'Requesting availability information for a future deployment.',requested_items:[{name:'Satellite connection kit',min_price:199,max_price:249,quote_required:false}],utm_source:'google',created_at:'2026-06-18T10:00:00Z'}
   ]
 };
 
@@ -859,6 +869,7 @@ function previewCopy(value){ return JSON.parse(JSON.stringify(value)); }
 function enterAdmin(startTab){
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
+  if(API_ORIGIN) document.getElementById('environment-badge').textContent = 'Live · COM + ORG';
   activateTab(startTab || 'overview');
 }
 
@@ -873,7 +884,7 @@ function enterAdmin(startTab){
     if(!password) return;
     btn.disabled = true;
     btn.textContent = 'Signing in…';
-    fetch('/api/auth', {
+    fetch(apiUrl('/api/auth'), {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({password})
@@ -962,7 +973,7 @@ function api(method, type, body, id){
     }
     return Promise.resolve(method === 'DELETE' ? null : previewCopy(collection));
   }
-  var url = '/api/content?type=' + type;
+  var url = apiUrl('/api/content?type=' + type);
   if(id) url += '&id=' + encodeURIComponent(id);
   var opts = {
     method: method,
@@ -980,7 +991,7 @@ function api(method, type, body, id){
 
 function apiGet(type, slug){
   if(IS_LOCAL_PREVIEW) return Promise.resolve(previewCopy(PREVIEW_STORE[type] || []));
-  var url = '/api/content?type=' + type + '&_ts=' + Date.now();
+  var url = apiUrl('/api/content?type=' + type + '&_ts=' + Date.now());
   if(slug) url += '&slug=' + encodeURIComponent(slug);
   // Pass auth to get drafts too
   return fetch(url, {cache:'no-store',headers:{'Authorization':'Bearer ' + AUTH_TOKEN,'Cache-Control':'no-cache'}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
@@ -992,7 +1003,7 @@ function trackGet(type){
     if(type === 'interests') return Promise.resolve(previewCopy(PREVIEW_STORE.interests));
     if(type === 'availability') return Promise.resolve(previewCopy(PREVIEW_STORE.availability));
   }
-  return fetch('/api/track?type=' + type + '&_ts=' + Date.now(), {cache:'no-store',headers:{'Authorization':'Bearer '+AUTH_TOKEN,'Cache-Control':'no-cache'}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
+  return fetch(apiUrl('/api/track?type=' + type + '&_ts=' + Date.now()), {cache:'no-store',headers:{'Authorization':'Bearer '+AUTH_TOKEN,'Cache-Control':'no-cache'}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
 }
 
 function showStatus(msg, level){
@@ -1355,10 +1366,23 @@ function countBy(arr, key){
   return Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
 }
 
+function setLiveHtml(id, html){
+  var el = typeof id === 'string' ? document.getElementById(id) : id;
+  if(!el || el._liveHtml === html) return false;
+  var scrollLeft = el.scrollLeft;
+  el._liveHtml = html;
+  el.dataset.liveUpdates = String(Number(el.dataset.liveUpdates || 0) + 1);
+  el.innerHTML = html;
+  el.scrollLeft = scrollLeft;
+  el.classList.remove('live-updated');
+  void el.offsetWidth;
+  el.classList.add('live-updated');
+  return true;
+}
+
 function renderBars(containerId, entries, total, colorFn){
-  var el = document.getElementById(containerId);
-  if(!entries.length){ el.innerHTML = '<p style="color:var(--muted);font-size:13px">No data yet.</p>'; return; }
-  el.innerHTML = entries.slice(0,10).map(function(e){
+  if(!entries.length){ setLiveHtml(containerId,'<p style="color:var(--muted);font-size:13px">No data yet.</p>'); return; }
+  setLiveHtml(containerId,entries.slice(0,10).map(function(e){
     var pct = total ? Math.round(e[1]/total*100) : 0;
     var label = e[0];
     var color = colorFn ? colorFn(label) : 'var(--accent)';
@@ -1370,7 +1394,7 @@ function renderBars(containerId, entries, total, colorFn){
       '<div style="height:7px;background:var(--bg);border-radius:99px;overflow:hidden">' +
         '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:99px;transition:width .4s"></div>' +
       '</div></div>';
-  }).join('');
+  }).join(''));
 }
 
 function renderStatCard(label, value, sub){
@@ -1403,11 +1427,11 @@ function loadTraffic(){
       var topSource = countBy(visits,'utm_source')[0];
 
       // Summary cards
-      document.getElementById('traffic-summary-cards').innerHTML =
+      setLiveHtml('traffic-summary-cards',
         renderStatCard('Total Visits Tracked', total, 'all time') +
         renderStatCard('This Week', week, 'last 7 days') +
         renderStatCard('Paid Ad Visits', paidVisits, 'Facebook, TikTok, Google') +
-        renderStatCard('Top Source', topSource ? friendlySource(topSource[0]) : '—', topSource ? topSource[1]+' visits' : '');
+        renderStatCard('Top Source', topSource ? friendlySource(topSource[0]) : '—', topSource ? topSource[1]+' visits' : ''));
 
       // Source bars (label paid sources nicely)
       var srcEntries = countBy(visits,'utm_source').map(function(e){ return [friendlySource(e[0]),e[1]]; });
@@ -1421,7 +1445,7 @@ function loadTraffic(){
 
       // Recent visits table
       var visitsEl = document.getElementById('traffic-visits-table');
-      if(!visits.length){ visitsEl.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0">No visits logged yet. Make sure the donate page is being loaded.</p>'; return; }
+      if(!visits.length){ setLiveHtml(visitsEl,'<p style="color:var(--muted);font-size:13px;padding:8px 0">No visits logged yet. Make sure the public site is being loaded.</p>'); return; }
       var tableHtml = '<table class="items-table"><thead><tr><th>Date</th><th>Source</th><th>Medium</th><th>Campaign</th><th>Ad Type</th><th>Referrer</th></tr></thead><tbody>';
       visits.slice(0,50).forEach(function(v){
         var adType = '';
@@ -1438,7 +1462,7 @@ function loadTraffic(){
         '</tr>';
       });
       tableHtml += '</tbody></table>';
-      visitsEl.innerHTML = tableHtml;
+      setLiveHtml(visitsEl,tableHtml);
     })
     .catch(function(){ showStatus('Could not load traffic — check Supabase config.','warn'); });
 }
@@ -1457,7 +1481,7 @@ function loadInterests(){
       renderBars('interests-init-bars', countBy(rows,'initiative'), total, null);
 
       var el = document.getElementById('interests-table');
-      if(!rows.length){ el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0">No donation interests submitted yet.</p>'; return; }
+      if(!rows.length){ setLiveHtml(el,'<p style="color:var(--muted);font-size:13px;padding:8px 0">No donation interests submitted yet.</p>'); return; }
       var html = '<table class="items-table"><thead><tr><th>Date</th><th>Country</th><th>Initiative</th><th>Practical Need</th><th>Name</th><th>Email</th><th>Ad Source</th></tr></thead><tbody>';
       rows.forEach(function(r){
         var flag = FLAG_MAP[r.country] || '📍';
@@ -1472,7 +1496,7 @@ function loadInterests(){
         '</tr>';
       });
       html += '</tbody></table>';
-      el.innerHTML = html;
+      setLiveHtml(el,html);
     })
     .catch(function(){ showStatus('Could not load interests — check Supabase config.','warn'); });
 }
@@ -1491,13 +1515,16 @@ function loadKitRequests(){
       renderBars('kitrequests-source-bars', srcEntries, total, null);
 
       var el = document.getElementById('kitrequests-table');
-      if(!rows.length){ el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:8px 0">No kit requests submitted yet.</p>'; return; }
-      var html = '<table class="items-table"><thead><tr><th>Date</th><th>Country</th><th>Region</th><th>Name</th><th>Email</th><th>Organization</th><th>Message</th><th>Ad Source</th></tr></thead><tbody>';
+      if(!rows.length){ setLiveHtml(el,'<p style="color:var(--muted);font-size:13px;padding:8px 0">No kit requests submitted yet.</p>'); return; }
+      var html = '<table class="items-table"><thead><tr><th>Date</th><th>Country</th><th>Requested kit</th><th>Region</th><th>Name</th><th>Email</th><th>Organization</th><th>Message</th><th>Ad Source</th></tr></thead><tbody>';
       rows.forEach(function(r){
         var flag = FLAG_MAP[r.country] || '📍';
+        var requested = Array.isArray(r.requested_items) ? r.requested_items : [];
+        var requestedHtml = requested.length ? requested.map(function(item){ var label=typeof item==='string'?item:item.name; return '<span style="display:inline-block;background:#edf3e8;color:var(--forest);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700;margin:2px">'+esc(label||'Item')+'</span>'; }).join('') : '<span style="color:var(--muted);font-size:12px">Legacy request</span>';
         html += '<tr>' +
           '<td style="white-space:nowrap;font-size:12px;color:var(--muted)">'+fmtDate(r.created_at)+'</td>' +
           '<td><strong>'+flag+' '+esc(r.country||'—')+'</strong></td>' +
+          '<td style="min-width:190px">'+requestedHtml+'</td>' +
           '<td style="font-size:13px;color:var(--muted)">'+esc(r.region||'—')+'</td>' +
           '<td style="font-size:13px">'+esc(r.name||'—')+'</td>' +
           '<td style="font-size:13px">'+esc(r.email||'—')+'</td>' +
@@ -1507,7 +1534,7 @@ function loadKitRequests(){
         '</tr>';
       });
       html += '</tbody></table>';
-      el.innerHTML = html;
+      setLiveHtml(el,html);
     })
     .catch(function(){ showStatus('Could not load kit requests — check Supabase config.','warn'); });
 }
@@ -1527,7 +1554,7 @@ function setPollStatus(state, detail){
   if(!wrap || !label || !small) return;
   wrap.className = 'poll-status ' + (state || '');
   label.textContent = IS_LOCAL_PREVIEW ? 'Preview' : state === 'syncing' ? 'Syncing' : state === 'paused' ? 'Paused' : state === 'error' ? 'Retrying' : 'Live';
-  small.textContent = detail || 'refreshes every 4s';
+  small.textContent = detail || 'COM + ORG · every 4s';
 }
 
 function pollActiveTab(){
@@ -1545,7 +1572,7 @@ function pollActiveTab(){
     var count = Number(document.body.dataset.pollCount || 0) + 1;
     document.body.dataset.pollCount = String(count);
     document.body.dataset.pollTab = tab;
-    setPollStatus('','updated ' + now.toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'}) + ' · every 4s');
+    setPollStatus('','COM + ORG · ' + now.toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'}));
     return true;
   }).catch(function(){
     setPollStatus('error','next retry in 4s');
@@ -1555,7 +1582,7 @@ function pollActiveTab(){
 
 function startAutoPolling(){
   if(pollTimer) return;
-  setPollStatus('','refreshes every 4s');
+  setPollStatus('','COM + ORG · every 4s');
   pollTimer = setInterval(pollActiveTab, POLL_INTERVAL_MS);
   document.addEventListener('visibilitychange', function(){
     if(document.hidden) setPollStatus('paused','tab hidden');

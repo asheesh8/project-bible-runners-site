@@ -2,9 +2,11 @@
   'use strict';
 
   var languages = [
-    ['en', 'English'], ['fr', 'Français'], ['sw', 'Kiswahili'],
-    ['es', 'Español'], ['hi', 'हिन्दी'], ['ne', 'नेपाली'], ['bn', 'বাংলা']
+    ['en', 'English'], ['fr', 'Français'], ['sw', 'Kiswahili / Swahili'],
+    ['es', 'Español'], ['hi', 'हिन्दी / Hindi'], ['ur', 'اردو / Urdu'],
+    ['sd', 'سنڌي / Sindhi'], ['ne', 'नेपाली'], ['bn', 'বাংলা']
   ];
+  var curatedHomepageLanguages = ['en', 'fr', 'sw', 'es', 'hi', 'ne', 'bn'];
   var supported = languages.map(function (item) { return item[0]; });
   var saved = localStorage.getItem('vsi-language') || 'en';
   if (supported.indexOf(saved) < 0) saved = 'en';
@@ -58,6 +60,7 @@
 
   function protectCuratedHomepageText() {
     if (!document.getElementById('language-select')) return;
+    if (curatedHomepageLanguages.indexOf(saved) < 0) return;
     document.querySelectorAll('[data-i18n],[data-i18n-html],.setup-preview,.availability-result').forEach(function (node) {
       node.classList.add('notranslate');
       node.setAttribute('translate', 'no');
