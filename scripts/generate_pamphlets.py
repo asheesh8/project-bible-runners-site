@@ -4,8 +4,10 @@
 from pathlib import Path
 from reportlab.lib.colors import HexColor, white
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfgen.canvas import Canvas
+from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,9 +65,29 @@ def footer(c, page_label):
     c.drawRightString(W - 42, 21, page_label)
 
 
-def logo(c, x, y, width=156):
-    if LOGO.exists():
-        c.drawImage(str(LOGO), x, y, width=width, height=40, preserveAspectRatio=True, mask="auto", anchor="sw")
+_LOGO_READER = None
+
+
+def logo_reader():
+    # The source emblem is 1254x1254 (~2 MB); it only ever renders at ~40pt.
+    # Downscale once and reuse so the PDFs stay small for low-bandwidth users.
+    global _LOGO_READER
+    if _LOGO_READER is None and LOGO.exists():
+        im = Image.open(str(LOGO)).convert("RGBA")
+        im.thumbnail((256, 256), Image.LANCZOS)
+        _LOGO_READER = ImageReader(im)
+    return _LOGO_READER
+
+
+def logo(c, x, y, width=156, on_dark=False):
+    # The emblem is a square, transparent PNG; reportlab fits it to a 40pt box.
+    # On dark headers, sit it on a light rounded chip so every part stays visible.
+    if on_dark:
+        c.setFillColor(white)
+        c.roundRect(x - 7, y - 7, 54, 54, 11, fill=1, stroke=0)
+    reader = logo_reader()
+    if reader is not None:
+        c.drawImage(reader, x, y, width=40, height=40, preserveAspectRatio=True, mask="auto", anchor="sw")
 
 
 def pill(c, text, x, y, fill=LEAF, text_color=white):
@@ -109,7 +131,7 @@ def draw_route(filename, title, method, use_when, steps, checks, source_label, s
     c.rect(0, 0, W, H, fill=1, stroke=0)
     c.setFillColor(FOREST)
     c.rect(0, H - 190, W, 190, fill=1, stroke=0)
-    logo(c, 42, H - 58, 145)
+    logo(c, 42, H - 58, 145, on_dark=True)
     pill(c, "Offline transfer field guide", 42, H - 91, fill=LEAF)
     c.setFillColor(white)
     c.setFont("Times-Bold", 28)
@@ -179,7 +201,7 @@ def overview():
 
     c.setFillColor(FOREST)
     c.rect(0, 0, W, H, fill=1, stroke=0)
-    logo(c, 42, H - 60, 160)
+    logo(c, 42, H - 60, 160, on_dark=True)
     pill(c, "Missionary field overview", 42, H - 103, fill=LEAF)
     c.setFillColor(white)
     c.setFont("Times-Bold", 44)
