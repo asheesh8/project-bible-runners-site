@@ -1,0 +1,84 @@
+// /api/track.js — Visit tracking + donation interest capture
+// Env vars: SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD
+//
+// Public (no auth):
+//   POST /api/track?type=visit     { path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
+//   POST /api/track?type=interest  { name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
+//
+// Admin (Authorization: Bearer <ADMIN_PASSWORD>):
+//   GET  /api/track?type=visits
+//   GET  /api/track?type=interests
+//   GET  /api/track?type=summary
+
+export default async function handler(req, res) {
+  const { SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD } = process.env;
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const { type } = req.query;
+  const VALID = ['visit', 'visits', 'interest', 'interests', 'summary'];
+  if (!VALID.includes(type)) return res.status(400).json({ error: 'Invalid type' });
+
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    if (req.method === 'GET') return res.status(200).json([]);
+    return res.status(200).json({ ok: true, note: 'Supabase not configured — tracking skipped' });
+  }
+
+  const sbH = {
+    'Content-Type': 'application/json',
+    apikey: SUPABASE_SERVICE_KEY,
+    Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+  };
+
+  // ── Public POST: log visit ───────────────────────────────────────
+  if (req.method === 'POST' && type === 'visit') {
+    const { path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid } = req.body || {};
+    await fetch(`${SUPABASE_URL}/rest/v1/page_visits`, {
+      method: 'POST',
+      headers: { ...sbH, Prefer: 'return=minimal' },
+      body: JSON.stringify({ path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }),
+    });
+    return res.status(200).json({ ok: true });
+  }
+
+  // ── Public POST: log donation interest ──────────────────────────
+  if (req.method === 'POST' && type === 'interest') {
+    const { name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign } = req.body || {};
+    if (!country) return res.status(400).json({ error: 'country is required' });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/donation_interests`, {
+      method: 'POST',
+      headers: { ...sbH, Prefer: 'return=representation' },
+      body: JSON.stringify({ name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }),
+    });
+    const data = await r.json();
+    return res.status(r.status).json(data);
+  }
+
+  // ── Admin reads ──────────────────────────────────────────────────
+  const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
+  if (authHeader !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
+
+  if (req.method === 'GET' && type === 'visits') {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=*&order=created_at.desc&limit=200`, { headers: sbH });
+    return res.status(r.status).json(await r.json());
+  }
+
+  if (req.method === 'GET' && type === 'interests') {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=*&order=created_at.desc`, { headers: sbH });
+    return res.status(r.status).json(await r.json());
+  }
+
+  if (req.method === 'GET' && type === 'summary') {
+    const [visitsR, interestsR] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH }),
+      fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, { headers: sbH }),
+    ]);
+    const [visits, interests] = await Promise.all([visitsR.json(), interestsR.json()]);
+    return res.status(200).json({ visits: visits || [], interests: interests || [] });
+  }
+
+  return res.status(405).json({ error: 'Method not allowed' });
+}
