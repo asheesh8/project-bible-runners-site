@@ -194,6 +194,12 @@ test('initiative checklist content is present and honest about launch status', (
 
 test('admin includes an accurate traffic-attribution FAQ', () => {
   const admin = read('landing/admin.html');
+  assert.match(admin, /id="tab-overview"/);
+  assert.match(admin, /Local preview mode/);
+  assert.match(admin, /IS_LOCAL_PREVIEW/);
+  assert.match(admin, /PREVIEW_STORE/);
+  assert.match(admin, /Everything the initiative needs in one place/);
+  assert.match(admin, /Open copy-paste schema/);
   assert.match(admin, /data-tab="analyticsfaq"/);
   assert.match(admin, /id="tab-analyticsfaq"/);
   assert.match(admin, /this is not packet scraping/i);
@@ -203,6 +209,8 @@ test('admin includes an accurate traffic-attribution FAQ', () => {
   assert.match(admin, /document\.referrer/);
   assert.match(admin, /Network packet payloads/);
   assert.match(admin, /Direct \/ Unknown/);
+  const scripts = [...admin.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+  for (const [, source] of scripts) new Function(source);
 });
 
 for (const page of pages) {

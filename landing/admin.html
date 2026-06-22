@@ -13,16 +13,16 @@
 <style>
 *, *::before, *::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f6f8fa;
-  --sidebar:#24292f;
-  --sidebar-hover:#2d333b;
-  --sidebar-active:#316dca;
+  --bg:#f4f2ea;
+  --sidebar:#0b2e25;
+  --sidebar-hover:#17483a;
+  --sidebar-active:#d9df7b;
   --card:#fff;
-  --border:#d0d7de;
-  --text:#1f2328;
-  --muted:#636c76;
-  --accent:#1a7f37;
-  --accent-hover:#116329;
+  --border:#d9ddd4;
+  --text:#18221d;
+  --muted:#687169;
+  --accent:#123e31;
+  --accent-hover:#0b2e25;
   --danger:#d1242f;
   --danger-hover:#a40e26;
   --input-bg:#fff;
@@ -123,12 +123,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   user-select:none;
 }
 .nav-item:hover{background:var(--sidebar-hover);color:#fff}
-.nav-item.active{background:var(--sidebar-active);color:#fff}
+.nav-item.active{background:var(--sidebar-active);color:var(--sidebar)}
 .nav-item svg{flex:0 0 auto;opacity:.7}
 .nav-item.active svg{opacity:1}
 
 /* Main content */
-.main-content{flex:1;padding:32px 36px;min-width:0;min-height:0}
+.main-content{flex:1;padding:42px;min-width:0;min-height:0;max-width:1500px}
 
 /* Page header */
 .page-header{
@@ -227,6 +227,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 }
 .empty-state svg{margin-bottom:12px;opacity:.35}
 
+/* Dashboard shell and useful non-blank states */
+.preview-banner{display:none;align-items:center;justify-content:space-between;gap:20px;padding:13px 16px;border-radius:12px;background:#edf1df;border:1px solid #cbd59a;color:#31451d;font-size:13px;margin-bottom:24px}.preview-banner b{color:var(--forest,#123e31)}body.preview-mode .preview-banner{display:flex}.dashboard-hero{display:grid;grid-template-columns:1.3fr .7fr;gap:40px;padding:36px;border-radius:20px;background:linear-gradient(135deg,#0b2e25,#17483a);color:#fff;margin-bottom:22px;overflow:hidden;position:relative}.dashboard-hero::after{content:'VS';position:absolute;right:28px;bottom:-54px;font-size:180px;font-weight:800;color:rgba(255,255,255,.04);line-height:1}.dashboard-hero>*{position:relative;z-index:1}.dashboard-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#d9df7b;margin-bottom:12px}.dashboard-hero h2{font-size:clamp(30px,4vw,50px);line-height:1;margin-bottom:14px}.dashboard-hero p{max-width:700px;color:rgba(255,255,255,.7);font-size:15px}.dashboard-focus{align-self:end;padding:22px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(255,255,255,.07)}.dashboard-focus span,.dashboard-focus strong{display:block}.dashboard-focus span{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#d9df7b;font-weight:700}.dashboard-focus strong{font-size:20px;margin:9px 0 5px}.dashboard-focus small{color:rgba(255,255,255,.6)}.dashboard-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}.dashboard-stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;min-width:0}.dashboard-stat span,.dashboard-stat strong,.dashboard-stat small{display:block}.dashboard-stat span{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}.dashboard-stat strong{font-size:30px;line-height:1;margin:12px 0 7px;color:var(--accent)}.dashboard-stat small{font-size:12px;color:var(--muted)}.dashboard-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.dashboard-panel,.panel-card,#campaigns-list,#posts-list,#affiliates-list{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}.dashboard-panel{padding:24px}.dashboard-panel h3{font-size:16px;margin-bottom:6px}.dashboard-panel>p{font-size:13px;color:var(--muted);margin-bottom:18px}.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.quick-action{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font:700 13px var(--sans);cursor:pointer;text-align:left}.quick-action:hover{background:#edf1df;border-color:#cbd59a}.readiness-list{display:grid;gap:9px}.readiness-item{display:grid;grid-template-columns:34px 1fr;gap:11px;align-items:start;padding:12px;background:var(--bg);border-radius:10px}.readiness-item>span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#d9df7b;font-size:11px;font-weight:800}.readiness-item b,.readiness-item small{display:block}.readiness-item b{font-size:13px}.readiness-item small{font-size:11px;color:var(--muted);margin-top:2px}.analytics-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:20px!important;margin-bottom:28px!important}.panel-card{padding:22px}.panel-card h3{font-size:12px!important;font-weight:700!important;margin:0 0 18px!important;color:var(--muted)!important;text-transform:uppercase;letter-spacing:.08em}.stat-grid{display:grid!important;grid-template-columns:repeat(4,minmax(150px,1fr))!important;gap:12px!important;margin-bottom:22px!important}.loading-state{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:12px 0}.loading-state::before{content:'';width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:admin-spin .8s linear infinite}@keyframes admin-spin{to{transform:rotate(360deg)}}.items-table-wrap{overflow-x:auto}.items-table{min-width:720px}.page-title{font-size:26px}.page-header{padding-bottom:18px;border-bottom:1px solid var(--border)}
+
 /* Photo grid */
 .photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
 .photo-item{
@@ -250,6 +253,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   padding:1px 6px;font-size:12px;font-family:monospace;
 }
 .setup-card a{color:#316dca;font-weight:600}
+.schema-actions{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 28px}.schema-actions h3{font-size:17px;margin-bottom:8px}.schema-actions p{font-size:13px;color:var(--muted);margin-bottom:16px}.schema-actions a{display:inline-flex;padding:10px 16px;border-radius:9px;background:var(--accent);color:#fff;text-decoration:none;font-size:13px;font-weight:700}.legacy-schema{display:none}
 
 /* Analytics FAQ / internal knowledge base */
 .faq-hero{padding:34px;border-radius:16px;background:linear-gradient(135deg,#102a43,#1f6f54);color:#fff;margin-bottom:24px;overflow:hidden;position:relative}.faq-hero::after{content:'?';position:absolute;right:24px;top:-42px;font-size:180px;font-weight:700;color:rgba(255,255,255,.06);line-height:1}.faq-eyebrow{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#a7f3d0;margin-bottom:12px}.faq-hero h2{font-size:clamp(26px,4vw,42px);line-height:1.05;max-width:720px;margin-bottom:14px}.faq-hero>p:last-child{max-width:760px;color:rgba(255,255,255,.72);font-size:15px}.truth-note{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;padding:20px 22px;background:#fff8c5;border:1px solid #d4a72c;border-radius:12px;margin-bottom:24px}.truth-note>span{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#7d4e00;color:#fff;font-weight:800}.truth-note h3{font-size:15px;margin:0 0 4px;color:#7d4e00}.truth-note p{font-size:13px;color:#5d4700;margin:0}.tracking-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:30px}.flow-card{position:relative;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:20px;min-height:155px}.flow-card:not(:last-child)::after{content:'→';position:absolute;right:-12px;top:50%;z-index:2;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--sidebar);color:#fff;font-size:12px}.flow-number{font-size:10px;font-weight:700;letter-spacing:.12em;color:#316dca}.flow-card h3{font-size:15px;margin:28px 0 6px}.flow-card p{font-size:12px;color:var(--muted)}.faq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.faq-article{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:26px;min-width:0}.faq-article.wide{grid-column:1/-1}.faq-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:22px}.faq-number{font-size:11px;font-weight:700;color:#316dca}.faq-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:4px 9px;border-radius:99px;background:#ddf4ff;color:#0969da}.faq-article h3{font-size:19px;line-height:1.25;margin-bottom:12px}.faq-article p{font-size:14px;color:var(--muted);margin:0 0 12px}.faq-article p:last-child{margin-bottom:0}.faq-article ul{padding-left:18px;color:var(--muted);font-size:14px}.faq-article li{padding:4px 0}.faq-code{display:block;padding:14px 16px;border-radius:8px;background:#161b22;color:#a7f3d0;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere;margin:14px 0}.field-map{width:100%;border-collapse:collapse;margin-top:12px}.field-map th,.field-map td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top}.field-map th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}.field-map code{font-size:11px;color:#0969da}.privacy-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;list-style:none!important;padding:0!important}.privacy-list li{padding:10px 12px!important;border-radius:8px;background:#f6f8fa}.privacy-list .yes::before{content:'✓';color:var(--accent);font-weight:800;margin-right:8px}.privacy-list .no::before{content:'×';color:var(--danger);font-weight:800;margin-right:8px}
@@ -260,11 +264,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
 /* Responsive */
 @media(max-width:760px){
-  .sidebar{display:none}
-  .main-content{padding:20px}
+  .topbar{height:58px;padding:0 13px}.topbar-title{font-size:12px}.topbar-badge,.topbar-link{display:none}.app-body{display:block}.sidebar{display:flex;width:100%;height:auto;position:sticky;top:58px;z-index:90;padding:8px 10px;overflow-x:auto}.sidebar-section{display:contents}.sidebar-label{display:none}.nav-item{flex:0 0 auto;padding:8px 12px;font-size:12px}.main-content{padding:20px 13px}
   .form-row{grid-template-columns:1fr}
-  .tracking-flow,.faq-grid{grid-template-columns:1fr}.flow-card:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-17px}.faq-article.wide{grid-column:auto}.privacy-list{grid-template-columns:1fr}
+  .dashboard-hero,.dashboard-grid{grid-template-columns:1fr}.dashboard-stats{grid-template-columns:1fr 1fr}.stat-grid{grid-template-columns:1fr 1fr!important}.analytics-grid{grid-template-columns:1fr!important}.preview-banner{align-items:flex-start;flex-direction:column}.tracking-flow,.faq-grid{grid-template-columns:1fr}.flow-card:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-17px}.faq-article.wide{grid-column:auto}.privacy-list{grid-template-columns:1fr}
 }
+@media(max-width:460px){.dashboard-stats,.stat-grid,.quick-actions{grid-template-columns:1fr!important}.dashboard-hero{padding:26px 22px}.dashboard-hero h2{font-size:34px}.topbar-right{gap:5px}.btn-logout{padding:6px 9px}}
 </style>
 </head>
 <body>
@@ -293,7 +297,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
     </div>
     <div class="topbar-title">
       VillageServer Initiative
-      <span class="topbar-badge">Admin</span>
+      <span class="topbar-badge" id="environment-badge">Admin</span>
     </div>
     <div class="topbar-right">
       <a class="topbar-link" href="./index.html" target="_blank">View site ↗</a>
@@ -307,7 +311,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
     <nav class="sidebar">
       <div class="sidebar-section">
         <div class="sidebar-label">Content</div>
-        <div class="nav-item active" data-tab="campaigns">
+        <div class="nav-item active" data-tab="overview">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Overview
+        </div>
+        <div class="nav-item" data-tab="campaigns">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
           Campaigns
         </div>
@@ -323,7 +331,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 21v-2a6 6 0 0 1 12 0v2M12 21v-2a6 6 0 0 1 10-3"/></svg>
           Affiliates
         </div>
-      </div>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-label">Analytics</div>
@@ -357,9 +364,28 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
     <main class="main-content">
 
       <div id="api-status"></div>
+      <div class="preview-banner" id="preview-banner"><span><b>Local preview mode</b> — sample VillageServer data is shown so every dashboard view can be reviewed without Supabase.</span><span>Changes reset when this page reloads.</span></div>
+
+      <!-- ── OVERVIEW ───────────────────────────────── -->
+      <div class="tab-view active" id="tab-overview">
+        <section class="dashboard-hero">
+          <div><p class="dashboard-eyebrow">VillageServer operations</p><h2>Everything the initiative needs in one place.</h2><p>Manage public content, see where interest is coming from, review kit requests, and keep the next field deployment moving.</p></div>
+          <aside class="dashboard-focus"><span>Current phase</span><strong>Initial field pilots</strong><small>Kenya and the Peruvian Amazon · July–September 2026</small></aside>
+        </section>
+        <section class="dashboard-stats" aria-label="Dashboard summary">
+          <article class="dashboard-stat"><span>Public content</span><strong id="overview-content-count">—</strong><small>campaigns, posts, photos, affiliates</small></article>
+          <article class="dashboard-stat"><span>Tracked visits</span><strong id="overview-visit-count">—</strong><small>latest analytics window</small></article>
+          <article class="dashboard-stat"><span>Kit requests</span><strong id="overview-kit-count">—</strong><small>communities asking for access</small></article>
+          <article class="dashboard-stat"><span>Support interest</span><strong id="overview-interest-count">—</strong><small>location and ministry preferences</small></article>
+        </section>
+        <section class="dashboard-grid">
+          <article class="dashboard-panel"><h3>Quick actions</h3><p>Jump directly to the work you want to do.</p><div class="quick-actions"><button class="quick-action" data-open-tab="posts">Write a field update <span>→</span></button><button class="quick-action" data-open-tab="photos">Add a field photo <span>→</span></button><button class="quick-action" data-open-tab="kitrequests">Review kit requests <span>→</span></button><button class="quick-action" data-open-tab="traffic">Read traffic sources <span>→</span></button></div></article>
+          <article class="dashboard-panel"><h3>Launch readiness</h3><p>The core administrative pieces now have a home.</p><div class="readiness-list"><div class="readiness-item"><span>01</span><div><b>Supabase schema ready</b><small>Content, affiliates, analytics, and requests</small></div></div><div class="readiness-item"><span>02</span><div><b>Field guides published</b><small>Raspberry Pi, storage, power, and satellite</small></div></div><div class="readiness-item"><span>03</span><div><b>Pamphlet library live</b><small>Printable device-transfer instructions</small></div></div></div></article>
+        </section>
+      </div>
 
       <!-- ── CAMPAIGNS ──────────────────────────────── -->
-      <div class="tab-view active" id="tab-campaigns">
+      <div class="tab-view" id="tab-campaigns">
         <div class="page-header">
           <h2 class="page-title">Campaigns</h2>
           <button class="btn-new" id="new-campaign-btn">
@@ -526,30 +552,30 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
 
         <!-- Summary cards -->
-        <div id="traffic-summary-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:28px"></div>
+        <div id="traffic-summary-cards" class="stat-grid"><div class="loading-state">Loading traffic summary…</div></div>
 
         <!-- Source breakdown -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+        <div class="analytics-grid">
+          <div class="panel-card">
             <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Visits by Source</h3>
-            <div id="traffic-source-bars"></div>
+            <div id="traffic-source-bars"><div class="loading-state">Loading sources…</div></div>
           </div>
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+          <div class="panel-card">
             <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Visits by Medium</h3>
-            <div id="traffic-medium-bars"></div>
+            <div id="traffic-medium-bars"><div class="loading-state">Loading media…</div></div>
           </div>
         </div>
 
         <!-- Campaign breakdown -->
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px;margin-bottom:28px">
+        <div class="panel-card" style="margin-bottom:28px">
           <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Ad Campaigns</h3>
-          <div id="traffic-campaign-bars"></div>
+          <div id="traffic-campaign-bars"><div class="loading-state">Loading campaigns…</div></div>
         </div>
 
         <!-- Recent visits table -->
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+        <div class="panel-card">
           <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Recent Visits (last 200)</h3>
-          <div id="traffic-visits-table" style="overflow-x:auto"></div>
+          <div id="traffic-visits-table" class="items-table-wrap"><div class="loading-state">Loading recent visits…</div></div>
         </div>
       </div>
 
@@ -564,21 +590,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
 
         <!-- Country breakdown -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+        <div class="analytics-grid">
+          <div class="panel-card">
             <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Interests by Country</h3>
-            <div id="interests-country-bars"></div>
+            <div id="interests-country-bars"><div class="loading-state">Loading locations…</div></div>
           </div>
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+          <div class="panel-card">
             <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Interests by Initiative</h3>
-            <div id="interests-init-bars"></div>
+            <div id="interests-init-bars"><div class="loading-state">Loading preferences…</div></div>
           </div>
         </div>
 
         <!-- Interests table -->
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+        <div class="panel-card">
           <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">All Submissions</h3>
-          <div id="interests-table" style="overflow-x:auto"></div>
+          <div id="interests-table" class="items-table-wrap"><div class="loading-state">Loading submissions…</div></div>
         </div>
       </div>
 
@@ -592,20 +618,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           </button>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px">
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+        <div class="analytics-grid">
+          <div class="panel-card">
             <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Requests by Country</h3>
-            <div id="kitrequests-country-bars"></div>
+            <div id="kitrequests-country-bars"><div class="loading-state">Loading countries…</div></div>
           </div>
-          <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+          <div class="panel-card">
             <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Requests by Ad Source</h3>
-            <div id="kitrequests-source-bars"></div>
+            <div id="kitrequests-source-bars"><div class="loading-state">Loading sources…</div></div>
           </div>
         </div>
 
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:22px">
+        <div class="panel-card">
           <h3 style="font-size:14px;font-weight:700;margin:0 0 18px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">All Requests</h3>
-          <div id="kitrequests-table" style="overflow-x:auto"></div>
+          <div id="kitrequests-table" class="items-table-wrap"><div class="loading-state">Loading requests…</div></div>
         </div>
       </div>
 
@@ -652,7 +678,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           <h3>⚠ Connect Supabase to enable content management</h3>
           <ol>
             <li>Create a free project at <a href="https://supabase.com" target="_blank">supabase.com</a></li>
-            <li>In the Supabase SQL editor, run the schema below to create the tables</li>
+            <li>Open the complete schema file, copy it, and run it once in the Supabase SQL editor</li>
             <li>Go to Project Settings → API and copy your <strong>Project URL</strong> and <strong>service_role key</strong></li>
             <li>In <a href="https://vercel.com" target="_blank">Vercel</a> → your project → Settings → Environment Variables, add:
               <ul style="list-style:disc;margin:8px 0 0 16px;line-height:2">
@@ -664,9 +690,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
             <li>Redeploy the site once env vars are set</li>
           </ol>
         </div>
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:24px 28px">
-          <h3 style="font-size:16px;font-weight:700;margin:0 0 14px">Supabase SQL schema — paste into SQL editor</h3>
-          <pre style="background:#161b22;color:#e6edf3;border-radius:8px;padding:20px;font-size:12px;overflow-x:auto;line-height:1.7"><code>create table campaigns (
+        <div class="schema-actions">
+          <h3>Complete Supabase schema</h3>
+          <p>The canonical schema is idempotent, enables row-level security, seeds the current affiliates, and includes every content, analytics, donation-interest, and kit-request table.</p>
+          <a href="https://github.com/asheesh8/project-bible-runners-site/blob/main/supabase/schema.sql" target="_blank" rel="noopener">Open copy-paste schema ↗</a>
+          <pre class="legacy-schema"><code>create table campaigns (
   id uuid default gen_random_uuid() primary key,
   slug text unique not null,
   name text not null,
@@ -786,6 +814,51 @@ create policy "Public insert availability" on availability_requests for insert w
 
 <script>
 var AUTH_TOKEN = null;
+var IS_LOCAL_PREVIEW = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+var PREVIEW_STORE = {
+  campaigns: [
+    {id:'preview-campaign-1',name:'Kenya Field Pilot',slug:'kenya-field-pilot',description:'Test the complete VillageServer field kit with local ministry partners.',story:'A first field pilot for offline Scripture access, charging, projection, and training.',goal_amount:12500,raised_amount:4200,bibles_funded:0,bibles_needed:0,end_date:'2026-09-30',zeffy_url:null,image_url:'./img/hero-village.webp',active:true,created_at:'2026-06-10T14:00:00Z'},
+    {id:'preview-campaign-2',name:'Peruvian Amazon Pilot',slug:'peruvian-amazon-pilot',description:'Prepare a solar-powered library for river communities.',story:'A planned pilot focused on power resilience, portable media, and local-language access.',goal_amount:15000,raised_amount:2850,bibles_funded:0,bibles_needed:0,end_date:'2026-10-15',zeffy_url:null,image_url:'./img/solar-field.webp',active:false,created_at:'2026-06-08T14:00:00Z'}
+  ],
+  posts: [
+    {id:'preview-post-1',title:'Field kit enters pilot preparation',body:'The core server, language-card workflow, and printable transfer guides are ready for partner review.',author:'VillageServer Initiative',image_url:'./img/kit-case.webp',published:true,published_at:'2026-06-21T15:00:00Z',created_at:'2026-06-21T15:00:00Z'},
+    {id:'preview-post-2',title:'Partner training outline',body:'A short training path for powering the kit, joining Wi-Fi, saving resources, and sharing them onward.',author:'VillageServer Initiative',image_url:null,published:false,published_at:'2026-06-22T13:00:00Z',created_at:'2026-06-22T13:00:00Z'}
+  ],
+  photos: [
+    {id:'preview-photo-1',url:'./img/hero-village.webp',caption:'Community setting for the first field pilot.',alt:'A rural community landscape',category:'field',created_at:'2026-06-17T12:00:00Z'},
+    {id:'preview-photo-2',url:'./img/kit-case.webp',caption:'Portable equipment prepared for field deployment.',alt:'VillageServer equipment case',category:'kit',created_at:'2026-06-18T12:00:00Z'},
+    {id:'preview-photo-3',url:'./img/field-reading.webp',caption:'Resources designed to move from device to device.',alt:'A person reading in the field',category:'field',created_at:'2026-06-19T12:00:00Z'}
+  ],
+  affiliates: [
+    {id:'preview-affiliate-1',name:'Project Bible Runners',website_url:'https://projectbiblerunners.com',description:'Scripture access and field relationships.',logo_url:null,active:true,sort_order:10,created_at:'2026-06-01T12:00:00Z'},
+    {id:'preview-affiliate-2',name:'Digital Bible Society',website_url:'https://digitalbiblesociety.org',description:'Digital Bible resources and library support.',logo_url:null,active:true,sort_order:20,created_at:'2026-06-01T12:00:00Z'}
+  ],
+  visits: [
+    {id:'v1',path:'/',referrer:'https://facebook.com/',utm_source:'facebook',utm_medium:'paid-social',utm_campaign:'kenya-pilot',fbclid:'preview-fb-1',ttclid:null,created_at:'2026-06-22T13:10:00Z'},
+    {id:'v2',path:'/initiative',referrer:'https://google.com/',utm_source:'google',utm_medium:'organic',utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-22T11:40:00Z'},
+    {id:'v3',path:'/pamphlets',referrer:'https://instagram.com/',utm_source:'instagram',utm_medium:'social',utm_campaign:'missionary-library',fbclid:null,ttclid:null,created_at:'2026-06-21T18:20:00Z'},
+    {id:'v4',path:'/donate',referrer:'',utm_source:'email',utm_medium:'newsletter',utm_campaign:'pilot-update',fbclid:null,ttclid:null,created_at:'2026-06-20T16:00:00Z'},
+    {id:'v5',path:'/access',referrer:'',utm_source:null,utm_medium:null,utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-19T16:00:00Z'},
+    {id:'v6',path:'/transfer',referrer:'https://tiktok.com/',utm_source:'tiktok',utm_medium:'paid-social',utm_campaign:'offline-sharing',fbclid:null,ttclid:'preview-tt-1',created_at:'2026-06-18T16:00:00Z'}
+  ],
+  interests: [
+    {id:'i1',name:'Grace M.',email:'grace@example.org',country:'Kenya',initiative:'VillageServer Initiative',practical_need:'Language microSD',utm_source:'facebook',created_at:'2026-06-21T12:00:00Z'},
+    {id:'i2',name:'Daniel R.',email:'daniel@example.org',country:'Peru',initiative:'Digital Bible Society',practical_need:'Solar power',utm_source:'email',created_at:'2026-06-20T12:00:00Z'},
+    {id:'i3',name:'Maya K.',email:'maya@example.org',country:'Where most needed',initiative:'VillageServer Initiative',practical_need:'Complete field kit',utm_source:'google',created_at:'2026-06-19T12:00:00Z'}
+  ],
+  availability: [
+    {id:'a1',country:'Kenya',region:'Nakuru County',name:'Samuel K.',email:'samuel@example.org',organization:'Field Church Network',message:'Interested in a pilot kit and local-leader training.',utm_source:'facebook',created_at:'2026-06-22T10:00:00Z'},
+    {id:'a2',country:'Peru',region:'Loreto',name:'Ana P.',email:'ana@example.org',organization:'River Community Mission',message:'Need an offline library with solar power and projection.',utm_source:'email',created_at:'2026-06-20T10:00:00Z'},
+    {id:'a3',country:'Uganda',region:'Northern Region',name:'Peter O.',email:'peter@example.org',organization:'Local Ministry Partner',message:'Requesting availability information for a future deployment.',utm_source:'google',created_at:'2026-06-18T10:00:00Z'}
+  ]
+};
+
+function previewCopy(value){ return JSON.parse(JSON.stringify(value)); }
+function enterAdmin(startTab){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  activateTab(startTab || 'overview');
+}
 
 // ── Login ────────────────────────────────────────────────
 (function(){
@@ -808,9 +881,7 @@ var AUTH_TOKEN = null;
       if(data.token){
         AUTH_TOKEN = data.token;
         sessionStorage.setItem('pbr_admin_token', AUTH_TOKEN);
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-        loadTab('campaigns');
+        enterAdmin('overview');
       } else {
         err.style.display = 'block';
         btn.disabled = false;
@@ -831,16 +902,21 @@ var AUTH_TOKEN = null;
 
   // Restore session
   var saved = sessionStorage.getItem('pbr_admin_token');
-  if(saved){
+  if(IS_LOCAL_PREVIEW){
+    AUTH_TOKEN = 'local-preview';
+    document.body.classList.add('preview-mode');
+    document.getElementById('environment-badge').textContent = 'Local preview';
+    document.getElementById('logout-btn').textContent = 'Reset preview';
+    enterAdmin('overview');
+  } else if(saved){
     AUTH_TOKEN = saved;
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    loadTab('campaigns');
+    enterAdmin('overview');
   }
 })();
 
 // ── Logout ───────────────────────────────────────────────
 document.getElementById('logout-btn').addEventListener('click', function(){
+  if(IS_LOCAL_PREVIEW){ location.reload(); return; }
   AUTH_TOKEN = null;
   sessionStorage.removeItem('pbr_admin_token');
   document.getElementById('login-screen').style.display = 'flex';
@@ -848,19 +924,42 @@ document.getElementById('logout-btn').addEventListener('click', function(){
 });
 
 // ── Sidebar navigation ───────────────────────────────────
-document.querySelectorAll('.nav-item').forEach(function(item){
-  item.addEventListener('click', function(){
-    var tab = item.dataset.tab;
+function activateTab(tab){
     document.querySelectorAll('.nav-item').forEach(function(i){ i.classList.remove('active'); });
     document.querySelectorAll('.tab-view').forEach(function(t){ t.classList.remove('active'); });
+    var item = document.querySelector('.nav-item[data-tab="' + tab + '"]');
+    var panel = document.getElementById('tab-' + tab);
+    if(!item || !panel) return;
     item.classList.add('active');
-    document.getElementById('tab-' + tab).classList.add('active');
+    panel.classList.add('active');
     loadTab(tab);
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.nav-item').forEach(function(item){
+  item.addEventListener('click', function(){
+    activateTab(item.dataset.tab);
   });
+});
+document.querySelectorAll('[data-open-tab]').forEach(function(item){
+  item.addEventListener('click', function(){ activateTab(item.dataset.openTab); });
 });
 
 // ── API helper ───────────────────────────────────────────
 function api(method, type, body, id){
+  if(IS_LOCAL_PREVIEW){
+    var collection = PREVIEW_STORE[type] || [];
+    if(method === 'DELETE') PREVIEW_STORE[type] = collection.filter(function(item){ return item.id !== id; });
+    if(method === 'PATCH'){
+      var index = collection.findIndex(function(item){ return item.id === id; });
+      if(index >= 0) collection[index] = Object.assign({}, collection[index], body, {updated_at:new Date().toISOString()});
+    }
+    if(method === 'POST'){
+      var created = Object.assign({}, body, {id:'preview-' + type + '-' + Date.now(),created_at:new Date().toISOString()});
+      collection.unshift(created);
+      return Promise.resolve([previewCopy(created)]);
+    }
+    return Promise.resolve(method === 'DELETE' ? null : previewCopy(collection));
+  }
   var url = '/api/content?type=' + type;
   if(id) url += '&id=' + encodeURIComponent(id);
   var opts = {
@@ -873,15 +972,25 @@ function api(method, type, body, id){
   if(body) opts.body = JSON.stringify(body);
   return fetch(url, opts).then(function(r){
     if(r.status === 204) return null;
-    return r.json();
+    return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; });
   });
 }
 
 function apiGet(type, slug){
+  if(IS_LOCAL_PREVIEW) return Promise.resolve(previewCopy(PREVIEW_STORE[type] || []));
   var url = '/api/content?type=' + type;
   if(slug) url += '&slug=' + encodeURIComponent(slug);
   // Pass auth to get drafts too
-  return fetch(url, {headers:{'Authorization':'Bearer ' + AUTH_TOKEN}}).then(function(r){ return r.json(); });
+  return fetch(url, {headers:{'Authorization':'Bearer ' + AUTH_TOKEN}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
+}
+
+function trackGet(type){
+  if(IS_LOCAL_PREVIEW){
+    if(type === 'summary') return Promise.resolve({visits:previewCopy(PREVIEW_STORE.visits),interests:previewCopy(PREVIEW_STORE.interests)});
+    if(type === 'interests') return Promise.resolve(previewCopy(PREVIEW_STORE.interests));
+    if(type === 'availability') return Promise.resolve(previewCopy(PREVIEW_STORE.availability));
+  }
+  return fetch('/api/track?type=' + type, {headers:{'Authorization':'Bearer '+AUTH_TOKEN}}).then(function(r){ return r.json().then(function(data){ if(!r.ok) throw new Error(data.error || 'Request failed'); return data; }); });
 }
 
 function showStatus(msg, level){
@@ -897,13 +1006,28 @@ function fmtDate(d){ if(!d) return '—'; return new Date(d).toLocaleDateString(
 
 // ── Load tab ─────────────────────────────────────────────
 function loadTab(tab){
-  if(tab === 'campaigns') loadCampaigns();
+  if(tab === 'overview') loadOverview();
+  else if(tab === 'campaigns') loadCampaigns();
   else if(tab === 'posts') loadPosts();
   else if(tab === 'photos') loadPhotos();
   else if(tab === 'affiliates') loadAffiliates();
   else if(tab === 'traffic') loadTraffic();
   else if(tab === 'interests') loadInterests();
   else if(tab === 'kitrequests') loadKitRequests();
+}
+
+function loadOverview(){
+  Promise.all([apiGet('campaigns'),apiGet('posts'),apiGet('photos'),apiGet('affiliates'),trackGet('summary'),trackGet('availability')]).then(function(results){
+    var contentTotal = results[0].length + results[1].length + results[2].length + results[3].length;
+    var summary = results[4] || {};
+    document.getElementById('overview-content-count').textContent = contentTotal;
+    document.getElementById('overview-visit-count').textContent = (summary.visits || []).length;
+    document.getElementById('overview-interest-count').textContent = (summary.interests || []).length;
+    document.getElementById('overview-kit-count').textContent = (results[5] || []).length;
+  }).catch(function(){
+    ['overview-content-count','overview-visit-count','overview-interest-count','overview-kit-count'].forEach(function(id){document.getElementById(id).textContent='0';});
+    showStatus('The dashboard loaded, but live Supabase data is not available yet.','warn');
+  });
 }
 
 // ════════════════════════════════════════════════════════
@@ -1255,8 +1379,7 @@ function renderStatCard(label, value, sub){
 }
 
 function loadTraffic(){
-  fetch('/api/track?type=summary', {headers:{'Authorization':'Bearer '+AUTH_TOKEN}})
-    .then(function(r){return r.json();})
+  trackGet('summary')
     .then(function(data){
       var visits = data.visits || [];
       var interests = data.interests || [];
@@ -1323,8 +1446,7 @@ function loadTraffic(){
 var FLAG_MAP = {Kenya:'🇰🇪',Peru:'🇵🇪',Uganda:'🇺🇬','Amazon Basin':'🌿','Where most needed':'🌍','Future deployment':'📍'};
 
 function loadInterests(){
-  fetch('/api/track?type=interests', {headers:{'Authorization':'Bearer '+AUTH_TOKEN}})
-    .then(function(r){return r.json();})
+  trackGet('interests')
     .then(function(data){
       var rows = data || [];
       var total = rows.length;
@@ -1356,8 +1478,7 @@ function loadInterests(){
 // KIT AVAILABILITY REQUESTS
 // ════════════════════════════════════════════════════════
 function loadKitRequests(){
-  fetch('/api/track?type=availability', {headers:{'Authorization':'Bearer '+AUTH_TOKEN}})
-    .then(function(r){return r.json();})
+  trackGet('availability')
     .then(function(data){
       var rows = data || [];
       var total = rows.length;
