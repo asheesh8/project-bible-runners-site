@@ -540,8 +540,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--ink);b
   }
   function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
 
-  // Init
+  // Init — support deep-link from home widget (?country=Kenya) by
+  // preselecting and advancing straight to the next question.
   setProgress(0);
+  var preCountry = params.get('country');
+  var KNOWN = ['Kenya','Peru','Uganda','Amazon Basin','Where most needed','Future site'];
+  if(preCountry && KNOWN.indexOf(preCountry) !== -1){
+    answers.country = preCountry;
+    var preBtn = document.querySelector('#step-0 .opt-btn[data-val="'+preCountry+'"]');
+    if(preBtn) preBtn.classList.add('selected');
+    goToStep(1);
+  }
 })();
 </script>
 </body>
