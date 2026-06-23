@@ -13,7 +13,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "output" / "pdf"
 WEB = ROOT / "landing" / "downloads"
-LOGO = ROOT / "landing" / "img" / "villageserver-initiative-logo.png"
+LOGO = ROOT / "landing" / "img" / "villageserver-initiative-logo.webp"
 
 FOREST = HexColor("#123E31")
 FOREST_DARK = HexColor("#0B2E25")
