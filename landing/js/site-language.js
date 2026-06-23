@@ -2,9 +2,22 @@
   'use strict';
 
   var languages = [
-    ['en', 'English'], ['fr', 'Français'], ['sw', 'Kiswahili / Swahili'],
-    ['es', 'Español'], ['hi', 'हिन्दी / Hindi'], ['ur', 'اردو / Urdu'],
-    ['sd', 'سنڌي / Sindhi'], ['ne', 'नेपाली'], ['bn', 'বাংলা']
+    ['en', 'English'],
+    ['es', 'Español / Spanish'],
+    ['zh-CN', '中文 / Chinese'],
+    ['hi', 'हिन्दी / Hindi'],
+    ['ar', 'العربية / Arabic'],
+    ['fr', 'Français / French'],
+    ['pt', 'Português / Portuguese'],
+    ['ru', 'Русский / Russian'],
+    ['bn', 'বাংলা / Bengali'],
+    ['id', 'Bahasa Indonesia / Indonesian'],
+    ['ur', 'اردو / Urdu'],
+    ['sw', 'Kiswahili / Swahili'],
+    ['vi', 'Tiếng Việt / Vietnamese'],
+    ['tl', 'Tagalog / Filipino'],
+    ['ne', 'नेपाली / Nepali'],
+    ['sd', 'سنڌي / Sindhi']
   ];
   var curatedHomepageLanguages = ['en', 'fr', 'sw', 'es', 'hi', 'ne', 'bn'];
   var supported = languages.map(function (item) { return item[0]; });
