@@ -44,6 +44,8 @@ test('the access resource teaches every supported access path', () => {
   assert.match(html, /AirDrop/);
   assert.match(html, /airplane mode/i);
   assert.match(html, /transfer\.html#ios-android/);
+  for (const id of ['choose-path', 'phone-storage', 'share-nearby']) assert.match(html, new RegExp(`id="${id}"`));
+  assert.match(html, /aria-label="Access steps"/);
 });
 
 test('the transfer center covers every device-to-device route', () => {
@@ -208,10 +210,14 @@ test('initiative checklist content is present and honest about launch status', (
   const donate = read('landing/donate.html');
   const api = read('api/content.js');
   assert.match(initiative, /VillageServer Initiative is a portable technology project designed/);
+  assert.match(initiative, /href="#mission">Read the mission statement/);
+  assert.match(initiative, /id="mission"/);
+  assert.match(initiative, /Four simple steps people can understand fast/);
   assert.match(initiative, /Raspberry Pi 5 · 4GB/);
   assert.match(initiative, /Proof of concept/);
   assert.match(initiative, /Project Bible Runners/);
   assert.match(initiative, /Digital Bible Society/);
+  assert.match(initiative, /new Set/);
   assert.match(initiative, /Formation is being prepared—not claimed/);
   assert.match(donate, /data-val="Kenya"/);
   assert.match(donate, /data-val="VillageServer Initiative"/);
@@ -219,7 +225,7 @@ test('initiative checklist content is present and honest about launch status', (
   assert.match(donate, /data-val="Digital Bible Society"/);
   assert.match(donate, /data-val="Language microSD"/);
   assert.match(api, /affiliates: true/);
-  assert.ok(existsSync(join(root, 'landing/img/villageserver-initiative-logo.png')));
+  assert.ok(existsSync(join(root, 'landing/img/villageserver-initiative-logo.webp')));
   assert.ok(existsSync(join(root, 'docs/vermont-nonprofit-readiness.md')));
   assert.ok(existsSync(join(root, 'docs/domain-setup.md')));
 });

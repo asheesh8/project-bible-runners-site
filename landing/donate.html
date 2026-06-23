@@ -520,7 +520,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);color:var(--ink);b
       .then(function(data){
         if(!data||!data.length) return;
         var row = document.getElementById('affil-row');
-        row.innerHTML = data.map(function(a){
+        var seen = {};
+        var unique = data.filter(function(a){
+          var key = String((a && (a.name || a.website_url)) || '').toLowerCase().replace(/^https?:\/\/(www\.)?/,'').replace(/\/$/,'').trim();
+          if(!key || seen[key]) return false;
+          seen[key] = true;
+          return a.active !== false;
+        });
+        row.innerHTML = unique.map(function(a){
           return '<div class="affil-card">' +
             '<div class="affil-org">'+esc(a.name)+'</div>' +
             '<div class="affil-desc">'+esc(a.description||'')+'</div>' +
