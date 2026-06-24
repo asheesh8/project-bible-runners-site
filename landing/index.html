@@ -25,7 +25,7 @@
       <a class="brand official-brand" href="#top" aria-label="VillageServer Initiative home"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a>
       <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" data-i18n="menu">Menu</button>
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
-        <a href="#initiative" data-i18n="navWhat">What we do</a><a href="#system" data-i18n="navHow">How it works</a><a href="#availability" data-i18n="navFind">Find a kit</a><a href="#setup" data-i18n="navSetup">Set up</a><a href="#support" data-i18n="navGive">Give</a><a class="nav-support" href="./initiative.html" data-i18n="navAbout">About the initiative</a>
+        <a href="#initiative" data-i18n="navWhat">What we do</a><a href="#system" data-i18n="navHow">How it works</a><a href="#availability" data-i18n="navFind">Find a kit</a><a href="#setup" data-i18n="navSetup">Set up</a><a class="nav-support" href="./initiative.html" data-i18n="navAbout">About the initiative</a>
       </nav>
     </div>
   </header>
@@ -94,9 +94,18 @@
             <button role="tab" aria-selected="true" data-setup="wifi" data-i18n="tabWifi">Phone + Wi-Fi</button><button role="tab" aria-selected="false" data-setup="pi" data-i18n="tabPi" tabindex="-1">Raspberry Pi</button><button role="tab" aria-selected="false" data-setup="microsd" data-i18n="tabSd" tabindex="-1">microSD</button><button role="tab" aria-selected="false" data-setup="usb" data-i18n="tabUsb" tabindex="-1">USB drive</button><button role="tab" aria-selected="false" data-setup="solar" data-i18n="tabSolar" tabindex="-1">Solar suitcase</button><button role="tab" aria-selected="false" data-setup="projector" data-i18n="tabProjector" tabindex="-1">Projector</button><button role="tab" aria-selected="false" data-setup="charging" data-i18n="tabCharging" tabindex="-1">Phone charging</button><button role="tab" aria-selected="false" data-setup="satellite" data-i18n="tabSatellite" tabindex="-1">Satellite</button>
           </div>
           <div class="setup-preview" aria-live="polite">
-            <div class="setup-preview-icon" id="setup-icon">◉</div><p class="preview-type" id="setup-type">Use the library</p><h3 id="setup-title">Connect a phone</h3><p id="setup-summary">Join VillageServer Wi-Fi, open the local library, and save one resource for offline use.</p>
-            <ol id="setup-quick"><li>Open Wi-Fi settings</li><li>Join VillageServer</li><li>Open and save a resource</li></ol>
-            <a class="button button-primary" id="setup-link" href="./guide.html?part=wifi">Open the full phone guide</a>
+            <div class="setup-preview-visual" id="setup-model" data-model="wifi">
+              <div class="setup-model-object" aria-hidden="true"><span class="model-part part-a"></span><span class="model-part part-b"></span><span class="model-part part-c"></span><span class="model-part part-d"></span><span class="model-part part-e"></span></div>
+              <button class="model-hotspot hotspot-a active" type="button" data-hotspot="0" aria-label="Show first model detail"></button>
+              <button class="model-hotspot hotspot-b" type="button" data-hotspot="1" aria-label="Show second model detail"></button>
+              <button class="model-hotspot hotspot-c" type="button" data-hotspot="2" aria-label="Show third model detail"></button>
+              <div class="model-detail-card"><b id="setup-model-title">Phone connects locally</b><p id="setup-model-detail">Tap a glowing dot to see what each part does.</p></div>
+            </div>
+            <div class="setup-preview-copy">
+              <p class="preview-type" id="setup-type">Use the library</p><h3 id="setup-title">Connect a phone</h3><p id="setup-summary">Join VillageServer Wi-Fi, open the local library, and save one resource for offline use.</p>
+              <ol id="setup-quick"><li>Open Wi-Fi settings</li><li>Join VillageServer</li><li>Open and save a resource</li></ol>
+              <a class="button button-primary" id="setup-link" href="./guide.html?part=wifi">Open the full phone guide</a>
+            </div>
           </div>
         </div>
       </div>
@@ -134,47 +143,9 @@
       </div></div>
     </section>
 
-    <section class="home-step support-step" id="support">
-      <div class="wrap">
-        <div class="support-card">
-          <div>
-            <p class="kicker light" data-i18n="giveKicker">Fund the mission</p>
-            <h2 data-i18n="giveHeading">Help send the next kit into the field.</h2>
-            <p data-i18n="giveCopy">Every gift funds Raspberry Pi servers, language libraries, solar power, and field training for communities beyond reliable internet. 100% reaches the field through Zeffy — zero platform fees.</p>
-            <div class="give-progress" id="give-progress" hidden>
-              <div class="give-progress-head"><b id="give-campaign-name"></b><span id="give-progress-amount"></span></div>
-              <div class="give-progress-track"><div class="give-progress-fill" id="give-progress-fill"></div></div>
-              <small id="give-progress-meta"></small>
-            </div>
-            <div class="support-actions">
-              <a class="button button-primary" href="./donate.html" data-i18n="giveCta">Give now →</a>
-              <a class="text-link light-link" href="./initiative.html#costs" data-i18n="giveSecondary">See where your gift goes →</a>
-            </div>
-          </div>
-          <div class="give-picker">
-            <p class="give-picker-title" data-i18n="givePickTitle">Choose a country to support</p>
-            <p class="give-picker-copy" data-i18n="givePickCopy">Pick where your gift goes — we’ll take you straight to giving.</p>
-            <div class="give-countries">
-              <a href="./donate.html?country=Kenya"><span class="give-flag">🇰🇪</span><span>Kenya</span></a>
-              <a href="./donate.html?country=Peru"><span class="give-flag">🇵🇪</span><span>Peru</span></a>
-              <a href="./donate.html?country=Uganda"><span class="give-flag">🇺🇬</span><span>Uganda</span></a>
-              <a href="./donate.html?country=Amazon%20Basin"><span class="give-flag">🌿</span><span>Amazon</span></a>
-              <a href="./donate.html?country=Where%20most%20needed"><span class="give-flag">🌍</span><span data-i18n="giveAnywhere">Where most needed</span></a>
-            </div>
-            <p class="give-impact-label" data-i18n="giveImpactLabel">What your gift provides</p>
-            <div class="support-list">
-              <span data-i18n="giveImpact1">$75 · Raspberry Pi server</span>
-              <span data-i18n="giveImpact2">$50 · Language microSD</span>
-              <span data-i18n="giveImpact3">$120 · Solar power</span>
-              <span data-i18n="giveImpact4">$300 · Complete field kit</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
-  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand official-brand footer-brand" href="#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b data-i18n="footerResources">Resources</b><a href="./initiative.html" data-i18n="footerInitiative">The initiative</a><a href="./access.html" data-i18n="footerAccess">Access resources</a><a href="./guide.html?part=wifi" data-i18n="footerGuides">Setup guides</a><a href="./pamphlets.html">Missionary pamphlets &amp; FAQ</a></div><div><b data-i18n="footerInvolved">Get involved</b><a href="#availability" data-i18n="footerAvailability">Kit availability</a><a href="./donate.html" data-i18n="footerSupport">Support the work</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
+  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand official-brand footer-brand" href="#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b data-i18n="footerResources">Resources</b><a href="./initiative.html" data-i18n="footerInitiative">The initiative</a><a href="./access.html" data-i18n="footerAccess">Access resources</a><a href="./guide.html?part=wifi" data-i18n="footerGuides">Setup guides</a><a href="./pamphlets.html">Missionary pamphlets &amp; FAQ</a></div><div><b>Start here</b><a href="#availability" data-i18n="footerAvailability">Kit availability</a><a href="#setup">Interactive tech examples</a><a href="./transfer.html">Phone-to-phone sharing</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
 
   <!-- Kit availability request modal (browser-window styled) -->
   <div class="kit-modal" id="kit-modal" hidden>
@@ -247,24 +218,8 @@
     const regionSelect=document.getElementById('region-select');const regionResult=document.getElementById('availability-result');function renderAvailability(){const item=window.VSI18N.availability(regionSelect.value);if(!regionSelect.value){regionResult.innerHTML=`<span class="status-dot warning"></span><div><b>${item.status}</b><p>${item.copy}</p></div>`;return}regionResult.innerHTML=`<span class="status-dot ready"></span><div><b>${item.status}</b><p>${item.copy}</p><a href="${item.link}">${item.label} →</a></div>`}document.getElementById('check-region').addEventListener('click',renderAvailability);
 
     const setupData={wifi:{icon:'◉',type:'Use the library',title:'Connect a phone',summary:'Join VillageServer Wi-Fi, open the local library, and save one resource for offline use.',quick:['Open Wi-Fi settings','Join VillageServer','Open and save a resource'],label:'Open the full phone guide'},pi:{icon:'▣',type:'Core system',title:'Start the Raspberry Pi',summary:'Power the server, wait for the local network, and verify it from a phone.',quick:['Check the system card','Connect approved power','Verify the Wi-Fi library'],label:'Open the Raspberry Pi guide'},microsd:{icon:'SD',type:'Language library',title:'Use a microSD card',summary:'Open or swap a language-specific library on VillageServer, a phone, or a computer.',quick:['Check the language label','Insert with the correct adapter','Open START HERE'],label:'Open the microSD guide'},usb:{icon:'USB',type:'Portable files',title:'Use a USB drive',summary:'Connect a portable resource library and copy selected files safely.',quick:['Connect the labeled drive','Open START HERE','Copy, then safely eject'],label:'Open the USB guide'},solar:{icon:'☀',type:'Off-grid power',title:'Set up the solar suitcase',summary:'Position the panels and power the field system using the kit-specific connection order.',quick:['Place panels in clear sun','Follow the cable labels','Check charge before starting'],label:'Open the solar guide'},projector:{icon:'▶',type:'Group media',title:'Set up the projector',summary:'Connect a source, choose the correct input, and prepare a clear group showing.',quick:['Place and power the projector','Connect the media source','Focus and test sound'],label:'Open the projector guide'},charging:{icon:'⚡',type:'Practical service',title:'Set up phone charging',summary:'Build a supervised charging station without overloading the field power system.',quick:['Check available power','Add phones gradually','Track and monitor devices'],label:'Open the charging guide'},satellite:{icon:'⌁',type:'Optional connection',title:'Set up satellite',summary:'Add a live connection for updates or streams while keeping local access independent.',quick:['Choose clear open sky','Assemble by printed labels','Align and confirm signal'],label:'Open the satellite guide'}};
-    const setupTabs=[...document.querySelectorAll('[data-setup]')];function chooseSetup(tab){setupTabs.forEach(item=>{const selected=item===tab;item.setAttribute('aria-selected',String(selected));item.tabIndex=selected?0:-1});const key=tab.dataset.setup;const item=window.VSI18N.setup(key,setupData[key]);document.getElementById('setup-icon').textContent=item.icon;document.getElementById('setup-type').textContent=item.type;document.getElementById('setup-title').textContent=item.title;document.getElementById('setup-summary').textContent=item.summary;document.getElementById('setup-quick').innerHTML=item.quick.map(step=>`<li>${step}</li>`).join('');const link=document.getElementById('setup-link');link.href=`./guide.html?part=${key}`;link.textContent=item.label}setupTabs.forEach((tab,index)=>{tab.addEventListener('click',()=>chooseSetup(tab));tab.addEventListener('keydown',event=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();const forward=['ArrowDown','ArrowRight'].includes(event.key);const next=(index+(forward?1:-1)+setupTabs.length)%setupTabs.length;setupTabs[next].focus();chooseSetup(setupTabs[next])})});window.addEventListener('vsi:languagechange',()=>{const selected=document.querySelector('[data-setup][aria-selected="true"]');chooseSetup(selected);if(regionSelect.value)renderAvailability()});
-
-    // Live campaign progress in the donation widget (degrades gracefully)
-    fetch('/api/content?type=campaigns').then(r=>r.json()).then(list=>{
-      const c=(list||[]).find(x=>x&&x.active);
-      if(!c)return;
-      const goal=Number(c.goal_amount||0),raised=Number(c.raised_amount||0);
-      const pct=goal>0?Math.min(100,Math.round(raised/goal*100)):0;
-      document.getElementById('give-campaign-name').textContent=c.name||'Current campaign';
-      document.getElementById('give-progress-amount').textContent='$'+raised.toLocaleString()+(goal>0?' / $'+goal.toLocaleString():'');
-      const meta=[];
-      if(goal>0)meta.push(pct+'% funded');
-      if(c.bibles_funded)meta.push(Number(c.bibles_funded).toLocaleString()+' Bibles funded');
-      if(c.bibles_needed)meta.push(Number(c.bibles_needed).toLocaleString()+' still needed');
-      document.getElementById('give-progress-meta').textContent=meta.join(' · ');
-      document.getElementById('give-progress').hidden=false;
-      requestAnimationFrame(()=>{document.getElementById('give-progress-fill').style.width=pct+'%';});
-    }).catch(()=>{});
+    const setupModelData={wifi:{title:'Phone connects locally',hotspots:[['Local Wi‑Fi','The phone joins the VillageServer network just like joining normal Wi‑Fi.'],['No data plan','The library opens from the nearby kit, so mobile data is not required.'],['Save and share','Useful files can be saved and passed to another nearby phone.']]},pi:{title:'Raspberry Pi server',hotspots:[['Server brain','The Pi stores the library and runs the local website people open.'],['microSD system','The system card holds the operating setup and local content.'],['USB ports','Ports connect storage, power helpers, or field accessories.']]},microsd:{title:'microSD language card',hotspots:[['Tiny library','A labeled card can carry Scripture, audio, video, and PDFs.'],['Use adapter','Phone or computer adapters let a leader copy files without internet.'],['Swap language','Different cards can serve different language groups.']]},usb:{title:'USB resource drive',hotspots:[['Computer path','A laptop can copy files from the drive to phones or other storage.'],['Folder labels','START HERE folders reduce confusion for nontechnical users.'],['Safe eject','Eject before unplugging so files do not get corrupted.']]},solar:{title:'Solar suitcase power',hotspots:[['Panels','Panels face strong sun and feed the battery/controller.'],['Battery','Stored power keeps the kit running when clouds move in.'],['Load order','Connect power in the printed order to protect the electronics.']]},projector:{title:'Projector for groups',hotspots:[['Video source','Use a phone, USB drive, or VillageServer media output as the source.'],['Focus and sound','Test image and speaker before people gather.'],['Group teaching','Films and lessons can serve people without personal devices.']]},charging:{title:'Phone charging station',hotspots:[['Power budget','Add phones gradually so the system is not overloaded.'],['Numbered spots','Simple numbering helps people find their own device again.'],['Supervision','A local leader watches the station while phones charge.']]},satellite:{title:'Optional satellite link',hotspots:[['Open sky','The dish needs a clear view of the sky to connect.'],['Updates','Satellite can update content, send reports, or support limited live access.'],['Offline backup','The library still works locally if satellite is unavailable.']]}};
+    const setupTabs=[...document.querySelectorAll('[data-setup]')];function paintSetupModel(key){const model=setupModelData[key]||setupModelData.wifi;const shell=document.getElementById('setup-model');if(!shell)return;shell.dataset.model=key;const title=document.getElementById('setup-model-title');const detail=document.getElementById('setup-model-detail');const buttons=[...shell.querySelectorAll('[data-hotspot]')];function show(index){const item=model.hotspots[index]||model.hotspots[0];buttons.forEach((button,i)=>button.classList.toggle('active',i===index));title.textContent=item[0];detail.textContent=item[1]}buttons.forEach((button,index)=>{const item=model.hotspots[index]||model.hotspots[0];button.setAttribute('aria-label','Show '+item[0]);button.onclick=()=>show(index)});show(0)}function chooseSetup(tab){if(!tab)return;setupTabs.forEach(item=>{const selected=item===tab;item.setAttribute('aria-selected',String(selected));item.tabIndex=selected?0:-1});const key=tab.dataset.setup;const item=window.VSI18N.setup(key,setupData[key]);document.getElementById('setup-type').textContent=item.type;document.getElementById('setup-title').textContent=item.title;document.getElementById('setup-summary').textContent=item.summary;document.getElementById('setup-quick').innerHTML=item.quick.map(step=>`<li>${step}</li>`).join('');paintSetupModel(key);const link=document.getElementById('setup-link');link.href=`./guide.html?part=${key}`;link.textContent=item.label}setupTabs.forEach((tab,index)=>{tab.addEventListener('click',()=>chooseSetup(tab));tab.addEventListener('keydown',event=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();const forward=['ArrowDown','ArrowRight'].includes(event.key);const next=(index+(forward?1:-1)+setupTabs.length)%setupTabs.length;setupTabs[next].focus();chooseSetup(setupTabs[next])})});chooseSetup(document.querySelector('[data-setup][aria-selected="true"]'));window.addEventListener('vsi:languagechange',()=>{const selected=document.querySelector('[data-setup][aria-selected="true"]');chooseSetup(selected);if(regionSelect.value)renderAvailability()});
 
     // ── ArkiTech-Sol footer credit: hover scale + triple-click → admin ─
     (function(){

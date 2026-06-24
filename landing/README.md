@@ -8,6 +8,6 @@
 
 `guide.html?part=...` is the focused field-manual view. The homepage launcher and kit diagram link to eight component-specific walkthroughs.
 
-`donate.html` is a deliberately secondary support page. It lists sponsorship categories from the rollout summary without presenting an unverified checkout link.
+The public landing experience is education-first: explain the initiative, show each technology path, and route visitors to setup/access guides. Donation checkout pages are intentionally not part of the primary public bundle.
 
 All images are local WebP assets so the site remains resilient and lightweight.

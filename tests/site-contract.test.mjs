@@ -111,11 +111,12 @@ test('the homepage follows a simpler mission-first consumer journey', () => {
   assert.match(html, /not yet available through public online checkout/i);
 });
 
-test('stacked homepage sections keep links and gift amounts inside their backgrounds', () => {
+test('stacked homepage sections and model cards stay inside their backgrounds', () => {
   const css = read('landing/css/home.css');
   assert.match(css, /\.split-story,\.availability-grid,\.step-heading\{gap:40px\}/);
-  assert.match(css, /\.support-card\{gap:30px;padding:34px 26px\}/);
-  assert.match(css, /\.support-list span\{min-width:0;overflow-wrap:anywhere/);
+  assert.match(css, /\.setup-preview-visual\{position:relative;min-height:430px/);
+  assert.match(css, /\.model-detail-card\{position:absolute/);
+  assert.match(css, /data-model="satellite"/);
 });
 
 test('the homepage can fully localize into major field languages', () => {
@@ -136,7 +137,7 @@ test('the homepage can fully localize into major field languages', () => {
 
 test('language choice persists across every public page and dynamic UI', () => {
   const languageScript = read('landing/js/site-language.js');
-  for (const page of ['landing/index.html', 'landing/index-b.html', 'landing/initiative.html', 'landing/access.html', 'landing/guide.html', 'landing/donate.html', 'landing/transfer.html', 'landing/pamphlets.html']) {
+  for (const page of ['landing/index.html', 'landing/index-b.html', 'landing/initiative.html', 'landing/access.html', 'landing/guide.html', 'landing/transfer.html', 'landing/pamphlets.html']) {
     assert.match(read(page), /\.\/js\/site-language\.js/);
   }
   for (const language of ['en', 'fr', 'sw', 'es', 'hi', 'ur', 'sd', 'ne', 'bn']) {
@@ -150,7 +151,7 @@ test('language choice persists across every public page and dynamic UI', () => {
 });
 
 test('every public page records a fresh visit for live admin analytics', () => {
-  const trackedPages = ['landing/index.html', 'landing/index-b.html', 'landing/initiative.html', 'landing/access.html', 'landing/guide.html', 'landing/donate.html', 'landing/transfer.html', 'landing/pamphlets.html'];
+  const trackedPages = ['landing/index.html', 'landing/index-b.html', 'landing/initiative.html', 'landing/access.html', 'landing/guide.html', 'landing/transfer.html', 'landing/pamphlets.html'];
   for (const page of trackedPages) assert.match(read(page), /\.\/js\/site-tracking\.js/);
   const tracker = read('landing/js/site-tracking.js');
   assert.match(tracker, /type=visit/);
@@ -162,7 +163,6 @@ test('every public page records a fresh visit for live admin analytics', () => {
   assert.match(tracker, /data-visit-tracked/);
   new Function(tracker);
   assert.doesNotMatch(read('landing/index.html'), /Home-page visit logging/);
-  assert.doesNotMatch(read('landing/donate.html'), /Object\.assign\(\{path:'\/donate'/);
   assert.match(read('api/content.js'), /Cache-Control', 'no-store/);
   assert.match(read('api/track.js'), /Cache-Control', 'no-store/);
 });
@@ -174,7 +174,10 @@ test('the setup widget launches a focused guide for every component', () => {
     assert.match(html, new RegExp(`data-setup="${part}"`));
     assert.match(html, new RegExp(`${part}:\\{`));
   }
-  assert.match(html, /id="setup-preview"|class="setup-preview"/);
+  assert.match(html, /id="setup-model"/);
+  assert.match(html, /class="setup-preview-visual"/);
+  assert.match(html, /class="model-hotspot hotspot-a active"/);
+  assert.match(html, /function paintSetupModel/);
 });
 
 test('the setup guide contains complete data and valid behavior for every path', () => {
@@ -193,9 +196,11 @@ test('the setup guide contains complete data and valid behavior for every path',
 test('deep content is split into resource pages and old campaign branding is gone', () => {
   const html = read('landing/index.html');
   assert.doesNotMatch(html, /Give a Bible|\$7 answers|Spring Uganda/i);
+  assert.doesNotMatch(html, /donate\.html|Fund the mission|Give now|Support the work/i);
   for (const page of ['landing/initiative.html', 'landing/access.html', 'landing/guide.html']) {
     assert.ok(existsSync(join(root, page)), `${page} should exist`);
   }
+  assert.equal(existsSync(join(root, 'landing/donate.html')), false, 'donation page should be out of the public bundle');
   assert.match(html, /Shorter pages\. Clearer jobs\./);
 });
 
@@ -214,7 +219,6 @@ test('kit requests preserve itemized equipment choices end to end', () => {
 
 test('initiative checklist content is present and honest about launch status', () => {
   const initiative = read('landing/initiative.html');
-  const donate = read('landing/donate.html');
   const api = read('api/content.js');
   assert.match(initiative, /VillageServer Initiative is a portable technology project designed/);
   assert.match(initiative, /href="#mission">Read the mission statement/);
@@ -226,11 +230,8 @@ test('initiative checklist content is present and honest about launch status', (
   assert.match(initiative, /Digital Bible Society/);
   assert.match(initiative, /new Set/);
   assert.match(initiative, /Formation is being prepared—not claimed/);
-  assert.match(donate, /data-val="Kenya"/);
-  assert.match(donate, /data-val="VillageServer Initiative"/);
-  assert.match(donate, /data-val="Project Bible Runners"/);
-  assert.match(donate, /data-val="Digital Bible Society"/);
-  assert.match(donate, /data-val="Language microSD"/);
+  assert.match(initiative, /Open the field setup guides/);
+  assert.doesNotMatch(initiative, /donate\.html/);
   assert.match(api, /affiliates: true/);
   assert.ok(existsSync(join(root, 'landing/img/villageserver-initiative-logo.webp')));
   assert.ok(existsSync(join(root, 'docs/vermont-nonprofit-readiness.md')));
