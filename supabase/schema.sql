@@ -60,6 +60,7 @@ create table if not exists public.affiliates (
 -- ── Analytics and public-interest forms ─────────────────────────────
 create table if not exists public.page_visits (
   id uuid primary key default gen_random_uuid(),
+  visitor_id text,
   site_host text,
   path text,
   referrer text,
@@ -106,6 +107,7 @@ alter table public.campaigns add column if not exists updated_at timestamptz not
 alter table public.posts add column if not exists updated_at timestamptz not null default now();
 alter table public.photos add column if not exists updated_at timestamptz not null default now();
 alter table public.affiliates add column if not exists updated_at timestamptz not null default now();
+alter table public.page_visits add column if not exists visitor_id text;
 alter table public.page_visits add column if not exists site_host text;
 alter table public.availability_requests add column if not exists requested_items jsonb not null default '[]'::jsonb;
 
@@ -143,6 +145,7 @@ create index if not exists posts_published_created_idx on public.posts (publishe
 create index if not exists photos_created_idx on public.photos (created_at desc);
 create index if not exists affiliates_active_sort_idx on public.affiliates (active, sort_order, created_at desc);
 create index if not exists page_visits_created_idx on public.page_visits (created_at desc);
+create index if not exists page_visits_visitor_id_idx on public.page_visits (visitor_id);
 create index if not exists page_visits_utm_source_idx on public.page_visits (utm_source);
 create index if not exists page_visits_site_host_idx on public.page_visits (site_host);
 create index if not exists donation_interests_created_idx on public.donation_interests (created_at desc);

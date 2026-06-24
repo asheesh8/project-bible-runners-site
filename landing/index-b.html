@@ -25,7 +25,7 @@
       <a class="brand official-brand" href="#top" aria-label="VillageServer Initiative home"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a>
       <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" data-i18n="menu">Menu</button>
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
-        <a href="#initiative" data-i18n="navWhat">What we do</a><a href="#system" data-i18n="navHow">How it works</a><a href="#availability" data-i18n="navFind">Find a kit</a><a href="#setup" data-i18n="navSetup">Set up</a><a class="nav-support" href="./initiative.html" data-i18n="navAbout">About the initiative</a>
+        <a href="#mission">Mission</a><a href="#tech">Technology</a><a href="#resources">Resource links</a><a href="./guide.html?part=wifi">Setup guides</a><a class="nav-support" href="./initiative.html">Full initiative</a>
       </nav>
     </div>
   </header>
@@ -42,119 +42,77 @@
           <h1>Spreading the gospel where internet cannot reach.</h1>
           <p class="hero-statement-label">Mission statement</p>
           <p class="hero-lead">To carry Scripture, Christian media, and local-language discipleship resources into places with limited internet, unreliable electricity, and little access to Christian teaching.</p>
-          <div class="hero-mission-card"><span>Plain-language promise</span><p>A field team powers the kit. Nearby phones join its local Wi‑Fi. Families, churches, and schools can read, watch, listen, save, and share without using mobile data.</p></div>
-          <div class="hero-actions hero-actions-simple"><a class="button button-primary" href="#mission">Read the mission</a></div>
+          <div class="hero-mission-card"><span>Simple promise</span><p>Power the kit. Join its local Wi‑Fi. Open the library. Save and share Scripture, gospel media, training, and children’s resources without using mobile data.</p></div>
+          <div class="hero-actions hero-actions-simple"><a class="button button-primary" href="#mission">Mission</a><a class="button button-glass" href="#tech">How the tech works</a></div>
         </div>
-        <aside class="hero-logo-panel" aria-label="VillageServer logo and simple system flow">
-          <img class="hero-logo-art" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async">
-          <div class="hero-signal-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+        <aside class="hero-logo-panel hero-proof-panel" aria-label="VillageServer logo with real field and kit photos">
+          <figure class="hero-proof-photo hero-proof-a"><img src="./img/field-distribute.webp" alt="Bible distribution with local leaders and families" width="780" height="585" loading="lazy"><figcaption>Field handoff</figcaption></figure>
+          <figure class="hero-proof-photo hero-proof-b"><img src="./img/kit-case.webp" alt="Portable VillageServer solar field kit opened beside solar panels" width="1300" height="975" loading="lazy"><figcaption>Portable kit</figcaption></figure>
+          <figure class="hero-proof-photo hero-proof-c"><img src="./img/field-reading.webp" alt="A parent reading Scripture with a child" width="631" height="620" loading="lazy"><figcaption>Saved resources</figcaption></figure>
+          <div class="hero-logo-stage"><img class="hero-logo-art" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async"><span>VillageServer Initiative</span></div>
           <ol class="hero-mini-flow">
-            <li><b>1</b><span>Power the kit</span></li>
-            <li><b>2</b><span>Join local Wi‑Fi</span></li>
-            <li><b>3</b><span>Open Scripture</span></li>
+            <li><b>1</b><span>Power kit</span></li>
+            <li><b>2</b><span>Join Wi‑Fi</span></li>
+            <li><b>3</b><span>Open library</span></li>
           </ol>
         </aside>
       </div>
       <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 42C220 85 393 17 590 48c190 29 373-11 552 15 125 18 218 12 298-18v45H0Z"/></svg>
     </section>
 
-    <nav class="journey wrap simple-journey" id="journey" aria-label="VillageServer getting started steps">
-      <a href="#mission"><span>1</span><b>Read the mission</b><small>Why VillageServer exists</small></a>
-      <a href="#availability"><span>2</span><b>Find a kit</b><small>Check your country or region</small></a>
-      <a href="#setup"><span>3</span><b>Use the guides</b><small>One simple setup at a time</small></a>
+    <nav class="home-link-strip wrap" aria-label="Start here">
+      <a href="#mission">Mission</a>
+      <a href="#tech">Technology</a>
+      <a href="#resources">All resource links</a>
+      <a href="./guide.html?part=wifi">Setup guides</a>
+      <a href="./kit-levels.html">Kit planning</a>
     </nav>
 
-    <section class="home-step initiative-step" id="initiative">
-      <div class="wrap split-story mission-split" id="mission">
-        <div class="story-copy"><p class="step-kicker"><span>Mission</span><i>Plain-language purpose</i></p><h2>Technology that carries the gospel farther.</h2><p>Many communities have limited internet access, unreliable electricity, few local-language resources, or little access to Christian teaching. VillageServer is built so a field team can carry a whole digital library into those places.</p><p>A nearby person does not need a data plan or technical background. They join the local VillageServer Wi‑Fi, open the library, and can read, listen, watch, save, and share gospel resources from their own phone.</p><div class="mini-benefits mission-benefits"><span><b>Gospel first</b><i>Scripture, audio, films, training, and children’s resources</i></span><span><b>Offline first</b><i>Works locally without internet after setup</i></span><span><b>Built for the field</b><i>Solar, projector, charging, and optional satellite support</i></span></div><a class="inline-cta" href="./initiative.html#mission">Read the full initiative →</a></div>
-        <figure class="story-photo mission-photo"><img src="./img/kit-case.webp" alt="The portable VillageServer kit in its field case" width="1300" height="975" loading="lazy"><figcaption>One field kit can serve phones, groups, language libraries, power needs, and optional live connection.</figcaption></figure>
+    <section class="home-step mission-front" id="mission">
+      <div class="wrap mission-front-grid">
+        <div><p class="step-kicker"><span>Mission</span><i>Why it exists</i></p><h2>Gospel access for places with limited internet, power, and teaching resources.</h2></div>
+        <div class="mission-front-copy"><p>VillageServer is a portable local library for Scripture, Christian media, discipleship training, children’s resources, and practical ministry files.</p><p>It is built for missionaries and local leaders who need the gospel to keep moving even when the internet does not.</p><div class="mission-link-row"><a href="./mission.html">Read the mission statement →</a><a href="./initiative.html">Full initiative overview →</a></div></div>
+      </div>
+      <div class="wrap mission-proof-gallery" aria-label="Real ministry and field kit photos">
+        <figure><img src="./img/receiving.webp" alt="Woman holding a Bible after receiving Scripture" width="1536" height="1920" loading="lazy"><figcaption>Scripture in hand</figcaption></figure>
+        <figure><img src="./img/solar-field.webp" alt="Solar power setup for field equipment" width="1100" height="1467" loading="lazy"><figcaption>Power where the grid is weak</figcaption></figure>
+        <figure><img src="./img/kit-pi.webp" alt="Raspberry Pi local server connected with USB storage" width="1100" height="825" loading="lazy"><figcaption>Local library server</figcaption></figure>
       </div>
     </section>
 
-    <section class="home-step availability-step" id="availability">
-      <div class="wrap availability-grid">
-        <div><p class="step-kicker"><span data-i18n="step2">Step 2</span><i data-i18n="step2Label">Find a kit</i></p><h2 data-i18n="step2Heading">Can I order a kit near me?</h2><p data-i18n="step2Copy">VillageServer is entering field pilots rather than public retail distribution. Check your area for the clearest current path.</p></div>
-        <div class="availability-widget">
-          <label for="region-select" data-i18n="regionLabel">Where will the kit be used?</label>
-          <div class="select-row"><select id="region-select"><option value="" data-i18n="regionChoose">Choose a location</option><option value="kenya" data-i18n="regionKenya">Kenya</option><option value="peru" data-i18n="regionPeru">Peruvian Amazon / Peru</option><option value="africa" data-i18n="regionAfrica">Elsewhere in Africa</option><option value="latin" data-i18n="regionLatin">Elsewhere in Latin America</option><option value="asia" data-i18n="regionAsia">Asia</option><option value="other" data-i18n="regionOther">Another region</option></select><button type="button" id="check-region" data-i18n="checkAvailability">Check availability</button></div>
-          <div class="availability-result" id="availability-result" aria-live="polite">
-            <span class="status-dot"></span><div><b data-i18n="regionInitial">Select a location to begin.</b><p data-i18n="regionInitialCopy">We’ll show whether it is a pilot area or a future deployment request.</p></div>
-          </div>
-          <p class="honesty-note" data-i18n="honesty">VillageServer kits are not yet available through public online checkout. Pilot access is coordinated with field partners.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="home-step setup-step" id="setup">
+    <section class="home-step tech-front" id="tech">
       <div class="wrap">
-        <div class="step-heading"><div><p class="step-kicker"><span data-i18n="step3">Step 3</span><i data-i18n="step3Label">Set it up</i></p><h2 data-i18n="step3Heading">What is in front of you?</h2></div><p data-i18n="step3Copy">Choose one item. The widget gives you the quick path; the full guide opens only when you need it.</p></div>
-        <div class="setup-widget">
-          <div class="setup-choices" role="tablist" aria-label="Choose setup component">
-            <button role="tab" aria-selected="true" data-setup="wifi" data-i18n="tabWifi">Phone + Wi-Fi</button><button role="tab" aria-selected="false" data-setup="pi" data-i18n="tabPi" tabindex="-1">Raspberry Pi</button><button role="tab" aria-selected="false" data-setup="microsd" data-i18n="tabSd" tabindex="-1">microSD</button><button role="tab" aria-selected="false" data-setup="usb" data-i18n="tabUsb" tabindex="-1">USB drive</button><button role="tab" aria-selected="false" data-setup="solar" data-i18n="tabSolar" tabindex="-1">Solar suitcase</button><button role="tab" aria-selected="false" data-setup="projector" data-i18n="tabProjector" tabindex="-1">Projector</button><button role="tab" aria-selected="false" data-setup="charging" data-i18n="tabCharging" tabindex="-1">Phone charging</button><button role="tab" aria-selected="false" data-setup="satellite" data-i18n="tabSatellite" tabindex="-1">Satellite</button>
-          </div>
-          <div class="setup-preview" aria-live="polite">
-            <div class="setup-preview-visual" id="setup-model" data-model="wifi">
-              <div class="setup-model-object" aria-hidden="true"><span class="model-part part-a"></span><span class="model-part part-b"></span><span class="model-part part-c"></span><span class="model-part part-d"></span><span class="model-part part-e"></span></div>
-              <button class="model-hotspot hotspot-a active" type="button" data-hotspot="0" aria-label="Show first model detail"></button>
-              <button class="model-hotspot hotspot-b" type="button" data-hotspot="1" aria-label="Show second model detail"></button>
-              <button class="model-hotspot hotspot-c" type="button" data-hotspot="2" aria-label="Show third model detail"></button>
-              <div class="model-detail-card"><b id="setup-model-title">Phone connects locally</b><p id="setup-model-detail">Tap a glowing dot to see what each part does.</p></div>
-            </div>
-            <div class="setup-preview-copy">
-              <p class="preview-type" id="setup-type">Use the library</p><h3 id="setup-title">Connect a phone</h3><p id="setup-summary">Join VillageServer Wi-Fi, open the local library, and save one resource for offline use.</p>
-              <ol id="setup-quick"><li>Open Wi-Fi settings</li><li>Join VillageServer</li><li>Open and save a resource</li></ol>
-              <a class="button button-primary" id="setup-link" href="./guide.html?part=wifi">Open the full phone guide</a>
-            </div>
-          </div>
+        <div class="step-heading inverse"><div><p class="step-kicker light-step"><span>Technology</span><i>Simple field model</i></p><h2>Power in. Gospel library out.</h2></div><p>Do not make the user think about servers. For them, it should feel like joining Wi‑Fi and opening a website.</p></div>
+        <div class="tech-card-grid" aria-label="VillageServer technology overview">
+          <a href="./raspberry-pi.html"><img class="tech-card-photo" src="./img/kit-pi.webp" alt="Raspberry Pi local server with USB storage" width="1100" height="825" loading="lazy"><span>01</span><h3>Raspberry Pi local server</h3><p>Stores the library and creates the local Wi‑Fi people connect to.</p><b>Read about the server →</b></a>
+          <a href="./sharing-library.html"><img class="tech-card-photo" src="./img/field-reading.webp" alt="A family reading Scripture from a field resource" width="631" height="620" loading="lazy"><span>02</span><h3>Phones, microSD, and USB</h3><p>Lets one saved resource move from device to device without repeating the download.</p><b>See sharing paths →</b></a>
+          <a href="./projector-media.html"><img class="tech-card-photo" src="./img/projector.webp" alt="Small projector used for group media" width="900" height="869" loading="lazy"><span>03</span><h3>Projector and group media</h3><p>Turns films, Scripture audio, and training into a group teaching moment.</p><b>Open media guide →</b></a>
+          <a href="./satellite.html"><img class="tech-card-photo" src="./img/kit-case.webp" alt="Solar field kit with portable power panels" width="1300" height="975" loading="lazy"><span>04</span><h3>Optional satellite support</h3><p>Adds a live link for updates and support while the local library stays offline-first.</p><b>Learn satellite role →</b></a>
         </div>
       </div>
     </section>
 
-    <section class="home-step system-step" id="system">
-      <div class="wrap">
-        <div class="step-heading inverse"><div><p class="step-kicker light-step"><span>How it works</span><i>Simple field model</i></p><h2>Power in. Gospel library out.</h2></div><p>VillageServer is meant to feel simple for the person using it: join Wi‑Fi, open the library, save what helps, then share it with someone nearby.</p></div>
-        <div class="kit-model-grid" aria-label="VillageServer explanatory kit model">
-          <div class="kit-3d-stage">
-            <div class="pi-model" aria-hidden="true">
-              <span class="pi-port port-1"></span><span class="pi-port port-2"></span><span class="pi-port port-3"></span><span class="pi-port port-4"></span>
-              <span class="pi-chip">VS</span><span class="pi-card-slot">SD</span><span class="pi-wifi">⌁</span>
-            </div>
-            <div class="model-callout callout-power"><b>Power</b><span>Solar, battery, or local power</span></div>
-            <div class="model-callout callout-library"><b>Library</b><span>Scripture, audio, films, PDFs</span></div>
-            <div class="model-callout callout-phones"><b>Phones</b><span>Read, listen, save, share</span></div>
-            <div class="model-callout callout-group"><b>Groups</b><span>Projector teaching and films</span></div>
-          </div>
-          <div class="model-explainer">
-            <article><span>01</span><b>VillageServer stores the resources.</b><p>A Raspberry Pi holds the offline library and creates a local Wi‑Fi network.</p></article>
-            <article><span>02</span><b>People connect with normal phones.</b><p>No app, account, or data plan is required to open the local library.</p></article>
-            <article><span>03</span><b>The gospel keeps moving.</b><p>Resources can be saved, copied to microSD or USB, projected for groups, or shared phone-to-phone.</p></article>
-          </div>
-        </div>
-        <div class="optional-tools model-links"><span>Open setup guide:</span><a href="./guide.html?part=pi">Raspberry Pi</a><a href="./guide.html?part=projector">Projector</a><a href="./guide.html?part=solar">Solar</a><a href="./guide.html?part=satellite">Satellite</a></div>
-      </div>
-    </section>
-
-    <section class="resource-section" id="resources">
-      <div class="wrap"><div class="resource-heading"><p class="kicker" data-i18n="resourceKicker">Go deeper when you need to</p><h2 data-i18n="resourceHeading">Shorter pages. Clearer jobs.</h2></div><div class="resource-grid">
-        <a href="./initiative.html"><img src="./img/hero-village.webp" alt="A village landscape" width="1400" height="933" loading="lazy"><div><small data-i18n="resourceLearn">Learn</small><h3 data-i18n="resourceInitiative">Initiative, pilots, and rollout</h3><span data-i18n="resourceStory">Read the story →</span></div></a>
-        <a href="./access.html"><img src="./img/field-reading.webp" alt="A person reading a resource outdoors" width="631" height="620" loading="lazy"><div><small data-i18n="resourceUse">Use</small><h3 data-i18n="resourceAccess">Get, save, and share resources</h3><span data-i18n="resourceAccessLink">Open access guide →</span></div></a>
-        <a href="./guide.html?part=wifi"><img src="./img/kit-pi.webp" alt="The VillageServer Raspberry Pi" width="1100" height="825" loading="lazy"><div><small data-i18n="resourceSetup">Set up</small><h3 data-i18n="resourceGuides">All field setup guides</h3><span data-i18n="resourceGuideLink">Choose a guide →</span></div></a>
+    <section class="resource-section resource-index" id="resources">
+      <div class="wrap"><div class="resource-heading"><p class="kicker">Resource links</p><h2>Find the exact page you need.</h2><p>Use this as the table of contents. Each link opens a focused page instead of making this homepage longer.</p></div><div class="resource-link-list" aria-label="VillageServer resource links">
+        <a href="./mission.html"><b>Mission statement</b><span>Why VillageServer exists.</span></a>
+        <a href="./raspberry-pi.html"><b>Raspberry Pi library</b><span>How the local server works.</span></a>
+        <a href="./satellite.html"><b>Satellite connection</b><span>Optional live access and updates.</span></a>
+        <a href="./sharing-library.html"><b>Phones, SD, and USB</b><span>How files move device to device.</span></a>
+        <a href="./projector-media.html"><b>Projector and media</b><span>Films, training, and group teaching.</span></a>
+        <a href="./kit-levels.html"><b>Kit levels and costs</b><span>Planning levels and price references.</span></a>
+        <a href="./rollout.html"><b>Rollout and reach</b><span>Pilots, proof, and honest metrics.</span></a>
+        <a href="./affiliates.html"><b>Affiliates</b><span>Partners and ministry relationships.</span></a>
+        <a href="./field-faq.html"><b>Field FAQ</b><span>Simple answers and troubleshooting.</span></a>
       </div></div>
     </section>
   </main>
 
-  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand official-brand footer-brand" href="#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b data-i18n="footerResources">Resources</b><a href="./initiative.html" data-i18n="footerInitiative">The initiative</a><a href="./access.html" data-i18n="footerAccess">Access resources</a><a href="./guide.html?part=wifi" data-i18n="footerGuides">Setup guides</a><a href="./pamphlets.html">Missionary pamphlets &amp; FAQ</a></div><div><b>Start here</b><a href="#availability" data-i18n="footerAvailability">Kit availability</a><a href="#setup">Interactive tech examples</a><a href="./transfer.html">Phone-to-phone sharing</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span></div></footer>
+  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand official-brand footer-brand" href="#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b>Key pages</b><a href="./mission.html">Mission statement</a><a href="./raspberry-pi.html">Technology overview</a><a href="./sharing-library.html">Sharing resources</a><a href="./field-faq.html">Field FAQ</a></div><div><b>Use it</b><a href="./guide.html?part=wifi">Setup guides</a><a href="./transfer.html">Phone-to-phone sharing</a><a href="./kit-levels.html">Kit planning</a><a href="./pamphlets.html">Printable pamphlets</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span></div></footer>
 
   <script src="./js/i18n.js?v=2"></script>
   <script src="./js/site-language.js?v=2"></script>
   <script>
-    const menuButton=document.querySelector('.menu-button');const siteNav=document.querySelector('.site-nav');menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-expanded',String(!open));siteNav.classList.toggle('open',!open)});siteNav.addEventListener('click',event=>{if(event.target.matches('a')){menuButton.setAttribute('aria-expanded','false');siteNav.classList.remove('open')}});
-
-    const regionSelect=document.getElementById('region-select');const regionResult=document.getElementById('availability-result');function renderAvailability(){const item=window.VSI18N.availability(regionSelect.value);if(!regionSelect.value){regionResult.innerHTML=`<span class="status-dot warning"></span><div><b>${item.status}</b><p>${item.copy}</p></div>`;return}regionResult.innerHTML=`<span class="status-dot ready"></span><div><b>${item.status}</b><p>${item.copy}</p><a href="${item.link}">${item.label} →</a></div>`}document.getElementById('check-region').addEventListener('click',renderAvailability);
-
-    const setupData={wifi:{icon:'◉',type:'Use the library',title:'Connect a phone',summary:'Join VillageServer Wi-Fi, open the local library, and save one resource for offline use.',quick:['Open Wi-Fi settings','Join VillageServer','Open and save a resource'],label:'Open the full phone guide'},pi:{icon:'▣',type:'Core system',title:'Start the Raspberry Pi',summary:'Power the server, wait for the local network, and verify it from a phone.',quick:['Check the system card','Connect approved power','Verify the Wi-Fi library'],label:'Open the Raspberry Pi guide'},microsd:{icon:'SD',type:'Language library',title:'Use a microSD card',summary:'Open or swap a language-specific library on VillageServer, a phone, or a computer.',quick:['Check the language label','Insert with the correct adapter','Open START HERE'],label:'Open the microSD guide'},usb:{icon:'USB',type:'Portable files',title:'Use a USB drive',summary:'Connect a portable resource library and copy selected files safely.',quick:['Connect the labeled drive','Open START HERE','Copy, then safely eject'],label:'Open the USB guide'},solar:{icon:'☀',type:'Off-grid power',title:'Set up the solar suitcase',summary:'Position the panels and power the field system using the kit-specific connection order.',quick:['Place panels in clear sun','Follow the cable labels','Check charge before starting'],label:'Open the solar guide'},projector:{icon:'▶',type:'Group media',title:'Set up the projector',summary:'Connect a source, choose the correct input, and prepare a clear group showing.',quick:['Place and power the projector','Connect the media source','Focus and test sound'],label:'Open the projector guide'},charging:{icon:'⚡',type:'Practical service',title:'Set up phone charging',summary:'Build a supervised charging station without overloading the field power system.',quick:['Check available power','Add phones gradually','Track and monitor devices'],label:'Open the charging guide'},satellite:{icon:'⌁',type:'Optional connection',title:'Set up satellite',summary:'Add a live connection for updates or streams while keeping local access independent.',quick:['Choose clear open sky','Assemble by printed labels','Align and confirm signal'],label:'Open the satellite guide'}};
-    const setupModelData={wifi:{title:'Phone connects locally',hotspots:[['Local Wi‑Fi','The phone joins the VillageServer network just like joining normal Wi‑Fi.'],['No data plan','The library opens from the nearby kit, so mobile data is not required.'],['Save and share','Useful files can be saved and passed to another nearby phone.']]},pi:{title:'Raspberry Pi server',hotspots:[['Server brain','The Pi stores the library and runs the local website people open.'],['microSD system','The system card holds the operating setup and local content.'],['USB ports','Ports connect storage, power helpers, or field accessories.']]},microsd:{title:'microSD language card',hotspots:[['Tiny library','A labeled card can carry Scripture, audio, video, and PDFs.'],['Use adapter','Phone or computer adapters let a leader copy files without internet.'],['Swap language','Different cards can serve different language groups.']]},usb:{title:'USB resource drive',hotspots:[['Computer path','A laptop can copy files from the drive to phones or other storage.'],['Folder labels','START HERE folders reduce confusion for nontechnical users.'],['Safe eject','Eject before unplugging so files do not get corrupted.']]},solar:{title:'Solar suitcase power',hotspots:[['Panels','Panels face strong sun and feed the battery/controller.'],['Battery','Stored power keeps the kit running when clouds move in.'],['Load order','Connect power in the printed order to protect the electronics.']]},projector:{title:'Projector for groups',hotspots:[['Video source','Use a phone, USB drive, or VillageServer media output as the source.'],['Focus and sound','Test image and speaker before people gather.'],['Group teaching','Films and lessons can serve people without personal devices.']]},charging:{title:'Phone charging station',hotspots:[['Power budget','Add phones gradually so the system is not overloaded.'],['Numbered spots','Simple numbering helps people find their own device again.'],['Supervision','A local leader watches the station while phones charge.']]},satellite:{title:'Optional satellite link',hotspots:[['Open sky','The dish needs a clear view of the sky to connect.'],['Updates','Satellite can update content, send reports, or support limited live access.'],['Offline backup','The library still works locally if satellite is unavailable.']]}};
-    const setupTabs=[...document.querySelectorAll('[data-setup]')];function paintSetupModel(key){const model=setupModelData[key]||setupModelData.wifi;const shell=document.getElementById('setup-model');if(!shell)return;shell.dataset.model=key;const title=document.getElementById('setup-model-title');const detail=document.getElementById('setup-model-detail');const buttons=[...shell.querySelectorAll('[data-hotspot]')];function show(index){const item=model.hotspots[index]||model.hotspots[0];buttons.forEach((button,i)=>button.classList.toggle('active',i===index));title.textContent=item[0];detail.textContent=item[1]}buttons.forEach((button,index)=>{const item=model.hotspots[index]||model.hotspots[0];button.setAttribute('aria-label','Show '+item[0]);button.onclick=()=>show(index)});show(0)}function chooseSetup(tab){if(!tab)return;setupTabs.forEach(item=>{const selected=item===tab;item.setAttribute('aria-selected',String(selected));item.tabIndex=selected?0:-1});const key=tab.dataset.setup;const item=window.VSI18N.setup(key,setupData[key]);document.getElementById('setup-type').textContent=item.type;document.getElementById('setup-title').textContent=item.title;document.getElementById('setup-summary').textContent=item.summary;document.getElementById('setup-quick').innerHTML=item.quick.map(step=>`<li>${step}</li>`).join('');paintSetupModel(key);const link=document.getElementById('setup-link');link.href=`./guide.html?part=${key}`;link.textContent=item.label}setupTabs.forEach((tab,index)=>{tab.addEventListener('click',()=>chooseSetup(tab));tab.addEventListener('keydown',event=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();const forward=['ArrowDown','ArrowRight'].includes(event.key);const next=(index+(forward?1:-1)+setupTabs.length)%setupTabs.length;setupTabs[next].focus();chooseSetup(setupTabs[next])})});chooseSetup(document.querySelector('[data-setup][aria-selected="true"]'));window.addEventListener('vsi:languagechange',()=>{const selected=document.querySelector('[data-setup][aria-selected="true"]');chooseSetup(selected);if(regionSelect.value)renderAvailability()});
+    const menuButton=document.querySelector('.menu-button');const siteNav=document.querySelector('.site-nav');if(menuButton&&siteNav){menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-expanded',String(!open));siteNav.classList.toggle('open',!open)});siteNav.addEventListener('click',event=>{if(event.target.matches('a')){menuButton.setAttribute('aria-expanded','false');siteNav.classList.remove('open')}})}
   </script>
   <script src="./js/site-tracking.js?v=1"></script>
 </body>

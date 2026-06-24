@@ -6,8 +6,24 @@
   window.__vsiVisitTracked = true;
   document.documentElement.setAttribute('data-visit-tracked', 'true');
 
+  function getVisitorId() {
+    var key = 'vsi-visitor-id';
+    try {
+      var existing = localStorage.getItem(key);
+      if (existing) return existing;
+      var id = (window.crypto && window.crypto.randomUUID)
+        ? window.crypto.randomUUID()
+        : 'vsi-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+      localStorage.setItem(key, id);
+      return id;
+    } catch (e) {
+      return 'vsi-session-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+    }
+  }
+
   var params = new URLSearchParams(location.search);
   var payload = {
+    visitor_id: getVisitorId(),
     site_host: (location.hostname || '').toLowerCase().replace(/^www\./, ''),
     path: location.pathname || '/',
     referrer: document.referrer || '',

@@ -2,7 +2,7 @@
 // Env vars: SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD
 //
 // Public (no auth):
-//   POST /api/track?type=visit     { site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
+//   POST /api/track?type=visit     { visitor_id, site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
 //   POST /api/track?type=interest  { name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
 //
 // Admin (Authorization: Bearer <ADMIN_PASSWORD>):
@@ -73,24 +73,26 @@ export default async function handler(req, res) {
 
   // ── Public POST: log visit ───────────────────────────────────────
   if (req.method === 'POST' && type === 'visit') {
-    const { site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid } = req.body || {};
+    const { visitor_id, site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid } = req.body || {};
     const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
     const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
-    const payload = { site_host: cleanHost, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid };
-    let visitResponse = await fetch(`${SUPABASE_URL}/rest/v1/page_visits`, {
-      method: 'POST',
-      headers: { ...sbH, Prefer: 'return=minimal' },
-      body: JSON.stringify(payload),
-    });
-    // Keep tracking alive during the short window before the site_host migration is applied.
-    if (!visitResponse.ok) {
-      const legacyPayload = { ...payload };
-      delete legacyPayload.site_host;
+    const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
+    const payload = { visitor_id: cleanVisitorId || null, site_host: cleanHost, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid };
+    const payloads = [
+      payload,
+      (() => { const p = { ...payload }; delete p.visitor_id; return p; })(),
+      (() => { const p = { ...payload }; delete p.site_host; return p; })(),
+      (() => { const p = { ...payload }; delete p.visitor_id; delete p.site_host; return p; })(),
+    ];
+    let visitResponse;
+    // Keep tracking alive during short windows before visitor_id/site_host migrations are applied.
+    for (const candidate of payloads) {
       visitResponse = await fetch(`${SUPABASE_URL}/rest/v1/page_visits`, {
         method: 'POST',
         headers: { ...sbH, Prefer: 'return=minimal' },
-        body: JSON.stringify(legacyPayload),
+        body: JSON.stringify(candidate),
       });
+      if (visitResponse.ok) break;
     }
     return res.status(visitResponse.ok ? 200 : 502).json({ ok: visitResponse.ok });
   }
@@ -148,9 +150,10 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET' && type === 'summary') {
     let [visitsR, interestsR] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' }),
+      fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' }),
       fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, { headers: sbH }),
     ]);
+    if (!visitsR.ok) visitsR = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' });
     if (!visitsR.ok) visitsR = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' });
     const [visits, interests] = await Promise.all([visitsR.json(), interestsR.json()]);
     return res.status(200).json({ visits: visits || [], interests: interests || [] });

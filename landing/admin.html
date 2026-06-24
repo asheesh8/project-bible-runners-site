@@ -379,7 +379,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </section>
         <section class="dashboard-stats" aria-label="Dashboard summary">
           <article class="dashboard-stat"><span>Public content</span><strong id="overview-content-count">—</strong><small>campaigns, posts, photos, affiliates</small></article>
-          <article class="dashboard-stat"><span>Tracked visits</span><strong id="overview-visit-count">—</strong><small>latest analytics window</small></article>
+          <article class="dashboard-stat"><span>Individual people</span><strong id="overview-visit-count">—</strong><small id="overview-visit-detail">unique anonymous visitors</small></article>
           <article class="dashboard-stat"><span>Kit requests</span><strong id="overview-kit-count">—</strong><small>communities asking for access</small></article>
           <article class="dashboard-stat"><span>Support interest</span><strong id="overview-interest-count">—</strong><small>location and ministry preferences</small></article>
         </section>
@@ -675,13 +675,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
           <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 04</span><span class="faq-tag">Referrers</span></div><h3>What does the referrer tell us?</h3><p><code>document.referrer</code> can identify the previous webpage when the browser and that website permit it. Privacy settings, apps, HTTPS rules, and redirects may remove or shorten it.</p><p>A blank referrer is labeled direct/unknown; it does not prove that the visitor typed the address manually.</p></article>
 
-          <article class="faq-article wide"><div class="faq-meta"><span class="faq-number">QUESTION 05</span><span class="faq-tag">Stored fields</span></div><h3>What exactly is saved for a page visit?</h3><table class="field-map"><thead><tr><th>Field</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td><code>site_host</code></td><td>Public VillageServer domain; both domains feed one stream</td><td><code>villageserver.org</code></td></tr><tr><td><code>path</code></td><td>VillageServer destination page</td><td><code>/guide</code></td></tr><tr><td><code>referrer</code></td><td>Previous page when supplied</td><td><code>facebook.com/…</code></td></tr><tr><td><code>utm_source</code></td><td>Platform or publisher</td><td><code>facebook</code></td></tr><tr><td><code>utm_medium</code></td><td>Traffic type</td><td><code>paid-social</code></td></tr><tr><td><code>utm_campaign</code></td><td>Campaign label</td><td><code>kenya-pilot</code></td></tr><tr><td><code>fbclid / ttclid</code></td><td>Platform click clue</td><td>Opaque identifier</td></tr><tr><td><code>created_at</code></td><td>Time Supabase created the row</td><td>UTC timestamp</td></tr></tbody></table></article>
+          <article class="faq-article wide"><div class="faq-meta"><span class="faq-number">QUESTION 05</span><span class="faq-tag">Stored fields</span></div><h3>What exactly is saved for a page visit?</h3><table class="field-map"><thead><tr><th>Field</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td><code>visitor_id</code></td><td>Anonymous browser/device ID used to separate individual people from repeat page visits</td><td><code>8f2…</code></td></tr><tr><td><code>site_host</code></td><td>Public VillageServer domain; both domains feed one stream</td><td><code>villageserver.org</code></td></tr><tr><td><code>path</code></td><td>VillageServer destination page</td><td><code>/guide</code></td></tr><tr><td><code>referrer</code></td><td>Previous page when supplied</td><td><code>facebook.com/…</code></td></tr><tr><td><code>utm_source</code></td><td>Platform or publisher</td><td><code>facebook</code></td></tr><tr><td><code>utm_medium</code></td><td>Traffic type</td><td><code>paid-social</code></td></tr><tr><td><code>utm_campaign</code></td><td>Campaign label</td><td><code>kenya-pilot</code></td></tr><tr><td><code>fbclid / ttclid</code></td><td>Platform click clue</td><td>Opaque identifier</td></tr><tr><td><code>created_at</code></td><td>Time Supabase created the row</td><td>UTC timestamp</td></tr></tbody></table></article>
 
-          <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 06</span><span class="faq-tag">Privacy</span></div><h3>What can and can’t the tracker see?</h3><ul class="privacy-list"><li class="yes">Tagged campaign values</li><li class="yes">VillageServer page path</li><li class="yes">Allowed referrer value</li><li class="yes">Submission fields a person enters</li><li class="no">Network packet payloads</li><li class="no">Browsing history</li><li class="no">Social passwords or accounts</li><li class="no">Files on the visitor's device</li></ul></article>
+          <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 06</span><span class="faq-tag">Privacy</span></div><h3>What can and can’t the tracker see?</h3><ul class="privacy-list"><li class="yes">Anonymous visitor ID</li><li class="yes">Tagged campaign values</li><li class="yes">VillageServer page path</li><li class="yes">Allowed referrer value</li><li class="yes">Submission fields a person enters</li><li class="no">Network packet payloads</li><li class="no">Browsing history</li><li class="no">Social passwords or accounts</li><li class="no">Files on the visitor's device</li></ul></article>
 
           <article class="faq-article"><div class="faq-meta"><span class="faq-number">QUESTION 07</span><span class="faq-tag">Troubleshooting</span></div><h3>Why does traffic appear as Direct / Unknown?</h3><ul><li>The link had no UTM tags.</li><li>The browser or app removed the referrer.</li><li>A redirect stripped query parameters.</li><li>The visitor opened a bookmark or copied link.</li><li>An ad platform did not append its click ID.</li></ul><p>Use consistent tagged campaign links and test the final landing URL before publishing an ad.</p></article>
 
-          <article class="faq-article wide"><div class="faq-meta"><span class="faq-number">QUESTION 08</span><span class="faq-tag">Reading reports</span></div><h3>What conclusions are safe to make?</h3><p>The dashboard can say, “This many tracked visits arrived with the source label Facebook,” or “This form was submitted after a Kenya campaign link.” It cannot prove that every untagged visitor was direct, that one person equals one visit, or that a marketing channel caused a donation.</p><p>Treat these reports as directional attribution. Compare them with campaign-platform reports and confirmed donations before making budget decisions.</p></article>
+          <article class="faq-article wide"><div class="faq-meta"><span class="faq-number">QUESTION 08</span><span class="faq-tag">Reading reports</span></div><h3>What conclusions are safe to make?</h3><p>The dashboard can say, “Five anonymous individuals created one hundred total page visits,” or “This many tracked visits arrived with the source label Facebook.” A refresh, page click, or return visit increases total page visits; the same browser/device stays one individual.</p><p>It cannot prove that every untagged visitor was direct, that every device equals a different human, or that a marketing channel caused a donation. Treat these reports as directional attribution and compare them with campaign-platform reports and confirmed donations before making budget decisions.</p></article>
         </section>
       </div>
 
@@ -758,6 +758,7 @@ create table affiliates (
 
 create table page_visits (
   id uuid default gen_random_uuid() primary key,
+  visitor_id text,
   site_host text,
   path text,
   referrer text,
@@ -805,6 +806,7 @@ alter table posts enable row level security;
 alter table photos enable row level security;
 alter table affiliates enable row level security;
 alter table page_visits enable row level security;
+alter table page_visits add column if not exists visitor_id text;
 alter table page_visits add column if not exists site_host text;
 alter table donation_interests enable row level security;
 alter table availability_requests enable row level security;
@@ -855,12 +857,13 @@ var PREVIEW_STORE = {
     {id:'preview-affiliate-2',name:'Digital Bible Society',website_url:'https://digitalbiblesociety.org',description:'Digital Bible resources and library support.',logo_url:null,active:true,sort_order:20,created_at:'2026-06-01T12:00:00Z'}
   ],
   visits: [
-    {id:'v1',site_host:'villageserver.com',path:'/',referrer:'https://facebook.com/',utm_source:'facebook',utm_medium:'paid-social',utm_campaign:'kenya-pilot',fbclid:'preview-fb-1',ttclid:null,created_at:'2026-06-22T13:10:00Z'},
-    {id:'v2',site_host:'villageserver.org',path:'/initiative',referrer:'https://google.com/',utm_source:'google',utm_medium:'organic',utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-22T11:40:00Z'},
-    {id:'v3',site_host:'villageserver.com',path:'/pamphlets',referrer:'https://instagram.com/',utm_source:'instagram',utm_medium:'social',utm_campaign:'missionary-library',fbclid:null,ttclid:null,created_at:'2026-06-21T18:20:00Z'},
-    {id:'v4',site_host:'villageserver.org',path:'/guide',referrer:'',utm_source:'email',utm_medium:'newsletter',utm_campaign:'pilot-update',fbclid:null,ttclid:null,created_at:'2026-06-20T16:00:00Z'},
-    {id:'v5',site_host:'villageserver.com',path:'/access',referrer:'',utm_source:null,utm_medium:null,utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-19T16:00:00Z'},
-    {id:'v6',site_host:'villageserver.org',path:'/transfer',referrer:'https://tiktok.com/',utm_source:'tiktok',utm_medium:'paid-social',utm_campaign:'offline-sharing',fbclid:null,ttclid:'preview-tt-1',created_at:'2026-06-18T16:00:00Z'}
+    {id:'v1',visitor_id:'preview-person-a',site_host:'villageserver.com',path:'/',referrer:'https://facebook.com/',utm_source:'facebook',utm_medium:'paid-social',utm_campaign:'kenya-pilot',fbclid:'preview-fb-1',ttclid:null,created_at:'2026-06-22T13:10:00Z'},
+    {id:'v2',visitor_id:'preview-person-a',site_host:'villageserver.org',path:'/initiative',referrer:'https://facebook.com/',utm_source:'facebook',utm_medium:'paid-social',utm_campaign:'kenya-pilot',fbclid:'preview-fb-1',ttclid:null,created_at:'2026-06-22T13:08:00Z'},
+    {id:'v3',visitor_id:'preview-person-b',site_host:'villageserver.org',path:'/initiative',referrer:'https://google.com/',utm_source:'google',utm_medium:'organic',utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-22T11:40:00Z'},
+    {id:'v4',visitor_id:'preview-person-c',site_host:'villageserver.com',path:'/pamphlets',referrer:'https://instagram.com/',utm_source:'instagram',utm_medium:'social',utm_campaign:'missionary-library',fbclid:null,ttclid:null,created_at:'2026-06-21T18:20:00Z'},
+    {id:'v5',visitor_id:'preview-person-d',site_host:'villageserver.org',path:'/guide',referrer:'',utm_source:'email',utm_medium:'newsletter',utm_campaign:'pilot-update',fbclid:null,ttclid:null,created_at:'2026-06-20T16:00:00Z'},
+    {id:'v6',visitor_id:'preview-person-d',site_host:'villageserver.com',path:'/access',referrer:'',utm_source:null,utm_medium:null,utm_campaign:null,fbclid:null,ttclid:null,created_at:'2026-06-19T16:00:00Z'},
+    {id:'v7',visitor_id:'preview-person-e',site_host:'villageserver.org',path:'/transfer',referrer:'https://tiktok.com/',utm_source:'tiktok',utm_medium:'paid-social',utm_campaign:'offline-sharing',fbclid:null,ttclid:'preview-tt-1',created_at:'2026-06-18T16:00:00Z'}
   ],
   interests: [
     {id:'i1',name:'Grace M.',email:'grace@example.org',country:'Kenya',initiative:'VillageServer Initiative',practical_need:'Language microSD',utm_source:'facebook',created_at:'2026-06-21T12:00:00Z'},
@@ -1043,12 +1046,16 @@ function loadOverview(){
   return Promise.all([apiGet('campaigns'),apiGet('posts'),apiGet('photos'),apiGet('affiliates'),trackGet('summary'),trackGet('availability')]).then(function(results){
     var contentTotal = results[0].length + results[1].length + results[2].length + results[3].length;
     var summary = results[4] || {};
+    var visits = summary.visits || [];
+    var uniquePeople = uniqueVisitorCount(visits);
     document.getElementById('overview-content-count').textContent = contentTotal;
-    document.getElementById('overview-visit-count').textContent = (summary.visits || []).length;
+    document.getElementById('overview-visit-count').textContent = uniquePeople;
+    document.getElementById('overview-visit-detail').textContent = visits.length + ' total page visit' + (visits.length===1?'':'s');
     document.getElementById('overview-interest-count').textContent = (summary.interests || []).length;
     document.getElementById('overview-kit-count').textContent = (results[5] || []).length;
   }).catch(function(){
     ['overview-content-count','overview-visit-count','overview-interest-count','overview-kit-count'].forEach(function(id){document.getElementById(id).textContent='0';});
+    var detail=document.getElementById('overview-visit-detail'); if(detail) detail.textContent='0 total page visits';
     showStatus('The dashboard loaded, but live Supabase data is not available yet.','warn');
   });
 }
@@ -1375,6 +1382,41 @@ function countBy(arr, key){
   return Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
 }
 
+function visitorKey(v){
+  return v && v.visitor_id ? String(v.visitor_id) : 'legacy:' + ((v && v.id) || [v && v.created_at, v && v.path, v && v.utm_source, v && v.referrer].join('|'));
+}
+
+function uniqueVisitorCount(visits){
+  var seen = {};
+  (visits || []).forEach(function(v){ seen[visitorKey(v)] = true; });
+  return Object.keys(seen).length;
+}
+
+function visitorBreakdown(visits){
+  var counts = {};
+  var labels = {};
+  var next = 1;
+  (visits || []).forEach(function(v){
+    var key = visitorKey(v);
+    counts[key] = (counts[key] || 0) + 1;
+    if(!labels[key]) labels[key] = 'Person ' + (next++);
+  });
+  return { counts: counts, labels: labels };
+}
+
+function getAdminVisitorId(){
+  var key='vsi-visitor-id';
+  try{
+    var existing=localStorage.getItem(key);
+    if(existing) return existing;
+    var id=(window.crypto&&window.crypto.randomUUID)?window.crypto.randomUUID():'vsi-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12);
+    localStorage.setItem(key,id);
+    return id;
+  }catch(e){
+    return 'vsi-admin-session-'+Date.now().toString(36);
+  }
+}
+
 function setLiveHtml(id, html){
   var el = typeof id === 'string' ? document.getElementById(id) : id;
   if(!el || el._liveHtml === html) return false;
@@ -1446,7 +1488,7 @@ function renderTrafficHealth(){
   if(!b) return;
   b.addEventListener('click', function(){
     b.disabled=true; var orig=b.innerHTML; b.textContent='Sending…';
-    fetch(apiUrl('/api/track?type=visit'),{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({site_host:(location.hostname||'').replace(/^www\./,''),path:'/admin-self-test',referrer:'admin-dashboard',utm_source:'admin-test',utm_medium:'diagnostic',utm_campaign:'pipeline-check'})})
+    fetch(apiUrl('/api/track?type=visit'),{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({visitor_id:getAdminVisitorId(),site_host:(location.hostname||'').replace(/^www\./,''),path:'/admin-self-test',referrer:'admin-dashboard',utm_source:'admin-test',utm_medium:'diagnostic',utm_campaign:'pipeline-check'})})
       .then(function(r){ return r.json().then(function(d){ return {ok:r.ok,d:d}; }); })
       .then(function(res){
         if(res.ok && res.d && res.d.ok===true && !res.d.note) showStatus('Test visit saved ✓ — refreshing the dashboard…','ok');
@@ -1475,16 +1517,22 @@ function loadTraffic(){
       });
 
       var total = visits.length;
+      var individualPeople = uniqueVisitorCount(visits);
+      var repeatViews = Math.max(0, total - individualPeople);
       var now = Date.now();
-      var week = visits.filter(function(v){ return now - new Date(v.created_at).getTime() < 7*24*3600*1000; }).length;
+      var weekVisits = visits.filter(function(v){ return now - new Date(v.created_at).getTime() < 7*24*3600*1000; });
+      var week = weekVisits.length;
+      var weekPeople = uniqueVisitorCount(weekVisits);
       var paidSources = ['facebook','fb','tiktok','tt','instagram','ig','google','youtube'];
       var paidVisits = visits.filter(function(v){ return paidSources.includes((v.utm_source||'').toLowerCase()); }).length;
       var topSource = countBy(visits,'utm_source')[0];
+      var people = visitorBreakdown(visits);
 
       // Summary cards
       setLiveHtml('traffic-summary-cards',
-        renderStatCard('Total Visits Tracked', total, 'all time') +
-        renderStatCard('This Week', week, 'last 7 days') +
+        renderStatCard('Individual People', individualPeople, 'unique anonymous visitors') +
+        renderStatCard('Total Page Visits', total, repeatViews + ' repeat page view' + (repeatViews===1?'':'s')) +
+        renderStatCard('This Week', week, weekPeople + ' individual' + (weekPeople===1?'':'s')) +
         renderStatCard('Paid Ad Visits', paidVisits, 'Facebook, TikTok, Google') +
         renderStatCard('Top Source', topSource ? friendlySource(topSource[0]) : '—', topSource ? topSource[1]+' visits' : ''));
 
@@ -1501,14 +1549,19 @@ function loadTraffic(){
       // Recent visits table
       var visitsEl = document.getElementById('traffic-visits-table');
       if(!visits.length){ setLiveHtml(visitsEl,'<p style="color:var(--muted);font-size:13px;padding:8px 0">No visits logged yet. Make sure the public site is being loaded.</p>'); return; }
-      var tableHtml = '<table class="items-table"><thead><tr><th>Date</th><th>Source</th><th>Medium</th><th>Campaign</th><th>Ad Type</th><th>Referrer</th></tr></thead><tbody>';
+      var tableHtml = '<table class="items-table"><thead><tr><th>Person</th><th>Date</th><th>Page</th><th>Source</th><th>Medium</th><th>Campaign</th><th>Ad Type</th><th>Referrer</th></tr></thead><tbody>';
       visits.slice(0,50).forEach(function(v){
+        var key = visitorKey(v);
+        var personVisits = people.counts[key] || 1;
+        var personLabel = people.labels[key] || 'Person';
         var adType = '';
         if(v.fbclid) adType = '<span style="background:#e8f0fe;color:#1877f2;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">Facebook Ad</span>';
         else if(v.ttclid) adType = '<span style="background:#f1f1f1;color:#010101;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">TikTok Ad</span>';
         else if(v.utm_source) adType = '<span style="background:var(--bg);color:var(--muted);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">'+esc(v.utm_source)+'</span>';
         tableHtml += '<tr>' +
+          '<td><strong style="font-size:13px">'+esc(personLabel)+'</strong><br><span style="font-size:11px;color:var(--muted)">'+personVisits+' page visit'+(personVisits===1?'':'s')+'</span></td>' +
           '<td style="white-space:nowrap;font-size:12px;color:var(--muted)">'+fmtDate(v.created_at)+'</td>' +
+          '<td style="font-size:12px;color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(v.path||'/')+'</td>' +
           '<td>'+(v.utm_source?'<strong style="color:'+sourceColor(v.utm_source)+'">'+esc(friendlySource(v.utm_source))+'</strong>':'<span style="color:var(--muted)">Direct</span>')+'</td>' +
           '<td style="color:var(--muted);font-size:13px">'+esc(v.utm_medium||'—')+'</td>' +
           '<td style="font-size:13px">'+esc(v.utm_campaign||'—')+'</td>' +
