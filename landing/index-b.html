@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>VillageServer Initiative | Start here</title>
-  <meta name="description" content="Learn what VillageServer does, check kit availability, choose a setup guide, and see how the offline system works.">
+  <meta name="description" content="VillageServer helps missionaries and local leaders share Scripture, gospel media, and Christian resources where internet and electricity are limited.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="VillageServer Initiative">
-  <meta property="og:description" content="A portable digital library for communities beyond reliable internet.">
-  <meta property="og:image" content="./img/hero-field.webp">
+  <meta property="og:description" content="A portable gospel-access system for communities beyond reliable internet.">
+  <meta property="og:image" content="./img/villageserver-initiative-logo.webp">
   <link rel="canonical" href="https://villageserver.org/">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="./img/hero-field.webp" type="image/webp" fetchpriority="high">
+  <link rel="preload" as="image" href="./img/villageserver-initiative-logo.webp" type="image/webp" fetchpriority="high">
   <link rel="stylesheet" href="./css/base.css?v=3">
   <link rel="stylesheet" href="./css/home.css?v=3">
 </head>
@@ -25,7 +25,7 @@
       <a class="brand official-brand" href="#top" aria-label="VillageServer Initiative home"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a>
       <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" data-i18n="menu">Menu</button>
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
-        <a href="#initiative" data-i18n="navWhat">What we do</a><a href="#availability" data-i18n="navFind">Find a kit</a><a href="#setup" data-i18n="navSetup">Set up</a><a href="#system" data-i18n="navHow">How it works</a><a class="nav-support" href="./initiative.html" data-i18n="navAbout">About the initiative</a>
+        <a href="#initiative" data-i18n="navWhat">What we do</a><a href="#system" data-i18n="navHow">How it works</a><a href="#availability" data-i18n="navFind">Find a kit</a><a href="#setup" data-i18n="navSetup">Set up</a><a class="nav-support" href="./initiative.html" data-i18n="navAbout">About the initiative</a>
       </nav>
     </div>
   </header>
@@ -34,29 +34,40 @@
   </section>
 
   <main id="main">
-    <section class="hero home-hero" id="top">
-      <img class="hero-media" src="./img/hero-field.webp" alt="A VillageServer field leader in a remote community" width="1300" height="1733" fetchpriority="high" decoding="async">
-      <div class="hero-shade"></div>
-      <div class="wrap hero-copy">
-        <p class="kicker light" data-i18n="heroKicker">The VillageServer Initiative</p>
-        <h1 data-i18n-html="heroTitle">Start with what <em>you need.</em></h1>
-        <p class="hero-lead" data-i18n="heroLead">Understand the initiative, find out whether kits are available near you, or jump directly into a field setup guide.</p>
-        <div class="hero-actions"><a class="button button-primary" href="#journey" data-i18n="heroStart">Show me where to start</a><a class="button button-glass" href="./guide.html?part=wifi" data-i18n="heroHave">I already have a kit</a></div>
+    <section class="hero home-hero mission-hero" id="top">
+      <div class="hero-brand-glow" aria-hidden="true"></div>
+      <div class="wrap hero-layout">
+        <div class="hero-copy">
+          <p class="kicker light">The VillageServer Initiative</p>
+          <h1>Spreading the gospel where internet cannot reach.</h1>
+          <p class="hero-statement-label">Mission statement</p>
+          <p class="hero-lead">To carry Scripture, Christian media, and local-language discipleship resources into places with limited internet, unreliable electricity, and little access to Christian teaching.</p>
+          <div class="hero-mission-card"><span>Plain-language promise</span><p>A field team powers the kit. Nearby phones join its local Wi‑Fi. Families, churches, and schools can read, watch, listen, save, and share without using mobile data.</p></div>
+          <div class="hero-actions hero-actions-simple"><a class="button button-primary" href="#mission">Read the mission</a></div>
+        </div>
+        <aside class="hero-logo-panel" aria-label="VillageServer logo and simple system flow">
+          <img class="hero-logo-art" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async">
+          <div class="hero-signal-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+          <ol class="hero-mini-flow">
+            <li><b>1</b><span>Power the kit</span></li>
+            <li><b>2</b><span>Join local Wi‑Fi</span></li>
+            <li><b>3</b><span>Open Scripture</span></li>
+          </ol>
+        </aside>
       </div>
       <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 42C220 85 393 17 590 48c190 29 373-11 552 15 125 18 218 12 298-18v45H0Z"/></svg>
     </section>
 
-    <nav class="journey wrap" id="journey" aria-label="VillageServer getting started steps">
-      <a href="#initiative"><span>1</span><b data-i18n="journeyUnderstand">Understand</b><small data-i18n="journeyWhat">What we do</small></a>
-      <a href="#availability"><span>2</span><b data-i18n="journeyFind">Find a kit</b><small data-i18n="journeyCheck">Check your area</small></a>
-      <a href="#setup"><span>3</span><b data-i18n="journeySet">Set it up</b><small data-i18n="journeyComponent">Choose a component</small></a>
-      <a href="#system"><span>4</span><b data-i18n="journeySee">See the system</b><small data-i18n="journeyConnect">How it connects</small></a>
+    <nav class="journey wrap simple-journey" id="journey" aria-label="VillageServer getting started steps">
+      <a href="#mission"><span>1</span><b>Read the mission</b><small>Why VillageServer exists</small></a>
+      <a href="#availability"><span>2</span><b>Find a kit</b><small>Check your country or region</small></a>
+      <a href="#setup"><span>3</span><b>Use the guides</b><small>One simple setup at a time</small></a>
     </nav>
 
     <section class="home-step initiative-step" id="initiative">
-      <div class="wrap split-story">
-        <div class="story-copy"><p class="step-kicker"><span data-i18n="step1">Step 1</span><i data-i18n="step1Label">Understand the initiative</i></p><h2 data-i18n="step1Heading">A local library where the internet cannot reliably go.</h2><p data-i18n="step1Copy">VillageServer is a portable Raspberry Pi 5 system that creates its own Wi-Fi network. Nearby phones can open Bible text, audio Scripture, gospel films, children’s resources, and training without mobile data.</p><div class="mini-benefits"><span><b data-i18n="benefitOff">Offline first</b><i data-i18n="benefitOffCopy">No internet required</i></span><span><b data-i18n="benefitLang">Language ready</b><i data-i18n="benefitLangCopy">Swap resource cards</i></span><span><b data-i18n="benefitPower">Field powered</b><i data-i18n="benefitPowerCopy">Solar-ready system</i></span></div><a class="inline-cta" href="./initiative.html" data-i18n="initiativeLink">Explore the initiative and rollout →</a></div>
-        <figure class="story-photo"><img src="./img/kit-case.webp" alt="The portable VillageServer kit in its field case" width="1300" height="975" loading="lazy"><figcaption data-i18n="kitCaption">Server, content, power, projection, charging, and optional satellite tools.</figcaption></figure>
+      <div class="wrap split-story mission-split" id="mission">
+        <div class="story-copy"><p class="step-kicker"><span>Mission</span><i>Plain-language purpose</i></p><h2>Technology that carries the gospel farther.</h2><p>Many communities have limited internet access, unreliable electricity, few local-language resources, or little access to Christian teaching. VillageServer is built so a field team can carry a whole digital library into those places.</p><p>A nearby person does not need a data plan or technical background. They join the local VillageServer Wi‑Fi, open the library, and can read, listen, watch, save, and share gospel resources from their own phone.</p><div class="mini-benefits mission-benefits"><span><b>Gospel first</b><i>Scripture, audio, films, training, and children’s resources</i></span><span><b>Offline first</b><i>Works locally without internet after setup</i></span><span><b>Built for the field</b><i>Solar, projector, charging, and optional satellite support</i></span></div><a class="inline-cta" href="./initiative.html#mission">Read the full initiative →</a></div>
+        <figure class="story-photo mission-photo"><img src="./img/kit-case.webp" alt="The portable VillageServer kit in its field case" width="1300" height="975" loading="lazy"><figcaption>One field kit can serve phones, groups, language libraries, power needs, and optional live connection.</figcaption></figure>
       </div>
     </section>
 
@@ -92,11 +103,25 @@
 
     <section class="home-step system-step" id="system">
       <div class="wrap">
-        <div class="step-heading inverse"><div><p class="step-kicker light-step"><span data-i18n="step4">Step 4</span><i data-i18n="step4Label">See the whole system</i></p><h2 data-i18n="step4Heading">Power in. Library out.</h2></div><p data-i18n="step4Copy">Every field tool supports one simple flow. Optional parts can be added without making the offline library depend on them.</p></div>
-        <div class="system-flow" aria-label="VillageServer system flow">
-          <article><span>01</span><b data-i18n="flowPower">Power</b><p data-i18n="flowPowerCopy">Solar suitcase, battery, or reliable local power.</p></article><i>→</i><article><span>02</span><b>VillageServer</b><p data-i18n="flowServerCopy">Raspberry Pi stores and serves the local library.</p></article><i>→</i><article><span>03</span><b data-i18n="flowAccess">Local access</b><p data-i18n="flowAccessCopy">Wi-Fi, microSD, and USB deliver the resources.</p></article><i>→</i><article><span>04</span><b data-i18n="flowPeople">People</b><p data-i18n="flowPeopleCopy">Read, listen, watch, save, and share.</p></article>
+        <div class="step-heading inverse"><div><p class="step-kicker light-step"><span>How it works</span><i>Simple field model</i></p><h2>Power in. Gospel library out.</h2></div><p>VillageServer is meant to feel simple for the person using it: join Wi‑Fi, open the library, save what helps, then share it with someone nearby.</p></div>
+        <div class="kit-model-grid" aria-label="VillageServer explanatory kit model">
+          <div class="kit-3d-stage">
+            <div class="pi-model" aria-hidden="true">
+              <span class="pi-port port-1"></span><span class="pi-port port-2"></span><span class="pi-port port-3"></span><span class="pi-port port-4"></span>
+              <span class="pi-chip">VS</span><span class="pi-card-slot">SD</span><span class="pi-wifi">⌁</span>
+            </div>
+            <div class="model-callout callout-power"><b>Power</b><span>Solar, battery, or local power</span></div>
+            <div class="model-callout callout-library"><b>Library</b><span>Scripture, audio, films, PDFs</span></div>
+            <div class="model-callout callout-phones"><b>Phones</b><span>Read, listen, save, share</span></div>
+            <div class="model-callout callout-group"><b>Groups</b><span>Projector teaching and films</span></div>
+          </div>
+          <div class="model-explainer">
+            <article><span>01</span><b>VillageServer stores the resources.</b><p>A Raspberry Pi holds the offline library and creates a local Wi‑Fi network.</p></article>
+            <article><span>02</span><b>People connect with normal phones.</b><p>No app, account, or data plan is required to open the local library.</p></article>
+            <article><span>03</span><b>The gospel keeps moving.</b><p>Resources can be saved, copied to microSD or USB, projected for groups, or shared phone-to-phone.</p></article>
+          </div>
         </div>
-        <div class="optional-tools"><span data-i18n="optional">Optional additions</span><a href="./guide.html?part=projector" data-i18n="optionalProjector">Pico projector</a><a href="./guide.html?part=charging" data-i18n="optionalCharging">20-phone charging</a><a href="./guide.html?part=satellite" data-i18n="optionalSatellite">Satellite connection</a></div>
+        <div class="optional-tools model-links"><span>Open setup guide:</span><a href="./guide.html?part=pi">Raspberry Pi</a><a href="./guide.html?part=projector">Projector</a><a href="./guide.html?part=solar">Solar</a><a href="./guide.html?part=satellite">Satellite</a></div>
       </div>
     </section>
 

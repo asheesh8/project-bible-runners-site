@@ -92,7 +92,7 @@ test('the missionary pamphlet library exposes every printable field route', () =
   for (const [, source] of scripts) new Function(source);
 });
 
-test('the homepage follows the four-step consumer journey', () => {
+test('the homepage follows a simpler mission-first consumer journey', () => {
   const html = read('landing/index.html');
   for (const id of ['initiative', 'availability', 'setup', 'system']) {
     assert.match(html, new RegExp(`id="${id}"`));
@@ -100,6 +100,13 @@ test('the homepage follows the four-step consumer journey', () => {
   assert.ok(html.indexOf('id="initiative"') < html.indexOf('id="availability"'));
   assert.ok(html.indexOf('id="availability"') < html.indexOf('id="setup"'));
   assert.ok(html.indexOf('id="setup"') < html.indexOf('id="system"'));
+  assert.match(html, /Spreading the gospel where internet cannot reach/);
+  assert.match(html, /id="mission"/);
+  assert.match(html, /Mission statement/);
+  assert.match(html, /simple-journey/);
+  assert.match(html, /Power in\. Gospel library out\./);
+  assert.match(html, /class="pi-model"/);
+  assert.doesNotMatch(html, /I already have a kit/);
   assert.match(html, /Can I order a kit near me\?/);
   assert.match(html, /not yet available through public online checkout/i);
 });
@@ -267,11 +274,12 @@ test('admin includes an accurate traffic-attribution FAQ', () => {
 });
 
 for (const page of pages) {
-  test(`${page} uses a semantic, high-priority hero image`, () => {
+  test(`${page} uses the logo as the high-priority hero visual`, () => {
     const html = read(page);
-    assert.match(html, /<img[^>]+class="hero-media"[^>]+src="\.\/img\/hero-field\.webp"/s);
-    assert.match(html, /<img[^>]+class="hero-media"[^>]+fetchpriority="high"/s);
-    assert.match(html, /<img[^>]+class="hero-media"[^>]+width="1300"[^>]+height="1733"/s);
+    assert.match(html, /<img[^>]+class="hero-logo-art"[^>]+src="\.\/img\/villageserver-initiative-logo\.webp"/s);
+    assert.match(html, /<img[^>]+class="hero-logo-art"[^>]+fetchpriority="high"/s);
+    assert.match(html, /<img[^>]+class="hero-logo-art"[^>]+width="1254"[^>]+height="1254"/s);
+    assert.doesNotMatch(html, /class="hero-media"[^>]+hero-field\.webp/s);
     assert.doesNotMatch(html, /new Image\(\)/);
     assert.doesNotMatch(html, /data:image|var lqip=/);
     assert.match(html, /<svg[^>]+class="hero-wave"[^>]+aria-hidden="true"/s);
