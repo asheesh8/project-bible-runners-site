@@ -317,6 +317,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .tab-view{display:none}
 .tab-view.active{display:block}
 
+/* Stat cards */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 16px;text-align:center}
+.stat-val{font-size:26px;font-weight:800;color:var(--text);line-height:1.1}
+.stat-label{font-size:11px;color:var(--muted);margin-top:4px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.stat-card.accent .stat-val{color:var(--accent)}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.bar-label{font-size:13px;color:var(--text);min-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.bar-track{flex:1;height:7px;background:var(--bg);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:var(--sidebar-active);border-radius:99px}
+.bar-count{font-size:12px;color:var(--muted);font-weight:700;min-width:30px;text-align:right}
+.interests-table-wrap{overflow-x:auto}
+
 /* Responsive */
 @media(max-width:760px){
   .sidebar{display:none}
@@ -380,6 +393,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         <div class="nav-item" data-tab="testimonies">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           Testimonies
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Analytics</div>
+        <div class="nav-item" data-tab="traffic">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Traffic
         </div>
       </div>
       <div class="sidebar-section">
@@ -592,6 +612,44 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <div>No testimonies yet. Add one above.</div>
           </div>
+        </div>
+      </div>
+
+      <!-- ── TRAFFIC ──────────────────────────────── -->
+      <div class="tab-view" id="tab-traffic">
+        <div class="page-header">
+          <h2 class="page-title">Traffic &amp; Analytics</h2>
+          <button class="btn-new" id="refresh-traffic-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card accent"><div class="stat-val" id="stat-visits">—</div><div class="stat-label">Total visits</div></div>
+          <div class="stat-card"><div class="stat-val" id="stat-unique">—</div><div class="stat-label">Unique visitors</div></div>
+          <div class="stat-card"><div class="stat-val" id="stat-today">—</div><div class="stat-label">Visits today</div></div>
+          <div class="stat-card"><div class="stat-val" id="stat-interests">—</div><div class="stat-label">Donation interests</div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">📄 &nbsp;Top pages</div>
+          <div id="top-pages-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">📣 &nbsp;Traffic sources</div>
+          <div id="utm-sources-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">🙋 &nbsp;Donation interests</div>
+          <div class="interests-table-wrap" id="interests-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">🕓 &nbsp;Recent visits</div>
+          <div id="visits-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
       </div>
 
@@ -854,6 +912,7 @@ function loadTab(tab){
   else if(tab === 'posts') loadPosts();
   else if(tab === 'photos') loadPhotos();
   else if(tab === 'testimonies') loadTestimonies();
+  else if(tab === 'traffic') loadTraffic();
   // 'resources' is static — nothing to load
 }
 
@@ -1169,6 +1228,115 @@ function editPhoto(id){
 function deletePhoto(id){
   if(!confirm('Delete this photo?')) return;
   api('DELETE','photos',null,id).then(function(){ loadPhotos(); showStatus('Photo deleted.','ok'); });
+}
+
+// ════════════════════════════════════════════════════════
+// TRAFFIC / ANALYTICS
+// ════════════════════════════════════════════════════════
+document.getElementById('refresh-traffic-btn').addEventListener('click', loadTraffic);
+
+function loadTraffic(){
+  var btn = document.getElementById('refresh-traffic-btn');
+  btn.disabled = true;
+  btn.textContent = 'Loading…';
+
+  fetch('/api/track?type=summary', { headers:{ 'Authorization':'Bearer '+AUTH_TOKEN } })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      renderTraffic(data.visits||[], data.interests||[]);
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Refresh';
+    })
+    .catch(function(){
+      showStatus('Could not load traffic data — Supabase may not be configured.','warn');
+      btn.disabled = false;
+      btn.textContent = 'Refresh';
+    });
+}
+
+function renderTraffic(visits, interests){
+  // ── Stats ────────────────────────────────────────────
+  var todayStr = new Date().toDateString();
+  var todayCount = visits.filter(function(v){ return new Date(v.created_at).toDateString()===todayStr; }).length;
+  var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||v.site_host||''; }).filter(Boolean));
+
+  document.getElementById('stat-visits').textContent = visits.length;
+  document.getElementById('stat-unique').textContent = uniqueIds.size || '—';
+  document.getElementById('stat-today').textContent = todayCount;
+  document.getElementById('stat-interests').textContent = interests.length;
+
+  // ── Top pages ────────────────────────────────────────
+  var pageCounts = {};
+  visits.forEach(function(v){ var p=v.path||'/'; pageCounts[p]=(pageCounts[p]||0)+1; });
+  var topPages = Object.entries(pageCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+  var maxPage = topPages.length ? topPages[0][1] : 1;
+
+  if(topPages.length){
+    document.getElementById('top-pages-list').innerHTML = topPages.map(function(row){
+      return '<div class="bar-row">' +
+        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(row[0])+'</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxPage*100)+'%"></div></div>' +
+        '<span class="bar-count">'+row[1]+'</span>' +
+      '</div>';
+    }).join('');
+  } else {
+    document.getElementById('top-pages-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No visit data yet.</div></div>';
+  }
+
+  // ── Traffic sources ──────────────────────────────────
+  var srcCounts = {};
+  visits.forEach(function(v){
+    var s = v.utm_source || (v.referrer ? new URL('http://x/'+v.referrer.replace(/^\//,'')).hostname||v.referrer : null) || 'Direct / unknown';
+    srcCounts[s]=(srcCounts[s]||0)+1;
+  });
+  var topSrc = Object.entries(srcCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  var maxSrc = topSrc.length ? topSrc[0][1] : 1;
+
+  if(topSrc.length){
+    document.getElementById('utm-sources-list').innerHTML = topSrc.map(function(row){
+      return '<div class="bar-row">' +
+        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(row[0])+'</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxSrc*100)+'%"></div></div>' +
+        '<span class="bar-count">'+row[1]+'</span>' +
+      '</div>';
+    }).join('');
+  } else {
+    document.getElementById('utm-sources-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No source data yet.</div></div>';
+  }
+
+  // ── Donation interests ────────────────────────────────
+  if(interests.length){
+    var intHtml = '<table class="items-table"><thead><tr><th>Country</th><th>Initiative</th><th>UTM source</th><th>Date</th></tr></thead><tbody>';
+    interests.forEach(function(i){
+      intHtml += '<tr>' +
+        '<td>'+esc(i.country||'—')+'</td>' +
+        '<td>'+esc(i.initiative||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+esc(i.utm_source||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(i.created_at)+'</td>' +
+      '</tr>';
+    });
+    intHtml += '</tbody></table>';
+    document.getElementById('interests-list').innerHTML = intHtml;
+  } else {
+    document.getElementById('interests-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No donation interests captured yet.</div></div>';
+  }
+
+  // ── Recent visits ─────────────────────────────────────
+  if(visits.length){
+    var visHtml = '<table class="items-table"><thead><tr><th>Path</th><th>Source</th><th>UTM campaign</th><th>Date</th></tr></thead><tbody>';
+    visits.slice(0,100).forEach(function(v){
+      visHtml += '<tr>' +
+        '<td style="font-size:13px">'+esc(v.path||'/')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+esc(v.utm_source||v.referrer||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+esc(v.utm_campaign||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(v.created_at)+'</td>' +
+      '</tr>';
+    });
+    visHtml += '</tbody></table>';
+    document.getElementById('visits-list').innerHTML = visHtml;
+  } else {
+    document.getElementById('visits-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No visits recorded yet.</div></div>';
+  }
 }
 
 // ════════════════════════════════════════════════════════
