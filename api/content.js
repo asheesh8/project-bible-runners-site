@@ -3,28 +3,23 @@
 //
 // Public endpoints (no auth):
 //   GET /api/content?type=campaigns
-//   GET /api/content?type=campaigns&slug=kenya-field-pilot
+//   GET /api/content?type=campaigns&slug=spring-uganda-2026
 //   GET /api/content?type=posts
 //   GET /api/content?type=photos
-//   GET /api/content?type=affiliates
 //
 // Admin endpoints (Authorization: Bearer <ADMIN_PASSWORD>):
 //   POST   /api/content?type=campaigns   body={}
 //   PATCH  /api/content?type=campaigns&id=uuid  body={}
 //   DELETE /api/content?type=campaigns&id=uuid
 
-const TABLES = { campaigns: true, posts: true, photos: true, affiliates: true };
+const TABLES = { campaigns: true, posts: true, photos: true, testimonies: true };
 
 export default async function handler(req, res) {
-  const { ADMIN_PASSWORD } = process.env;
-  // Accept either our own names or the ones the Supabase–Vercel integration creates.
-  const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+  const { SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD } = process.env;
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Cache-Control', 'no-store, max-age=0');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
@@ -34,7 +29,7 @@ export default async function handler(req, res) {
   }
 
   const { type, slug, id } = req.query;
-  if (!TABLES[type]) return res.status(400).json({ error: 'Invalid type. Use: campaigns | posts | photos | affiliates' });
+  if (!TABLES[type]) return res.status(400).json({ error: 'Invalid type. Use: campaigns | posts | photos | testimonies' });
 
   const sbHeaders = {
     'Content-Type': 'application/json',
@@ -49,7 +44,6 @@ export default async function handler(req, res) {
     if (id)   url += `&id=eq.${encodeURIComponent(id)}`;
     // Only return published posts to public
     if (type === 'posts' && !req.headers.authorization) url += '&published=eq.true';
-    if (type === 'affiliates' && !req.headers.authorization) url += '&active=eq.true';
 
     const r = await fetch(url, { headers: sbHeaders });
     const data = await r.json();
