@@ -56,8 +56,31 @@ const directoryPages = [
   'field-faq.html',
 ];
 
-const transferPdfs = [
+const topicPdfs = [
+  'villageserver-mission-statement.pdf',
   'villageserver-initiative-overview.pdf',
+  'villageserver-about-us.pdf',
+  'villageserver-programs-and-services.pdf',
+  'villageserver-photos-and-visuals.pdf',
+  'villageserver-testimonials.pdf',
+  'villageserver-phone-based-gospel-distribution.pdf',
+  'villageserver-raspberry-pi-system.pdf',
+  'villageserver-power-and-solar.pdf',
+  'villageserver-projector-and-audio.pdf',
+  'villageserver-custom-libraries.pdf',
+  'villageserver-satellite-systems.pdf',
+  'villageserver-ministry-partners.pdf',
+  'villageserver-get-and-share-resources.pdf',
+  'villageserver-transfer-resources-between-devices.pdf',
+  'villageserver-sharing-the-library.pdf',
+  'villageserver-setup-guide.pdf',
+  'villageserver-printable-pamphlets-and-field-faq.pdf',
+  'villageserver-kit-levels-and-costs.pdf',
+  'villageserver-rollout-and-reach.pdf',
+  'villageserver-field-faq.pdf',
+];
+
+const routePdfs = [
   'villageserver-transfer-iphone-to-iphone.pdf',
   'villageserver-transfer-android-to-android.pdf',
   'villageserver-transfer-iphone-to-android.pdf',
@@ -65,6 +88,7 @@ const transferPdfs = [
   'villageserver-transfer-computer-to-phone.pdf',
   'villageserver-transfer-microsd-to-phone.pdf',
 ];
+const allPdfs = [...topicPdfs, ...routePdfs];
 
 function read(relativePath) {
   return readFileSync(join(root, relativePath), 'utf8');
@@ -103,6 +127,9 @@ test('the board stylesheet protects the older-reader design system', () => {
   assert.match(css, /\.test-run-media/);
   assert.match(css, /\.board-hero/);
   assert.match(css, /\.plain-answer/);
+  assert.match(css, /\.step-section/);
+  assert.match(css, /\.step-list/);
+  assert.match(css, /\.pdf-button/);
   assert.match(css, /\.brief-grid/);
   assert.match(css, /\.side-card/);
   assert.match(css, /@media\(max-width:560px\)/);
@@ -168,8 +195,14 @@ test('every informational page follows the same short blog-style board template'
     assert.match(html, /class="board-top"/, `${page} should have a simple top bar`);
     assert.match(html, /class="board-hero"/, `${page} should have a short page hero`);
     assert.match(html, /class="plain-answer"/, `${page} should lead with a plain answer`);
+    assert.match(html, /class="step-list"/, `${page} should include field steps`);
+    assert.ok([...html.matchAll(/<li><div><strong>/g)].length >= 4, `${page} should include at least four field steps`);
     assert.match(html, /class="brief-grid"/, `${page} should summarize with small cards`);
     assert.match(html, /class="side-card"/, `${page} should have one visual summary card`);
+    const pdfMatch = html.match(/<a class="pdf-button" href="\.\/downloads\/([^"]+\.pdf)" download>Download PDF<\/a>/);
+    assert.ok(pdfMatch, `${page} should have a primary PDF download`);
+    assert.ok(existsSync(join(root, 'landing/downloads', pdfMatch[1])), `${page} should reference a deployed PDF`);
+    assert.ok(existsSync(join(root, 'output/pdf', pdfMatch[1])), `${page} should retain the source PDF`);
     assert.match(html, /class="related"/, `${page} should link to related pages`);
     assert.match(html, /Read this page when/, `${page} should explain when to use it`);
     assert.match(html, /\.\/js\/site-language\.js/, `${page} should keep translation controls`);
@@ -195,12 +228,14 @@ test('core page copy is plain, ministry-focused, and non-technical', () => {
 
 test('pamphlets page exposes the printable field handouts and files exist', () => {
   const html = read('landing/pamphlets.html');
-  assert.match(html, /class="download-list"/);
-  for (const file of transferPdfs) {
+  assert.match(html, /class="[^"]*\bdownload-list\b[^"]*"/);
+  assert.match(html, /download-list download-list-compact/);
+  for (const file of allPdfs) {
     assert.match(html, new RegExp(`\\./downloads/${escapeRegExp(file)}`));
     assert.ok(existsSync(join(root, 'landing/downloads', file)), `${file} should be deployed`);
     assert.ok(existsSync(join(root, 'output/pdf', file)), `${file} should be retained in output/pdf`);
   }
+  assert.equal([...html.matchAll(/class="download-link"/g)].length, allPdfs.length);
 });
 
 test('language controls cover major field languages and every public page can translate', () => {

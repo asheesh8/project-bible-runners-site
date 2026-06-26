@@ -70,6 +70,14 @@ a{color:inherit}
 .plain-answer{padding:clamp(24px,4vw,38px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:var(--shadow)}
 .plain-answer h2,.brief-card h2,.side-card h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.9rem,3vw,3rem);line-height:1.08;margin:0 0 12px}
 .plain-answer p{font-size:1.12rem;color:var(--muted);margin:0}
+.step-section{margin-top:18px;padding:clamp(22px,3vw,32px);border:1px solid var(--line);border-radius:24px;background:#fff}
+.section-kicker{margin:0 0 8px;text-transform:uppercase;letter-spacing:.15em;font-size:.72rem;font-weight:900;color:var(--gold)}
+.step-section h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.9rem,3vw,3rem);line-height:1.08;margin:0 0 16px;color:var(--ink)}
+.step-list{counter-reset:steps;display:grid;gap:10px;list-style:none;margin:0;padding:0}
+.step-list li{counter-increment:steps;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+.step-list li::before{content:counter(steps);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-weight:900}
+.step-list strong{display:block;color:var(--ink);font-size:1rem;line-height:1.25}
+.step-list span{display:block;color:var(--muted);font-size:.96rem;line-height:1.45;margin-top:3px}
 .brief-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
 .brief-card,.side-card{padding:24px;border:1px solid var(--line);border-radius:20px;background:#fff}
 .brief-card h3,.side-card h3{font-size:1.18rem;margin:0 0 8px}
@@ -81,7 +89,11 @@ a{color:inherit}
 .related{margin-top:18px;display:grid;gap:10px}
 .related a,.download-link{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:#fff;text-decoration:none;font-weight:900;color:var(--blue-dark)}
 .related a::after,.download-link::after{content:"→";color:var(--gold)}
+.pdf-button{display:flex;align-items:center;justify-content:center;min-height:54px;margin-top:16px;padding:12px 16px;border-radius:999px;background:var(--blue);color:#fff;text-decoration:none;font-weight:900;box-shadow:0 12px 26px rgba(31,87,149,.2)}
+.pdf-button:hover,.pdf-button:focus-visible{background:var(--blue-dark);outline:0}
+.mini-note{margin-top:12px;font-size:.92rem;color:var(--muted)}
 .download-list{display:grid;gap:10px;margin-top:14px}
+.download-list-compact{grid-template-columns:repeat(2,minmax(0,1fr))}
 .footer{background:var(--blue-dark);color:rgba(255,255,255,.76);padding:24px 0;text-align:center;font-size:.92rem}
 .footer a{color:#fff;font-weight:800}
 .logo-modal{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;padding:24px;background:rgba(8,28,52,.78);backdrop-filter:blur(8px)}
@@ -94,4 +106,4 @@ a{color:inherit}
 @keyframes logoSweep{0%,34%{transform:translateX(-145%) rotate(4deg)}54%,100%{transform:translateX(145%) rotate(4deg)}}
 @media(prefers-reduced-motion:reduce){.logo-button::after,.home-hero-logo{animation:none}}
 @media(max-width:900px){.board-layout{grid-template-columns:1fr}.side-card{position:static}.photo-grid,.brief-grid{grid-template-columns:1fr 1fr}.test-run-media{grid-template-columns:1fr}.test-run-video,.test-run-video video{min-height:360px}}
-@media(max-width:560px){body{font-size:17px}.board-top .wrap{align-items:flex-start;flex-direction:column}.home-hero-logo{width:min(58vw,210px)}.link-band a{width:100%;font-size:1.35rem}.photo-grid,.brief-grid,.test-run-gallery{grid-template-columns:1fr}.photo-card{min-height:250px}.test-run-video,.test-run-video video{min-height:300px}.board-hero h1{font-size:2.75rem}.button{width:100%}}
+@media(max-width:560px){body{font-size:17px}.board-top .wrap{align-items:flex-start;flex-direction:column}.home-hero-logo{width:min(58vw,210px)}.link-band a{width:100%;font-size:1.35rem}.photo-grid,.brief-grid,.test-run-gallery,.download-list-compact{grid-template-columns:1fr}.step-list li{grid-template-columns:1fr}.photo-card{min-height:250px}.test-run-video,.test-run-video video{min-height:300px}.board-hero h1{font-size:2.75rem}.button{width:100%}}
