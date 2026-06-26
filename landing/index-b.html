@@ -31,17 +31,15 @@
     .vs-logo-hint{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#c8ddf6}
     .vs-hero h1{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:clamp(3.2rem,8vw,7rem);line-height:1.02;margin:0 0 22px;color:#fff}
     .vs-hero .vs-tagline{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.2rem,2.6vw,2.05rem);line-height:1.42;max-width:1060px;margin:0 auto;color:rgba(255,255,255,.95)}
-    .vs-sections{background:var(--vs-blue);padding:clamp(36px,5vw,64px) 20px clamp(56px,7vw,90px)}
-    .vs-groups{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3.5vw,52px);text-align:left}
-    .vs-group h2{font-family:"DM Sans",system-ui,sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:.72rem;font-weight:700;color:#bcd3ef;margin:0 0 6px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.22)}
-    .vs-group a{display:block;font-family:"Newsreader",Georgia,serif;font-size:clamp(1.12rem,1.5vw,1.4rem);font-weight:500;color:#fff;text-decoration:none;padding:11px 0;line-height:1.22;border-bottom:1px solid rgba(255,255,255,.09);transition:color .15s,padding-left .15s}
-    .vs-group a:last-child{border-bottom:0}
-    .vs-group a:hover,.vs-group a:focus-visible{color:var(--vs-gold);padding-left:7px}
+    .vs-sections{background:#f7fbff;color:#142b46;padding:clamp(28px,4vw,48px) 20px clamp(18px,3vw,28px);border-top:1px solid rgba(255,255,255,.55);box-shadow:inset 0 18px 50px rgba(255,255,255,.72)}
+    .vs-link-band{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px clamp(22px,3vw,46px);text-align:center}
+    .vs-link-band a{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.22rem,1.9vw,1.85rem);font-weight:700;line-height:1.12;color:#142b46;text-decoration:none;padding:9px 4px;transition:color .15s ease,transform .15s ease}
+    .vs-link-band a:hover,.vs-link-band a:focus-visible{color:#c58b24;transform:translateY(-1px);outline:0}
     .vs-foot{background:var(--vs-blue-d);color:rgba(255,255,255,.66);text-align:center;padding:22px 20px;font-size:.78rem;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center}
     .vs-foot a{color:rgba(255,255,255,.8)}
-    .vs-tech-strip{background:var(--vs-blue);padding:clamp(18px,3vw,36px) 20px clamp(32px,5vw,58px)}
-    .vs-tech-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-    .vs-tech-card{position:relative;min-height:250px;border:1px solid rgba(255,255,255,.18);border-radius:22px;overflow:hidden;text-decoration:none;color:#fff;background:#163e70;box-shadow:0 18px 54px rgba(8,35,64,.22)}
+    .vs-tech-strip{background:#f7fbff;padding:0 20px clamp(46px,6vw,78px)}
+    .vs-tech-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .vs-tech-card{position:relative;min-height:270px;border:1px solid rgba(22,62,112,.16);border-radius:22px;overflow:hidden;text-decoration:none;color:#fff;background:#163e70;box-shadow:0 18px 54px rgba(8,35,64,.16)}
     .vs-tech-card img{width:100%;height:100%;object-fit:cover;filter:saturate(.95) contrast(1.04) brightness(.78);transition:transform .22s ease,filter .22s ease}
     .vs-tech-card:hover img,.vs-tech-card:focus-visible img{transform:scale(1.04);filter:saturate(1.02) contrast(1.05) brightness(.68)}
     .vs-tech-card div{position:absolute;inset:auto 16px 16px;padding:14px;border-radius:16px;background:rgba(11,45,82,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -52,9 +50,8 @@
     .vs-logo-dialog{position:relative;width:min(92vw,760px);padding:clamp(16px,2vw,24px);border:1px solid rgba(255,255,255,.26);border-radius:28px;background:#fff;box-shadow:0 40px 120px rgba(0,0,0,.45)}
     .vs-logo-dialog img{width:100%;height:auto;border-radius:20px}
     .vs-logo-close{position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:999px;background:var(--vs-blue-d);color:#fff;font-size:1.4rem;line-height:1;cursor:pointer}
-    @media(max-width:920px){.vs-tech-grid{grid-template-columns:1fr 1fr}.vs-tech-card{min-height:220px}}
-    @media(max-width:820px){.vs-groups{grid-template-columns:1fr 1fr}}
-    @media(max-width:560px){.vs-groups,.vs-tech-grid{grid-template-columns:1fr}.vs-hero-tools{justify-content:center;margin-bottom:28px}.vs-lang select{width:min(100%,280px)}.vs-tech-card{min-height:240px}}
+    @media(max-width:920px){.vs-tech-grid{grid-template-columns:1fr 1fr}.vs-tech-card{min-height:240px}}
+    @media(max-width:560px){.vs-link-band{gap:2px}.vs-link-band a{width:100%;font-size:1.45rem}.vs-tech-grid{grid-template-columns:1fr}.vs-hero-tools{justify-content:center;margin-bottom:28px}.vs-lang select{width:min(100%,280px)}.vs-tech-card{min-height:240px}}
   </style>
 </head>
 <body>
@@ -73,38 +70,29 @@
       <p class="vs-tagline">Using technology to help place God's Word, biblical teaching, and ministry resources within reach of every village.</p>
     </section>
 
+    <section class="vs-sections" id="resources">
+      <div class="vs-link-band">
+        <a href="./mission.html">Mission Statement</a>
+        <a href="./about.html">About Us</a>
+        <a href="./programs.html">Programs &amp; Services</a>
+        <a href="./visuals.html">Photos / Visuals</a>
+        <a href="./testimonials.html">Testimonials</a>
+        <a href="./phone-distribution.html">Phone-Based Gospel Distribution</a>
+        <a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a>
+        <a href="./power.html">Power Systems and Solar Solutions</a>
+        <a href="./projector-media.html">Projector Systems and Audio Solutions</a>
+        <a href="./custom-libraries.html">Content Libraries and Custom Ministry Resources</a>
+        <a href="./satellite.html">Satellite Systems and Content Acquisition</a>
+        <a href="./affiliates.html">Ministry Resource Partners</a>
+      </div>
+    </section>
+
     <section class="vs-tech-strip" aria-label="VillageServer field technology photos">
       <div class="vs-tech-grid">
         <a class="vs-tech-card" href="./raspberry-pi.html"><img src="./img/kit-pi.webp" alt="Raspberry Pi local server with USB storage" width="1100" height="825" loading="lazy"><div><span>Local server</span><b>Raspberry Pi library</b></div></a>
         <a class="vs-tech-card" href="./satellite.html"><img src="./img/dish.webp" alt="Satellite dish for remote connectivity" width="1024" height="768" loading="lazy"><div><span>Optional uplink</span><b>Satellite dish</b></div></a>
         <a class="vs-tech-card" href="./projector-media.html"><img src="./img/projector.webp" alt="Portable projector for group gospel media" width="900" height="869" loading="lazy"><div><span>Group media</span><b>Projector system</b></div></a>
         <a class="vs-tech-card" href="./power.html"><img src="./img/solar-field.webp" alt="Solar power setup for field equipment" width="1100" height="1467" loading="lazy"><div><span>Power source</span><b>Solar field kit</b></div></a>
-      </div>
-    </section>
-
-    <section class="vs-sections" id="resources">
-      <div class="vs-groups">
-        <div class="vs-group">
-          <h2>About the Initiative</h2>
-          <a href="./mission.html">Mission Statement</a>
-          <a href="./about.html">About Us</a>
-          <a href="./programs.html">Programs &amp; Services</a>
-          <a href="./visuals.html">Photos / Visuals</a>
-          <a href="./testimonials.html">Testimonials</a>
-        </div>
-        <div class="vs-group">
-          <h2>Technology &amp; Field Systems</h2>
-          <a href="./phone-distribution.html">Phone-Based Gospel Distribution</a>
-          <a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a>
-          <a href="./power.html">Power Systems and Solar Solutions</a>
-          <a href="./projector-media.html">Projector Systems and Audio Solutions</a>
-          <a href="./satellite.html">Satellite Systems and Content Acquisition</a>
-        </div>
-        <div class="vs-group">
-          <h2>Content &amp; Partners</h2>
-          <a href="./custom-libraries.html">Content Libraries and Custom Ministry Resources</a>
-          <a href="./affiliates.html">Ministry Resource Partners</a>
-        </div>
       </div>
     </section>
   </main>

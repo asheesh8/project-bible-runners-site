@@ -136,11 +136,12 @@ test('the homepage is a clean blue, mission-first resource directory', () => {
   assert.match(html, /id="resources"/);
   assert.match(html, /VillageServer Initiative/);
   assert.match(html, /Using technology to help place God's Word/);
-  assert.match(html, /About the Initiative/);
-  assert.match(html, /Technology &amp; Field Systems/);
-  assert.match(html, /Content &amp; Partners/);
+  assert.match(html, /Mission Statement/);
+  assert.match(html, /Raspberry Pi VillageServer System/);
+  assert.match(html, /Ministry Resource Partners/);
   assert.match(html, /class="vs-hero"/);
-  assert.match(html, /class="vs-groups"/);
+  assert.match(html, /class="vs-link-band"/);
+  assert.match(html, /class="vs-tech-strip"/);
   assert.match(html, /class="vs-hero-logo"/);
   assert.match(html, /class="vs-hero-tools"/);
   assert.match(html, /class="vs-logo-button"/);
@@ -156,16 +157,18 @@ test('homepage blue layout stays compact and grouped', () => {
   const html = read('landing/index.html');
   assert.match(html, /--vs-blue:#1e4f8c/);
   assert.match(html, /--vs-blue-d:#163e70/);
-  assert.match(html, /\.vs-groups\{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat\(3,1fr\)/);
-  assert.match(html, /@media\(max-width:560px\)\{\.vs-groups,\.vs-tech-grid\{grid-template-columns:1fr\}/);
+  assert.match(html, /\.vs-sections\{background:#f7fbff/);
+  assert.match(html, /\.vs-link-band\{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center/);
+  assert.match(html, /@media\(max-width:560px\)\{\.vs-link-band\{gap:2px\}/);
   assert.doesNotMatch(html, /<header[\s\S]*?<\/header>/);
 });
 
 test('homepage resource directory links to the focused topic pages without visual clutter', () => {
   const html = read('landing/index.html');
-  assert.match(html, /class="vs-groups"/);
+  assert.match(html, /class="vs-link-band"/);
   assert.ok(existsSync(join(root, 'landing/img/villageserver-initiative-logo.webp')));
   assert.match(html, /class="vs-tech-strip"/);
+  assert.ok(html.indexOf('class="vs-sections"') < html.indexOf('class="vs-tech-strip"'), 'picture cards should sit below the white link band');
   for (const asset of ['kit-pi.webp', 'dish.webp', 'projector.webp', 'solar-field.webp']) {
     assert.match(html, new RegExp(`\\./img/${asset}`));
     assert.ok(existsSync(join(root, 'landing/img', asset)), `${asset} should exist for homepage tech photos`);
@@ -275,8 +278,9 @@ test('deep content is split into resource pages and old campaign branding is gon
   }
   assert.equal(existsSync(join(root, 'landing/donate.html')), false, 'donation page should be out of the public bundle');
   assert.match(html, /VillageServer Initiative/);
-  assert.match(html, /About the Initiative/);
-  assert.match(html, /Technology &amp; Field Systems/);
+  assert.match(html, /Mission Statement/);
+  assert.match(html, /Phone-Based Gospel Distribution/);
+  assert.match(html, /Ministry Resource Partners/);
   assert.doesNotMatch(html, /Where will the kit be used\?|Choose one item\. The widget/);
 });
 
