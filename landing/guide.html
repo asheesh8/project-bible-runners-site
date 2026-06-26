@@ -3,240 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Setup guide | VillageServer Initiative</title>
-  <meta name="description" content="Step-by-step VillageServer field setup guide.">
+  <title>Setup Guide | VillageServer Initiative</title>
+  <meta name="description" content="The setup guide gives field teams a plain order of operations so they can start with the part in front of them.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/base.css?v=3">
-  <link rel="stylesheet" href="./css/guide.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/board.css?v=1">
 </head>
 <body>
-  <header class="guide-header">
-    <div class="wrap guide-nav">
-      <a class="brand official-brand" href="./index.html#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a>
-      <a class="back-link" href="./index.html#resources">← Back to resource links</a>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="board-top">
+    <div class="wrap">
+      <a class="board-brand" href="./index.html"><img src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"><span>VillageServer Initiative</span></a>
+      <a class="board-back" href="./index.html#directory">Back to directory</a>
     </div>
   </header>
-
-  <main>
-    <section class="guide-hero">
-      <div class="wrap guide-hero-grid">
-        <div>
-          <p class="kicker light" id="guide-category">Setup guide</p>
-          <h1 id="guide-title">Connect a phone</h1>
-          <p id="guide-summary">Join the local VillageServer network and open the offline library.</p>
-        </div>
-        <div class="guide-symbol" id="guide-symbol" aria-hidden="true">◉</div>
+  <main id="main">
+    <section class="board-hero">
+      <div class="wrap">
+        <p class="meta">Board brief · What to set up first</p>
+        <h1>Setup Guide</h1>
+        <p class="summary">The setup guide gives field teams a plain order of operations so they can start with the part in front of them.</p>
       </div>
     </section>
-
-    <div class="wrap guide-layout">
-      <aside class="guide-sidebar" aria-label="All setup guides">
-        <p>Choose a guide</p>
-        <nav>
-          <a href="./guide.html?part=wifi" data-guide-link="wifi">Connect a phone</a>
-          <a href="./guide.html?part=pi" data-guide-link="pi">Raspberry Pi</a>
-          <a href="./guide.html?part=microsd" data-guide-link="microsd">microSD card</a>
-          <a href="./guide.html?part=usb" data-guide-link="usb">USB drive</a>
-          <a href="./guide.html?part=solar" data-guide-link="solar">Solar suitcase</a>
-          <a href="./guide.html?part=projector" data-guide-link="projector">Pico projector</a>
-          <a href="./guide.html?part=charging" data-guide-link="charging">Phone charging</a>
-          <a href="./guide.html?part=satellite" data-guide-link="satellite">Satellite dish</a>
-        </nav>
-      </aside>
-
-      <article class="guide-content">
-        <section class="bring-section">
-          <p class="step-label">Before you begin</p>
-          <h2>Bring these items</h2>
-          <ul class="bring-list" id="guide-bring"></ul>
-        </section>
-
-        <section class="steps-section">
-          <p class="step-label">Walkthrough</p>
-          <h2>Set it up</h2>
-          <ol class="setup-steps" id="guide-steps"></ol>
-        </section>
-
-        <section class="success-section">
-          <div class="success-check">✓</div>
-          <div><p class="step-label">Success check</p><h2>How you know it worked</h2><p id="guide-success"></p></div>
-        </section>
-
-        <section class="trouble-section">
-          <p class="step-label">If it does not work</p>
-          <h2>Try these first</h2>
-          <ul id="guide-trouble"></ul>
-        </section>
-
-        <section class="field-note">
-          <b>Field note</b>
-          <p id="guide-note"></p>
-        </section>
-
-        <nav class="guide-next" aria-label="Guide navigation">
-          <a href="./index.html#resources">View all resource links</a>
-          <a id="next-guide" href="./guide.html?part=pi">Next guide →</a>
-        </nav>
-      </article>
-    </div>
+    <section class="page-body">
+      <div class="wrap board-layout">
+        <article>
+          <section class="plain-answer"><h2>Plain answer</h2><p>A good setup guide does not start with theory. It starts with a choice: phone, Raspberry Pi, microSD, USB, solar, projector, charging, or satellite.</p></section>
+          <section class="brief-grid" aria-label="Key points"><article class="brief-card"><h3>Phone + Wi‑Fi</h3><p>Connect one phone and confirm the local library opens.</p></article><article class="brief-card"><h3>Raspberry Pi</h3><p>Power the server, wait for the Wi‑Fi network, and test the library from a phone.</p></article><article class="brief-card"><h3>Power</h3><p>Confirm the source first: wall power, battery, solar, generator, or hybrid.</p></article><article class="brief-card"><h3>Group media</h3><p>Only add projector, speakers, or satellite after the local library works.</p></article></section>
+          
+        </article>
+        <aside class="side-card" aria-label="Page summary">
+          <img src="./img/kit-case.webp" alt="Portable VillageServer field kit" loading="lazy">
+          <h2>Read this page when...</h2>
+          <p>You need a short explanation of setup guide for a board member, missionary, or ministry partner.</p>
+          <div class="related" aria-label="Related pages"><a href="./access.html">Get and Share Resources</a><a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a><a href="./power.html">Power Systems and Solar Solutions</a><a href="./projector-media.html">Projector Systems and Audio Solutions</a></div>
+        </aside>
+      </div>
+    </section>
   </main>
-
-  <footer class="site-footer guide-footer"><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span><a href="./pamphlets.html">Pamphlets &amp; FAQ</a> · <a href="./index.html">Return to the main site</a></span></div></footer>
-
+  <footer class="footer"><div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
-  <script>
-    const guides = {
-      wifi: {
-        title: 'Connect a phone', category: 'Use the library', symbol: '◉',
-        summary: 'Join VillageServer Wi-Fi, open the offline library, and save a resource to your phone.',
-        bring: ['A phone or tablet with Wi-Fi', 'A powered-on VillageServer kit', 'The network name and local address printed with the kit'],
-        steps: [
-          ['Confirm the server is ready', 'Power on VillageServer and allow it time to start. Use the ready light or printed field card as your signal.'],
-          ['Open Wi-Fi settings', 'On the phone, open Settings and choose Wi-Fi or Connections.'],
-          ['Join the VillageServer network', 'Tap the network name printed with the kit. If the phone says “No internet,” choose to stay connected. That message is expected.'],
-          ['Open the local library', 'Tap the welcome prompt. If no prompt appears, open a browser and enter the local address printed on the kit.'],
-          ['Choose, open, and save', 'Pick a language and resource. Use Download or Save so the file remains available when you leave the network.'],
-          ['Test it offline', 'Turn on airplane mode and open the saved file. If it opens, the resource is stored on the phone.']
-        ],
-        success: 'The VillageServer library opens in a browser, and at least one saved file still opens in airplane mode.',
-        trouble: ['Turn Wi-Fi off and back on, then rejoin VillageServer.', 'Choose “stay connected” if the phone warns there is no internet.', 'Move closer to the kit.', 'Confirm another phone can see the network. If no phone can see it, check the server guide.'],
-        note: 'VillageServer is a local network. Your phone may show no internet even while the library is working correctly.', next: 'pi'
-      },
-      pi: {
-        title: 'Start the Raspberry Pi', category: 'Core system', symbol: '▣',
-        summary: 'Power the VillageServer core, let it create the local library, and verify it from a phone.',
-        bring: ['VillageServer Raspberry Pi 5', 'Prepared system card supplied with the kit', 'Approved power cable or solar power output', 'VillageServer network and address card', 'A phone for testing'],
-        steps: [
-          ['Set the server on a safe surface', 'Choose a dry, ventilated place away from direct rain, loose soil, and foot traffic.'],
-          ['Check the prepared system card', 'Confirm the card supplied for the server is fully seated. Do not force it or use an unlabeled personal card.'],
-          ['Connect the included kit parts', 'Attach only the cables and storage labeled for this VillageServer kit. Match the printed port labels.'],
-          ['Connect approved power', 'Use the supplied power source or the labeled VillageServer output from the solar suitcase.'],
-          ['Wait for startup', 'Allow the server to finish starting before disconnecting anything. Use the kit’s ready indicator or field card.'],
-          ['Verify from a phone', 'Open Wi-Fi settings, join VillageServer, and load the local library.']
-        ],
-        success: 'A nearby phone sees the VillageServer Wi-Fi network and can open the local library without mobile data.',
-        trouble: ['Check that the power cable is fully seated at both ends.', 'Confirm the power source has charge.', 'Remove any accessory that was not packed with this kit.', 'Power down before reseating the system card, then try once more.'],
-        note: 'Never remove the Raspberry Pi system card or disconnect storage while the server is writing or shutting down. Hardware labels may change during the pilot; use the printed kit card as the authority.', next: 'microsd'
-      },
-      microsd: {
-        title: 'Use a microSD language card', category: 'Language library', symbol: 'SD',
-        summary: 'Open a language library directly on a device or make it available through VillageServer.',
-        bring: ['A labeled VillageServer language card', 'The matching adapter or device card tray', 'A phone, tablet, computer, or VillageServer', 'A safe case for the card'],
-        steps: [
-          ['Read the card label', 'Confirm the language and library version before inserting it. Keep different cards in their labeled cases.'],
-          ['Choose where to use it', 'For VillageServer, use the labeled language-card slot or reader. For a phone or computer, use its card slot or a compatible USB card reader.'],
-          ['Insert it gently', 'Align the card with the slot. Never bend it or force it. Turn a phone off first if the card shares a SIM tray.'],
-          ['Open the library', 'On Android, open Files or My Files and choose SD card. On iPhone or iPad, connect a reader and open Files, then Browse. On a computer, open the drive.'],
-          ['Start with START HERE', 'Choose the language, then Bible, Audio, Video, Children, or Training. Copy needed files to the device if they must travel.'],
-          ['Eject before removing', 'Use Eject on a computer or reader when available. Return the card to its labeled case.']
-        ],
-        success: 'The correct language folders appear, one resource opens, and copied files remain available after the card is removed.',
-        trouble: ['Remove and reinsert the card once, without forcing it.', 'Try the supplied reader or adapter.', 'Check that the card is not locked by a full-size SD adapter switch.', 'Test the card in one other device, then mark it for technical review if it still does not appear.'],
-        note: 'Language cards hold ministry content. The Raspberry Pi may use a separate system card; do not swap the two unless the kit label explicitly says to.', next: 'usb'
-      },
-      usb: {
-        title: 'Use a USB resource drive', category: 'Portable files', symbol: 'USB',
-        summary: 'Connect a portable library, open its folders, and move resources safely.',
-        bring: ['A labeled VillageServer USB drive', 'A compatible USB-A, USB-C, or Lightning adapter if needed', 'A phone, tablet, computer, or VillageServer'],
-        steps: [
-          ['Check the drive label', 'Confirm the language or resource collection before connecting it.'],
-          ['Use the correct adapter', 'Connect the drive directly when possible. Otherwise use the adapter supplied for that device.'],
-          ['Open the drive', 'Use Files on a phone or tablet, File Explorer on Windows, Finder on Mac, or Files on Linux.'],
-          ['Open START HERE', 'Choose a language and content type. Open one small file first to confirm the drive is readable.'],
-          ['Copy only what is needed', 'Copy selected folders to Downloads or another clearly named location. Keep the original folder names.'],
-          ['Eject safely', 'Use Eject before unplugging from a computer or whenever the device provides that option.']
-        ],
-        success: 'The drive appears by name, a resource opens, and any copied file remains available after the drive is unplugged.',
-        trouble: ['Reconnect the drive firmly.', 'Try the supplied adapter or another labeled port.', 'Unlock the phone before connecting the drive.', 'Test one other device and mark the drive for review if neither detects it.'],
-        note: 'Do not edit, rename, or delete master library files in the field. Copy resources to the device and leave the source drive organized.', next: 'solar'
-      },
-      solar: {
-        title: 'Set up the solar suitcase', category: 'Off-grid power', symbol: '☀',
-        summary: 'Position the panels, connect the labeled power system, and bring VillageServer online safely.',
-        bring: ['Solar suitcase and panels', 'Included controller and battery', 'Labeled VillageServer power cable', 'A dry, shaded location for electronics'],
-        steps: [
-          ['Choose the locations', 'Place panels in clear sunlight. Keep the battery, controller, server, and connections dry and shaded.'],
-          ['Open and secure the panels', 'Unfold the panels and support them so wind or foot traffic cannot knock them over.'],
-          ['Follow the printed connection order', 'Match every cable label. Use the controller instructions packed with this exact suitcase; do not bypass the controller.'],
-          ['Check the controller', 'Confirm it shows battery or charging status before attaching VillageServer. Stop if it shows an error.'],
-          ['Connect the labeled VillageServer output', 'Use only the designated output and approved cable. Then start the Raspberry Pi.'],
-          ['Monitor during use', 'Check charge status periodically and reduce optional loads if the battery becomes low.']
-        ],
-        success: 'The controller shows charging or available battery power, and VillageServer runs steadily from the labeled output.',
-        trouble: ['Move panels out of shade and face them more directly toward the sun.', 'Check every labeled connection without opening sealed electrical parts.', 'Disconnect optional charging loads.', 'If the controller shows an error, stop and use the kit-specific technical card.'],
-        note: 'Solar hardware and controller sequences vary. The printed instructions inside the suitcase override this general guide. Never expose electrical connectors to water.', next: 'projector'
-      },
-      projector: {
-        title: 'Set up the pico projector', category: 'Group media', symbol: '▶',
-        summary: 'Connect a media source and prepare a clear, audible group showing.',
-        bring: ['Pico projector', 'Approved power cable or charged battery', 'Included video cable or wireless adapter', 'VillageServer media source', 'A light surface or portable screen'],
-        steps: [
-          ['Choose the viewing area', 'Find a shaded or dark place with a clear wall or screen and enough room for the group.'],
-          ['Place the projector', 'Use a stable surface where it will not be kicked, blocked, or exposed to dust and moisture.'],
-          ['Connect power and media', 'Use the included power and video connection. Connect the VillageServer player or approved source.'],
-          ['Select the matching input', 'On the projector, choose the input named on the connected port or kit card.'],
-          ['Frame and focus', 'Move the projector for image size, then adjust focus until text and faces are clear.'],
-          ['Test sound and playback', 'Play a short section, set a safe volume, then return to the beginning before gathering the group.']
-        ],
-        success: 'The chosen film or training video plays with a focused image and audible sound for the group.',
-        trouble: ['Remove the lens cap and confirm the projector is on.', 'Choose the input that matches the connected cable.', 'Reconnect the cable at both ends.', 'Dim the area, move closer to the screen, and test a different approved media file.'],
-        note: 'Test the full program before traveling to the gathering. Keep vents uncovered and allow the projector to cool before packing.', next: 'charging'
-      },
-      charging: {
-        title: 'Set up phone charging', category: 'Practical service', symbol: '⚡',
-        summary: 'Create an orderly charging station for up to 20 phones without overloading the field power system.',
-        bring: ['VillageServer charging station', 'Approved power input', 'Labeled charging cables', 'A dry, supervised table', 'A simple phone-numbering or claim system'],
-        steps: [
-          ['Choose a supervised location', 'Keep the station dry, ventilated, visible, and away from walking paths.'],
-          ['Confirm available power', 'Check the solar controller, battery, or approved source before adding phones. Keep enough power reserved for VillageServer.'],
-          ['Connect the station', 'Use only the labeled charging-station input and cables supplied with the kit.'],
-          ['Add phones gradually', 'Connect a few phones first and confirm charging, then add more without exceeding the station’s labeled capacity.'],
-          ['Keep ownership clear', 'Number the ports or use a simple claim tag so every phone returns to the right person.'],
-          ['Monitor heat and charge', 'Remove a device if its cable, battery, or adapter becomes unusually hot. Disconnect completed phones to make room.']
-        ],
-        success: 'Connected phones show charging, VillageServer remains stable, and every device can be matched to its owner.',
-        trouble: ['Check the station’s power indicator.', 'Remove all phones, reconnect power, then add one known-good phone and cable.', 'Disconnect optional loads if solar battery is low.', 'Stop using any damaged or hot cable.'],
-        note: '“Up to 20 phones” is the planned station capacity; always obey the capacity label on the actual pilot hardware and the available power budget.', next: 'satellite'
-      },
-      satellite: {
-        title: 'Set up the satellite connection', category: 'Optional live connection', symbol: '⌁',
-        summary: 'Assemble the portable connection for updates or streams while keeping VillageServer useful offline.',
-        bring: ['Portable dish kit', 'Tripod or supplied mount', 'Modem/router and labeled cables', 'Approved power source', 'Provider alignment instructions', 'A clear view of the sky'],
-        steps: [
-          ['Choose a clear, safe site', 'Use open sky away from trees, buildings, vehicle paths, and overhead electrical hazards.'],
-          ['Stabilize the mount', 'Set the tripod or base on firm ground and secure it exactly as the kit instructions show.'],
-          ['Assemble the labeled parts', 'Connect the dish, modem, router, and power using the field diagram packed with the kit. Do not force connectors.'],
-          ['Follow provider alignment', 'Use the provider’s approved aiming or setup process for this location and service.'],
-          ['Confirm the live connection', 'Check the modem or setup tool for a stable signal before starting an update or stream.'],
-          ['Keep local access independent', 'Continue serving saved resources through VillageServer. Use the live link only where it adds value.'],
-          ['Shut down and pack', 'End active transfers, power down in the printed order, dry all parts, and return each piece to its marked place.']
-        ],
-        success: 'The provider tool shows a stable connection while the VillageServer local library remains available to nearby phones.',
-        trouble: ['Check for a clear sky view and a stable mount.', 'Confirm all labeled cables are fully seated.', 'Repeat the provider’s alignment step.', 'If weather or signal is poor, stop the live task and continue with the offline library.'],
-        note: 'Satellite hardware, service, and aiming steps are provider-specific and still being field-tested. Always use the printed provider instructions included with the deployed kit.', next: 'wifi'
-      }
-    };
-
-    const params = new URLSearchParams(window.location.search);
-    const key = Object.prototype.hasOwnProperty.call(guides, params.get('part')) ? params.get('part') : 'wifi';
-    const guide = guides[key];
-    document.title = `${guide.title} | VillageServer field guide`;
-    document.getElementById('guide-title').textContent = guide.title;
-    document.getElementById('guide-category').textContent = guide.category;
-    document.getElementById('guide-symbol').textContent = guide.symbol;
-    document.getElementById('guide-summary').textContent = guide.summary;
-    document.getElementById('guide-bring').innerHTML = guide.bring.map(item => `<li>${item}</li>`).join('');
-    document.getElementById('guide-steps').innerHTML = guide.steps.map(([title, copy], index) => `<li><span>${String(index + 1).padStart(2, '0')}</span><div><h3>${title}</h3><p>${copy}</p></div></li>`).join('');
-    document.getElementById('guide-success').textContent = guide.success;
-    document.getElementById('guide-trouble').innerHTML = guide.trouble.map(item => `<li>${item}</li>`).join('');
-    document.getElementById('guide-note').textContent = guide.note;
-    document.getElementById('next-guide').href = `./guide.html?part=${guide.next}`;
-    document.getElementById('next-guide').textContent = `Next: ${guides[guide.next].title} →`;
-    document.querySelector(`[data-guide-link="${key}"]`).setAttribute('aria-current', 'page');
-  </script>
 </body>
 </html>

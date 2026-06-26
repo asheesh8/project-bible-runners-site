@@ -3,78 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Transfer resources between devices | VillageServer</title>
-  <meta name="description" content="Step-by-step offline file transfer routes for Android, iPhone, Windows, Mac, microSD, and USB.">
-  <link rel="canonical" href="https://villageserver.org/transfer">
+  <title>Transfer Resources Between Devices | VillageServer Initiative</title>
+  <meta name="description" content="A simple transfer plan helps one saved resource move from one phone, computer, USB drive, or microSD card to another device.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/base.css?v=3">
-  <link rel="stylesheet" href="./css/resource.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/board.css?v=1">
 </head>
 <body>
-  <header class="resource-nav"><div class="wrap"><a class="brand official-brand" href="./index.html"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><a href="./access.html">← Access guide</a></div></header>
-  <main>
-    <section class="resource-hero transfer-hero"><div class="wrap"><p class="kicker light">Device transfer center</p><h1>One copy can reach every nearby device.</h1><p>After a resource leaves the microSD card, choose the two devices involved. Open only that route for a focused walkthrough.</p></div></section>
-
-    <nav class="transfer-launcher wrap" aria-label="Choose a transfer route">
-      <a href="#phone-phone"><span>01</span><b>Phone → phone</b><small>Android or iPhone</small></a>
-      <a href="#ios-android"><span>02</span><b>iPhone ↔ Android</b><small>Cross-platform</small></a>
-      <a href="#computer-phone"><span>03</span><b>Computer → phone</b><small>Windows or Mac</small></a>
-      <a href="#card-phone"><span>04</span><b>microSD → phone</b><small>Start with the card</small></a>
-    </nav>
-
-    <section class="resource-block transfer-intro"><div class="wrap transfer-intro-grid"><div><p class="kicker">Best all-around transfer app</p><h2>LocalSend works across the whole device mix.</h2><p>Install LocalSend on both devices, connect them to the same local Wi-Fi or phone hotspot, choose Send, select the files, and tap the receiving device. It supports Android, iOS, Windows, macOS, and Linux without an account or cloud upload.</p><div class="app-badges"><span>Android</span><span>iPhone / iPad</span><span>Windows</span><span>Mac</span><span>Linux</span></div><a class="button button-primary" href="https://localsend.org/" target="_blank" rel="noopener">Get LocalSend ↗</a></div><aside class="transfer-picture-card transfer-picture-dark"><img src="./img/phone-transfer-visual.svg" alt="iPhone and Android phones sharing files by app or USB cable" width="1200" height="760" loading="lazy"><div class="transfer-method-pills"><a href="#phone-phone">AirDrop / Quick Share</a><a href="#ios-android">LocalSend</a><a href="#computer-phone">Cable from computer</a><a href="#card-phone">USB / microSD</a></div><p><b>Field rule:</b> Transfer one small file first, open it on the receiving device, then send the larger folder.</p></aside></div></section>
-
-    <section class="resource-block sand-block" id="routes"><div class="wrap"><div class="resource-title"><p class="kicker">Choose one route</p><h2>Click a row to open its instructions.</h2><p>Only one walkthrough stays open at a time so the page remains easy to follow in the field.</p></div><div class="transfer-accordions">
-
-      <details class="transfer-route" id="phone-phone">
-        <summary><span>01</span><div><small>Same platform</small><h3>Phone → phone</h3><p>Android to Android or iPhone to iPhone</p></div><b aria-hidden="true">+</b></summary>
-        <div class="route-body two-route-columns">
-          <article><p class="route-label">Android → Android</p><h4>Use Quick Share</h4><ol><li>On the receiving Android, turn on Bluetooth and Wi-Fi, unlock it, and open Quick Share receiving visibility.</li><li>On the sending phone, open Files and locate the VillageServer file or folder.</li><li>Press and hold the item, tap <strong>Share</strong>, then <strong>Quick Share</strong>.</li><li>Choose the receiving phone. Confirm the device name or PIN on both screens.</li><li>Accept the request. Open the received file from Downloads or the Quick Share folder.</li></ol><a href="https://support.google.com/files/answer/15685428?hl=en" target="_blank" rel="noopener">Official Android instructions ↗</a></article>
-          <article><p class="route-label">iPhone → iPhone</p><h4>Use AirDrop</h4><ol><li>On both iPhones, turn on Wi-Fi and Bluetooth and keep the devices nearby.</li><li>Set the receiver’s AirDrop visibility to Contacts Only or Everyone for 10 Minutes.</li><li>On the sending iPhone, open Files and touch and hold the resource.</li><li>Tap <strong>Share</strong>, then <strong>AirDrop</strong>, and choose the receiving iPhone.</li><li>Accept the transfer and confirm the file appears in Files or its matching app.</li></ol><a href="https://support.apple.com/en-us/102538" target="_blank" rel="noopener">Official Apple instructions ↗</a></article>
-        </div>
-      </details>
-
-      <details class="transfer-route" id="ios-android">
-        <summary><span>02</span><div><small>Cross-platform phones</small><h3>iPhone ↔ Android</h3><p>Move ordinary files in either direction</p></div><b aria-hidden="true">+</b></summary>
-        <div class="route-body">
-          <div class="method-callout"><strong>Recommended: LocalSend</strong><span>Offline after installation · no account · keeps original files</span></div>
-          <ol class="route-steps"><li><b>Install before traveling.</b><p>Install LocalSend on the iPhone and Android while internet access is available.</p></li><li><b>Create one local network.</b><p>Connect both phones to VillageServer Wi-Fi, another trusted Wi-Fi network, or one phone’s hotspot. The network does not need internet.</p></li><li><b>Allow local access.</b><p>Open LocalSend on both phones. On iPhone, allow Local Network access; on Android, approve nearby-device or file permissions when requested.</p></li><li><b>Send from the phone holding the resource.</b><p>Tap Send, choose Files, select the copied VillageServer resources, then choose the other phone’s LocalSend name.</p></li><li><b>Accept and verify.</b><p>Accept on the receiver. Open the Downloads folder, play or read one file, then send the larger batch.</p></li></ol>
-          <div class="route-notes"><p><b>No app available?</b> Copy through an ExFAT USB drive or microSD reader that both phones can open. iPhone may require a compatible USB-C or Lightning adapter.</p><p><b>Setting up a brand-new phone?</b> Android Switch and Apple Move to iOS are migration tools for initial setup—not the normal choice for sharing VillageServer files later.</p></div>
-        </div>
-      </details>
-
-      <details class="transfer-route" id="computer-phone">
-        <summary><span>03</span><div><small>Desktop bridge</small><h3>Computer → phone</h3><p>Windows or Mac to Android or iPhone</p></div><b aria-hidden="true">+</b></summary>
-        <div class="route-body route-matrix">
-          <article><span>Windows → Android</span><h4>USB cable or Quick Share</h4><p><b>Cable:</b> Unlock Android, connect a data-capable USB cable, tap the USB notification, choose File transfer, and drag files into Download or Documents.</p><p><b>Wireless:</b> Install Quick Share for Windows, choose the file, select the nearby Android, and accept on the phone.</p></article>
-          <article><span>Mac → Android</span><h4>LocalSend or removable storage</h4><p>Install LocalSend on both devices and use the same local network. If apps cannot be installed, copy files from the Mac to an ExFAT USB drive or microSD card, then connect that storage to Android.</p></article>
-          <article><span>Mac → iPhone</span><h4>Finder, AirDrop, or LocalSend</h4><p><b>Cable:</b> Connect the iPhone, select it in Finder, open Files, and drag files into an app that supports File Sharing.</p><p><b>Wireless:</b> Use AirDrop for Apple-to-Apple or LocalSend for the same workflow used by every platform.</p></article>
-          <article><span>Windows → iPhone</span><h4>Apple Devices or LocalSend</h4><p><b>Cable:</b> Use Apple Devices for Windows and copy into an app that supports File Sharing.</p><p><b>Wireless:</b> Install LocalSend on Windows and iPhone, place both on the same local network, then send and accept.</p></article>
-          <div class="route-source-links"><a href="https://support.google.com/android/answer/9064445?hl=en-GB" target="_blank" rel="noopener">Android USB guide ↗</a><a href="https://support.google.com/android/answer/13801258?hl=en-en" target="_blank" rel="noopener">Quick Share for Windows ↗</a><a href="https://support.apple.com/en-lamr/guide/iphone/iph339bafff3/ios" target="_blank" rel="noopener">Apple computer-transfer guide ↗</a></div>
-        </div>
-      </details>
-
-      <details class="transfer-route" id="card-phone">
-        <summary><span>04</span><div><small>First copy</small><h3>microSD → phone → more phones</h3><p>Offload once, then multiply the resource</p></div><b aria-hidden="true">+</b></summary>
-        <div class="route-body">
-          <div class="handoff-flow"><span><b>1</b>Insert card</span><i>→</i><span><b>2</b>Copy to Files</span><i>→</i><span><b>3</b>Open one file</span><i>→</i><span><b>4</b>Share onward</span></div>
-          <ol class="route-steps"><li><b>Connect the correct reader.</b><p>Use the phone’s card slot or a compatible microSD-to-USB adapter. Never force a card or connector.</p></li><li><b>Open the labeled library.</b><p>In Android Files or Apple Files, find the card under Storage or Locations and open START HERE.</p></li><li><b>Copy—do not move—the files.</b><p>Copy selected language folders into Downloads, Documents, or a clearly named VillageServer folder. Leave the master card unchanged.</p></li><li><b>Test before removing the card.</b><p>Open one copied file, safely eject the card, and open that file again with airplane mode on.</p></li><li><b>Choose the onward route.</b><p>Use Quick Share for Android, AirDrop for Apple, or LocalSend when the phones use different platforms.</p></li></ol>
-        </div>
-      </details>
-    </div></div></section>
-
-    <section class="resource-block"><div class="wrap"><div class="resource-title"><p class="kicker">App chooser</p><h2>Use the simplest tool both devices support.</h2><p>This is the short version. If the first method is available, use it. If not, move down the list.</p></div><div class="app-comparison method-priority"><article><b>1 · Built-in</b><span>AirDrop or Quick Share</span><p>Fastest when both phones are the same ecosystem: iPhone to iPhone, or Android to Android.</p></article><article><b>2 · LocalSend</b><span>iPhone ↔ Android · phone ↔ computer</span><p>Best cross-platform offline choice. Both devices need the app and the same local network.</p></article><article><b>3 · Cable</b><span>USB-C, Lightning, Windows, Mac</span><p>Best when a computer is available or wireless sharing is blocked.</p></article><article><b>4 · USB / microSD</b><span>Adapters and removable storage</span><p>Best no-app fallback. Use ExFAT storage for broad compatibility and always eject safely.</p></article></div></div></section>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="board-top">
+    <div class="wrap">
+      <a class="board-brand" href="./index.html"><img src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"><span>VillageServer Initiative</span></a>
+      <a class="board-back" href="./index.html#directory">Back to directory</a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="board-hero">
+      <div class="wrap">
+        <p class="meta">Board brief · Device routes</p>
+        <h1>Transfer Resources Between Devices</h1>
+        <p class="summary">A simple transfer plan helps one saved resource move from one phone, computer, USB drive, or microSD card to another device.</p>
+      </div>
+    </section>
+    <section class="page-body">
+      <div class="wrap board-layout">
+        <article>
+          <section class="plain-answer"><h2>Plain answer</h2><p>Do not teach every method at once. Choose the route in front of you: iPhone to iPhone, Android to Android, iPhone to Android, computer to phone, or card to phone.</p></section>
+          <section class="brief-grid" aria-label="Key points"><article class="brief-card"><h3>iPhone to iPhone</h3><p>Use AirDrop first. It is usually the easiest Apple-to-Apple option.</p></article><article class="brief-card"><h3>Android to Android</h3><p>Use Quick Share first. LocalSend is a strong backup when installed on both phones.</p></article><article class="brief-card"><h3>iPhone and Android</h3><p>Use LocalSend, USB through a computer, or another shared storage route.</p></article><article class="brief-card"><h3>Computer to phone</h3><p>Use a USB cable, Finder on Mac for iPhone, Apple Devices on Windows, or Android File Transfer style tools when needed.</p></article></section>
+          
+        </article>
+        <aside class="side-card" aria-label="Page summary">
+          <img src="./img/phone-transfer-visual.svg" alt="Two phones transferring resources" loading="lazy">
+          <h2>Read this page when...</h2>
+          <p>You need a short explanation of transfer resources between devices for a board member, missionary, or ministry partner.</p>
+          <div class="related" aria-label="Related pages"><a href="./phone-distribution.html">Phone-Based Gospel Distribution</a><a href="./access.html">Get and Share Resources</a><a href="./pamphlets.html">Printable Pamphlets and Field FAQ</a><a href="./sharing-library.html">Phones, SD, and USB Sharing</a></div>
+        </aside>
+      </div>
+    </section>
   </main>
-  <footer class="site-footer resource-footer"><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span><a href="./pamphlets.html">Printable pamphlets &amp; FAQ</a> · <a href="./access.html">Return to access guide</a></span></div></footer>
+  <footer class="footer"><div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
-  <script>
-    const routes=[...document.querySelectorAll('.transfer-route')];
-    routes.forEach(route=>route.addEventListener('toggle',()=>{if(!route.open)return;routes.forEach(other=>{if(other!==route)other.open=false});history.replaceState(null,'','#'+route.id)}));
-    const selected=location.hash&&document.querySelector(location.hash+'.transfer-route');if(selected)selected.open=true;
-  </script>
 </body>
 </html>
