@@ -36,3 +36,10 @@
 
 /* Let the main VillageServer banner leave the viewport with normal scrolling. */
 .site-header{position:relative;top:auto}
+
+/* VillageServer blue system: keep public pages visually aligned with the clean homepage. */
+:root{--forest:#1e4f8c;--forest-2:#163e70;--leaf:#2f6fb0;--lime:#f5c45e;--sun:#f0b54a;--blue:#1e4f8c;--sand:#eef3fb;--paper:#f7fbff;--line:#d6deea;--ochre:#d99a2b}
+.site-header{background:#f7fbff;border-bottom:1px solid var(--line)}
+.site-footer{background:#143a6b}
+.footer-brand .official-logo{background:#fff}
+.path-card:hover,.path-card:focus-visible{background:#edf4ff}

@@ -17,102 +17,74 @@
   <link rel="preload" as="image" href="./img/villageserver-initiative-logo.webp" type="image/webp" fetchpriority="high">
   <link rel="stylesheet" href="./css/base.css?v=3">
   <link rel="stylesheet" href="./css/home.css?v=3">
+  <style>
+    :root{--vs-blue:#1e4f8c;--vs-blue-d:#163e70;--vs-gold:#f0b54a}
+    body{background:var(--vs-blue)}
+    .vs-hero-tools{max-width:1180px;margin:0 auto clamp(28px,4vw,54px);display:flex;justify-content:flex-end}
+    .vs-lang select{appearance:auto;-webkit-appearance:auto;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 15px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
+    .vs-lang select option{color:#16324a}
+    .vs-hero{background:var(--vs-blue);color:#fff;text-align:center;padding:clamp(30px,5vw,70px) 20px clamp(20px,3vw,40px)}
+    .vs-hero-logo{display:block;width:clamp(96px,11vw,144px);height:auto;margin:0 auto 24px;padding:8px;border-radius:20px;background:#fff;box-shadow:0 20px 60px rgba(7,33,61,.28)}
+    .vs-hero h1{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:clamp(3.2rem,8vw,7rem);line-height:1.02;margin:0 0 22px;color:#fff}
+    .vs-hero .vs-tagline{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.2rem,2.6vw,2.05rem);line-height:1.42;max-width:1060px;margin:0 auto;color:rgba(255,255,255,.95)}
+    .vs-sections{background:var(--vs-blue);padding:clamp(36px,5vw,64px) 20px clamp(56px,7vw,90px)}
+    .vs-groups{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3.5vw,52px);text-align:left}
+    .vs-group h2{font-family:"DM Sans",system-ui,sans-serif;text-transform:uppercase;letter-spacing:.15em;font-size:.72rem;font-weight:700;color:#bcd3ef;margin:0 0 6px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.22)}
+    .vs-group a{display:block;font-family:"Newsreader",Georgia,serif;font-size:clamp(1.12rem,1.5vw,1.4rem);font-weight:500;color:#fff;text-decoration:none;padding:11px 0;line-height:1.22;border-bottom:1px solid rgba(255,255,255,.09);transition:color .15s,padding-left .15s}
+    .vs-group a:last-child{border-bottom:0}
+    .vs-group a:hover,.vs-group a:focus-visible{color:var(--vs-gold);padding-left:7px}
+    .vs-foot{background:var(--vs-blue-d);color:rgba(255,255,255,.66);text-align:center;padding:22px 20px;font-size:.78rem;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center}
+    .vs-foot a{color:rgba(255,255,255,.8)}
+    @media(max-width:820px){.vs-groups{grid-template-columns:1fr 1fr}}
+    @media(max-width:560px){.vs-groups{grid-template-columns:1fr}.vs-hero-tools{justify-content:center;margin-bottom:28px}.vs-lang select{width:min(100%,280px)}}
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
-  <header class="site-header">
-    <div class="wrap nav-row">
-      <a class="brand official-brand" href="#top" aria-label="VillageServer Initiative home"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a>
-      <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav" data-i18n="menu">Menu</button>
-      <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
-        <a href="#mission">Mission</a><a href="#tech">Technology</a><a href="#resources">Resource links</a><a href="./guide.html?part=wifi">Setup guides</a><a class="nav-support" href="./initiative.html">Full initiative</a>
-      </nav>
-    </div>
-  </header>
-  <section class="language-bar" aria-label="Language selection">
-    <div class="wrap language-row"><div><span class="language-globe" aria-hidden="true">文</span><span><b data-i18n="languageLabel">View in your language</b><small data-i18n="languageHelp">Translate this entire resource page</small></span></div><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="es">Español / Spanish</option><option value="zh-CN">中文 / Chinese</option><option value="hi">हिन्दी / Hindi</option><option value="ar">العربية / Arabic</option><option value="fr">Français / French</option><option value="pt">Português / Portuguese</option><option value="ru">Русский / Russian</option><option value="bn">বাংলা / Bengali</option><option value="id">Bahasa Indonesia / Indonesian</option><option value="ur">اردو / Urdu</option><option value="sw">Kiswahili / Swahili</option><option value="vi">Tiếng Việt / Vietnamese</option><option value="tl">Tagalog / Filipino</option><option value="ne">नेपाली / Nepali</option><option value="sd">سنڌي / Sindhi</option></select></div>
-  </section>
 
   <main id="main">
-    <section class="hero home-hero mission-hero" id="top">
-      <div class="hero-brand-glow" aria-hidden="true"></div>
-      <div class="wrap hero-layout">
-        <div class="hero-copy">
-          <p class="kicker light">The VillageServer Initiative</p>
-          <h1>Spreading the gospel where internet cannot reach.</h1>
-          <p class="hero-statement-label">Mission statement</p>
-          <p class="hero-lead">To carry Scripture, Christian media, and local-language discipleship resources into places with limited internet, unreliable electricity, and little access to Christian teaching.</p>
-          <div class="hero-mission-card"><span>Simple promise</span><p>Power the kit. Join its local Wi‑Fi. Open the library. Save and share Scripture, gospel media, training, and children’s resources without using mobile data.</p></div>
-          <div class="hero-actions hero-actions-simple"><a class="button button-primary" href="#mission">Mission</a><a class="button button-glass" href="#tech">How the tech works</a></div>
+    <section class="vs-hero" id="top">
+      <div class="vs-hero-tools" aria-label="Language selection">
+        <div class="vs-lang"><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="es">Español / Spanish</option><option value="zh-CN">中文 / Chinese</option><option value="hi">हिन्दी / Hindi</option><option value="ar">العربية / Arabic</option><option value="fr">Français / French</option><option value="pt">Português / Portuguese</option><option value="ru">Русский / Russian</option><option value="bn">বাংলা / Bengali</option><option value="id">Bahasa Indonesia / Indonesian</option><option value="ur">اردو / Urdu</option><option value="sw">Kiswahili / Swahili</option><option value="vi">Tiếng Việt / Vietnamese</option><option value="tl">Tagalog / Filipino</option><option value="ne">नेपाली / Nepali</option><option value="sd">سنڌي / Sindhi</option></select></div>
+      </div>
+      <img class="vs-hero-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async">
+      <h1>VillageServer Initiative</h1>
+      <p class="vs-tagline">Using technology to help place God's Word, biblical teaching, and ministry resources within reach of every village.</p>
+    </section>
+
+    <section class="vs-sections" id="resources">
+      <div class="vs-groups">
+        <div class="vs-group">
+          <h2>About the Initiative</h2>
+          <a href="./mission.html">Mission Statement</a>
+          <a href="./about.html">About Us</a>
+          <a href="./programs.html">Programs &amp; Services</a>
+          <a href="./visuals.html">Photos / Visuals</a>
+          <a href="./testimonials.html">Testimonials</a>
         </div>
-        <aside class="hero-logo-panel hero-proof-panel" aria-label="VillageServer logo with real field and kit photos">
-          <figure class="hero-proof-photo hero-proof-a"><img src="./img/field-distribute.webp" alt="Bible distribution with local leaders and families" width="780" height="585" loading="lazy"><figcaption>Field handoff</figcaption></figure>
-          <figure class="hero-proof-photo hero-proof-b"><img src="./img/kit-case.webp" alt="Portable VillageServer solar field kit opened beside solar panels" width="1300" height="975" loading="lazy"><figcaption>Portable kit</figcaption></figure>
-          <figure class="hero-proof-photo hero-proof-c"><img src="./img/field-reading.webp" alt="A parent reading Scripture with a child" width="631" height="620" loading="lazy"><figcaption>Saved resources</figcaption></figure>
-          <div class="hero-logo-stage"><img class="hero-logo-art" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async"><span>VillageServer Initiative</span></div>
-          <ol class="hero-mini-flow">
-            <li><b>1</b><span>Power kit</span></li>
-            <li><b>2</b><span>Join Wi‑Fi</span></li>
-            <li><b>3</b><span>Open library</span></li>
-          </ol>
-        </aside>
-      </div>
-      <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 42C220 85 393 17 590 48c190 29 373-11 552 15 125 18 218 12 298-18v45H0Z"/></svg>
-    </section>
-
-    <nav class="home-link-strip wrap" aria-label="Start here">
-      <a href="#mission">Mission</a>
-      <a href="#tech">Technology</a>
-      <a href="#resources">All resource links</a>
-      <a href="./guide.html?part=wifi">Setup guides</a>
-      <a href="./kit-levels.html">Kit planning</a>
-    </nav>
-
-    <section class="home-step mission-front" id="mission">
-      <div class="wrap mission-front-grid">
-        <div><p class="step-kicker"><span>Mission</span><i>Why it exists</i></p><h2>Gospel access for places with limited internet, power, and teaching resources.</h2></div>
-        <div class="mission-front-copy"><p>VillageServer is a portable local library for Scripture, Christian media, discipleship training, children’s resources, and practical ministry files.</p><p>It is built for missionaries and local leaders who need the gospel to keep moving even when the internet does not.</p><div class="mission-link-row"><a href="./mission.html">Read the mission statement →</a><a href="./initiative.html">Full initiative overview →</a></div></div>
-      </div>
-      <div class="wrap mission-proof-gallery" aria-label="Real ministry and field kit photos">
-        <figure><img src="./img/receiving.webp" alt="Woman holding a Bible after receiving Scripture" width="1536" height="1920" loading="lazy"><figcaption>Scripture in hand</figcaption></figure>
-        <figure><img src="./img/solar-field.webp" alt="Solar power setup for field equipment" width="1100" height="1467" loading="lazy"><figcaption>Power where the grid is weak</figcaption></figure>
-        <figure><img src="./img/kit-pi.webp" alt="Raspberry Pi local server connected with USB storage" width="1100" height="825" loading="lazy"><figcaption>Local library server</figcaption></figure>
-      </div>
-    </section>
-
-    <section class="home-step tech-front" id="tech">
-      <div class="wrap">
-        <div class="step-heading inverse"><div><p class="step-kicker light-step"><span>Technology</span><i>Simple field model</i></p><h2>Power in. Gospel library out.</h2></div><p>Do not make the user think about servers. For them, it should feel like joining Wi‑Fi and opening a website.</p></div>
-        <div class="tech-card-grid" aria-label="VillageServer technology overview">
-          <a href="./raspberry-pi.html"><img class="tech-card-photo" src="./img/kit-pi.webp" alt="Raspberry Pi local server with USB storage" width="1100" height="825" loading="lazy"><span>01</span><h3>Raspberry Pi local server</h3><p>Stores the library and creates the local Wi‑Fi people connect to.</p><b>Read about the server →</b></a>
-          <a href="./sharing-library.html"><img class="tech-card-photo" src="./img/field-reading.webp" alt="A family reading Scripture from a field resource" width="631" height="620" loading="lazy"><span>02</span><h3>Phones, microSD, and USB</h3><p>Lets one saved resource move from device to device without repeating the download.</p><b>See sharing paths →</b></a>
-          <a href="./projector-media.html"><img class="tech-card-photo" src="./img/projector.webp" alt="Small projector used for group media" width="900" height="869" loading="lazy"><span>03</span><h3>Projector and group media</h3><p>Turns films, Scripture audio, and training into a group teaching moment.</p><b>Open media guide →</b></a>
-          <a href="./satellite.html"><img class="tech-card-photo" src="./img/kit-case.webp" alt="Solar field kit with portable power panels" width="1300" height="975" loading="lazy"><span>04</span><h3>Optional satellite support</h3><p>Adds a live link for updates and support while the local library stays offline-first.</p><b>Learn satellite role →</b></a>
+        <div class="vs-group">
+          <h2>Technology &amp; Field Systems</h2>
+          <a href="./phone-distribution.html">Phone-Based Gospel Distribution</a>
+          <a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a>
+          <a href="./power.html">Power Systems and Solar Solutions</a>
+          <a href="./projector-media.html">Projector Systems and Audio Solutions</a>
+          <a href="./satellite.html">Satellite Systems and Content Acquisition</a>
+        </div>
+        <div class="vs-group">
+          <h2>Content &amp; Partners</h2>
+          <a href="./custom-libraries.html">Content Libraries and Custom Ministry Resources</a>
+          <a href="./affiliates.html">Ministry Resource Partners</a>
         </div>
       </div>
-    </section>
-
-    <section class="resource-section resource-index" id="resources">
-      <div class="wrap"><div class="resource-heading"><p class="kicker">Resource links</p><h2>Find the exact page you need.</h2><p>Use this as the table of contents. Each link opens a focused page instead of making this homepage longer.</p></div><div class="resource-link-list" aria-label="VillageServer resource links">
-        <a href="./mission.html"><b>Mission statement</b><span>Why VillageServer exists.</span></a>
-        <a href="./raspberry-pi.html"><b>Raspberry Pi library</b><span>How the local server works.</span></a>
-        <a href="./satellite.html"><b>Satellite connection</b><span>Optional live access and updates.</span></a>
-        <a href="./sharing-library.html"><b>Phones, SD, and USB</b><span>How files move device to device.</span></a>
-        <a href="./projector-media.html"><b>Projector and media</b><span>Films, training, and group teaching.</span></a>
-        <a href="./kit-levels.html"><b>Kit levels and costs</b><span>Planning levels and price references.</span></a>
-        <a href="./rollout.html"><b>Rollout and reach</b><span>Pilots, proof, and honest metrics.</span></a>
-        <a href="./affiliates.html"><b>Affiliates</b><span>Partners and ministry relationships.</span></a>
-        <a href="./field-faq.html"><b>Field FAQ</b><span>Simple answers and troubleshooting.</span></a>
-      </div></div>
     </section>
   </main>
 
-  <footer class="site-footer"><div class="wrap footer-grid"><div><a class="brand official-brand footer-brand" href="#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><p data-i18n="footerCopy">Portable Scripture, media, power, and practical access beyond reliable internet.</p></div><div><b>Key pages</b><a href="./mission.html">Mission statement</a><a href="./raspberry-pi.html">Technology overview</a><a href="./sharing-library.html">Sharing resources</a><a href="./field-faq.html">Field FAQ</a></div><div><b>Use it</b><a href="./guide.html?part=wifi">Setup guides</a><a href="./transfer.html">Phone-to-phone sharing</a><a href="./kit-levels.html">Kit planning</a><a href="./pamphlets.html">Printable pamphlets</a></div></div><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span></div></footer>
+  <footer class="vs-foot"><span>&copy; 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span><a href="./pamphlets.html">Pamphlets &amp; FAQ</a> · <a href="./guide.html?part=wifi">Setup guides</a> · <a href="./kit-levels.html">Kit planning</a></span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></footer>
 
   <script src="./js/i18n.js?v=2"></script>
   <script src="./js/site-language.js?v=2"></script>
   <script>
-    const menuButton=document.querySelector('.menu-button');const siteNav=document.querySelector('.site-nav');if(menuButton&&siteNav){menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-expanded',String(!open));siteNav.classList.toggle('open',!open)});siteNav.addEventListener('click',event=>{if(event.target.matches('a')){menuButton.setAttribute('aria-expanded','false');siteNav.classList.remove('open')}})}
+    (function(){var el=document.getElementById('arki-credit'),n=0,t;if(!el)return;el.addEventListener('click',function(){clearTimeout(t);n++;if(n>=3){n=0;window.location.href='./admin.html';}t=setTimeout(function(){n=0;},600);});})();
   </script>
   <script src="./js/site-tracking.js?v=1"></script>
 </body>

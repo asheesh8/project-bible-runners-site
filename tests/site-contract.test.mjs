@@ -8,14 +8,35 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pages = ['landing/index.html', 'landing/index-b.html'];
 const topicPages = [
   'landing/mission.html',
+  'landing/about.html',
+  'landing/programs.html',
+  'landing/visuals.html',
+  'landing/testimonials.html',
+  'landing/phone-distribution.html',
   'landing/raspberry-pi.html',
+  'landing/power.html',
   'landing/satellite.html',
   'landing/sharing-library.html',
   'landing/projector-media.html',
   'landing/kit-levels.html',
   'landing/rollout.html',
+  'landing/custom-libraries.html',
   'landing/affiliates.html',
   'landing/field-faq.html',
+];
+const homepageResourcePages = [
+  'mission.html',
+  'about.html',
+  'programs.html',
+  'visuals.html',
+  'testimonials.html',
+  'phone-distribution.html',
+  'raspberry-pi.html',
+  'power.html',
+  'projector-media.html',
+  'satellite.html',
+  'custom-libraries.html',
+  'affiliates.html',
 ];
 
 function read(relativePath) {
@@ -109,50 +130,46 @@ test('the missionary pamphlet library exposes every printable field route', () =
   for (const [, source] of scripts) new Function(source);
 });
 
-test('the homepage follows a simpler mission-first consumer journey', () => {
+test('the homepage is a clean blue, mission-first resource directory', () => {
   const html = read('landing/index.html');
-  for (const id of ['mission', 'tech', 'resources']) {
-    assert.match(html, new RegExp(`id="${id}"`));
-  }
-  assert.ok(html.indexOf('id="mission"') < html.indexOf('id="tech"'));
-  assert.ok(html.indexOf('id="tech"') < html.indexOf('id="resources"'));
-  assert.match(html, /Spreading the gospel where internet cannot reach/);
-  assert.match(html, /Mission statement/);
-  assert.match(html, /home-link-strip/);
-  assert.match(html, /hero-proof-panel/);
-  assert.match(html, /mission-proof-gallery/);
-  assert.match(html, /Power in\. Gospel library out\./);
-  assert.match(html, /class="tech-card-grid"/);
-  assert.match(html, /class="tech-card-photo"/);
+  assert.match(html, /id="top"/);
+  assert.match(html, /id="resources"/);
+  assert.match(html, /VillageServer Initiative/);
+  assert.match(html, /Using technology to help place God's Word/);
+  assert.match(html, /About the Initiative/);
+  assert.match(html, /Technology &amp; Field Systems/);
+  assert.match(html, /Content &amp; Partners/);
+  assert.match(html, /class="vs-hero"/);
+  assert.match(html, /class="vs-groups"/);
+  assert.match(html, /class="vs-hero-logo"/);
+  assert.match(html, /class="vs-hero-tools"/);
+  assert.match(html, /id="language-select"/);
+  assert.doesNotMatch(html, /class="vs-top"|class="site-header"|class="site-nav"|class="menu-button"|class="language-bar"/);
   assert.doesNotMatch(html, /I already have a kit/);
-  assert.doesNotMatch(html, /id="availability"|id="setup"|setup-widget|kit-modal|open-kit-form|model-hotspot|setup-model-object|kit-3d-stage/);
+  assert.doesNotMatch(html, /id="availability"|id="setup"|setup-widget|kit-modal|open-kit-form|model-hotspot|setup-model-object|kit-3d-stage|hero-proof-panel|tech-card-grid/);
   assert.match(html, /\.\/kit-levels\.html/);
 });
 
-test('homepage tech overview and link directory stay compact', () => {
-  const css = read('landing/css/home.css');
-  assert.match(css, /\.mission-front-grid\{display:grid/);
-  assert.match(css, /\.tech-card-grid\{display:grid;grid-template-columns:repeat\(4,1fr\)/);
-  assert.match(css, /\.resource-link-list\{display:grid;grid-template-columns:repeat\(3,1fr\)/);
-  assert.match(css, /@media\(max-width:620px\).*\.tech-card-grid,\.resource-link-list\{grid-template-columns:1fr\}/s);
+test('homepage blue layout stays compact and grouped', () => {
+  const html = read('landing/index.html');
+  assert.match(html, /--vs-blue:#1e4f8c/);
+  assert.match(html, /--vs-blue-d:#163e70/);
+  assert.match(html, /\.vs-groups\{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat\(3,1fr\)/);
+  assert.match(html, /@media\(max-width:560px\)\{\.vs-groups\{grid-template-columns:1fr\}/);
+  assert.doesNotMatch(html, /<header[\s\S]*?<\/header>/);
 });
 
-test('homepage resource directory links to every focused topic page', () => {
+test('homepage resource directory links to the focused topic pages without visual clutter', () => {
   const html = read('landing/index.html');
-  const css = read('landing/css/home.css');
-  assert.match(html, /class="resource-link-list"/);
-  for (const asset of ['field-distribute.webp', 'kit-case.webp', 'receiving.webp', 'solar-field.webp', 'kit-pi.webp', 'projector.webp']) {
-    assert.match(html, new RegExp(`\\./img/${asset}`));
-    assert.ok(existsSync(join(root, 'landing/img', asset)), `${asset} should exist for photo-first homepage sections`);
-  }
-  const directory = html.match(/<div class="resource-link-list"[\s\S]*?<\/div><\/div>\s*<\/section>/)?.[0] || '';
-  assert.equal([...directory.matchAll(/<a href="\.\/(?:mission|raspberry-pi|satellite|sharing-library|projector-media|kit-levels|rollout|affiliates|field-faq)\.html"/g)].length, 9);
-  for (const page of topicPages) {
-    const href = page.replace('landing/', './');
+  assert.match(html, /class="vs-groups"/);
+  assert.ok(existsSync(join(root, 'landing/img/villageserver-initiative-logo.webp')));
+  const directory = html.match(/<section class="vs-sections"[\s\S]*?<\/section>/)?.[0] || '';
+  assert.equal([...directory.matchAll(/<a href="\.\/[a-z0-9-]+\.html"/g)].length, homepageResourcePages.length);
+  for (const page of homepageResourcePages) {
+    const href = `./${page}`;
     assert.match(html, new RegExp(`href="${href.replace('.', '\\.')}"`));
-    assert.ok(existsSync(join(root, page)), `${page} should exist`);
+    assert.ok(existsSync(join(root, 'landing', page)), `${page} should exist`);
   }
-  assert.match(css, /\.resource-link-list\{display:grid;grid-template-columns:repeat\(3,1fr\)/);
   assert.match(read('landing/satellite.html'), /Satellite adds a live link/);
   assert.match(read('landing/mission.html'), /Carry the gospel where access is limited/);
 });
@@ -214,7 +231,7 @@ test('the homepage links out instead of embedding the setup widget', () => {
   const html = read('landing/index.html');
   assert.ok(existsSync(join(root, 'landing/guide.html')));
   assert.match(html, /\.\/guide\.html\?part=wifi/);
-  for (const page of ['mission.html', 'raspberry-pi.html', 'sharing-library.html', 'projector-media.html', 'satellite.html', 'kit-levels.html']) {
+  for (const page of ['mission.html', 'phone-distribution.html', 'raspberry-pi.html', 'power.html', 'projector-media.html', 'satellite.html', 'kit-levels.html']) {
     assert.match(html, new RegExp(`\\./${page}`));
   }
   assert.doesNotMatch(html, /data-setup=|id="setup-model"|function paintSetupModel|const setupData/);
@@ -250,7 +267,9 @@ test('deep content is split into resource pages and old campaign branding is gon
     assert.ok(existsSync(join(root, page)), `${page} should exist`);
   }
   assert.equal(existsSync(join(root, 'landing/donate.html')), false, 'donation page should be out of the public bundle');
-  assert.match(html, /Find the exact page you need/);
+  assert.match(html, /VillageServer Initiative/);
+  assert.match(html, /About the Initiative/);
+  assert.match(html, /Technology &amp; Field Systems/);
   assert.doesNotMatch(html, /Where will the kit be used\?|Choose one item\. The widget/);
 });
 
@@ -334,19 +353,19 @@ test('admin includes an accurate traffic-attribution FAQ', () => {
 for (const page of pages) {
   test(`${page} uses the logo as the high-priority hero visual`, () => {
     const html = read(page);
-    assert.match(html, /<img[^>]+class="hero-logo-art"[^>]+src="\.\/img\/villageserver-initiative-logo\.webp"/s);
-    assert.match(html, /<img[^>]+class="hero-logo-art"[^>]+fetchpriority="high"/s);
-    assert.match(html, /<img[^>]+class="hero-logo-art"[^>]+width="1254"[^>]+height="1254"/s);
+    assert.match(html, /<img[^>]+class="vs-hero-logo"[^>]+src="\.\/img\/villageserver-initiative-logo\.webp"/s);
+    assert.match(html, /<img[^>]+class="vs-hero-logo"[^>]+fetchpriority="high"/s);
+    assert.match(html, /<img[^>]+class="vs-hero-logo"[^>]+width="1254"[^>]+height="1254"/s);
     assert.doesNotMatch(html, /class="hero-media"[^>]+hero-field\.webp/s);
     assert.doesNotMatch(html, /new Image\(\)/);
     assert.doesNotMatch(html, /data:image|var lqip=/);
-    assert.match(html, /<svg[^>]+class="hero-wave"[^>]+aria-hidden="true"/s);
+    assert.doesNotMatch(html, /<svg[^>]+class="hero-wave"/s);
   });
 
   test(`${page} uses portable local asset URLs and every asset exists`, () => {
     const html = read(page);
-    const assetMatches = [...html.matchAll(/(?:src|href)="(\.\/(?:img|css)\/[^"?#]+)"/g)];
-    assert.ok(assetMatches.length >= 4, 'expected local image and stylesheet references');
+    const assetMatches = [...html.matchAll(/(?:src|href)="(\.\/(?:img|css)\/[^"?#]+)(?:\?[^"]*)?"/g)];
+    assert.ok(assetMatches.length >= 3, 'expected local image and stylesheet references');
     assert.doesNotMatch(html, /(?:src|href)="(?:img|css)\//);
 
     for (const [, assetPath] of assetMatches) {

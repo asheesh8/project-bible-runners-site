@@ -20,13 +20,11 @@
   <style>
     :root{--vs-blue:#1e4f8c;--vs-blue-d:#163e70;--vs-gold:#f0b54a}
     body{background:var(--vs-blue)}
-    .vs-top{background:var(--vs-blue-d);display:flex;align-items:center;justify-content:flex-end;gap:16px;padding:10px clamp(16px,4vw,42px)}
-    .vs-top .vs-logo{display:flex;align-items:center;gap:11px;text-decoration:none}
-    .vs-top .vs-logo img{height:44px;width:auto;background:#fff;border-radius:10px;padding:5px;box-shadow:0 2px 12px rgba(0,0,0,.18)}
-    .vs-top .vs-logo b{color:#fff;font-family:"Newsreader",Georgia,serif;font-size:1.2rem;font-weight:600;letter-spacing:.01em}
-    .vs-lang select{appearance:none;-webkit-appearance:none;background:rgba(255,255,255,.12) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 12px center;color:#fff;border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 32px 8px 15px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
+    .vs-hero-tools{max-width:1180px;margin:0 auto clamp(28px,4vw,54px);display:flex;justify-content:flex-end}
+    .vs-lang select{appearance:auto;-webkit-appearance:auto;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 15px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
     .vs-lang select option{color:#16324a}
-    .vs-hero{background:var(--vs-blue);color:#fff;text-align:center;padding:clamp(48px,6vw,88px) 20px clamp(20px,3vw,40px)}
+    .vs-hero{background:var(--vs-blue);color:#fff;text-align:center;padding:clamp(30px,5vw,70px) 20px clamp(20px,3vw,40px)}
+    .vs-hero-logo{display:block;width:clamp(96px,11vw,144px);height:auto;margin:0 auto 24px;padding:8px;border-radius:20px;background:#fff;box-shadow:0 20px 60px rgba(7,33,61,.28)}
     .vs-hero h1{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:clamp(3.2rem,8vw,7rem);line-height:1.02;margin:0 0 22px;color:#fff}
     .vs-hero .vs-tagline{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.2rem,2.6vw,2.05rem);line-height:1.42;max-width:1060px;margin:0 auto;color:rgba(255,255,255,.95)}
     .vs-sections{background:var(--vs-blue);padding:clamp(36px,5vw,64px) 20px clamp(56px,7vw,90px)}
@@ -38,17 +36,18 @@
     .vs-foot{background:var(--vs-blue-d);color:rgba(255,255,255,.66);text-align:center;padding:22px 20px;font-size:.78rem;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center}
     .vs-foot a{color:rgba(255,255,255,.8)}
     @media(max-width:820px){.vs-groups{grid-template-columns:1fr 1fr}}
-    @media(max-width:560px){.vs-groups{grid-template-columns:1fr}.vs-top .vs-logo b{display:none}}
+    @media(max-width:560px){.vs-groups{grid-template-columns:1fr}.vs-hero-tools{justify-content:center;margin-bottom:28px}.vs-lang select{width:min(100%,280px)}}
   </style>
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
-  <header class="vs-top">
-    <div class="vs-lang"><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="es">Español / Spanish</option><option value="zh-CN">中文 / Chinese</option><option value="hi">हिन्दी / Hindi</option><option value="ar">العربية / Arabic</option><option value="fr">Français / French</option><option value="pt">Português / Portuguese</option><option value="ru">Русский / Russian</option><option value="bn">বাংলা / Bengali</option><option value="id">Bahasa Indonesia / Indonesian</option><option value="ur">اردو / Urdu</option><option value="sw">Kiswahili / Swahili</option><option value="vi">Tiếng Việt / Vietnamese</option><option value="tl">Tagalog / Filipino</option><option value="ne">नेपाली / Nepali</option><option value="sd">سنڌي / Sindhi</option></select></div>
-  </header>
 
   <main id="main">
     <section class="vs-hero" id="top">
+      <div class="vs-hero-tools" aria-label="Language selection">
+        <div class="vs-lang"><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="es">Español / Spanish</option><option value="zh-CN">中文 / Chinese</option><option value="hi">हिन्दी / Hindi</option><option value="ar">العربية / Arabic</option><option value="fr">Français / French</option><option value="pt">Português / Portuguese</option><option value="ru">Русский / Russian</option><option value="bn">বাংলা / Bengali</option><option value="id">Bahasa Indonesia / Indonesian</option><option value="ur">اردو / Urdu</option><option value="sw">Kiswahili / Swahili</option><option value="vi">Tiếng Việt / Vietnamese</option><option value="tl">Tagalog / Filipino</option><option value="ne">नेपाली / Nepali</option><option value="sd">سنڌي / Sindhi</option></select></div>
+      </div>
+      <img class="vs-hero-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async">
       <h1>VillageServer Initiative</h1>
       <p class="vs-tagline">Using technology to help place God's Word, biblical teaching, and ministry resources within reach of every village.</p>
     </section>
@@ -81,12 +80,11 @@
 
   </main>
 
-  <footer class="vs-foot"><span>&copy; 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></footer>
+  <footer class="vs-foot"><span>&copy; 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span><a href="./pamphlets.html">Pamphlets &amp; FAQ</a> · <a href="./guide.html?part=wifi">Setup guides</a> · <a href="./kit-levels.html">Kit planning</a></span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></footer>
 
   <script src="./js/i18n.js?v=2"></script>
   <script src="./js/site-language.js?v=2"></script>
   <script>
-    const menuButton=document.querySelector('.menu-button');const siteNav=document.querySelector('.site-nav');if(menuButton&&siteNav){menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-expanded',String(!open));siteNav.classList.toggle('open',!open)});siteNav.addEventListener('click',event=>{if(event.target.matches('a')){menuButton.setAttribute('aria-expanded','false');siteNav.classList.remove('open')}})}
     (function(){var el=document.getElementById('arki-credit'),n=0,t;if(!el)return;el.addEventListener('click',function(){clearTimeout(t);n++;if(n>=3){n=0;window.location.href='./admin.html';}t=setTimeout(function(){n=0;},600);});})();
   </script>
   <script src="./js/site-tracking.js?v=1"></script>
