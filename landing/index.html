@@ -17,6 +17,16 @@
   <link rel="preload" as="image" href="./img/villageserver-initiative-logo.webp" type="image/webp" fetchpriority="high">
   <link rel="stylesheet" href="./css/base.css?v=3">
   <link rel="stylesheet" href="./css/home.css?v=3">
+  <style>
+    .vs-banner{background:#1e4f8c;color:#fff;text-align:center;padding:clamp(54px,7vw,96px) 20px clamp(44px,6vw,76px)}
+    .vs-banner h1{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:clamp(3.4rem,8.5vw,7.5rem);line-height:1.02;letter-spacing:.01em;margin:0 0 24px;color:#fff}
+    .vs-banner p{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.25rem,2.7vw,2.2rem);line-height:1.4;max-width:1120px;margin:0 auto;color:rgba(255,255,255,.96)}
+    .vs-directory{background:#fff;padding:clamp(44px,6vw,76px) 20px}
+    .vs-directory nav{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;row-gap:20px;column-gap:48px}
+    .vs-directory a{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:clamp(1.45rem,2.5vw,2.1rem);line-height:1.18;color:#16324a;text-decoration:none}
+    .vs-directory a:hover,.vs-directory a:focus-visible{color:#c8821a}
+    @media(max-width:600px){.vs-directory nav{row-gap:16px;column-gap:28px}}
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
@@ -34,47 +44,28 @@
   </section>
 
   <main id="main">
-    <section class="hero home-hero mission-hero" id="top">
-      <div class="hero-brand-glow" aria-hidden="true"></div>
-      <div class="wrap hero-layout">
-        <div class="hero-copy">
-          <p class="kicker light">The VillageServer Initiative</p>
-          <h1>Spreading the gospel where internet cannot reach.</h1>
-          <p class="hero-statement-label">Mission statement</p>
-          <p class="hero-lead">To carry Scripture, Christian media, and local-language discipleship resources into places with limited internet, unreliable electricity, and little access to Christian teaching.</p>
-          <div class="hero-mission-card"><span>Simple promise</span><p>Power the kit. Join its local Wi‑Fi. Open the library. Save and share Scripture, gospel media, training, and children’s resources without using mobile data.</p></div>
-          <div class="hero-actions hero-actions-simple"><a class="button button-primary" href="#mission">Mission</a><a class="button button-glass" href="#tech">How the tech works</a></div>
-        </div>
-        <aside class="hero-logo-panel hero-proof-panel" aria-label="VillageServer logo with real field and kit photos">
-          <figure class="hero-proof-photo hero-proof-a"><img src="./img/field-distribute.webp" alt="Bible distribution with local leaders and families" width="780" height="585" loading="lazy"><figcaption>Field handoff</figcaption></figure>
-          <figure class="hero-proof-photo hero-proof-b"><img src="./img/kit-case.webp" alt="Portable VillageServer solar field kit opened beside solar panels" width="1300" height="975" loading="lazy"><figcaption>Portable kit</figcaption></figure>
-          <figure class="hero-proof-photo hero-proof-c"><img src="./img/field-reading.webp" alt="A parent reading Scripture with a child" width="631" height="620" loading="lazy"><figcaption>Saved resources</figcaption></figure>
-          <div class="hero-logo-stage"><img class="hero-logo-art" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async"><span>VillageServer Initiative</span></div>
-          <ol class="hero-mini-flow">
-            <li><b>1</b><span>Power kit</span></li>
-            <li><b>2</b><span>Join Wi‑Fi</span></li>
-            <li><b>3</b><span>Open library</span></li>
-          </ol>
-        </aside>
+    <section class="vs-banner" id="top">
+      <div class="wrap">
+        <h1>VillageServer Initiative</h1>
+        <p>Using technology to help place God's Word, biblical teaching, and ministry resources within reach of every village.</p>
       </div>
-      <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 42C220 85 393 17 590 48c190 29 373-11 552 15 125 18 218 12 298-18v45H0Z"/></svg>
     </section>
 
-    <section class="resource-section resource-index" id="resources">
-      <div class="wrap"><div class="resource-heading"><p class="kicker">Explore the initiative</p><h2>Every section, one place to start.</h2><p>Use this as the table of contents. Each link opens a focused page.</p></div><div class="resource-link-list" aria-label="VillageServer sections">
-        <a href="./mission.html"><b>Mission Statement</b><span>Why VillageServer exists.</span></a>
-        <a href="./about.html"><b>About Us</b><span>The fellowship behind the work.</span></a>
-        <a href="./programs.html"><b>Programs &amp; Services</b><span>Equipping ministries through technology.</span></a>
-        <a href="./visuals.html"><b>Photos / Visuals</b><span>The initiative in the field.</span></a>
-        <a href="./testimonials.html"><b>Testimonials</b><span>Stories from the field.</span></a>
-        <a href="./phone-distribution.html"><b>Phone-Based Gospel Distribution</b><span>Using phones to carry the Word.</span></a>
-        <a href="./raspberry-pi.html"><b>Raspberry Pi VillageServer System</b><span>The local server at the core.</span></a>
-        <a href="./power.html"><b>Power Systems and Solar Solutions</b><span>Reliable power for every kit.</span></a>
-        <a href="./projector-media.html"><b>Projector Systems and Audio Solutions</b><span>Films, training, and group teaching.</span></a>
-        <a href="./custom-libraries.html"><b>Content Libraries and Custom Ministry Resources</b><span>Build a library for your calling.</span></a>
-        <a href="./satellite.html"><b>Satellite Systems and Content Acquisition</b><span>From space to the village.</span></a>
-        <a href="./affiliates.html"><b>Ministry Resource Partners</b><span>Organizations and resources we use.</span></a>
-      </div></div>
+    <section class="vs-directory" id="resources">
+      <nav aria-label="VillageServer sections">
+        <a href="./mission.html">Mission Statement</a>
+        <a href="./about.html">About Us</a>
+        <a href="./programs.html">Programs &amp; Services</a>
+        <a href="./visuals.html">Photos / Visuals</a>
+        <a href="./testimonials.html">Testimonials</a>
+        <a href="./phone-distribution.html">Phone-Based Gospel Distribution</a>
+        <a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a>
+        <a href="./power.html">Power Systems and Solar Solutions</a>
+        <a href="./projector-media.html">Projector Systems and Audio Solutions</a>
+        <a href="./custom-libraries.html">Content Libraries and Custom Ministry Resources</a>
+        <a href="./satellite.html">Satellite Systems and Content Acquisition</a>
+        <a href="./affiliates.html">Ministry Resource Partners</a>
+      </nav>
     </section>
 
     <section class="home-step mission-front" id="mission">
