@@ -143,6 +143,8 @@ test('the homepage is a clean blue, mission-first resource directory', () => {
   assert.match(html, /class="vs-groups"/);
   assert.match(html, /class="vs-hero-logo"/);
   assert.match(html, /class="vs-hero-tools"/);
+  assert.match(html, /class="vs-logo-button"/);
+  assert.match(html, /id="logo-modal"/);
   assert.match(html, /id="language-select"/);
   assert.doesNotMatch(html, /class="vs-top"|class="site-header"|class="site-nav"|class="menu-button"|class="language-bar"/);
   assert.doesNotMatch(html, /I already have a kit/);
@@ -155,7 +157,7 @@ test('homepage blue layout stays compact and grouped', () => {
   assert.match(html, /--vs-blue:#1e4f8c/);
   assert.match(html, /--vs-blue-d:#163e70/);
   assert.match(html, /\.vs-groups\{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat\(3,1fr\)/);
-  assert.match(html, /@media\(max-width:560px\)\{\.vs-groups\{grid-template-columns:1fr\}/);
+  assert.match(html, /@media\(max-width:560px\)\{\.vs-groups,\.vs-tech-grid\{grid-template-columns:1fr\}/);
   assert.doesNotMatch(html, /<header[\s\S]*?<\/header>/);
 });
 
@@ -163,6 +165,11 @@ test('homepage resource directory links to the focused topic pages without visua
   const html = read('landing/index.html');
   assert.match(html, /class="vs-groups"/);
   assert.ok(existsSync(join(root, 'landing/img/villageserver-initiative-logo.webp')));
+  assert.match(html, /class="vs-tech-strip"/);
+  for (const asset of ['kit-pi.webp', 'dish.webp', 'projector.webp', 'solar-field.webp']) {
+    assert.match(html, new RegExp(`\\./img/${asset}`));
+    assert.ok(existsSync(join(root, 'landing/img', asset)), `${asset} should exist for homepage tech photos`);
+  }
   const directory = html.match(/<section class="vs-sections"[\s\S]*?<\/section>/)?.[0] || '';
   assert.equal([...directory.matchAll(/<a href="\.\/[a-z0-9-]+\.html"/g)].length, homepageResourcePages.length);
   for (const page of homepageResourcePages) {

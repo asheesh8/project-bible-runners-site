@@ -24,7 +24,11 @@
     .vs-lang select{appearance:auto;-webkit-appearance:auto;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:8px 15px;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
     .vs-lang select option{color:#16324a}
     .vs-hero{background:var(--vs-blue);color:#fff;text-align:center;padding:clamp(30px,5vw,70px) 20px clamp(20px,3vw,40px)}
-    .vs-hero-logo{display:block;width:clamp(96px,11vw,144px);height:auto;margin:0 auto 24px;padding:8px;border-radius:20px;background:#fff;box-shadow:0 20px 60px rgba(7,33,61,.28)}
+    .vs-logo-button{display:inline-flex;flex-direction:column;align-items:center;gap:8px;margin:0 auto 24px;padding:0;border:0;background:transparent;color:#d7e7fb;cursor:pointer}
+    .vs-logo-button:hover .vs-hero-logo,.vs-logo-button:focus-visible .vs-hero-logo{transform:translateY(-2px) scale(1.03);box-shadow:0 26px 72px rgba(7,33,61,.35)}
+    .vs-logo-button:focus-visible{outline:2px solid var(--vs-gold);outline-offset:8px;border-radius:24px}
+    .vs-hero-logo{display:block;width:clamp(96px,11vw,144px);height:auto;padding:8px;border-radius:20px;background:#fff;box-shadow:0 20px 60px rgba(7,33,61,.28);transition:transform .18s ease,box-shadow .18s ease}
+    .vs-logo-hint{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#c8ddf6}
     .vs-hero h1{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:clamp(3.2rem,8vw,7rem);line-height:1.02;margin:0 0 22px;color:#fff}
     .vs-hero .vs-tagline{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.2rem,2.6vw,2.05rem);line-height:1.42;max-width:1060px;margin:0 auto;color:rgba(255,255,255,.95)}
     .vs-sections{background:var(--vs-blue);padding:clamp(36px,5vw,64px) 20px clamp(56px,7vw,90px)}
@@ -35,8 +39,22 @@
     .vs-group a:hover,.vs-group a:focus-visible{color:var(--vs-gold);padding-left:7px}
     .vs-foot{background:var(--vs-blue-d);color:rgba(255,255,255,.66);text-align:center;padding:22px 20px;font-size:.78rem;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center}
     .vs-foot a{color:rgba(255,255,255,.8)}
+    .vs-tech-strip{background:var(--vs-blue);padding:clamp(18px,3vw,36px) 20px clamp(32px,5vw,58px)}
+    .vs-tech-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .vs-tech-card{position:relative;min-height:250px;border:1px solid rgba(255,255,255,.18);border-radius:22px;overflow:hidden;text-decoration:none;color:#fff;background:#163e70;box-shadow:0 18px 54px rgba(8,35,64,.22)}
+    .vs-tech-card img{width:100%;height:100%;object-fit:cover;filter:saturate(.95) contrast(1.04) brightness(.78);transition:transform .22s ease,filter .22s ease}
+    .vs-tech-card:hover img,.vs-tech-card:focus-visible img{transform:scale(1.04);filter:saturate(1.02) contrast(1.05) brightness(.68)}
+    .vs-tech-card div{position:absolute;inset:auto 16px 16px;padding:14px;border-radius:16px;background:rgba(11,45,82,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+    .vs-tech-card span{display:block;margin-bottom:6px;color:var(--vs-gold);font-size:.64rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+    .vs-tech-card b{display:block;font-family:"Newsreader",Georgia,serif;font-size:1.35rem;line-height:1.05}
+    .vs-logo-modal{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:rgba(5,24,44,.76);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .vs-logo-modal[hidden]{display:none}
+    .vs-logo-dialog{position:relative;width:min(92vw,760px);padding:clamp(16px,2vw,24px);border:1px solid rgba(255,255,255,.26);border-radius:28px;background:#fff;box-shadow:0 40px 120px rgba(0,0,0,.45)}
+    .vs-logo-dialog img{width:100%;height:auto;border-radius:20px}
+    .vs-logo-close{position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;border-radius:999px;background:var(--vs-blue-d);color:#fff;font-size:1.4rem;line-height:1;cursor:pointer}
+    @media(max-width:920px){.vs-tech-grid{grid-template-columns:1fr 1fr}.vs-tech-card{min-height:220px}}
     @media(max-width:820px){.vs-groups{grid-template-columns:1fr 1fr}}
-    @media(max-width:560px){.vs-groups{grid-template-columns:1fr}.vs-hero-tools{justify-content:center;margin-bottom:28px}.vs-lang select{width:min(100%,280px)}}
+    @media(max-width:560px){.vs-groups,.vs-tech-grid{grid-template-columns:1fr}.vs-hero-tools{justify-content:center;margin-bottom:28px}.vs-lang select{width:min(100%,280px)}.vs-tech-card{min-height:240px}}
   </style>
 </head>
 <body>
@@ -47,9 +65,21 @@
       <div class="vs-hero-tools" aria-label="Language selection">
         <div class="vs-lang"><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="es">Español / Spanish</option><option value="zh-CN">中文 / Chinese</option><option value="hi">हिन्दी / Hindi</option><option value="ar">العربية / Arabic</option><option value="fr">Français / French</option><option value="pt">Português / Portuguese</option><option value="ru">Русский / Russian</option><option value="bn">বাংলা / Bengali</option><option value="id">Bahasa Indonesia / Indonesian</option><option value="ur">اردو / Urdu</option><option value="sw">Kiswahili / Swahili</option><option value="vi">Tiếng Việt / Vietnamese</option><option value="tl">Tagalog / Filipino</option><option value="ne">नेपाली / Nepali</option><option value="sd">سنڌي / Sindhi</option></select></div>
       </div>
-      <img class="vs-hero-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async">
+      <button class="vs-logo-button" type="button" aria-haspopup="dialog" aria-controls="logo-modal">
+        <img class="vs-hero-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high" decoding="async">
+        <span class="vs-logo-hint">Click logo to enlarge</span>
+      </button>
       <h1>VillageServer Initiative</h1>
       <p class="vs-tagline">Using technology to help place God's Word, biblical teaching, and ministry resources within reach of every village.</p>
+    </section>
+
+    <section class="vs-tech-strip" aria-label="VillageServer field technology photos">
+      <div class="vs-tech-grid">
+        <a class="vs-tech-card" href="./raspberry-pi.html"><img src="./img/kit-pi.webp" alt="Raspberry Pi local server with USB storage" width="1100" height="825" loading="lazy"><div><span>Local server</span><b>Raspberry Pi library</b></div></a>
+        <a class="vs-tech-card" href="./satellite.html"><img src="./img/dish.webp" alt="Satellite dish for remote connectivity" width="1024" height="768" loading="lazy"><div><span>Optional uplink</span><b>Satellite dish</b></div></a>
+        <a class="vs-tech-card" href="./projector-media.html"><img src="./img/projector.webp" alt="Portable projector for group gospel media" width="900" height="869" loading="lazy"><div><span>Group media</span><b>Projector system</b></div></a>
+        <a class="vs-tech-card" href="./power.html"><img src="./img/solar-field.webp" alt="Solar power setup for field equipment" width="1100" height="1467" loading="lazy"><div><span>Power source</span><b>Solar field kit</b></div></a>
+      </div>
     </section>
 
     <section class="vs-sections" id="resources">
@@ -79,11 +109,19 @@
     </section>
   </main>
 
+  <div class="vs-logo-modal" id="logo-modal" role="dialog" aria-modal="true" aria-label="VillageServer Initiative logo enlarged" hidden>
+    <div class="vs-logo-dialog">
+      <button class="vs-logo-close" type="button" aria-label="Close enlarged logo">&times;</button>
+      <img src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo enlarged" width="1254" height="1254" loading="lazy">
+    </div>
+  </div>
+
   <footer class="vs-foot"><span>&copy; 2026 VillageServer Initiative</span><span data-i18n="footerBuilt">Built for low-connectivity communities.</span><span><a href="./pamphlets.html">Pamphlets &amp; FAQ</a> · <a href="./guide.html?part=wifi">Setup guides</a> · <a href="./kit-levels.html">Kit planning</a></span><span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></footer>
 
   <script src="./js/i18n.js?v=2"></script>
   <script src="./js/site-language.js?v=2"></script>
   <script>
+    (function(){var openButton=document.querySelector('.vs-logo-button'),modal=document.getElementById('logo-modal'),closeButton=document.querySelector('.vs-logo-close');if(!openButton||!modal||!closeButton)return;function openLogo(){modal.hidden=false;closeButton.focus({preventScroll:true});}function closeLogo(){modal.hidden=true;openButton.focus({preventScroll:true});}openButton.addEventListener('click',openLogo);closeButton.addEventListener('click',closeLogo);modal.addEventListener('click',function(event){if(event.target===modal)closeLogo();});document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!modal.hidden)closeLogo();});})();
     (function(){var el=document.getElementById('arki-credit'),n=0,t;if(!el)return;el.addEventListener('click',function(){clearTimeout(t);n++;if(n>=3){n=0;window.location.href='./admin.html';}t=setTimeout(function(){n=0;},600);});})();
   </script>
   <script src="./js/site-tracking.js?v=1"></script>
