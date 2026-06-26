@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Photos &amp; visuals | VillageServer</title>
+  <meta name="description" content="Field photos and visuals from the VillageServer Initiative — Scripture distribution, portable kits, solar power, and group media in the communities we serve.">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/base.css?v=3">
+  <link rel="stylesheet" href="./css/resource.css">
+  <style>
+    .visual-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .visual-gallery figure{position:relative;margin:0;min-height:300px;border-radius:20px;overflow:hidden;background:var(--forest);box-shadow:0 16px 48px rgba(20,38,28,.1)}
+    .visual-gallery img{width:100%;height:100%;object-fit:cover;display:block}
+    .visual-gallery figcaption{position:absolute;left:14px;right:14px;bottom:14px;padding:10px 13px;border-radius:13px;background:rgba(5,29,23,.78);color:#fff;font-size:.78rem;font-weight:800;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    @media(max-width:800px){.visual-gallery{grid-template-columns:1fr 1fr}}
+    @media(max-width:520px){.visual-gallery{grid-template-columns:1fr}.visual-gallery figure{min-height:260px}}
+  </style>
+</head>
+<body>
+  <header class="resource-nav"><div class="wrap"><a class="brand official-brand" href="./index.html#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><a href="./index.html#resources">← Back to resource library</a></div></header>
+  <main>
+    <section class="resource-hero detail-hero"><div class="wrap"><p class="kicker light">Photos &amp; visuals</p><h1>The work, in the field.</h1><p class="hero-summary">Scripture reaching real hands, portable kits powered by sun and battery, and group media gathering communities together — a look at the VillageServer Initiative in the places it serves.</p></div></section>
+    <nav class="page-jumps wrap" aria-label="On this page"><a href="#field">In the field</a><a href="#kit">The kit</a><a href="#next">Next</a></nav>
+
+    <section class="resource-block" id="field"><div class="wrap"><div class="resource-title"><p class="kicker">In the field</p><h2>Scripture and teaching in the community.</h2></div><div class="visual-gallery">
+      <figure><img src="./img/field-distribute.webp" alt="Bible distribution with local leaders and families" loading="lazy"><figcaption>Field handoff</figcaption></figure>
+      <figure><img src="./img/receiving.webp" alt="Woman holding a Bible after receiving Scripture" loading="lazy"><figcaption>Scripture in hand</figcaption></figure>
+      <figure><img src="./img/field-reading.webp" alt="A parent reading Scripture with a child" loading="lazy"><figcaption>Reading together</figcaption></figure>
+      <figure><img src="./img/field-prayer.webp" alt="Prayer in the field" loading="lazy"><figcaption>Prayer in the field</figcaption></figure>
+      <figure><img src="./img/field-runner.webp" alt="A field runner carrying Scripture between communities" loading="lazy"><figcaption>Carrying the Word</figcaption></figure>
+      <figure><img src="./img/projector.webp" alt="Small projector used for group media" loading="lazy"><figcaption>Group media night</figcaption></figure>
+    </div></div></section>
+
+    <section class="resource-block sand-block" id="kit"><div class="wrap"><div class="resource-title"><p class="kicker">The kit</p><h2>Portable library, power, and reception.</h2></div><div class="visual-gallery">
+      <figure><img src="./img/kit-pi.webp" alt="Raspberry Pi local server connected with USB storage" loading="lazy"><figcaption>Raspberry Pi server</figcaption></figure>
+      <figure><img src="./img/kit-case.webp" alt="Portable VillageServer solar field kit opened beside solar panels" loading="lazy"><figcaption>Portable kit</figcaption></figure>
+      <figure><img src="./img/solar-field.webp" alt="Solar power setup for field equipment" loading="lazy"><figcaption>Solar power</figcaption></figure>
+      <figure><img src="./img/dish.webp" alt="Satellite dish for content reception" loading="lazy"><figcaption>Satellite reception</figcaption></figure>
+      <figure><img src="./img/broadcast.webp" alt="Satellite broadcast reception equipment" loading="lazy"><figcaption>Content acquisition</figcaption></figure>
+      <figure><img src="./img/map.webp" alt="Map showing reach across regions" loading="lazy"><figcaption>Reaching further</figcaption></figure>
+    </div></div></section>
+
+    <section class="next-band" id="next"><div class="wrap"><div><p class="kicker">Next</p><h2>Read the story behind the photos.</h2><div class="topic-footer-links"><a href="./mission.html">Mission statement</a><a href="./phone-distribution.html">Phone-based distribution</a><a href="./power.html">Power &amp; solar</a></div></div><a class="button button-primary" href="./index.html#resources">All sections</a></div></section>
+  </main>
+  <footer class="site-footer resource-footer"><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span><a href="./index.html">Return home</a></span></div></footer>
+  <script src="./js/site-language.js?v=2"></script>
+  <script src="./js/site-tracking.js?v=1"></script>
+</body>
+</html>
