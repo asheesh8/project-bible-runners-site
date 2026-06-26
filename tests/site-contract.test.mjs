@@ -97,8 +97,10 @@ test('the board stylesheet protects the older-reader design system', () => {
   assert.match(css, /\.link-band/);
   assert.match(css, /\.photo-row/);
   assert.match(css, /logoSweep/);
-  assert.match(css, /logoAura/);
-  assert.match(css, /width:clamp\(230px,24vw,360px\)/);
+  assert.doesNotMatch(css, /logoAura/);
+  assert.match(css, /width:clamp\(160px,15vw,230px\)/);
+  assert.match(css, /\.test-run-section/);
+  assert.match(css, /\.test-run-media/);
   assert.match(css, /\.board-hero/);
   assert.match(css, /\.plain-answer/);
   assert.match(css, /\.brief-grid/);
@@ -121,7 +123,11 @@ test('the homepage is a simple blue and white directory with photos below the li
     assert.match(html, /<h1 class="visually-hidden">VillageServer Initiative<\/h1>/);
     assert.match(html, /aria-label="Open enlarged VillageServer Initiative logo"/);
     assert.doesNotMatch(html, /logo-hint|Click logo to enlarge/i);
-    assert.match(html, /board-friendly directory/i);
+    assert.match(html, /Using technology to help place God's Word/);
+    assert.doesNotMatch(html, /class="home-actions"/);
+    assert.match(html, /class="test-run-section"/);
+    assert.match(html, /test-run-setup\.mp4/);
+    assert.match(html, /The team setting up the kit/);
     assert.ok(html.indexOf('class="white-band"') < html.indexOf('class="photo-row"'), `${page} should put pictures below the white link band`);
     assert.doesNotMatch(html, /<header[\s\S]*?<\/header>/);
     assert.doesNotMatch(html, /class="site-header"|class="site-nav"|class="menu-button"|class="vs-top"|I already have a kit/);
@@ -144,6 +150,13 @@ test('the homepage directory exposes every public informational page', () => {
     assert.match(html, new RegExp(`\\./img/${asset}`));
     assert.ok(existsSync(join(root, 'landing/img', asset)), `${asset} should exist for homepage technology photos`);
   }
+
+  for (const asset of ['test-run-video-poster.jpeg', 'test-run-table.jpeg', 'test-run-solar.jpeg', 'test-run-workshop.jpeg', 'test-run-satellite.jpeg']) {
+    assert.match(html, new RegExp(`\\./img/${asset}`));
+    assert.ok(existsSync(join(root, 'landing/img', asset)), `${asset} should exist for the field test run section`);
+  }
+  assert.match(html, /\.\/media\/test-run-setup\.mp4/);
+  assert.ok(existsSync(join(root, 'landing/media/test-run-setup.mp4')), 'test run video should be deployed');
 });
 
 test('every informational page follows the same short blog-style board template', () => {
