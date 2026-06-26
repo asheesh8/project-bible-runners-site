@@ -618,7 +618,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       <!-- ── TRAFFIC ──────────────────────────────── -->
       <div class="tab-view" id="tab-traffic">
         <div class="page-header">
-          <h2 class="page-title">Traffic &amp; Analytics</h2>
+          <div style="display:flex;align-items:center;gap:10px">
+            <h2 class="page-title" style="margin:0">Traffic &amp; Analytics</h2>
+            <span id="traffic-live-badge" style="display:none;background:#16a34a;color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:99px;text-transform:uppercase">● LIVE</span>
+          </div>
           <button class="btn-new" id="refresh-traffic-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             Refresh
@@ -862,6 +865,7 @@ document.getElementById('logout-btn').addEventListener('click', function(){
 document.querySelectorAll('.nav-item').forEach(function(item){
   item.addEventListener('click', function(){
     var tab = item.dataset.tab;
+    stopTrafficPoll();
     document.querySelectorAll('.nav-item').forEach(function(i){ i.classList.remove('active'); });
     document.querySelectorAll('.tab-view').forEach(function(t){ t.classList.remove('active'); });
     item.classList.add('active');
@@ -912,7 +916,7 @@ function loadTab(tab){
   else if(tab === 'posts') loadPosts();
   else if(tab === 'photos') loadPhotos();
   else if(tab === 'testimonies') loadTestimonies();
-  else if(tab === 'traffic') loadTraffic();
+  else if(tab === 'traffic') startTrafficPoll();
   // 'resources' is static — nothing to load
 }
 
@@ -1231,14 +1235,33 @@ function deletePhoto(id){
 }
 
 // ════════════════════════════════════════════════════════
-// TRAFFIC / ANALYTICS
+// TRAFFIC / ANALYTICS  — live poll every 4 s
 // ════════════════════════════════════════════════════════
-document.getElementById('refresh-traffic-btn').addEventListener('click', loadTraffic);
+var _trafficPoll = null;
 
-function loadTraffic(){
+document.getElementById('refresh-traffic-btn').addEventListener('click', function(){
+  loadTraffic(true);
+});
+
+function startTrafficPoll(){
+  loadTraffic(true);
+  document.getElementById('traffic-live-badge').style.display = 'inline-block';
+  if(_trafficPoll) clearInterval(_trafficPoll);
+  _trafficPoll = setInterval(function(){ loadTraffic(false); }, 4000);
+}
+
+function stopTrafficPoll(){
+  if(_trafficPoll){ clearInterval(_trafficPoll); _trafficPoll = null; }
+  var badge = document.getElementById('traffic-live-badge');
+  if(badge) badge.style.display = 'none';
+}
+
+function loadTraffic(showSpinner){
   var btn = document.getElementById('refresh-traffic-btn');
-  btn.disabled = true;
-  btn.textContent = 'Loading…';
+  if(showSpinner){
+    btn.disabled = true;
+    btn.textContent = 'Loading…';
+  }
 
   fetch('/api/track?type=summary', { headers:{ 'Authorization':'Bearer '+AUTH_TOKEN } })
     .then(function(r){ return r.json(); })
@@ -1248,7 +1271,7 @@ function loadTraffic(){
       btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Refresh';
     })
     .catch(function(){
-      showStatus('Could not load traffic data — Supabase may not be configured.','warn');
+      if(showSpinner) showStatus('Could not load traffic data — Supabase may not be configured.','warn');
       btn.disabled = false;
       btn.textContent = 'Refresh';
     });
