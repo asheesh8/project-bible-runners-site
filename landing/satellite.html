@@ -11,15 +11,75 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/base.css?v=3">
   <link rel="stylesheet" href="./css/resource.css">
+  <link rel="stylesheet" href="./css/setup.css">
 </head>
 <body>
   <header class="resource-nav"><div class="wrap"><a class="brand official-brand" href="./index.html#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><a href="./index.html#resources">← Back to resource library</a></div></header>
   <main>
     <section class="resource-hero detail-hero"><div class="wrap"><p class="kicker light">Optional connection</p><h1>Satellite adds a live link. It does not replace the local library.</h1><p class="hero-summary">Satellite can help with updates, limited live access, field reporting, or remote support. VillageServer should still work locally when the sky is blocked, power is low, or service is unavailable.</p></div></section>
-    <nav class="page-jumps wrap" aria-label="On this page"><a href="#use">When to use it</a><a href="#setup">Setup pattern</a><a href="#limits">Limits</a><a href="#next">Next steps</a></nav>
+    <nav class="page-jumps wrap" aria-label="On this page"><a href="#use">When to use it</a><a href="#setup">Setup pattern</a><a href="#limits">Limits</a><a href="#reception">Set up the dish</a><a href="#next">Next steps</a></nav>
     <section class="resource-block" id="use"><div class="wrap"><div class="resource-title"><p class="kicker">When it helps</p><h2>Use satellite for the jobs that actually need a live connection.</h2></div><div class="detail-grid"><article class="detail-card"><span>01</span><h3>Content updates</h3><p>Download new language packs, new videos, corrected files, or updated training when the field team has a service window.</p></article><article class="detail-card"><span>02</span><h3>Field reporting</h3><p>Send usage notes, support requests, or deployment check-ins when a mobile network is not available.</p></article><article class="detail-card"><span>03</span><h3>Remote support</h3><p>Let a technical helper diagnose a kit, confirm versions, or guide a team through a setup problem.</p></article></div></div></section>
     <section class="resource-block sand-block" id="setup"><div class="wrap"><div class="resource-title"><p class="kicker">Setup pattern</p><h2>Keep the satellite path separate and obvious.</h2></div><div class="detail-steps"><article><h3>Find open sky</h3><p>Place the dish where trees, buildings, mountains, or vehicles do not block the view.</p></article><article><h3>Power carefully</h3><p>Satellite gear can draw more power than the local server. Confirm the battery and solar plan first.</p></article><article><h3>Connect only when needed</h3><p>Use satellite for update windows or support, then let the local library serve users offline.</p></article><article><h3>Write down results</h3><p>Record whether signal, speed, and power were good enough for that location.</p></article></div></div></section>
     <section class="resource-block" id="limits"><div class="wrap two-col"><div><p class="kicker">Important limits</p><h2>Satellite is powerful, but it is not magic.</h2></div><div class="detail-panel"><ul class="detail-checklist"><li><b>Sky matters</b>Obstructions can break the connection even when the kit is healthy.</li><li><b>Power matters</b>Plan battery and solar capacity before promising long sessions.</li><li><b>Service varies</b>Provider availability, plan terms, and performance differ by country.</li><li><b>Offline remains first</b>The library should remain usable with satellite turned off.</li></ul></div></div></section>
+    <section class="setup" id="reception">
+      <div class="wrap">
+        <div class="setup-head">
+          <p class="kicker">Set up the dish</p>
+          <h2>Assemble, connect, and aim the reception system.</h2>
+          <p>A reception system is a chain: dish &rarr; LNB &rarr; receiver &rarr; VillageServer. Get each link right, aim at open sky, and lock the signal. Step through it below.</p>
+        </div>
+
+        <div class="stepper" data-stepper>
+          <ol class="stepper-rail">
+            <li class="step-dot" data-step="0"><b>1</b><span>Open sky</span></li>
+            <li class="step-dot" data-step="1"><b>2</b><span>Assemble</span></li>
+            <li class="step-dot" data-step="2"><b>3</b><span>Connect</span></li>
+            <li class="step-dot" data-step="3"><b>4</b><span>Aim</span></li>
+            <li class="step-dot" data-step="4"><b>5</b><span>Lock signal</span></li>
+            <li class="step-dot" data-step="5"><b>6</b><span>Capture</span></li>
+          </ol>
+          <div class="step-panels">
+            <div class="step-panel" data-step-panel="0"><h3>1 &middot; Find open sky</h3><p>Place the dish where trees, buildings, mountains, or vehicles do not block the view toward the satellite. A clear line of sight matters more than anything else.</p></div>
+            <div class="step-panel" data-step-panel="1"><h3>2 &middot; Assemble the dish</h3><p>Mount the dish solidly. A <b>segmented flyaway dish</b> &mdash; an older dish divided into sections that fit a suitcase &mdash; is reassembled on site to recreate the original dish surface for easier transport.</p></div>
+            <div class="step-panel" data-step-panel="2"><h3>3 &middot; Connect the chain</h3><p>Fix the <b>LNB</b> at the dish&rsquo;s focal point, run <b>coax</b> to the <b>satellite receiver</b>, then connect the receiver to a monitor or the <b>VillageServer</b>. Confirm a stable <a href="./power.html">power source &rarr;</a> &mdash; satellite gear can draw more than the server.</p></div>
+            <div class="step-panel" data-step-panel="3"><h3>4 &middot; Aim the dish</h3><p>Set elevation and azimuth for your location. Use a satellite finder app, signal meter, compass, and inclinometer to point accurately. Move slowly &mdash; small changes make big differences.</p></div>
+            <div class="step-panel" data-step-panel="4"><h3>5 &middot; Lock the signal</h3><p>Watch the receiver&rsquo;s signal-quality display and fine-tune until it peaks, then tighten every bolt so wind cannot shift the aim.</p></div>
+            <div class="step-panel" data-step-panel="5"><h3>6 &middot; Capture &amp; store</h3><p>Receive the content, then store it on the VillageServer for offline sharing. The satellite receives the signal, the VillageServer stores it, and the people share the message. <a href="./custom-libraries.html">Build the library &rarr;</a></p></div>
+          </div>
+          <div class="stepper-nav"><button data-prev>&larr; Back</button><span class="step-count"></span><button data-next>Next &rarr;</button></div>
+        </div>
+
+        <p class="setup-sub">The reception chain</p>
+        <div class="guide-cards">
+          <a><em>Hardware</em><b>Satellite dish</b><span>Collects weak signals from space and focuses them on the LNB.</span></a>
+          <a><em>Hardware</em><b>LNB</b><span>Low-noise block converter at the dish&rsquo;s focal point.</span></a>
+          <a><em>Hardware</em><b>Receiver</b><span>Turns the incoming signal into usable audio, video, or data.</span></a>
+          <a><em>Hardware</em><b>Coax + power</b><span>Carries the signal and runs the gear in the field.</span></a>
+        </div>
+
+        <p class="setup-sub">Alignment tool checklist</p>
+        <div class="checklist" data-checklist>
+          <div class="checklist-head"><b>Pack before you point</b><span class="pct"></span></div>
+          <div class="checklist-bar"><i></i></div>
+          <ul>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">Satellite signal meter</span><span class="ck-d">Read strength while you aim.</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">Satellite finder app</span><span class="ck-d">Smartphone pointing assistant.</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">Compass</span><span class="ck-d">Set azimuth (left/right).</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">Inclinometer</span><span class="ck-d">Set elevation (up/down).</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">GPS location</span><span class="ck-d">Get exact coordinates to compute the aim.</span></span></label></li>
+          </ul>
+        </div>
+
+        <p class="setup-sub">Keep going</p>
+        <div class="guide-cards">
+          <a href="./guide.html?part=satellite"><em>Step by step</em><b>Satellite guide</b><span>Full setup walkthrough when hardware is in hand.</span></a>
+          <a href="./raspberry-pi.html"><em>Related</em><b>Where content lands</b><span>The local server that stores what you capture.</span></a>
+          <a href="./custom-libraries.html"><em>Related</em><b>Build the library</b><span>Organize captured content for ministry use.</span></a>
+          <a href="./power.html"><em>Related</em><b>Power &amp; solar</b><span>Size power for the extra satellite draw.</span></a>
+        </div>
+      </div>
+    </section>
+
     <section class="sources" id="sources">
       <div class="wrap">
         <div class="resource-title"><p class="kicker">Sources &amp; references</p><h2>Related systems & references.</h2></div>
@@ -37,5 +97,6 @@
   <footer class="site-footer resource-footer"><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span><a href="./index.html">Return home</a></span></div></footer>
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
+  <script src="./js/setup.js?v=1"></script>
 </body>
 </html>

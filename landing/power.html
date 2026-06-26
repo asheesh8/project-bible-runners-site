@@ -11,12 +11,13 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/base.css?v=3">
   <link rel="stylesheet" href="./css/resource.css">
+  <link rel="stylesheet" href="./css/setup.css">
 </head>
 <body>
   <header class="resource-nav"><div class="wrap"><a class="brand official-brand" href="./index.html#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><a href="./index.html#resources">← Back to resource library</a></div></header>
   <main>
     <section class="resource-hero detail-hero"><div class="wrap"><p class="kicker light">Power systems &amp; solar solutions</p><h1>Reliable power for every VillageServer.</h1><p class="hero-summary">Every VillageServer depends on a source of electrical power, so selecting the proper power system is one of the most important decisions in planning a deployment — especially in villages, mission stations, refugee camps, and rural regions where power may be limited or unavailable.</p></div></section>
-    <nav class="page-jumps wrap" aria-label="On this page"><a href="#why">Why power matters</a><a href="#options">Power options</a><a href="#solar">Solar power</a><a href="#planning">Power planning</a><a href="#strategy">A typical kit</a><a href="#next">Next</a></nav>
+    <nav class="page-jumps wrap" aria-label="On this page"><a href="#why">Why power matters</a><a href="#options">Power options</a><a href="#solar">Solar power</a><a href="#planning">Power planning</a><a href="#strategy">A typical kit</a><a href="#setup">Plan it</a><a href="#next">Next</a></nav>
 
     <section class="resource-block" id="why"><div class="wrap two-col"><div><p class="kicker">Why power matters</p><h2>Without power, information cannot flow.</h2></div><div class="detail-panel"><p>Every component of the VillageServer system requires power — Raspberry Pi units, phones and tablets, portable projectors, audio systems, satellite equipment, Wi-Fi devices, LED lighting, laptops, charging stations, and educational equipment.</p><p>Without a dependable power source, access to information, communication, and training materials becomes limited. For this reason, power planning should always be considered an essential part of any deployment.</p></div></div></section>
 
@@ -27,6 +28,53 @@
     <section class="resource-block sand-block" id="planning"><div class="wrap two-col"><div><p class="kicker">Power planning</p><h2>Questions to answer before deploying.</h2></div><div class="detail-panel"><ul class="detail-checklist"><li><b>How much power?</b>Total power the kit will require.</li><li><b>How many devices?</b>Number operating at the same time.</li><li><b>Is service available?</b>Whether electrical service exists.</li><li><b>Is solar practical?</b>Sunlight and placement at the site.</li><li><b>What backups?</b>Available backup power systems.</li><li><b>How many days?</b>Days of operation required.</li></ul></div></div></section>
 
     <section class="resource-block" id="strategy"><div class="wrap"><div class="resource-title"><p class="kicker">VillageServer power strategy</p><h2>A typical deployment.</h2></div><div class="detail-steps"><article><h3>Raspberry Pi VillageServer</h3><p>The core unit storing and sharing the library.</p></article><article><h3>Portable battery + solar</h3><p>A battery system with solar charging capability.</p></article><article><h3>Phone charging station</h3><p>Charging for the community plus LED lighting.</p></article><article><h3>Backup power source</h3><p>A reliable fallback so the system keeps running.</p></article></div></div></section>
+
+    <section class="setup" id="setup">
+      <div class="wrap">
+        <div class="setup-head">
+          <p class="kicker">Plan it</p>
+          <h2>Match the power to the place &mdash; in three quick moves.</h2>
+          <p>Pick the source that fits the site, size it to the devices, and add a backup. Compare the options, then run the planning checklist below.</p>
+        </div>
+
+        <div class="tabset" data-tabset>
+          <div class="tab-btns" role="tablist">
+            <button class="tab-btn is-active" data-tab="0">Grid power</button>
+            <button class="tab-btn" data-tab="1">Battery</button>
+            <button class="tab-btn" data-tab="2">Solar</button>
+            <button class="tab-btn" data-tab="3">Generator / hybrid</button>
+          </div>
+          <div class="tab-panel is-active" data-panel="0"><h3>Existing electrical service</h3><ul><li><b>Best when</b> a home, church, school, or clinic already has reliable mains power.</li><li><b>Pros</b> simplest and cheapest &mdash; just plug in.</li><li><b>Watch for</b> brown-outs; add a battery so the server does not drop.</li></ul></div>
+          <div class="tab-panel" data-panel="1"><h3>Portable battery power</h3><ul><li><b>Power banks</b> &mdash; phones, tablets, and low-power devices.</li><li><b>Power stations</b> &mdash; run several devices at once.</li><li><b>Battery banks</b> &mdash; larger storage for longer sessions.</li><li><b>Pros</b> quiet, no fuel, no emissions, portable.</li></ul></div>
+          <div class="tab-panel" data-panel="2"><h3>Solar power</h3><ul><li><b>Portable panels</b> &mdash; carry in and deploy as needed.</li><li><b>Solar suitcases</b> &mdash; foldable systems built for the field.</li><li><b>Fixed installs</b> &mdash; best for a permanent VillageServer.</li><li><b>Pros</b> renewable, no fuel cost, low maintenance, sustainable.</li></ul></div>
+          <div class="tab-panel" data-panel="3"><h3>Generator &amp; hybrid</h3><ul><li><b>Generators</b> &mdash; strong output where fuel is available.</li><li><b>Hybrid</b> &mdash; combine mains, battery, and solar so one source covers another.</li><li><b>Best when</b> you need all-day, all-weather reliability.</li></ul></div>
+        </div>
+
+        <div class="tip"><span class="tip-ic">&#9889;</span><p><b>A typical kit:</b> Raspberry Pi VillageServer + a portable battery + solar charging + a phone-charging station + LED lighting + a backup source. That covers a normal day of ministry.</p></div>
+
+        <p class="setup-sub">Run the power-planning checklist</p>
+        <div class="checklist" data-checklist>
+          <div class="checklist-head"><b>Before you deploy</b><span class="pct"></span></div>
+          <div class="checklist-bar"><i></i></div>
+          <ul>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">How much power is needed?</span><span class="ck-d">Add up every device that will run.</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">How many devices at once?</span><span class="ck-d">Peak simultaneous load, not just total.</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">Is electrical service available?</span><span class="ck-d">If yes, mains + battery is simplest.</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">Is solar practical here?</span><span class="ck-d">Check sunlight, placement, and season.</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">What is the backup?</span><span class="ck-d">A second source for when the first fails.</span></span></label></li>
+            <li><label><input type="checkbox"><span class="ck-x"><span class="ck-t">How many days of operation?</span><span class="ck-d">Size storage to the length of the trip.</span></span></label></li>
+          </ul>
+        </div>
+
+        <p class="setup-sub">Keep going</p>
+        <div class="guide-cards">
+          <a href="./raspberry-pi.html"><em>Related</em><b>What it powers</b><span>The Raspberry Pi VillageServer at the core.</span></a>
+          <a href="./projector-media.html"><em>Related</em><b>Projector &amp; audio</b><span>Group media that also needs a power plan.</span></a>
+          <a href="./kit-levels.html"><em>Plan</em><b>Kit levels &amp; costs</b><span>See which power gear fits each kit tier.</span></a>
+          <a href="./satellite.html"><em>Related</em><b>Satellite power draw</b><span>Why satellite gear needs extra capacity.</span></a>
+        </div>
+      </div>
+    </section>
 
     <section class="sources" id="sources">
       <div class="wrap">
@@ -45,5 +93,6 @@
   <footer class="site-footer resource-footer"><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span><a href="./index.html">Return home</a></span></div></footer>
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
+  <script src="./js/setup.js?v=1"></script>
 </body>
 </html>

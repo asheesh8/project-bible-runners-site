@@ -11,15 +11,69 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/base.css?v=3">
   <link rel="stylesheet" href="./css/resource.css">
+  <link rel="stylesheet" href="./css/setup.css">
 </head>
 <body>
   <header class="resource-nav"><div class="wrap"><a class="brand official-brand" href="./index.html#top"><img class="official-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"></a><a href="./index.html#resources">← Back to resource library</a></div></header>
   <main>
     <section class="resource-hero detail-hero"><div class="wrap"><p class="kicker light">Local server</p><h1>The Raspberry Pi makes the library local.</h1><p class="hero-summary">The Pi is the small computer inside VillageServer. It stores the offline library, creates the local Wi‑Fi network, and serves a simple website that nearby phones can open without mobile data.</p></div></section>
-    <nav class="page-jumps wrap" aria-label="On this page"><a href="#simple">Simple model</a><a href="#parts">Parts</a><a href="#field">Field rules</a><a href="#next">Guides</a></nav>
+    <nav class="page-jumps wrap" aria-label="On this page"><a href="#simple">Simple model</a><a href="#parts">Parts</a><a href="#field">Field rules</a><a href="#setup">Set it up</a><a href="#next">Guides</a></nav>
     <section class="resource-block" id="simple"><div class="wrap"><div class="resource-title"><p class="kicker">Simple model</p><h2>People do not connect to the internet. They connect to the kit.</h2><p>That distinction matters. A phone may say “No internet,” but the local library can still be working correctly.</p></div><div class="detail-steps"><article><h3>Power starts the server</h3><p>Solar, battery, or local power starts the Raspberry Pi and the library service.</p></article><article><h3>Wi‑Fi appears nearby</h3><p>The kit broadcasts a local VillageServer network for phones and tablets.</p></article><article><h3>Browser opens the library</h3><p>Users open a local address or captive prompt, then choose a language and resource.</p></article><article><h3>Files can leave the kit</h3><p>People save useful files and share them by phone, USB, or microSD.</p></article></div></div></section>
     <section class="resource-block sand-block" id="parts"><div class="wrap"><div class="resource-title"><p class="kicker">What each part does</p><h2>Small hardware, clear responsibilities.</h2></div><div class="detail-grid"><article class="detail-card"><span>Pi</span><h3>Server brain</h3><p>Runs the local website and organizes content so users see a simple library instead of folders of confusing files.</p></article><article class="detail-card"><span>SD</span><h3>System card</h3><p>Holds the operating setup. It should stay with the server and should not be swapped casually in the field.</p></article><article class="detail-card"><span>USB</span><h3>Storage and updates</h3><p>Can carry media libraries, language packs, or field updates depending on the kit configuration.</p></article></div></div></section>
     <section class="resource-block" id="field"><div class="wrap two-col"><div><p class="kicker">Field rules</p><h2>Make startup boring and repeatable.</h2></div><div class="detail-panel"><ul class="detail-checklist"><li><b>Ventilation</b>Keep the Pi dry, shaded, and able to breathe.</li><li><b>Approved power</b>Use the labeled power source so the server does not brown out.</li><li><b>Wait before testing</b>Give the server time to start before deciding Wi‑Fi failed.</li><li><b>One test phone</b>Always verify with one saved file before inviting a group.</li></ul></div></div></section>
+    <section class="setup" id="setup">
+      <div class="wrap">
+        <div class="setup-head">
+          <p class="kicker">Set it up</p>
+          <h2>From a cold kit to a working library in five steps.</h2>
+          <p>No servers to think about, no internet account to create. Power it on, join its Wi&#8209;Fi, and open the library in any browser. Tap through the steps below.</p>
+        </div>
+
+        <div class="stepper" data-stepper>
+          <ol class="stepper-rail">
+            <li class="step-dot" data-step="0"><b>1</b><span>Power on</span></li>
+            <li class="step-dot" data-step="1"><b>2</b><span>Find Wi&#8209;Fi</span></li>
+            <li class="step-dot" data-step="2"><b>3</b><span>Open library</span></li>
+            <li class="step-dot" data-step="3"><b>4</b><span>Browse &amp; save</span></li>
+            <li class="step-dot" data-step="4"><b>5</b><span>Share on</span></li>
+          </ol>
+          <div class="step-panels">
+            <div class="step-panel" data-step-panel="0"><h3>1 &middot; Power the kit on</h3><p>Connect the labeled power source &mdash; solar, battery, or local mains. A small light shows the Raspberry Pi is starting. Give it about <b>60 seconds</b> to boot the library before testing.</p><p>Need the power details? See <a href="./power.html">Power systems &amp; solar solutions &rarr;</a></p></div>
+            <div class="step-panel" data-step-panel="1"><h3>2 &middot; Find the local Wi&#8209;Fi</h3><p>On any phone or tablet, open <b>Settings &rarr; Wi&#8209;Fi</b> and look for the <b>VillageServer</b> network. Join it like any other Wi&#8209;Fi. Your phone may say &ldquo;No internet&rdquo; &mdash; that is normal. You are connecting to the kit, not the internet.</p></div>
+            <div class="step-panel" data-step-panel="2"><h3>3 &middot; Open the library</h3><p>Open any web browser. Most phones show the library automatically; if not, type the local address:</p><p><span class="copy-chip">http://villageserver.local <button data-copy="http://villageserver.local">Copy</button></span></p></div>
+            <div class="step-panel" data-step-panel="3"><h3>4 &middot; Browse and save</h3><p>Choose a language, then read Bibles, listen to audio Scripture, watch teaching videos, and open training &mdash; all served from the kit. Tap <b>save / download</b> to keep a file on the phone so it works even after walking away.</p></div>
+            <div class="step-panel" data-step-panel="4"><h3>5 &middot; Share it onward</h3><p>Saved files can move phone&#8209;to&#8209;phone with no kit nearby. That is how one library reaches a whole village.</p><p>See <a href="./phone-distribution.html">Phone&#8209;based Gospel distribution &rarr;</a> and the <a href="./transfer.html">step&#8209;by&#8209;step transfer guides &rarr;</a></p></div>
+          </div>
+          <div class="stepper-nav"><button data-prev>&larr; Back</button><span class="step-count"></span><button data-next>Next &rarr;</button></div>
+        </div>
+
+        <p class="setup-sub">See it on a phone</p>
+        <div class="demo-split" data-phonedemo>
+          <div class="demo-copy">
+            <span class="demo-state"></span>
+            <h3>What the person holding the phone sees</h3>
+            <p>The whole experience is just: join a Wi&#8209;Fi, open a page, pick a resource. Step through it to preview each screen.</p>
+            <div class="demo-controls"><button data-demo-next>Next &rarr;</button><button class="ghost" data-demo-reset style="display:none">Start over</button></div>
+          </div>
+          <div class="phone">
+            <div class="phone-screen is-active" data-state="Step 1 &mdash; open Wi&#8209;Fi" data-next-label="Join VillageServer &rarr;"><div class="pico">&#128246;</div><h4>Wi&#8209;Fi settings</h4><div class="phone-wifi"><span>Home network<i>&#128274;</i></span><span class="pick">VillageServer<i>&rarr;</i></span><span>Neighbour<i>&#128274;</i></span></div></div>
+            <div class="phone-screen" data-state="Step 2 &mdash; connected" data-next-label="Open the library &rarr;"><span class="phone-badge">Connected</span><div class="pico">&#10003;</div><h4>Joined VillageServer</h4><p>&ldquo;No internet&rdquo; is normal &mdash; you are on the local kit.</p></div>
+            <div class="phone-screen" data-state="Step 3 &mdash; the library"><div class="phone-lib"><i>&#128214; Bibles</i><i>&#127911; Audio</i><i>&#127916; Films</i><i>&#128218; Training</i><i>&#128118; Kids</i><i>&#127760; Languages</i></div></div>
+          </div>
+        </div>
+
+        <div class="tip"><span class="tip-ic">!</span><p><b>Field rule:</b> always confirm with <b>one test phone</b> and one saved file before inviting a group. If Wi&#8209;Fi seems missing, wait a little longer &mdash; the server may still be starting.</p></div>
+
+        <p class="setup-sub">Keep going</p>
+        <div class="guide-cards">
+          <a href="./guide.html?part=pi"><em>Step by step</em><b>Raspberry Pi guide</b><span>Full setup walkthrough with screenshots.</span></a>
+          <a href="./guide.html?part=wifi"><em>Step by step</em><b>Phone Wi&#8209;Fi guide</b><span>Help a first&#8209;time user join and open the library.</span></a>
+          <a href="./phone-distribution.html"><em>Related</em><b>Share it onward</b><span>Move resources phone&#8209;to&#8209;phone after saving.</span></a>
+          <a href="./power.html"><em>Related</em><b>Power &amp; solar</b><span>Keep the server running all day.</span></a>
+        </div>
+      </div>
+    </section>
+
     <section class="sources" id="sources">
       <div class="wrap">
         <div class="resource-title"><p class="kicker">Sources &amp; references</p><h2>Sources & references.</h2></div>
@@ -37,5 +91,6 @@
   <footer class="site-footer resource-footer"><div class="wrap footer-bottom"><span>© 2026 VillageServer Initiative</span><span><a href="./index.html">Return home</a></span></div></footer>
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
+  <script src="./js/setup.js?v=1"></script>
 </body>
 </html>
