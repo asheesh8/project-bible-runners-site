@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=1">
+  <link rel="stylesheet" href="./css/board.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -22,26 +22,69 @@
   <main id="main">
     <section class="board-hero">
       <div class="wrap">
-        <p class="meta">Board brief - basic setup flow</p>
-        <h1>Setup Guide</h1>
-        <p class="summary">Unpack, power on, connect, test one file, and teach the next person. The field setup works in six consistent steps that any local leader can follow and repeat.</p>
+        <p class="meta">Setup Guide</p>
+        <h1>Six steps from kit to first file</h1>
+        <p class="summary">Unpack, power on, connect, open the library, test one file, and pack it back the same way every time. The field setup works in six consistent steps that any local leader can follow and repeat without technical help.</p>
       </div>
     </section>
     <section class="page-body">
       <div class="wrap board-layout">
-        <article>
-          <section class="plain-answer"><h2>Plain answer</h2><p>A setup guide should feel like a checklist, not an engineering manual. If a local leader cannot follow it under pressure, it is too complicated.</p></section>
-          <section class="step-section"><p class="section-kicker">Field steps</p><h2>Use it this way</h2><ol class="step-list"><li><div><strong>Unpack the kit</strong><span>Place the case, server, cables, battery, printed guide, and optional projector/satellite items where they are visible.</span></div></li><li><div><strong>Connect power</strong><span>Use wall power, battery, or solar-supported power based on the setting.</span></div></li><li><div><strong>Start the server</strong><span>Power the Raspberry Pi and wait for the VillageServer Wi-Fi network.</span></div></li><li><div><strong>Join from a phone</strong><span>Connect to the local Wi-Fi and open the library address or prompt.</span></div></li><li><div><strong>Test one resource</strong><span>Open one text, audio, video, or PDF file before inviting others.</span></div></li><li><div><strong>Pack consistently</strong><span>Return every cable, adapter, card, and printed guide to the same labeled place.</span></div></li></ol></section>
-          <section class="brief-grid" aria-label="Key points"><article class="brief-card"><h3>Minimum setup</h3><p>Power, server, phone, and one test file.</p></article><article class="brief-card"><h3>Optional setup</h3><p>Projector, speaker, solar, satellite, USB, or microSD.</p></article><article class="brief-card"><h3>Best habit</h3><p>Test one file before teaching the group.</p></article><article class="brief-card"><h3>Board takeaway</h3><p>The guide turns the kit from equipment into a repeatable process.</p></article></section>
-          
+        <article class="article-body">
+          <p class="article-lead">A setup guide is only useful if a local leader can follow it under pressure, without the original builder standing next to them. If it reads like an engineering manual, it's too complicated. This process takes under two minutes once someone has done it once.</p>
+
+          <figure class="fig-full">
+            <img src="./img/kit-case.webp" alt="VillageServer field kit case unpacked and ready for setup" loading="lazy">
+            <figcaption>The VillageServer kit unpacked — every component visible and labeled before setup begins.</figcaption>
+          </figure>
+
+          <h2>The six-step setup</h2>
+          <ol class="article-steps">
+            <li><div><strong>Unpack the kit</strong><p>Lay out the case, server, cables, battery, printed guide, and any optional items (projector, satellite hardware) so everything is visible before anything is plugged in. If a cable is missing now, fix it now.</p></div></li>
+            <li><div><strong>Connect power</strong><p>Use wall power, a charged battery, or solar-supported power depending on the setting. The Raspberry Pi draws very little current — a standard battery pack runs it for hours.</p></div></li>
+            <li><div><strong>Start the server</strong><p>Power on the Raspberry Pi and wait about 60 seconds. The VillageServer Wi-Fi network will appear on nearby phones when it's ready. Don't rush this step.</p></div></li>
+            <li><div><strong>Join from a phone</strong><p>Go to Wi-Fi settings on a phone and connect to the VillageServer network. Open the library address shown on the included card, or wait for the browser prompt to appear automatically.</p></div></li>
+            <li><div><strong>Test one resource before opening to the group</strong><p>Open one file — a Bible chapter, an audio track, a film, or a PDF — and confirm it loads. Do this before anyone else sits down. A broken test is fixable; a broken demo is not.</p></div></li>
+            <li><div><strong>Pack it the same way every time</strong><p>Return every cable, adapter, card, and printed guide to the same labeled place in the case. Missing cables are the most common setup failure at the next session.</p></div></li>
+          </ol>
+
+          <figure class="fig-half">
+            <img src="./img/test-run-table.jpeg" alt="Team running through the VillageServer setup checklist during a field readiness exercise" loading="lazy">
+            <figcaption>Running through the setup checklist during a field readiness exercise before deployment.</figcaption>
+          </figure>
+
+          <h2>Minimum vs. optional setup</h2>
+          <p>The minimum setup is: power, server, one phone, and a confirmed test file. Everything else is optional and should only be added when the setting calls for it.</p>
+          <ul class="article-bullets">
+            <li><strong>Minimum</strong> — power, Raspberry Pi, one phone connected to the Wi-Fi, one file opened and confirmed</li>
+            <li><strong>Add projector and speaker</strong> — when the session needs to serve a full room or outdoor group</li>
+            <li><strong>Add solar or battery backup</strong> — when wall power is unavailable or sessions will run longer than the local grid supports</li>
+            <li><strong>Add satellite</strong> — only when new content updates or remote communication are actually needed in the field</li>
+          </ul>
+
+          <div class="article-callout">
+            <p>The setup guide turns the kit from equipment into a repeatable process. If a local leader can't follow it alone, simplify the guide — not the mission.</p>
+          </div>
+
+          <div class="article-cta">
+            <p>Download the Setup Guide as a printable PDF for field kits, training sessions, and local leader handoffs.</p>
+            <a class="pdf-button" href="./downloads/villageserver-setup-guide.pdf" download>Download Setup Guide PDF</a>
+          </div>
         </article>
         <aside class="side-card" aria-label="Page summary">
-          <img src="./img/kit-case.webp" alt="Portable VillageServer field kit case" loading="lazy">
-          <h2>Download and use</h2>
-          <p><strong>Read this page when...</strong> someone needs the basic field setup flow in checklist form.</p>
+          <h2 class="side-title">Key points</h2>
+          <ul class="side-list">
+            <li>Test one file before opening the session to the group — always</li>
+            <li>Pack the kit the same way every time; missing cables cause the next setup to fail</li>
+            <li>The minimum setup is power, server, and one confirmed working file</li>
+          </ul>
           <a class="pdf-button" href="./downloads/villageserver-setup-guide.pdf" download>Download PDF</a>
-          <p class="mini-note">PDFs are printable and can be saved for offline use.</p>
-          <div class="related" aria-label="Related pages"><a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a><a href="./power.html">Power Systems and Solar Solutions</a><a href="./projector-media.html">Projector Systems and Audio Solutions</a><a href="./satellite.html">Satellite Systems and Content Acquisition</a></div>
+          <p class="mini-note">Printable and shareable offline.</p>
+          <div class="related" aria-label="Related pages">
+            <a href="./raspberry-pi.html">Raspberry Pi System</a>
+            <a href="./power.html">Power Systems and Solar</a>
+            <a href="./projector-media.html">Projector and Audio</a>
+            <a href="./satellite.html">Satellite Systems</a>
+          </div>
         </aside>
       </div>
     </section>

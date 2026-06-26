@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=1">
+  <link rel="stylesheet" href="./css/board.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -22,26 +22,69 @@
   <main id="main">
     <section class="board-hero">
       <div class="wrap">
-        <p class="meta">Board brief - planning a kit</p>
-        <h1>Kit Levels and Costs</h1>
-        <p class="summary">From a simple phone-sharing kit to a full satellite-enabled setup — choose the level that fits the field setting, budget, and mission need.</p>
+        <p class="meta">Kit Levels and Costs</p>
+        <h1>Start with what the field actually needs</h1>
+        <p class="summary">From a simple phone-sharing kit to a full satellite-enabled setup — choose the level that fits the field setting, budget, and mission need. Start small, then add.</p>
       </div>
     </section>
     <section class="page-body">
       <div class="wrap board-layout">
-        <article>
-          <section class="plain-answer"><h2>Plain answer</h2><p>Start with the smallest kit that solves the field problem. Add power, projector, or satellite only when the mission setting actually calls for it.</p></section>
-          <section class="step-section"><p class="section-kicker">Field steps</p><h2>Use it this way</h2><ol class="step-list"><li><div><strong>Define the use case</strong><span>Ask whether the need is personal phone sharing, group teaching, local library access, remote updates, or all of those.</span></div></li><li><div><strong>Pick the base level</strong><span>Start with phone-sharing materials or a Raspberry Pi local library kit.</span></div></li><li><div><strong>Add power only if needed</strong><span>Choose battery or solar based on runtime and grid reliability.</span></div></li><li><div><strong>Add media for groups</strong><span>Use projector and audio when one resource must serve a room or gathering.</span></div></li><li><div><strong>Quote satellite separately</strong><span>Treat satellite as an optional add-on because hardware, subscription, and power needs vary.</span></div></li><li><div><strong>Record item prices</strong><span>Keep chips, Raspberry Pi, projector, solar, and satellite kit costs itemized.</span></div></li></ol></section>
-          <section class="brief-grid" aria-label="Key points"><article class="brief-card"><h3>Basic Kit</h3><p>Phone sharing guides, microSD/USB options, and printed instructions.</p></article><article class="brief-card"><h3>Local Library Kit</h3><p>Raspberry Pi server, storage, power, and simple access instructions.</p></article><article class="brief-card"><h3>Media/Power Kit</h3><p>Projector, speaker, battery, and solar support for group use.</p></article><article class="brief-card"><h3>Satellite-Enabled Kit</h3><p>Optional uplink for remote updates and coordination.</p></article></section>
-          
+        <article class="article-body">
+          <p class="article-lead">There's no single right kit. The right kit is the one that solves the actual field problem — no more, no less. Start with the smallest level that works, and build from there only when the mission setting calls for it.</p>
+
+          <figure class="fig-full">
+            <img src="./img/kit-case.webp" alt="Portable VillageServer field kit case packed for deployment" loading="lazy">
+            <figcaption>A packed VillageServer field kit case — the foundation of every deployment.</figcaption>
+          </figure>
+
+          <h2>The four kit levels</h2>
+          <p>Each level builds on the last. A team can start at Level 1 and add components as the setting grows or funding allows. Every level includes printed guides and downloadable PDFs so the process continues after the visiting team leaves.</p>
+          <ul class="article-bullets">
+            <li><strong>Level 1 — Basic phone kit</strong> — printed transfer guides, microSD card or USB drive loaded with resources, and simple step-by-step instructions. No technical setup needed.</li>
+            <li><strong>Level 2 — Local library kit</strong> — Raspberry Pi server, storage, and power supply. Creates a local Wi-Fi network that any nearby phone can join and browse offline.</li>
+            <li><strong>Level 3 — Power and media kit</strong> — adds battery backup, solar panel, Bluetooth speaker, and a portable projector for group teaching sessions and film nights.</li>
+            <li><strong>Level 4 — Satellite-enabled kit</strong> — optional satellite uplink for remote content updates, field reports, and connectivity when no other network is available.</li>
+          </ul>
+
+          <figure class="fig-half">
+            <img src="./img/kit-pi.webp" alt="Raspberry Pi field server at the center of the VillageServer kit" loading="lazy">
+            <figcaption>The Raspberry Pi server — the heart of Levels 2 through 4.</figcaption>
+          </figure>
+
+          <h2>How to choose the right level</h2>
+          <ol class="article-steps">
+            <li><div><strong>Define the use case first</strong><p>Is the need personal phone sharing, group teaching, local library access, remote updates, or all of those? The use case drives everything else.</p></div></li>
+            <li><div><strong>Start at the base level</strong><p>A Level 1 phone kit costs almost nothing and works everywhere. Start there unless you already know the field needs more.</p></div></li>
+            <li><div><strong>Add power only when it's a real need</strong><p>Choose battery or solar based on how long sessions run and how reliable the local grid is. Don't add solar costs if wall power is available.</p></div></li>
+            <li><div><strong>Add media for group settings</strong><p>A projector and speaker only make sense when one screen needs to serve a room or outdoor gathering. Add them when the kit is going to a church, school, or village setting.</p></div></li>
+            <li><div><strong>Quote satellite separately</strong><p>Hardware, subscription, and power needs vary widely by region. Treat satellite as a line item that gets its own assessment — not a default add-on.</p></div></li>
+            <li><div><strong>Keep costs itemized</strong><p>For board reporting and partner transparency, break out each component — Pi, storage, projector, battery, solar, satellite — so costs are clear and replaceable.</p></div></li>
+          </ol>
+
+          <div class="article-callout">
+            <p>The most common mistake is over-building the first kit. A simple phone-sharing guide and a loaded microSD card can serve a community for years.</p>
+          </div>
+
+          <div class="article-cta">
+            <p>Download the Kit Levels overview as a printable PDF for board packets and field planning.</p>
+            <a class="pdf-button" href="./downloads/villageserver-kit-levels-and-costs.pdf" download>Download Kit Levels PDF</a>
+          </div>
         </article>
         <aside class="side-card" aria-label="Page summary">
-          <img src="./img/kit-case.webp" alt="Portable field kit case" loading="lazy">
-          <h2>Download and use</h2>
-          <p><strong>Read this page when...</strong> someone asks what a kit includes and how costs should be itemized.</p>
+          <h2 class="side-title">Key points</h2>
+          <ul class="side-list">
+            <li>Start with the smallest kit that solves the actual field problem</li>
+            <li>Add power, projection, or satellite only when the setting calls for it</li>
+            <li>Keep component costs itemized for board transparency</li>
+          </ul>
           <a class="pdf-button" href="./downloads/villageserver-kit-levels-and-costs.pdf" download>Download PDF</a>
-          <p class="mini-note">PDFs are printable and can be saved for offline use.</p>
-          <div class="related" aria-label="Related pages"><a href="./programs.html">Programs and Services</a><a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a><a href="./power.html">Power Systems and Solar Solutions</a><a href="./satellite.html">Satellite Systems and Content Acquisition</a></div>
+          <p class="mini-note">Printable and shareable offline.</p>
+          <div class="related" aria-label="Related pages">
+            <a href="./programs.html">Programs and Services</a>
+            <a href="./raspberry-pi.html">Raspberry Pi System</a>
+            <a href="./power.html">Power Systems and Solar</a>
+            <a href="./satellite.html">Satellite Systems</a>
+          </div>
         </aside>
       </div>
     </section>

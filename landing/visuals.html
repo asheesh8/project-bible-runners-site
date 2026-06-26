@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=1">
+  <link rel="stylesheet" href="./css/board.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -22,26 +22,69 @@
   <main id="main">
     <section class="board-hero">
       <div class="wrap">
-        <p class="meta">Board brief - show the work simply</p>
-        <h1>Photos and Visuals</h1>
-        <p class="summary">Photos, diagrams, and short videos help non-technical viewers understand the field model quickly.</p>
+        <p class="meta">Photos and Visuals</p>
+        <h1>A good visual answers one question at a glance</h1>
+        <p class="summary">Photos, diagrams, and short videos help non-technical viewers understand the field model quickly. The goal is fewer, stronger images — each one showing people using the kit in a real setting, not hardware sitting on a table.</p>
       </div>
     </section>
     <section class="page-body">
       <div class="wrap board-layout">
-        <article>
-          <section class="plain-answer"><h2>Plain answer</h2><p>A good visual should answer one question at a glance: what is being used, who is using it, and why it matters.</p></section>
-          <section class="step-section"><p class="section-kicker">Field steps</p><h2>Use it this way</h2><ol class="step-list"><li><div><strong>Show the people</strong><span>Use photos of real setup, training, and handoff moments, not only equipment close-ups.</span></div></li><li><div><strong>Show the parts</strong><span>Capture the phone, server, battery, solar panel, projector, dish, and printed guide in context.</span></div></li><li><div><strong>Caption plainly</strong><span>Write captions that explain the ministry purpose in one sentence.</span></div></li><li><div><strong>Avoid clutter</strong><span>Use fewer, stronger images so the page feels like a story instead of a dump of files.</span></div></li><li><div><strong>Keep permissions clear</strong><span>Only publish images and video that are approved for public ministry use.</span></div></li></ol></section>
-          <section class="brief-grid" aria-label="Key points"><article class="brief-card"><h3>Best photo</h3><p>A person using the kit in a real setting.</p></article><article class="brief-card"><h3>Best diagram</h3><p>A simple flow from power to server to phone to sharing.</p></article><article class="brief-card"><h3>Best video</h3><p>A short setup clip that shows confidence and practicality.</p></article><article class="brief-card"><h3>Board takeaway</h3><p>Visual proof makes the initiative easier to understand and easier to trust.</p></article></section>
-          
+        <article class="article-body">
+          <p class="article-lead">Most people who see VillageServer for the first time aren't technical. They need to understand what the initiative does before they can decide to support it. A good photo communicates in three seconds what three paragraphs struggle to say: what is being used, who is using it, and why it matters.</p>
+
+          <figure class="fig-full">
+            <img src="./img/test-run-workshop.jpeg" alt="Team assembling and testing VillageServer field kit components during a readiness workshop" loading="lazy">
+            <figcaption>Field readiness workshop — testing kit components before a real deployment, with real people in the frame.</figcaption>
+          </figure>
+
+          <h2>What makes a visual work</h2>
+          <p>The strongest images are candid, not staged. They show a real moment — a setup being tested, a local leader explaining the process, a group watching a film projected on a wall. Equipment-only photos don't carry the weight that a photo of people does.</p>
+          <ul class="article-bullets">
+            <li><strong>Best photo</strong> — a person using the kit in a real setting: a local leader connecting a phone, a group gathered around a projected screen, a missionary handing someone a printed guide</li>
+            <li><strong>Best diagram</strong> — a simple flow showing power → server → phone → sharing; non-technical viewers should be able to trace the path without explanation</li>
+            <li><strong>Best short video</strong> — a setup sequence that shows the whole process from unpacking to first file, demonstrating confidence and practicality in under two minutes</li>
+          </ul>
+
+          <div class="fig-pair">
+            <figure>
+              <img src="./img/test-run-table.jpeg" alt="Team checking phone connections during a VillageServer test run" loading="lazy">
+              <figcaption>Phones connecting during a test run — the moment the library becomes accessible.</figcaption>
+            </figure>
+            <figure>
+              <img src="./img/test-run-satellite.jpeg" alt="Satellite dish alignment check during the VillageServer field test" loading="lazy">
+              <figcaption>Satellite alignment check — documenting the optional components in context.</figcaption>
+            </figure>
+          </div>
+
+          <h2>How to capture and use visuals well</h2>
+          <ol class="article-steps">
+            <li><div><strong>Show the people, not just the equipment</strong><p>Photos of a Raspberry Pi on a table or cables in a case don't communicate the mission. Photos of a group using the kit in a real setting do.</p></div></li>
+            <li><div><strong>Capture real setup and handoff moments</strong><p>The moments that matter most visually are: powering on the kit for the first time, a local leader being trained, a group receiving resources, and a successful file transfer.</p></div></li>
+            <li><div><strong>Write plain captions</strong><p>One sentence explaining the ministry purpose. "A local leader connecting a phone during the first session" is better than "Setup testing in progress."</p></div></li>
+            <li><div><strong>Use fewer, stronger images</strong><p>Five well-chosen photos tell a better story than thirty random ones. A page that feels like a file dump doesn't hold anyone's attention.</p></div></li>
+            <li><div><strong>Keep permissions documented</strong><p>Only publish images and video that are approved for public ministry use. Keep a simple record of who approved what, especially for photos of identifiable people in sensitive regions.</p></div></li>
+          </ol>
+
+          <div class="article-cta">
+            <p>Download the Photos and Visuals guide as a printable PDF for presentation planning and board packets.</p>
+            <a class="pdf-button" href="./downloads/villageserver-photos-and-visuals.pdf" download>Download Visuals Guide PDF</a>
+          </div>
         </article>
         <aside class="side-card" aria-label="Page summary">
-          <img src="./img/test-run-workshop.jpeg" alt="Team assembling field kit components in a workshop" loading="lazy">
-          <h2>Download and use</h2>
-          <p><strong>Read this page when...</strong> you need to explain which photos and videos are useful for presentations.</p>
+          <h2 class="side-title">Key points</h2>
+          <ul class="side-list">
+            <li>Photos of people using the kit communicate more than photos of equipment alone</li>
+            <li>Use fewer, stronger images — a curated selection beats a large dump of files</li>
+            <li>Keep permissions documented for any identifiable people, especially in sensitive regions</li>
+          </ul>
           <a class="pdf-button" href="./downloads/villageserver-photos-and-visuals.pdf" download>Download PDF</a>
-          <p class="mini-note">PDFs are printable and can be saved for offline use.</p>
-          <div class="related" aria-label="Related pages"><a href="./testimonials.html">Testimonials</a><a href="./initiative.html">Full Initiative Overview</a><a href="./guide.html">Setup Guide</a><a href="./pamphlets.html">Printable Pamphlets and Field FAQ</a></div>
+          <p class="mini-note">Printable and shareable offline.</p>
+          <div class="related" aria-label="Related pages">
+            <a href="./testimonials.html">Testimonials</a>
+            <a href="./initiative.html">Full Initiative Overview</a>
+            <a href="./guide.html">Setup Guide</a>
+            <a href="./pamphlets.html">Printable Pamphlets</a>
+          </div>
         </aside>
       </div>
     </section>

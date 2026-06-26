@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=1">
+  <link rel="stylesheet" href="./css/board.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -22,26 +22,73 @@
   <main id="main">
     <section class="board-hero">
       <div class="wrap">
-        <p class="meta">Board brief - common questions</p>
-        <h1>Field FAQ</h1>
-        <p class="summary">The FAQ answers common field questions in plain language: internet, apps, power, privacy, content updates, and sharing.</p>
+        <p class="meta">Field FAQ</p>
+        <h1>Quick answers to the questions that come up every time</h1>
+        <p class="summary">The FAQ addresses the most common field questions in plain language — internet, apps, power, device compatibility, privacy, and what happens when things go wrong.</p>
       </div>
     </section>
     <section class="page-body">
       <div class="wrap board-layout">
-        <article>
-          <section class="plain-answer"><h2>Plain answer</h2><p>When someone is confused, give them the next action, not a lecture. Each answer should point back to one simple step.</p></section>
-          <section class="step-section"><p class="section-kicker">Field steps</p><h2>Use it this way</h2><ol class="step-list"><li><div><strong>Listen for the real blocker</strong><span>Is the problem power, Wi-Fi, file location, device type, language, or confidence?</span></div></li><li><div><strong>Answer in one sentence</strong><span>Give the shortest accurate answer first.</span></div></li><li><div><strong>Show the next action</strong><span>Point to the button, cable, Wi-Fi name, folder, or handout they need.</span></div></li><li><div><strong>Confirm on the device</strong><span>Have the person do the step while you watch.</span></div></li><li><div><strong>Write down repeats</strong><span>If several people ask the same question, update the guide or PDF.</span></div></li></ol></section>
-          <section class="brief-grid" aria-label="Key points"><article class="brief-card"><h3>Does it need internet?</h3><p>No. The local library should work offline. Internet or satellite is optional for updates.</p></article><article class="brief-card"><h3>Does every phone need an app?</h3><p>No for basic library access. Some sharing routes use common apps such as LocalSend.</p></article><article class="brief-card"><h3>What if power fails?</h3><p>Use battery, solar, or local power planning. Keep the library useful even when the live link is off.</p></article><article class="brief-card"><h3>Can local leaders run this without tech skills?</h3><p>Yes. The guides and PDFs are written for non-technical users who need to follow clear steps under field pressure.</p></article></section>
-          
+        <article class="article-body">
+          <p class="article-lead">When someone is confused in the field, give them the next action — not a lecture. Each answer below is short by design. If a longer explanation is needed, it belongs in a full guide, not a FAQ. Point to the handout, the cable, the folder, or the next step.</p>
+
+          <figure class="fig-full">
+            <img src="./img/child.webp" alt="Child using a VillageServer resource in a field learning setting" loading="lazy">
+            <figcaption>A child engaging with resources in the field — the system is designed to work for anyone, not just the technically confident.</figcaption>
+          </figure>
+
+          <h2>Common questions and plain answers</h2>
+
+          <h3 class="faq-q">Does it need internet to work?</h3>
+          <p>No. The local library runs completely offline. Once the Raspberry Pi is powered on and a phone connects to its Wi-Fi, all content is available without any internet connection. Internet or satellite is only needed if you want to download new content updates — the core library works in fully offline settings.</p>
+
+          <h3 class="faq-q">Does every phone need a special app?</h3>
+          <p>No. Basic library access through the Raspberry Pi Wi-Fi just needs a browser — nothing extra to install. Some sharing methods (like LocalSend) use a free app for cross-device transfers, but for joining the VillageServer library, a standard browser is all that's needed.</p>
+
+          <h3 class="faq-q">What happens if power fails mid-session?</h3>
+          <p>The session pauses — but files that were already downloaded to phones are still accessible offline. This is why the setup guide emphasizes downloading files to the phone during the session, not just streaming from the server. If the server goes off, the downloaded content stays.</p>
+
+          <h3 class="faq-q">Can local leaders run this without tech skills?</h3>
+          <p>Yes — that's the design goal. The setup process is six steps. The printed guides use plain language, not technical terms. The system is intentionally simple enough for someone who has never managed a computer before. If a local leader struggles to follow the guide, the guide needs to improve — not the person.</p>
+
+          <h3 class="faq-q">What if the Wi-Fi name doesn't appear?</h3>
+          <p>Give the Pi 90 seconds to fully boot before checking. If the network still doesn't appear: confirm the Pi is receiving power (check the LED indicator), try turning the phone's Wi-Fi off and back on, and check that the power source is stable. Most "not appearing" problems are power-related.</p>
+
+          <h3 class="faq-q">What if a file won't open?</h3>
+          <p>Try a different file first to confirm the connection is working. If one file fails but others open, the specific file may be corrupted — delete and re-download it. If no files open, the problem is the connection or browser, not the content. Clear the browser cache and try again.</p>
+
+          <h3 class="faq-q">How do we update the content?</h3>
+          <p>Content is updated by connecting the Pi to the internet (at a location with Wi-Fi or via satellite in truly remote settings) and running the update process. In areas with cellular data, a personal hotspot can also work. The library doesn't need to go back to a central location for updates — it can receive new content wherever connectivity is available.</p>
+
+          <h2>How to handle confusion in the field</h2>
+          <ol class="article-steps">
+            <li><div><strong>Listen for the real blocker</strong><p>Is the problem power, Wi-Fi connection, file location, device type, language, or confidence? Identify the actual issue before suggesting a fix.</p></div></li>
+            <li><div><strong>Give the shortest accurate answer first</strong><p>One sentence. If the answer takes three sentences to explain, the person probably needs to see it done, not described.</p></div></li>
+            <li><div><strong>Show the next action on the actual device</strong><p>Point to the button, cable, Wi-Fi name, folder, or handout. Have them do the step themselves while you watch — not while you do it for them.</p></div></li>
+            <li><div><strong>Confirm on the device before moving on</strong><p>The answer doesn't count until the person has done the step and it worked. "I understand" is not the same as "it opened."</p></div></li>
+            <li><div><strong>If multiple people ask the same question, fix the guide</strong><p>Repeated questions mean the current explanation isn't working. Update the PDF or printed handout so the answer is there the next time.</p></div></li>
+          </ol>
+
+          <div class="article-cta">
+            <p>Download the Field FAQ as a printable PDF — the single sheet to leave in every kit for quick reference in the field.</p>
+            <a class="pdf-button" href="./downloads/villageserver-field-faq.pdf" download>Download Field FAQ PDF</a>
+          </div>
         </article>
         <aside class="side-card" aria-label="Page summary">
-          <img src="./img/child.webp" alt="Child using learning resources" loading="lazy">
-          <h2>Download and use</h2>
-          <p><strong>Read this page when...</strong> someone needs quick answers without a technical manual.</p>
+          <h2 class="side-title">Key points</h2>
+          <ul class="side-list">
+            <li>The library works completely offline — no internet needed to browse or download content</li>
+            <li>Most field problems are power or connection related, not software related</li>
+            <li>If the same question comes up repeatedly, update the guide — not just the answer</li>
+          </ul>
           <a class="pdf-button" href="./downloads/villageserver-field-faq.pdf" download>Download PDF</a>
-          <p class="mini-note">PDFs are printable and can be saved for offline use.</p>
-          <div class="related" aria-label="Related pages"><a href="./guide.html">Setup Guide</a><a href="./access.html">Get and Share Resources</a><a href="./transfer.html">Transfer Resources Between Devices</a><a href="./rollout.html">Rollout and Reach</a></div>
+          <p class="mini-note">Printable and shareable offline.</p>
+          <div class="related" aria-label="Related pages">
+            <a href="./guide.html">Setup Guide</a>
+            <a href="./access.html">Get and Share Resources</a>
+            <a href="./transfer.html">Transfer Between Devices</a>
+            <a href="./rollout.html">Rollout and Reach</a>
+          </div>
         </aside>
       </div>
     </section>

@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Satellite Systems and Content Acquisition | VillageServer Initiative</title>
-  <meta name="description" content="Satellite can help a team update, download, or communicate from remote places, but the local library should still work without it.">
+  <meta name="description" content="Satellite is optional — a bridge for remote content updates and field coordination, not the foundation. The local library should work completely offline without it.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=1">
+  <link rel="stylesheet" href="./css/board.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -22,26 +22,69 @@
   <main id="main">
     <section class="board-hero">
       <div class="wrap">
-        <p class="meta">Board brief - optional uplink</p>
-        <h1>Satellite Systems and Content Acquisition</h1>
-        <p class="summary">Satellite can help a team update, download, or communicate from remote places, but the local library should still work without it.</p>
+        <p class="meta">Satellite Systems and Content Acquisition</p>
+        <h1>A bridge, not the foundation</h1>
+        <p class="summary">Satellite is the optional part of the VillageServer kit. Useful for remote content downloads and field coordination — but the local library should work completely offline before satellite ever enters the plan.</p>
       </div>
     </section>
     <section class="page-body">
       <div class="wrap board-layout">
-        <article>
-          <section class="plain-answer"><h2>Plain answer</h2><p>Satellite is optional. It is helpful for updates and remote coordination, but it should not become the foundation. VillageServer is strongest when the local library works offline first.</p></section>
-          <section class="step-section"><p class="section-kicker">Field steps</p><h2>Use it this way</h2><ol class="step-list"><li><div><strong>Decide if it is needed</strong><span>Use satellite only when updates, coordination, or downloads cannot wait for normal internet.</span></div></li><li><div><strong>Choose the location</strong><span>Find open sky, stable ground, and a safe cable path.</span></div></li><li><div><strong>Align and power</strong><span>Set up the dish, connect power, and wait for the link to stabilize.</span></div></li><li><div><strong>Download intentionally</strong><span>Update only the resources needed for the mission, not random large files.</span></div></li><li><div><strong>Return to offline mode</strong><span>Make sure the local library still works after the satellite link is turned off.</span></div></li><li><div><strong>Document the session</strong><span>Write down what was updated and any connection problems.</span></div></li></ol></section>
-          <section class="brief-grid" aria-label="Key points"><article class="brief-card"><h3>Best use</h3><p>Remote content updates, coordination, emergency communication, or proof-of-concept work.</p></article><article class="brief-card"><h3>Not required</h3><p>The core library should still work without satellite.</p></article><article class="brief-card"><h3>Main risks</h3><p>Power draw, sky view, weather, subscription cost, and setup complexity.</p></article><article class="brief-card"><h3>Board takeaway</h3><p>Satellite is a bridge for updates, not the heart of the system.</p></article></section>
-          
+        <article class="article-body">
+          <p class="article-lead">Satellite is helpful in the right setting — a team working days from the nearest town, needing to pull down fresh content or send field updates. But it's a bridge, not the road. VillageServer is strongest when the local library is already working offline.</p>
+
+          <figure class="fig-full">
+            <img src="./img/dish.webp" alt="Satellite dish aligned for a content update during a remote VillageServer field deployment" loading="lazy">
+            <figcaption>Satellite dish aligned for a content update during a remote VillageServer field test.</figcaption>
+          </figure>
+
+          <h2>When satellite actually helps</h2>
+          <p>Most VillageServer deployments don't need satellite at all. The library is loaded before the team leaves, and everything runs offline in the field. Satellite becomes useful in specific situations:</p>
+          <ul class="article-bullets">
+            <li><strong>Remote content updates</strong> — downloading a new language version or updated resource pack when too far from cellular data</li>
+            <li><strong>Field reports</strong> — sending observations, reach numbers, or testimonials back to base during extended deployments</li>
+            <li><strong>New resource acquisition</strong> — pulling a specific file or library that wasn't included in the original kit</li>
+            <li><strong>Emergency communication</strong> — when no other connectivity is available and contact with the team is necessary</li>
+          </ul>
+
+          <figure class="fig-half">
+            <img src="./img/test-run-satellite.jpeg" alt="Team checking satellite hardware alignment during the VillageServer field test" loading="lazy">
+            <figcaption>Checking satellite hardware alignment during the VillageServer field test run.</figcaption>
+          </figure>
+
+          <h2>Setting it up in the field</h2>
+          <ol class="article-steps">
+            <li><div><strong>Confirm satellite is actually needed</strong><p>If cellular data is available — even slow 3G — use it instead. Satellite adds cost, complexity, and setup time that isn't worth it when a hotspot works.</p></div></li>
+            <li><div><strong>Find open sky</strong><p>The dish needs an unobstructed line to the satellite. Even a single tree branch can break the link. Scout the location before setting up.</p></div></li>
+            <li><div><strong>Set up on stable ground</strong><p>The dish must stay aligned during use. Wind, soft ground, or accidental movement will drop the connection mid-download.</p></div></li>
+            <li><div><strong>Power it properly</strong><p>Satellite hardware draws more current than the Pi or projector. Plan this separately in your battery and solar budget.</p></div></li>
+            <li><div><strong>Download only what the mission needs</strong><p>Avoid pulling large files out of habit. Every unnecessary download wastes battery, data allowance, and time.</p></div></li>
+            <li><div><strong>Test the local library offline after</strong><p>Disconnect the satellite and confirm all core content still works without it. The session should never depend on the satellite link staying active.</p></div></li>
+          </ol>
+
+          <div class="article-callout">
+            <p>Build the offline library first. Satellite is a bridge for updates — not the heart of the system.</p>
+          </div>
+
+          <div class="article-cta">
+            <p>Download the Satellite Systems overview as a printable PDF for kit planning and field briefings.</p>
+            <a class="pdf-button" href="./downloads/villageserver-satellite-systems.pdf" download>Download Satellite Systems PDF</a>
+          </div>
         </article>
         <aside class="side-card" aria-label="Page summary">
-          <img src="./img/dish.webp" alt="Satellite dish for remote connectivity" loading="lazy">
-          <h2>Download and use</h2>
-          <p><strong>Read this page when...</strong> someone asks how remote internet or content updates fit into the model.</p>
+          <h2 class="side-title">Key points</h2>
+          <ul class="side-list">
+            <li>The offline library should work completely before satellite is part of the plan</li>
+            <li>Satellite needs open sky, stable ground, and its own power budget</li>
+            <li>Use cellular data instead whenever it's available — satellite is for truly remote settings</li>
+          </ul>
           <a class="pdf-button" href="./downloads/villageserver-satellite-systems.pdf" download>Download PDF</a>
-          <p class="mini-note">PDFs are printable and can be saved for offline use.</p>
-          <div class="related" aria-label="Related pages"><a href="./power.html">Power Systems and Solar Solutions</a><a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a><a href="./custom-libraries.html">Content Libraries and Custom Ministry Resources</a><a href="./kit-levels.html">Kit Levels and Costs</a></div>
+          <p class="mini-note">Printable and shareable offline.</p>
+          <div class="related" aria-label="Related pages">
+            <a href="./power.html">Power Systems and Solar</a>
+            <a href="./raspberry-pi.html">Raspberry Pi System</a>
+            <a href="./custom-libraries.html">Content Libraries</a>
+            <a href="./kit-levels.html">Kit Levels and Costs</a>
+          </div>
         </aside>
       </div>
     </section>
