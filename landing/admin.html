@@ -551,6 +551,50 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
       </div>
 
+      <!-- ── TESTIMONIES ───────────────────────────── -->
+      <div class="tab-view" id="tab-testimonies">
+        <div class="page-header">
+          <h2 class="page-title">Testimonies</h2>
+          <button class="btn-new" id="new-testi-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add testimony
+          </button>
+        </div>
+
+        <div class="form-panel" id="testi-form-panel">
+          <h3 id="testi-form-title">New testimony</h3>
+          <input type="hidden" id="testi-id" />
+          <div class="form-row full">
+            <div class="field"><label>Quote</label><textarea id="tf-quote" rows="3" placeholder="&ldquo;For the first time I had Scripture in my own language…&rdquo;"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Name / Attribution</label><input type="text" id="tf-name" placeholder="Pastor Emmanuel" /></div>
+            <div class="field"><label>Location (optional)</label><input type="text" id="tf-location" placeholder="Northern Uganda" /></div>
+          </div>
+          <div class="form-row full">
+            <div class="field">
+              <label>Status</label>
+              <select id="tf-status">
+                <option value="draft">Draft — not visible on site</option>
+                <option value="active">Active — visible on site</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" id="save-testi-btn">Save testimony</button>
+            <button class="btn-cancel" id="cancel-testi-btn">Cancel</button>
+          </div>
+          <p class="form-msg" id="testi-msg"></p>
+        </div>
+
+        <div class="testimonies-grid" id="testimonies-list">
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <div>No testimonies yet. Add one above.</div>
+          </div>
+        </div>
+      </div>
+
       <!-- ── RESOURCES ─────────────────────────────── -->
       <div class="tab-view" id="tab-resources">
         <div class="page-header"><h2 class="page-title">Resources &amp; How-To</h2></div>
@@ -809,6 +853,7 @@ function loadTab(tab){
   if(tab === 'campaigns') loadCampaigns();
   else if(tab === 'posts') loadPosts();
   else if(tab === 'photos') loadPhotos();
+  else if(tab === 'testimonies') loadTestimonies();
   // 'resources' is static — nothing to load
 }
 
@@ -881,8 +926,48 @@ document.getElementById('save-campaign-btn').addEventListener('click', function(
     .catch(function(){ showMsg('campaign-msg','Save failed — is Supabase configured?','err'); });
 });
 
+function updateProgressWidget(c){
+  var nameEl = document.getElementById('ctrl-campaign-name');
+  var badge  = document.getElementById('ctrl-active-badge');
+  var body   = document.getElementById('ctrl-body');
+  if(!c){
+    nameEl.textContent = '—';
+    badge.style.display = 'none';
+    body.innerHTML = '<div class="progress-no-active">No active campaign. Create one below and mark it Active.</div>';
+    return;
+  }
+  nameEl.textContent = c.name;
+  badge.style.display = 'inline-flex';
+  var goal   = Number(c.goal_amount)||0;
+  var raised = Number(c.raised_amount)||0;
+  var pct    = goal > 0 ? Math.min(100, Math.round(raised/goal*100)) : 0;
+  var bFunded  = Number(c.bibles_funded)||0;
+  var bNeeded  = Number(c.bibles_needed)||0;
+  body.innerHTML =
+    '<div class="pbar-wrap"><div class="pbar-fill" style="width:'+pct+'%"></div></div>' +
+    '<div class="pbar-stats">' +
+      '<span><strong>$'+Number(raised).toLocaleString()+'</strong> raised</span>' +
+      '<span><strong>$'+Number(goal).toLocaleString()+'</strong> goal</span>' +
+      '<span><strong>'+pct+'%</strong></span>' +
+    '</div>' +
+    (bFunded||bNeeded ? '<div class="pbar-stats"><span><strong>'+bFunded+'</strong> Bibles funded</span><span><strong>'+bNeeded+'</strong> still needed</span></div>' : '') +
+    '<div class="ctrl-actions">' +
+      '<button class="btn-reset" onclick="editCampaign('+JSON.stringify(c).replace(/"/g,'&quot;')+')">Edit / update progress</button>' +
+      '<button class="btn-reset" style="border-color:#ff8182;color:var(--danger)" onclick="resetCampaignProgress(\''+c.id+'\')">Reset raised to $0</button>' +
+    '</div>';
+}
+
+function resetCampaignProgress(id){
+  if(!confirm('Reset raised amount to $0 for this campaign?')) return;
+  api('PATCH','campaigns',{raised_amount:0,bibles_funded:0},id)
+    .then(function(){ loadCampaigns(); showStatus('Progress reset to $0.','ok'); })
+    .catch(function(){ showStatus('Reset failed.','err'); });
+}
+
 function loadCampaigns(){
   apiGet('campaigns').then(function(data){
+    var activeCampaign = data && data.find(function(c){ return c.active; });
+    updateProgressWidget(activeCampaign||null);
     var list = document.getElementById('campaigns-list');
     if(!data || !data.length){
       list.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v18H3z"/></svg><div>No campaigns yet. Create one above.</div></div>';
@@ -1084,6 +1169,90 @@ function editPhoto(id){
 function deletePhoto(id){
   if(!confirm('Delete this photo?')) return;
   api('DELETE','photos',null,id).then(function(){ loadPhotos(); showStatus('Photo deleted.','ok'); });
+}
+
+// ════════════════════════════════════════════════════════
+// TESTIMONIES
+// ════════════════════════════════════════════════════════
+document.getElementById('new-testi-btn').addEventListener('click', function(){
+  clearTestiForm();
+  document.getElementById('testi-form-title').textContent = 'New testimony';
+  document.getElementById('testi-form-panel').classList.add('open');
+});
+document.getElementById('cancel-testi-btn').addEventListener('click', function(){
+  document.getElementById('testi-form-panel').classList.remove('open');
+});
+
+function clearTestiForm(){
+  ['testi-id','tf-quote','tf-name','tf-location'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('tf-status').value = 'draft';
+  document.getElementById('testi-msg').style.display = 'none';
+}
+
+function fillTestiForm(t){
+  document.getElementById('testi-id').value = t.id||'';
+  document.getElementById('tf-quote').value = t.quote||'';
+  document.getElementById('tf-name').value = t.attribution||'';
+  document.getElementById('tf-location').value = t.location||'';
+  document.getElementById('tf-status').value = t.status||'draft';
+}
+
+document.getElementById('save-testi-btn').addEventListener('click', function(){
+  var body = {
+    quote: document.getElementById('tf-quote').value.trim(),
+    attribution: document.getElementById('tf-name').value.trim()||null,
+    location: document.getElementById('tf-location').value.trim()||null,
+    status: document.getElementById('tf-status').value,
+  };
+  if(!body.quote){ showMsg('testi-msg','Quote is required','err'); return; }
+  var id = document.getElementById('testi-id').value;
+  api(id?'PATCH':'POST','testimonies',body,id||null)
+    .then(function(data){
+      if(data && data.error){ showMsg('testi-msg','Error: '+data.error,'err'); return; }
+      document.getElementById('testi-form-panel').classList.remove('open');
+      clearTestiForm();
+      loadTestimonies();
+      showStatus(id?'Testimony updated.':'Testimony saved.','ok');
+    })
+    .catch(function(){ showMsg('testi-msg','Save failed — is Supabase configured?','err'); });
+});
+
+function loadTestimonies(){
+  apiGet('testimonies').then(function(data){
+    var list = document.getElementById('testimonies-list');
+    if(!data||!data.length){
+      list.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>No testimonies yet. Add one above.</div></div>';
+      return;
+    }
+    list.innerHTML = data.map(function(t){
+      return '<div class="testi-item">' +
+        '<div class="testi-body">' +
+          '<p class="testi-quote">&ldquo;'+esc(t.quote)+'&rdquo;</p>' +
+          '<p class="testi-meta">'+(t.attribution?esc(t.attribution):'Anonymous')+(t.location?' &mdash; '+esc(t.location):'')+'</p>' +
+          '<div class="testi-status"><span class="td-badge '+(t.status==='active'?'active':'draft')+'">'+(t.status==='active'?'Active':'Draft')+'</span></div>' +
+        '</div>' +
+        '<div class="td-actions" style="flex-direction:column;gap:6px">' +
+          '<button class="btn-edit" onclick="editTesti(\''+t.id+'\')">Edit</button>' +
+          '<button class="btn-del" onclick="deleteTesti(\''+t.id+'\')">Delete</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    window._testiCache = data;
+  }).catch(function(){ showStatus('Could not load testimonies — Supabase may not be configured yet.','warn'); });
+}
+
+function editTesti(id){
+  var t = (window._testiCache||[]).find(function(x){ return x.id===id; });
+  if(!t) return;
+  fillTestiForm(t);
+  document.getElementById('testi-form-title').textContent = 'Edit testimony';
+  document.getElementById('testi-form-panel').classList.add('open');
+  document.getElementById('testi-form-panel').scrollIntoView({behavior:'smooth'});
+}
+
+function deleteTesti(id){
+  if(!confirm('Delete this testimony? This cannot be undone.')) return;
+  api('DELETE','testimonies',null,id).then(function(){ loadTestimonies(); showStatus('Testimony deleted.','ok'); });
 }
 
 // ── Shared helpers ───────────────────────────────────────
