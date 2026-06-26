@@ -149,14 +149,15 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET' && type === 'summary') {
-    let [visitsR, interestsR] = await Promise.all([
+    let [visitsR, interestsR, availR] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' }),
       fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, { headers: sbH }),
+      fetch(`${SUPABASE_URL}/rest/v1/availability_requests?select=country,created_at&order=created_at.desc`, { headers: sbH }),
     ]);
     if (!visitsR.ok) visitsR = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' });
     if (!visitsR.ok) visitsR = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' });
-    const [visits, interests] = await Promise.all([visitsR.json(), interestsR.json()]);
-    return res.status(200).json({ visits: visits || [], interests: interests || [] });
+    const [visits, interests, availabilities] = await Promise.all([visitsR.json(), interestsR.json(), availR.ok ? availR.json() : Promise.resolve([])]);
+    return res.status(200).json({ visits: visits || [], interests: interests || [], availabilities: availabilities || [] });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });

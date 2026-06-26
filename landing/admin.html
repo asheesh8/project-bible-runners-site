@@ -329,6 +329,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .bar-fill{height:100%;background:var(--sidebar-active);border-radius:99px}
 .bar-count{font-size:12px;color:var(--muted);font-weight:700;min-width:30px;text-align:right}
 .interests-table-wrap{overflow-x:auto}
+/* Live polling UI */
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:#16a34a;color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em;padding:3px 8px 3px 6px;border-radius:99px;text-transform:uppercase}
+.live-dot{width:6px;height:6px;background:#fff;border-radius:50%;display:inline-block;animation:livePulse 1.4s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+.live-meta{font-size:11px;color:var(--muted)}
+#traffic-countdown-wrap{height:3px;background:var(--border);margin:0 0 20px;border-radius:99px;overflow:hidden;display:none}
+#traffic-countdown-bar{height:3px;background:#16a34a;border-radius:99px;width:100%;animation:cdShrink 4s linear forwards}
+@keyframes cdShrink{from{width:100%}to{width:0%}}
 
 /* Responsive */
 @media(max-width:760px){
@@ -618,21 +626,23 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       <!-- ── TRAFFIC ──────────────────────────────── -->
       <div class="tab-view" id="tab-traffic">
         <div class="page-header">
-          <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <h2 class="page-title" style="margin:0">Traffic &amp; Analytics</h2>
-            <span id="traffic-live-badge" style="display:none;background:#16a34a;color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:99px;text-transform:uppercase">● LIVE</span>
+            <span id="traffic-live-badge" style="display:none" class="live-badge"><span class="live-dot"></span>LIVE</span>
+            <span id="traffic-last-updated" class="live-meta" style="display:none"></span>
           </div>
           <button class="btn-new" id="refresh-traffic-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             Refresh
           </button>
         </div>
+        <div id="traffic-countdown-wrap"><div id="traffic-countdown-bar"></div></div>
 
         <div class="stat-grid">
           <div class="stat-card accent"><div class="stat-val" id="stat-visits">—</div><div class="stat-label">Total visits</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-unique">—</div><div class="stat-label">Unique visitors</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-today">—</div><div class="stat-label">Visits today</div></div>
-          <div class="stat-card"><div class="stat-val" id="stat-interests">—</div><div class="stat-label">Donation interests</div></div>
+          <div class="stat-card"><div class="stat-val" id="stat-interests">—</div><div class="stat-label">Interest signups</div></div>
         </div>
 
         <div class="res-section">
@@ -643,6 +653,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         <div class="res-section">
           <div class="res-section-title">📣 &nbsp;Traffic sources</div>
           <div id="utm-sources-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">🌍 &nbsp;Users by country</div>
+          <div id="country-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
         <div class="res-section">
@@ -1240,20 +1255,36 @@ function deletePhoto(id){
 var _trafficPoll = null;
 
 document.getElementById('refresh-traffic-btn').addEventListener('click', function(){
+  resetCountdownBar();
   loadTraffic(true);
 });
 
 function startTrafficPoll(){
   loadTraffic(true);
-  document.getElementById('traffic-live-badge').style.display = 'inline-block';
+  document.getElementById('traffic-live-badge').style.display = 'inline-flex';
+  document.getElementById('traffic-countdown-wrap').style.display = 'block';
+  resetCountdownBar();
   if(_trafficPoll) clearInterval(_trafficPoll);
-  _trafficPoll = setInterval(function(){ loadTraffic(false); }, 4000);
+  _trafficPoll = setInterval(function(){
+    loadTraffic(false);
+    resetCountdownBar();
+  }, 4000);
 }
 
 function stopTrafficPoll(){
   if(_trafficPoll){ clearInterval(_trafficPoll); _trafficPoll = null; }
   var badge = document.getElementById('traffic-live-badge');
   if(badge) badge.style.display = 'none';
+  var wrap = document.getElementById('traffic-countdown-wrap');
+  if(wrap) wrap.style.display = 'none';
+}
+
+function resetCountdownBar(){
+  var bar = document.getElementById('traffic-countdown-bar');
+  if(!bar) return;
+  bar.style.animation = 'none';
+  bar.offsetWidth; // force reflow to restart animation
+  bar.style.animation = 'cdShrink 4s linear forwards';
 }
 
 function loadTraffic(showSpinner){
@@ -1266,7 +1297,11 @@ function loadTraffic(showSpinner){
   fetch('/api/track?type=summary', { headers:{ 'Authorization':'Bearer '+AUTH_TOKEN } })
     .then(function(r){ return r.json(); })
     .then(function(data){
-      renderTraffic(data.visits||[], data.interests||[]);
+      renderTraffic(data.visits||[], data.interests||[], data.availabilities||[]);
+      var now = new Date();
+      document.getElementById('traffic-last-updated').style.display = 'inline';
+      document.getElementById('traffic-last-updated').textContent =
+        'Updated ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
       btn.disabled = false;
       btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Refresh';
     })
@@ -1277,7 +1312,7 @@ function loadTraffic(showSpinner){
     });
 }
 
-function renderTraffic(visits, interests){
+function renderTraffic(visits, interests, availabilities){
   // ── Stats ────────────────────────────────────────────
   var todayStr = new Date().toDateString();
   var todayCount = visits.filter(function(v){ return new Date(v.created_at).toDateString()===todayStr; }).length;
@@ -1325,6 +1360,24 @@ function renderTraffic(visits, interests){
     }).join('');
   } else {
     document.getElementById('utm-sources-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No source data yet.</div></div>';
+  }
+
+  // ── Users by country ─────────────────────────────────
+  var countryCounts = {};
+  interests.forEach(function(i){ if(i.country){ countryCounts[i.country]=(countryCounts[i.country]||0)+1; } });
+  availabilities.forEach(function(a){ if(a.country){ countryCounts[a.country]=(countryCounts[a.country]||0)+1; } });
+  var countryRows = Object.entries(countryCounts).sort(function(a,b){return b[1]-a[1];});
+  var maxC = countryRows.length ? countryRows[0][1] : 1;
+  if(countryRows.length){
+    document.getElementById('country-list').innerHTML = countryRows.map(function(row){
+      return '<div class="bar-row">' +
+        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(row[0])+'</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxC*100)+'%"></div></div>' +
+        '<span class="bar-count">'+row[1]+'</span>' +
+      '</div>';
+    }).join('');
+  } else {
+    document.getElementById('country-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No country data yet — comes from interest &amp; availability signups.</div></div>';
   }
 
   // ── Donation interests ────────────────────────────────
