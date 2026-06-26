@@ -17,6 +17,7 @@ img{display:block;max-width:100%}
 a{color:inherit}
 .skip-link{position:fixed;left:16px;top:-80px;z-index:2000;background:#fff;color:var(--ink);padding:12px 18px;border-radius:999px;box-shadow:var(--shadow)}
 .skip-link:focus{top:14px}
+.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}
 .wrap{width:min(1120px,calc(100% - 36px));margin-inline:auto}
 .board-top{background:var(--blue);color:#fff;padding:16px 0}
 .board-top .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px}
@@ -26,12 +27,13 @@ a{color:inherit}
 .board-back:hover,.board-back:focus-visible{background:#fff;color:var(--blue-dark);outline:0}
 .language-select{appearance:auto;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.42);border-radius:999px;padding:9px 14px;font:700 .9rem "DM Sans",sans-serif}
 .language-select option{color:var(--ink)}
-.home-hero{background:var(--blue);color:#fff;text-align:center;padding:clamp(42px,7vw,92px) 20px clamp(38px,5vw,70px)}
-.logo-button{display:inline-flex;flex-direction:column;align-items:center;gap:8px;margin:0 auto 22px;padding:0;border:0;background:transparent;color:#d7e7fb;cursor:pointer}
-.logo-button:focus-visible{outline:2px solid #fff;outline-offset:8px;border-radius:24px}
-.home-hero-logo{width:clamp(110px,12vw,160px);height:auto;padding:8px;border-radius:24px;background:#fff;box-shadow:0 20px 60px rgba(8,35,64,.24);transition:transform .18s ease}
-.logo-button:hover .home-hero-logo,.logo-button:focus-visible .home-hero-logo{transform:scale(1.03)}
-.logo-hint{font-size:.72rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#d7e7fb}
+.home-hero{background:var(--blue);color:#fff;text-align:center;padding:clamp(36px,6vw,78px) 20px clamp(38px,5vw,70px)}
+.logo-button{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;margin:0 auto 24px;padding:16px;border:0;border-radius:42px;background:transparent;color:#d7e7fb;cursor:pointer;overflow:hidden}
+.logo-button::before{content:"";position:absolute;inset:-28px;border-radius:56px;background:radial-gradient(circle,rgba(255,255,255,.55),rgba(197,139,36,.28) 42%,rgba(255,255,255,0) 70%);filter:blur(12px);opacity:.82;animation:logoAura 3.8s ease-in-out infinite;z-index:0}
+.logo-button::after{content:"";position:absolute;inset:16px;border-radius:30px;background:linear-gradient(110deg,rgba(255,255,255,0) 18%,rgba(255,255,255,.58) 45%,rgba(255,255,255,0) 64%);mix-blend-mode:screen;pointer-events:none;transform:translateX(-145%) rotate(4deg);animation:logoSweep 3.4s ease-in-out infinite;z-index:2}
+.logo-button:focus-visible{outline:2px solid #fff;outline-offset:8px}
+.home-hero-logo{position:relative;z-index:1;width:clamp(230px,24vw,360px);height:auto;padding:12px;border-radius:30px;background:#fff;box-shadow:0 24px 70px rgba(8,35,64,.34),0 0 0 1px rgba(255,255,255,.46),0 0 42px rgba(255,255,255,.28);transition:transform .2s ease,box-shadow .2s ease;animation:logoGlow 4s ease-in-out infinite}
+.logo-button:hover .home-hero-logo,.logo-button:focus-visible .home-hero-logo{transform:scale(1.055) rotate(-.6deg);box-shadow:0 30px 86px rgba(8,35,64,.42),0 0 0 2px rgba(255,255,255,.72),0 0 66px rgba(255,255,255,.48)}
 .home-hero h1,.board-hero h1{font-family:"Newsreader",Georgia,serif;font-weight:600;letter-spacing:-.04em;line-height:1.02;margin:0}
 .home-hero h1{font-size:clamp(3.2rem,8vw,7.2rem)}
 .home-hero p{max-width:930px;margin:22px auto 0;font-family:"Newsreader",Georgia,serif;font-size:clamp(1.25rem,2.3vw,2rem);line-height:1.35}
@@ -77,5 +79,9 @@ a{color:inherit}
 .logo-dialog img{width:100%;height:auto;border-radius:20px}
 .logo-close{position:absolute;right:12px;top:12px;width:44px;height:44px;border:0;border-radius:999px;background:var(--blue-dark);color:#fff;font-size:1.5rem;cursor:pointer}
 .global-language-switch{font-size:14px!important}
+@keyframes logoAura{0%,100%{opacity:.58;transform:scale(.96)}50%{opacity:.95;transform:scale(1.04)}}
+@keyframes logoGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.08)}}
+@keyframes logoSweep{0%,34%{transform:translateX(-145%) rotate(4deg)}54%,100%{transform:translateX(145%) rotate(4deg)}}
+@media(prefers-reduced-motion:reduce){.logo-button::before,.logo-button::after,.home-hero-logo{animation:none}}
 @media(max-width:900px){.board-layout{grid-template-columns:1fr}.side-card{position:static}.photo-grid,.brief-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){body{font-size:17px}.board-top .wrap{align-items:flex-start;flex-direction:column}.home-hero h1{font-size:3.25rem}.link-band a{width:100%;font-size:1.45rem}.photo-grid,.brief-grid{grid-template-columns:1fr}.photo-card{min-height:250px}.board-hero h1{font-size:2.75rem}.button{width:100%}}
+@media(max-width:560px){body{font-size:17px}.board-top .wrap{align-items:flex-start;flex-direction:column}.home-hero-logo{width:min(78vw,300px)}.link-band a{width:100%;font-size:1.45rem}.photo-grid,.brief-grid{grid-template-columns:1fr}.photo-card{min-height:250px}.board-hero h1{font-size:2.75rem}.button{width:100%}}

@@ -91,10 +91,14 @@ test('the board stylesheet protects the older-reader design system', () => {
   const css = read('landing/css/board.css');
   assert.match(css, /--blue:#1f5795/);
   assert.match(css, /body\{[^}]*font-size:18px/);
+  assert.match(css, /\.visually-hidden/);
   assert.match(css, /\.home-hero/);
   assert.match(css, /\.white-band/);
   assert.match(css, /\.link-band/);
   assert.match(css, /\.photo-row/);
+  assert.match(css, /logoSweep/);
+  assert.match(css, /logoAura/);
+  assert.match(css, /width:clamp\(230px,24vw,360px\)/);
   assert.match(css, /\.board-hero/);
   assert.match(css, /\.plain-answer/);
   assert.match(css, /\.brief-grid/);
@@ -114,6 +118,9 @@ test('the homepage is a simple blue and white directory with photos below the li
     assert.match(html, /class="logo-modal"/);
     assert.match(html, /id="language-select"/);
     assert.match(html, /VillageServer Initiative/);
+    assert.match(html, /<h1 class="visually-hidden">VillageServer Initiative<\/h1>/);
+    assert.match(html, /aria-label="Open enlarged VillageServer Initiative logo"/);
+    assert.doesNotMatch(html, /logo-hint|Click logo to enlarge/i);
     assert.match(html, /board-friendly directory/i);
     assert.ok(html.indexOf('class="white-band"') < html.indexOf('class="photo-row"'), `${page} should put pictures below the white link band`);
     assert.doesNotMatch(html, /<header[\s\S]*?<\/header>/);
