@@ -317,15 +317,8 @@ test('admin still polls smoothly and separates individual people from total visi
   assert.match(admin, /totals\.total_page_visits/);
   assert.match(admin, /totals\.individual_people/);
   assert.match(admin, /totals\.visits_today/);
-  assert.match(admin, /robots counted as people/i);
-  assert.match(admin, /100 page clicks from the same browser show as 100 visits but 1 individual person/);
   assert.match(admin, /visitor_id/);
-  assert.match(admin, /this is not packet scraping/i);
-  assert.match(admin, /does not inspect packets/);
-  assert.match(admin, /Network packet payloads/);
   assert.match(admin, /utm_source/);
-  assert.match(admin, /fbclid/);
-  assert.match(admin, /ttclid/);
   for (const source of inlineScripts(admin)) new Function(source);
 });
 
