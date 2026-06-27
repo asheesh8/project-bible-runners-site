@@ -4,7 +4,7 @@
 // Public (no auth):
 //   POST /api/track?type=visit     { visitor_id, site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
 //   POST /api/track?type=click     { visitor_id, site_host, path, link_url, link_text, link_type }
-//   POST /api/track?type=interest  { name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
+//   POST /api/track?type=interest  { visitor_id, site_host, name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
 //
 // Admin (Authorization: Bearer <ADMIN_PASSWORD>):
 //   GET  /api/track?type=visits
@@ -230,32 +230,40 @@ export default async function handler(req, res) {
 
   // ── Public POST: log donation interest ──────────────────────────
   if (req.method === 'POST' && type === 'interest') {
-    const { name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign } = req.body || {};
+    const { visitor_id, site_host, name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign } = req.body || {};
     if (!country) return res.status(400).json({ error: 'country is required' });
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/donation_interests`, {
-      method: 'POST',
-      headers: { ...sbH, Prefer: 'return=representation' },
-      body: JSON.stringify({ name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }),
-    });
+    const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+    const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
+    const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
+    const payload = { visitor_id: cleanVisitorId || null, site_host: cleanHost, name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign };
+    const legacyPayload = (() => { const p = { ...payload }; delete p.visitor_id; delete p.site_host; return p; })();
+    const r = await fetchWithFallback([
+      { url: `${SUPABASE_URL}/rest/v1/donation_interests`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(payload) } },
+      { url: `${SUPABASE_URL}/rest/v1/donation_interests`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(legacyPayload) } },
+    ]);
     const data = await r.json();
     return res.status(r.status).json(data);
   }
 
   // ── Public POST: kit availability / interest request ─────────────
   if (req.method === 'POST' && type === 'availability') {
-    const { country, region, name, email, organization, message, requested_items, utm_source, utm_medium, utm_campaign } = req.body || {};
+    const { visitor_id, site_host, country, region, name, email, organization, message, requested_items, utm_source, utm_medium, utm_campaign } = req.body || {};
     if (!country) return res.status(400).json({ error: 'country is required' });
+    const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+    const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
+    const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
     const cleanItems = Array.isArray(requested_items) ? requested_items.slice(0, 12).map((item) => ({
       name: String((item && item.name) || '').slice(0, 120),
       min_price: Number.isFinite(Number(item && item.min_price)) ? Number(item.min_price) : null,
       max_price: Number.isFinite(Number(item && item.max_price)) ? Number(item.max_price) : null,
       quote_required: Boolean(item && item.quote_required),
     })).filter((item) => item.name) : [];
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/availability_requests`, {
-      method: 'POST',
-      headers: { ...sbH, Prefer: 'return=representation' },
-      body: JSON.stringify({ country, region, name, email, organization, message, requested_items: cleanItems, utm_source, utm_medium, utm_campaign }),
-    });
+    const payload = { visitor_id: cleanVisitorId || null, site_host: cleanHost, country, region, name, email, organization, message, requested_items: cleanItems, utm_source, utm_medium, utm_campaign };
+    const legacyPayload = (() => { const p = { ...payload }; delete p.visitor_id; delete p.site_host; return p; })();
+    const r = await fetchWithFallback([
+      { url: `${SUPABASE_URL}/rest/v1/availability_requests`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(payload) } },
+      { url: `${SUPABASE_URL}/rest/v1/availability_requests`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(legacyPayload) } },
+    ]);
     const data = await r.json();
     return res.status(r.status).json(data);
   }
@@ -315,8 +323,14 @@ export default async function handler(req, res) {
         { url: `${SUPABASE_URL}/rest/v1/link_clicks?select=visitor_id,site_host,path,link_url,link_text,link_type,created_at,is_robot,robot_reason&is_robot=not.is.true&order=created_at.desc&limit=500`, options: { headers: clickRangeHeaders, cache: 'no-store' } },
         { url: `${SUPABASE_URL}/rest/v1/link_clicks?select=visitor_id,site_host,path,link_url,link_text,link_type,created_at&order=created_at.desc&limit=500`, options: { headers: clickRangeHeaders, cache: 'no-store' } },
       ]),
-      fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, { headers: sbH }),
-      fetch(`${SUPABASE_URL}/rest/v1/availability_requests?select=country,created_at&order=created_at.desc`, { headers: sbH }),
+      fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/donation_interests?select=visitor_id,site_host,country,initiative,utm_source,created_at&order=created_at.desc`, options: { headers: sbH, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, options: { headers: sbH, cache: 'no-store' } },
+      ]),
+      fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/availability_requests?select=visitor_id,site_host,country,region,requested_items,created_at&order=created_at.desc`, options: { headers: sbH, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/availability_requests?select=country,created_at&order=created_at.desc`, options: { headers: sbH, cache: 'no-store' } },
+      ]),
     ]);
     const totalPageVisits = exactCountFrom(visitsR);
     const visitsToday = exactCountFrom(todayR);
@@ -331,6 +345,8 @@ export default async function handler(req, res) {
     const uniqueIds = new Set(uniqueRows.map((v) => v.visitor_id).filter(Boolean));
     if (!uniqueIds.size) visits.forEach((v) => { if (v.visitor_id) uniqueIds.add(v.visitor_id); });
     clicks.forEach((c) => { if (c.visitor_id) uniqueIds.add(c.visitor_id); });
+    interests.forEach((i) => { if (i.visitor_id) uniqueIds.add(i.visitor_id); });
+    availabilities.forEach((a) => { if (a.visitor_id) uniqueIds.add(a.visitor_id); });
     return res.status(200).json({
       visits: visits || [],
       clicks: clicks || [],

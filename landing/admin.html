@@ -328,17 +328,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .bar-track{flex:1;height:7px;background:var(--bg);border-radius:99px;overflow:hidden}
 .bar-fill{height:100%;background:var(--sidebar-active);border-radius:99px}
 .bar-count{font-size:12px;color:var(--muted);font-weight:700;min-width:30px;text-align:right}
-.people-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
-.person-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.people-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px}
+.person-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px}
 .person-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
 .person-name{font-size:14px;font-weight:800;color:var(--text)}
-.person-meta{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.person-meta{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.person-location{display:inline-flex;margin-top:7px;font-size:12px;font-weight:800;color:#1a4731;background:#dafbe1;border:1px solid #52a55d;border-radius:999px;padding:4px 9px}
+.person-location.unknown{background:#f6f8fa;border-color:#d0d7de;color:#636c76}
 .person-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .person-badge{font-size:11px;font-weight:800;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:3px 8px;white-space:nowrap}
-.person-events{display:flex;flex-direction:column;gap:6px}
-.person-event{display:grid;grid-template-columns:58px 1fr;gap:8px;font-size:12px;color:var(--muted);line-height:1.35}
-.event-kind{font-weight:800;color:var(--sidebar-active);text-transform:uppercase;letter-spacing:.05em}
-.event-label{color:var(--text);word-break:break-word}
+.activity-array{font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;overflow:hidden}
+.array-bracket{color:var(--muted);font-weight:800}
+.array-row{display:grid;grid-template-columns:82px 70px 1fr;gap:8px;padding:2px 0;border-top:1px solid rgba(208,215,222,.55)}
+.array-row:first-of-type{border-top:0}
+.array-key{color:var(--sidebar-active);font-weight:800;text-transform:lowercase}
+.array-value{color:var(--text);word-break:break-word}
+.array-time{color:var(--muted)}
 .interests-table-wrap{overflow-x:auto}
 /* Live polling UI */
 .live-badge{display:inline-flex;align-items:center;gap:5px;background:#16a34a;color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em;padding:3px 8px 3px 6px;border-radius:99px;text-transform:uppercase}
@@ -1341,6 +1346,8 @@ function renderTraffic(visits, clicks, interests, availabilities, totals){
   var todayCount = visits.filter(function(v){ return new Date(v.created_at).toDateString()===todayStr; }).length;
   var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||''; }).filter(Boolean));
   clicks.forEach(function(c){ if(c.visitor_id) uniqueIds.add(c.visitor_id); });
+  interests.forEach(function(i){ if(i.visitor_id) uniqueIds.add(i.visitor_id); });
+  availabilities.forEach(function(a){ if(a.visitor_id) uniqueIds.add(a.visitor_id); });
   var totalVisits = Number(totals.total_page_visits);
   var individualPeople = Number(totals.individual_people);
   var visitsToday = Number(totals.visits_today);
@@ -1356,40 +1363,87 @@ function renderTraffic(visits, clicks, interests, availabilities, totals){
   var people = {};
   function personFor(id){
     var key = id || 'unknown';
-    if(!people[key]) people[key] = { id:key, visits:0, clicks:0, events:[], last:0 };
+    if(!people[key]) people[key] = { id:key, visits:0, clicks:0, forms:0, requests:0, locations:[], events:[], last:0 };
     return people[key];
+  }
+  function cleanLocation(value){
+    return (value||'').toString().replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
+  }
+  function formattedLocation(country, region){
+    var c = cleanLocation(country);
+    var r = cleanLocation(region);
+    if(/kitibus/i.test(r)) r = 'Kitibus';
+    if(/kitui/i.test(r)) r = 'Kitui';
+    if(r && c && r.toLowerCase() !== c.toLowerCase()) return r + ', ' + c;
+    return r || c || '';
+  }
+  function addLocation(person, label, source){
+    label = cleanLocation(label);
+    if(!label) return;
+    var item = { label: label, source: source || 'activity' };
+    if(!person.locations.some(function(existing){ return existing.label.toLowerCase() === item.label.toLowerCase(); })) person.locations.push(item);
+  }
+  function inferLocationFromText(text){
+    text = (text||'').toString().toLowerCase();
+    if(!text) return '';
+    if(/kitibus/.test(text)) return 'Kitibus, Kenya';
+    if(/kitui/.test(text)) return 'Kitui, Kenya';
+    if(/kenya/.test(text)) return 'Kenya';
+    if(/uganda/.test(text)) return 'Uganda';
+    if(/tanzania/.test(text)) return 'Tanzania';
+    if(/nepal/.test(text)) return 'Nepal';
+    if(/india/.test(text)) return 'India';
+    if(/peru|peruvian|amazon/.test(text)) return 'Peruvian Amazon / Peru';
+    if(/africa/.test(text)) return 'Africa';
+    if(/asia/.test(text)) return 'Asia';
+    return '';
+  }
+  function addEvent(person, kind, label, at, sourceText){
+    var time = at ? new Date(at).getTime() : 0;
+    person.last = Math.max(person.last, time||0);
+    person.events.push({ kind:kind, label:label, at:at||'' });
+    addLocation(person, inferLocationFromText(sourceText || label), 'activity');
   }
   visits.forEach(function(v){
     var p = personFor(v.visitor_id);
-    var time = v.created_at ? new Date(v.created_at).getTime() : 0;
     p.visits++;
-    p.last = Math.max(p.last, time||0);
-    p.events.push({ kind:'Page', label:v.path||'/', at:v.created_at||'' });
+    addEvent(p, 'page', v.path||'/', v.created_at, [v.path,v.referrer,v.utm_source,v.utm_campaign].join(' '));
   });
   clicks.forEach(function(c){
     var p = personFor(c.visitor_id);
-    var time = c.created_at ? new Date(c.created_at).getTime() : 0;
     p.clicks++;
-    p.last = Math.max(p.last, time||0);
-    p.events.push({
-      kind:'Click',
-      label:(c.link_text ? c.link_text + ' → ' : '') + (c.link_url||'link'),
-      at:c.created_at||''
-    });
+    addEvent(p, 'click', (c.link_text ? c.link_text + ' → ' : '') + (c.link_url||'link'), c.created_at, [c.path,c.link_text,c.link_url].join(' '));
+  });
+  interests.forEach(function(i){
+    if(!i.visitor_id) return;
+    var p = personFor(i.visitor_id);
+    p.forms++;
+    addLocation(p, formattedLocation(i.country), 'interest form');
+    addEvent(p, 'form', 'Interest signup' + (i.country ? ': ' + i.country : ''), i.created_at, i.country);
+  });
+  availabilities.forEach(function(a){
+    if(!a.visitor_id) return;
+    var p = personFor(a.visitor_id);
+    p.requests++;
+    var loc = formattedLocation(a.country, a.region);
+    addLocation(p, loc, 'kit request');
+    addEvent(p, 'kit', 'Kit request' + (loc ? ': ' + loc : ''), a.created_at, loc);
   });
   var peopleRows = Object.values(people).sort(function(a,b){ return b.last-a.last; }).slice(0,18);
   if(peopleRows.length){
     document.getElementById('people-list').innerHTML = '<div class="people-grid">' + peopleRows.map(function(person){
       var shortId = person.id === 'unknown' ? 'Unknown visitor' : 'Visitor ' + person.id.replace(/^vsi-visitor-?/,'').replace(/^vsi-/,'').slice(0,10);
       var events = person.events.sort(function(a,b){ return new Date(b.at||0)-new Date(a.at||0); }).slice(0,6);
+      var location = person.locations.length ? person.locations[0].label : '';
       return '<div class="person-card">' +
         '<div class="person-head">' +
-          '<div><div class="person-name">'+esc(shortId)+'</div><div class="person-meta">Last seen '+(person.last ? fmtDate(new Date(person.last).toISOString()) : '—')+'</div></div>' +
-          '<div class="person-badges"><span class="person-badge">'+person.visits+' visits</span><span class="person-badge">'+person.clicks+' clicks</span></div>' +
+          '<div><div class="person-name">'+esc(shortId)+'</div><div class="person-meta">Last seen '+(person.last ? fmtDate(new Date(person.last).toISOString()) : '—')+'</div>' +
+          (location ? '<span class="person-location">Potentially from '+esc(location)+'</span>' : '<span class="person-location unknown">Location unknown</span>') + '</div>' +
+          '<div class="person-badges"><span class="person-badge">'+person.visits+' visits</span><span class="person-badge">'+person.clicks+' clicks</span>' + (person.requests ? '<span class="person-badge">'+person.requests+' kit requests</span>' : '') + '</div>' +
         '</div>' +
-        '<div class="person-events">' + events.map(function(event){
-          return '<div class="person-event"><span class="event-kind">'+esc(event.kind)+'</span><span class="event-label">'+esc(event.label)+'</span></div>';
-        }).join('') + '</div>' +
+        '<div class="activity-array"><div class="array-bracket">activity: [</div>' + events.map(function(event){
+          return '<div class="array-row"><span class="array-time">'+esc(event.at ? fmtDate(event.at) : '—')+'</span><span class="array-key">'+esc(event.kind)+'</span><span class="array-value">"'+esc(event.label)+'"</span></div>';
+        }).join('') + '<div class="array-bracket">]</div></div>' +
       '</div>';
     }).join('') + '</div>';
   } else {

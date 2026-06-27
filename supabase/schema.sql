@@ -93,6 +93,8 @@ create table if not exists public.link_clicks (
 
 create table if not exists public.donation_interests (
   id uuid primary key default gen_random_uuid(),
+  visitor_id text,
+  site_host text,
   name text,
   email text,
   country text not null,
@@ -106,6 +108,8 @@ create table if not exists public.donation_interests (
 
 create table if not exists public.availability_requests (
   id uuid primary key default gen_random_uuid(),
+  visitor_id text,
+  site_host text,
   country text not null,
   region text,
   name text,
@@ -137,6 +141,10 @@ alter table public.link_clicks add column if not exists link_type text not null 
 alter table public.link_clicks add column if not exists user_agent text;
 alter table public.link_clicks add column if not exists is_robot boolean not null default false;
 alter table public.link_clicks add column if not exists robot_reason text;
+alter table public.donation_interests add column if not exists visitor_id text;
+alter table public.donation_interests add column if not exists site_host text;
+alter table public.availability_requests add column if not exists visitor_id text;
+alter table public.availability_requests add column if not exists site_host text;
 alter table public.availability_requests add column if not exists requested_items jsonb not null default '[]'::jsonb;
 
 -- Keep updated_at correct for admin edits.
@@ -184,8 +192,10 @@ create index if not exists link_clicks_link_type_idx on public.link_clicks (link
 create index if not exists link_clicks_is_robot_idx on public.link_clicks (is_robot, created_at desc);
 create index if not exists donation_interests_created_idx on public.donation_interests (created_at desc);
 create index if not exists donation_interests_country_idx on public.donation_interests (country);
+create index if not exists donation_interests_visitor_id_idx on public.donation_interests (visitor_id);
 create index if not exists availability_requests_created_idx on public.availability_requests (created_at desc);
 create index if not exists availability_requests_country_idx on public.availability_requests (country);
+create index if not exists availability_requests_visitor_id_idx on public.availability_requests (visitor_id);
 
 -- ── Row Level Security ──────────────────────────────────────────────
 alter table public.campaigns enable row level security;

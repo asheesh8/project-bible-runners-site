@@ -60,11 +60,20 @@
       .slice(0, 220);
   }
 
+  function basePayload() {
+    return {
+      visitor_id: getVisitorId(),
+      site_host: (location.hostname || '').toLowerCase().replace(/^www\./, ''),
+      path: location.pathname || '/'
+    };
+  }
+
   var params = new URLSearchParams(location.search);
+  var base = basePayload();
   var payload = {
-    visitor_id: getVisitorId(),
-    site_host: (location.hostname || '').toLowerCase().replace(/^www\./, ''),
-    path: location.pathname || '/',
+    visitor_id: base.visitor_id,
+    site_host: base.site_host,
+    path: base.path,
     referrer: document.referrer || '',
     utm_source: params.get('utm_source') || '',
     utm_medium: params.get('utm_medium') || '',
@@ -91,13 +100,24 @@
       return;
     }
 
+    var clickBase = basePayload();
     sendTracking('click', {
-      visitor_id: getVisitorId(),
-      site_host: (location.hostname || '').toLowerCase().replace(/^www\./, ''),
-      path: location.pathname || '/',
+      visitor_id: clickBase.visitor_id,
+      site_host: clickBase.site_host,
+      path: clickBase.path,
       link_url: url.href,
       link_text: linkLabel(link, rawHref),
       link_type: linkType(link, url)
     }, true);
   }, true);
+
+  window.VSITracking = {
+    visitorId: getVisitorId,
+    basePayload: basePayload,
+    enrich: function (data) {
+      var base = basePayload();
+      Object.keys(data || {}).forEach(function (key) { base[key] = data[key]; });
+      return base;
+    }
+  };
 }());

@@ -285,6 +285,8 @@ test('every public page records visits for individual people and total visits', 
   assert.match(tracker, /link_url/);
   assert.match(tracker, /link_text/);
   assert.match(tracker, /link_type/);
+  assert.match(tracker, /window\.VSITracking/);
+  assert.match(tracker, /enrich: function/);
   assert.match(tracker, /data-visit-tracked/);
   new Function(tracker);
 
@@ -301,6 +303,8 @@ test('every public page records visits for individual people and total visits', 
   assert.match(api, /visits_today/);
   assert.match(api, /link_clicks/);
   assert.match(api, /total_link_clicks/);
+  assert.match(api, /donation_interests\?select=visitor_id,site_host,country/);
+  assert.match(api, /availability_requests\?select=visitor_id,site_host,country,region/);
   assert.match(api, /Cache-Control', 'no-store/);
   assert.match(schema, /visitor_id text/);
   assert.match(schema, /site_host text/);
@@ -316,6 +320,8 @@ test('every public page records visits for individual people and total visits', 
   assert.match(schema, /page_visits_is_robot_idx/);
   assert.match(schema, /link_clicks_visitor_id_idx/);
   assert.match(schema, /link_clicks_is_robot_idx/);
+  assert.match(schema, /donation_interests_visitor_id_idx/);
+  assert.match(schema, /availability_requests_visitor_id_idx/);
 });
 
 test('admin still polls smoothly and separates individual people from total visits', () => {
@@ -332,6 +338,11 @@ test('admin still polls smoothly and separates individual people from total visi
   assert.match(admin, /Clicked links/);
   assert.match(admin, /people-list/);
   assert.match(admin, /clicks-list/);
+  assert.match(admin, /Potentially from/);
+  assert.match(admin, /activity: \[/);
+  assert.match(admin, /inferLocationFromText/);
+  assert.match(admin, /formattedLocation/);
+  assert.match(admin, /Kitibus, Kenya/);
   assert.match(admin, /data\.clicks/);
   assert.match(admin, /totals\.total_page_visits/);
   assert.match(admin, /totals\.individual_people/);
