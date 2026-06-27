@@ -286,11 +286,22 @@ test('every public page records visits for individual people and total visits', 
   const schema = read('supabase/schema.sql');
   assert.match(api, /visitor_id/);
   assert.match(api, /site_host/);
+  assert.match(api, /detectRobotRequest/);
+  assert.match(api, /ROBOT_USER_AGENT_RE/);
+  assert.match(api, /ignored: true/);
+  assert.match(api, /is_robot: false/);
+  assert.match(api, /total_page_visits/);
+  assert.match(api, /individual_people/);
+  assert.match(api, /visits_today/);
   assert.match(api, /Cache-Control', 'no-store/);
   assert.match(schema, /visitor_id text/);
   assert.match(schema, /site_host text/);
+  assert.match(schema, /user_agent text/);
+  assert.match(schema, /is_robot boolean not null default false/);
+  assert.match(schema, /robot_reason text/);
   assert.match(schema, /page_visits_visitor_id_idx/);
   assert.match(schema, /page_visits_site_host_idx/);
+  assert.match(schema, /page_visits_is_robot_idx/);
 });
 
 test('admin still polls smoothly and separates individual people from total visits', () => {
@@ -303,6 +314,11 @@ test('admin still polls smoothly and separates individual people from total visi
   assert.match(admin, /&_ts=' \+ Date\.now\(\)/);
   assert.match(admin, /Individual People/);
   assert.match(admin, /Total Page Visits/);
+  assert.match(admin, /totals\.total_page_visits/);
+  assert.match(admin, /totals\.individual_people/);
+  assert.match(admin, /totals\.visits_today/);
+  assert.match(admin, /robots counted as people/i);
+  assert.match(admin, /100 page clicks from the same browser show as 100 visits but 1 individual person/);
   assert.match(admin, /visitor_id/);
   assert.match(admin, /this is not packet scraping/i);
   assert.match(admin, /does not inspect packets/);

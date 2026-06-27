@@ -670,6 +670,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
             <p class="qa-q">What can it not see?</p>
             <p class="qa-a">VillageServer does not inspect packets, view another website's traffic, collect passwords, or browse files on a visitor's device. Network packet payloads are not read.</p>
           </div>
+          <div class="qa-card">
+            <p class="qa-q">Are robots counted as people?</p>
+            <p class="qa-a">Known crawlers, link preview bots, uptime monitors, and automated browser tests are filtered before they reach the dashboard. A real person is counted by one anonymous browser ID, so 100 page clicks from the same browser show as 100 visits but 1 individual person.</p>
+          </div>
         </div>
 
         <div class="res-section">
@@ -1309,7 +1313,7 @@ function loadTraffic(showSpinner){
   fetch('/api/track?type=summary&_ts=' + Date.now(), { cache:'no-store', headers:{ 'Authorization':'Bearer '+AUTH_TOKEN } })
     .then(function(r){ return r.json(); })
     .then(function(data){
-      renderTraffic(data.visits||[], data.interests||[], data.availabilities||[]);
+      renderTraffic(data.visits||[], data.interests||[], data.availabilities||[], data.totals||{});
       var now = new Date();
       document.getElementById('traffic-last-updated').style.display = 'inline';
       document.getElementById('traffic-last-updated').textContent =
@@ -1324,15 +1328,19 @@ function loadTraffic(showSpinner){
     });
 }
 
-function renderTraffic(visits, interests, availabilities){
+function renderTraffic(visits, interests, availabilities, totals){
   // ── Stats ────────────────────────────────────────────
+  totals = totals || {};
   var todayStr = new Date().toDateString();
   var todayCount = visits.filter(function(v){ return new Date(v.created_at).toDateString()===todayStr; }).length;
-  var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||v.id||''; }).filter(Boolean));
+  var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||''; }).filter(Boolean));
+  var totalVisits = Number(totals.total_page_visits);
+  var individualPeople = Number(totals.individual_people);
+  var visitsToday = Number(totals.visits_today);
 
-  document.getElementById('stat-visits').textContent = visits.length;
-  document.getElementById('stat-unique').textContent = uniqueIds.size || '—';
-  document.getElementById('stat-today').textContent = todayCount;
+  document.getElementById('stat-visits').textContent = Number.isFinite(totalVisits) ? totalVisits : visits.length;
+  document.getElementById('stat-unique').textContent = Number.isFinite(individualPeople) ? individualPeople : (uniqueIds.size || '—');
+  document.getElementById('stat-today').textContent = Number.isFinite(visitsToday) ? visitsToday : todayCount;
   document.getElementById('stat-interests').textContent = interests.length;
 
   // ── Top pages ────────────────────────────────────────

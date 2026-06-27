@@ -10,6 +10,47 @@
 //   GET  /api/track?type=interests
 //   GET  /api/track?type=summary
 
+const ROBOT_USER_AGENT_RE = /bot|crawler|spider|crawl|slurp|bingpreview|facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|google-inspectiontool|googleother|adsbot|mediapartners-google|apis-google|feedfetcher|monitor|uptime|pingdom|headlesschrome|phantomjs|lighthouse|pagespeed|semrush|ahrefs|mj12bot|dotbot|petalbot|bytespider|yandex|baiduspider|duckduckbot|archive\.org|wget|curl|python-requests|httpclient/i;
+
+function trimText(value, max = 255) {
+  return String(value || '').trim().slice(0, max);
+}
+
+function detectRobotRequest(req) {
+  const userAgent = trimText(req.headers['user-agent'], 500);
+  const purpose = trimText(req.headers.purpose || req.headers['sec-purpose'] || req.headers['x-purpose']).toLowerCase();
+  const secFetchSite = trimText(req.headers['sec-fetch-site']).toLowerCase();
+
+  if (ROBOT_USER_AGENT_RE.test(userAgent)) return `known crawler: ${userAgent.slice(0, 90)}`;
+  if (purpose.includes('prefetch') || purpose.includes('preview') || purpose.includes('prerender')) return `browser preview: ${purpose.slice(0, 90)}`;
+  if (secFetchSite === 'none' && /preview|bot|crawler/i.test(userAgent)) return `automated fetch: ${userAgent.slice(0, 90)}`;
+  return '';
+}
+
+function exactCountFrom(response) {
+  const range = response.headers.get('content-range') || '';
+  const total = Number(range.split('/')[1]);
+  return Number.isFinite(total) ? total : null;
+}
+
+async function jsonOrEmpty(response) {
+  try {
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function fetchWithFallback(attempts) {
+  let lastResponse = null;
+  for (const attempt of attempts) {
+    lastResponse = await fetch(attempt.url, attempt.options);
+    if (lastResponse.ok || lastResponse.status === 206) return lastResponse;
+  }
+  return lastResponse;
+}
+
 export default async function handler(req, res) {
   const { ADMIN_PASSWORD } = process.env;
   // Accept either our own names or the ones the Supabase–Vercel integration creates.
@@ -36,7 +77,12 @@ export default async function handler(req, res) {
     const probeH = { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` };
     for (const t of ['page_visits', 'donation_interests', 'availability_requests']) {
       try {
-        const rr = await fetch(`${SUPABASE_URL}/rest/v1/${t}?select=id`, { headers: { ...probeH, Prefer: 'count=exact', Range: '0-0' } });
+        const rr = t === 'page_visits'
+          ? await fetchWithFallback([
+            { url: `${SUPABASE_URL}/rest/v1/${t}?select=id&is_robot=not.is.true`, options: { headers: { ...probeH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store' } },
+            { url: `${SUPABASE_URL}/rest/v1/${t}?select=id`, options: { headers: { ...probeH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store' } },
+          ])
+          : await fetch(`${SUPABASE_URL}/rest/v1/${t}?select=id`, { headers: { ...probeH, Prefer: 'count=exact', Range: '0-0' } });
         if (rr.ok || rr.status === 206) {
           const cr = rr.headers.get('content-range') || '';
           const cnt = cr.includes('/') ? Number(cr.split('/')[1]) : null;
@@ -52,7 +98,10 @@ export default async function handler(req, res) {
     if (out.tables.page_visits && out.tables.page_visits.ok) {
       out.visit_count = out.tables.page_visits.count;
       try {
-        const lv = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=created_at&order=created_at.desc&limit=1`, { headers: probeH });
+        const lv = await fetchWithFallback([
+          { url: `${SUPABASE_URL}/rest/v1/page_visits?select=created_at&is_robot=not.is.true&order=created_at.desc&limit=1`, options: { headers: probeH, cache: 'no-store' } },
+          { url: `${SUPABASE_URL}/rest/v1/page_visits?select=created_at&order=created_at.desc&limit=1`, options: { headers: probeH, cache: 'no-store' } },
+        ]);
         const arr = await lv.json();
         out.latest_visit_at = Array.isArray(arr) && arr[0] ? arr[0].created_at : null;
       } catch (e) { /* ignore */ }
@@ -74,15 +123,43 @@ export default async function handler(req, res) {
   // ── Public POST: log visit ───────────────────────────────────────
   if (req.method === 'POST' && type === 'visit') {
     const { visitor_id, site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid } = req.body || {};
+    const robotReason = detectRobotRequest(req);
+    if (robotReason) {
+      return res.status(200).json({ ok: true, ignored: true, robot: true, reason: robotReason });
+    }
+
     const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
     const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
     const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
-    const payload = { visitor_id: cleanVisitorId || null, site_host: cleanHost, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid };
+    const payload = {
+      visitor_id: cleanVisitorId || null,
+      site_host: cleanHost,
+      path: trimText(path, 600),
+      referrer: trimText(referrer, 1000),
+      utm_source: trimText(utm_source),
+      utm_medium: trimText(utm_medium),
+      utm_campaign: trimText(utm_campaign),
+      utm_content: trimText(utm_content),
+      utm_term: trimText(utm_term),
+      fbclid: trimText(fbclid, 500),
+      ttclid: trimText(ttclid, 500),
+      user_agent: trimText(req.headers['user-agent'], 500) || null,
+      is_robot: false,
+      robot_reason: null,
+    };
+    const legacyPayload = (() => {
+      const p = { ...payload };
+      delete p.user_agent;
+      delete p.is_robot;
+      delete p.robot_reason;
+      return p;
+    })();
     const payloads = [
       payload,
-      (() => { const p = { ...payload }; delete p.visitor_id; return p; })(),
-      (() => { const p = { ...payload }; delete p.site_host; return p; })(),
-      (() => { const p = { ...payload }; delete p.visitor_id; delete p.site_host; return p; })(),
+      legacyPayload,
+      (() => { const p = { ...legacyPayload }; delete p.visitor_id; return p; })(),
+      (() => { const p = { ...legacyPayload }; delete p.site_host; return p; })(),
+      (() => { const p = { ...legacyPayload }; delete p.visitor_id; delete p.site_host; return p; })(),
     ];
     let visitResponse;
     // Keep tracking alive during short windows before visitor_id/site_host migrations are applied.
@@ -139,7 +216,10 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET' && type === 'visits') {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=*&order=created_at.desc&limit=200`, { headers: sbH });
+    const r = await fetchWithFallback([
+      { url: `${SUPABASE_URL}/rest/v1/page_visits?select=*&is_robot=not.is.true&order=created_at.desc&limit=200`, options: { headers: sbH, cache: 'no-store' } },
+      { url: `${SUPABASE_URL}/rest/v1/page_visits?select=*&order=created_at.desc&limit=200`, options: { headers: sbH, cache: 'no-store' } },
+    ]);
     return res.status(r.status).json(await r.json());
   }
 
@@ -149,15 +229,50 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET' && type === 'summary') {
-    let [visitsR, interestsR, availR] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' }),
+    const visitRangeHeaders = { ...sbH, Prefer: 'count=exact', Range: '0-499' };
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayIso = encodeURIComponent(todayStart.toISOString());
+    let [visitsR, uniqueR, todayR, interestsR, availR] = await Promise.all([
+      fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at,is_robot,robot_reason&is_robot=not.is.true&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
+      ]),
+      fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id&visitor_id=not.is.null&is_robot=not.is.true&order=created_at.desc&limit=10000`, options: { headers: sbH, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id&visitor_id=not.is.null&order=created_at.desc&limit=10000`, options: { headers: sbH, cache: 'no-store' } },
+      ]),
+      fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=id&created_at=gte.${todayIso}&is_robot=not.is.true`, options: { headers: { ...sbH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=id&created_at=gte.${todayIso}`, options: { headers: { ...sbH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store' } },
+      ]),
       fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, { headers: sbH }),
       fetch(`${SUPABASE_URL}/rest/v1/availability_requests?select=country,created_at&order=created_at.desc`, { headers: sbH }),
     ]);
-    if (!visitsR.ok) visitsR = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' });
-    if (!visitsR.ok) visitsR = await fetch(`${SUPABASE_URL}/rest/v1/page_visits?select=path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, { headers: sbH, cache: 'no-store' });
-    const [visits, interests, availabilities] = await Promise.all([visitsR.json(), interestsR.json(), availR.ok ? availR.json() : Promise.resolve([])]);
-    return res.status(200).json({ visits: visits || [], interests: interests || [], availabilities: availabilities || [] });
+    const totalPageVisits = exactCountFrom(visitsR);
+    const visitsToday = exactCountFrom(todayR);
+    const [visits, uniqueRows, interests, availabilities] = await Promise.all([
+      jsonOrEmpty(visitsR),
+      jsonOrEmpty(uniqueR),
+      jsonOrEmpty(interestsR),
+      availR.ok ? jsonOrEmpty(availR) : Promise.resolve([]),
+    ]);
+    const uniqueIds = new Set(uniqueRows.map((v) => v.visitor_id).filter(Boolean));
+    if (!uniqueIds.size) visits.forEach((v) => { if (v.visitor_id) uniqueIds.add(v.visitor_id); });
+    return res.status(200).json({
+      visits: visits || [],
+      interests: interests || [],
+      availabilities: availabilities || [],
+      totals: {
+        total_page_visits: totalPageVisits == null ? visits.length : totalPageVisits,
+        individual_people: uniqueIds.size,
+        visits_today: visitsToday == null ? visits.filter((v) => new Date(v.created_at).toDateString() === new Date().toDateString()).length : visitsToday,
+        loaded_visits: visits.length,
+        robot_filtered: true,
+      },
+    });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });

@@ -71,6 +71,9 @@ create table if not exists public.page_visits (
   utm_term text,
   fbclid text,
   ttclid text,
+  user_agent text,
+  is_robot boolean not null default false,
+  robot_reason text,
   created_at timestamptz not null default now()
 );
 
@@ -109,6 +112,9 @@ alter table public.photos add column if not exists updated_at timestamptz not nu
 alter table public.affiliates add column if not exists updated_at timestamptz not null default now();
 alter table public.page_visits add column if not exists visitor_id text;
 alter table public.page_visits add column if not exists site_host text;
+alter table public.page_visits add column if not exists user_agent text;
+alter table public.page_visits add column if not exists is_robot boolean not null default false;
+alter table public.page_visits add column if not exists robot_reason text;
 alter table public.availability_requests add column if not exists requested_items jsonb not null default '[]'::jsonb;
 
 -- Keep updated_at correct for admin edits.
@@ -148,6 +154,7 @@ create index if not exists page_visits_created_idx on public.page_visits (create
 create index if not exists page_visits_visitor_id_idx on public.page_visits (visitor_id);
 create index if not exists page_visits_utm_source_idx on public.page_visits (utm_source);
 create index if not exists page_visits_site_host_idx on public.page_visits (site_host);
+create index if not exists page_visits_is_robot_idx on public.page_visits (is_robot, created_at desc);
 create index if not exists donation_interests_created_idx on public.donation_interests (created_at desc);
 create index if not exists donation_interests_country_idx on public.donation_interests (country);
 create index if not exists availability_requests_created_idx on public.availability_requests (created_at desc);
