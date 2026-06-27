@@ -273,12 +273,18 @@ test('every public page records visits for individual people and total visits', 
   for (const page of publicPages) assert.match(read(page), /\.\/js\/site-tracking\.js/);
 
   const tracker = read('landing/js/site-tracking.js');
-  assert.match(tracker, /type=visit/);
+  assert.match(tracker, /sendTracking\('visit'/);
+  assert.match(tracker, /type=' \+ encodeURIComponent\(type\)/);
+  assert.match(tracker, /sendTracking\('click'/);
+  assert.match(tracker, /sendBeacon/);
   assert.match(tracker, /cache: 'no-store'/);
   assert.match(tracker, /keepalive: true/);
   assert.match(tracker, /vsi-visitor-id/);
   assert.match(tracker, /visitor_id: getVisitorId\(\)/);
   assert.match(tracker, /site_host/);
+  assert.match(tracker, /link_url/);
+  assert.match(tracker, /link_text/);
+  assert.match(tracker, /link_type/);
   assert.match(tracker, /data-visit-tracked/);
   new Function(tracker);
 
@@ -293,15 +299,23 @@ test('every public page records visits for individual people and total visits', 
   assert.match(api, /total_page_visits/);
   assert.match(api, /individual_people/);
   assert.match(api, /visits_today/);
+  assert.match(api, /link_clicks/);
+  assert.match(api, /total_link_clicks/);
   assert.match(api, /Cache-Control', 'no-store/);
   assert.match(schema, /visitor_id text/);
   assert.match(schema, /site_host text/);
+  assert.match(schema, /create table if not exists public\.link_clicks/);
+  assert.match(schema, /link_url text not null/);
+  assert.match(schema, /link_text text/);
+  assert.match(schema, /link_type text not null default 'link'/);
   assert.match(schema, /user_agent text/);
   assert.match(schema, /is_robot boolean not null default false/);
   assert.match(schema, /robot_reason text/);
   assert.match(schema, /page_visits_visitor_id_idx/);
   assert.match(schema, /page_visits_site_host_idx/);
   assert.match(schema, /page_visits_is_robot_idx/);
+  assert.match(schema, /link_clicks_visitor_id_idx/);
+  assert.match(schema, /link_clicks_is_robot_idx/);
 });
 
 test('admin still polls smoothly and separates individual people from total visits', () => {
@@ -314,10 +328,17 @@ test('admin still polls smoothly and separates individual people from total visi
   assert.match(admin, /&_ts=' \+ Date\.now\(\)/);
   assert.match(admin, /Individual People/);
   assert.match(admin, /Total Page Visits/);
+  assert.match(admin, /Link clicks/);
+  assert.match(admin, /Clicked links/);
+  assert.match(admin, /people-list/);
+  assert.match(admin, /clicks-list/);
+  assert.match(admin, /data\.clicks/);
   assert.match(admin, /totals\.total_page_visits/);
   assert.match(admin, /totals\.individual_people/);
   assert.match(admin, /totals\.visits_today/);
+  assert.match(admin, /totals\.total_link_clicks/);
   assert.match(admin, /visitor_id/);
+  assert.match(admin, /link_url/);
   assert.match(admin, /utm_source/);
   for (const source of inlineScripts(admin)) new Function(source);
 });

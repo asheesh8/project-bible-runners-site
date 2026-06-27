@@ -77,6 +77,20 @@ create table if not exists public.page_visits (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.link_clicks (
+  id uuid primary key default gen_random_uuid(),
+  visitor_id text,
+  site_host text,
+  path text,
+  link_url text not null,
+  link_text text,
+  link_type text not null default 'link',
+  user_agent text,
+  is_robot boolean not null default false,
+  robot_reason text,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.donation_interests (
   id uuid primary key default gen_random_uuid(),
   name text,
@@ -115,6 +129,14 @@ alter table public.page_visits add column if not exists site_host text;
 alter table public.page_visits add column if not exists user_agent text;
 alter table public.page_visits add column if not exists is_robot boolean not null default false;
 alter table public.page_visits add column if not exists robot_reason text;
+alter table public.link_clicks add column if not exists visitor_id text;
+alter table public.link_clicks add column if not exists site_host text;
+alter table public.link_clicks add column if not exists path text;
+alter table public.link_clicks add column if not exists link_text text;
+alter table public.link_clicks add column if not exists link_type text not null default 'link';
+alter table public.link_clicks add column if not exists user_agent text;
+alter table public.link_clicks add column if not exists is_robot boolean not null default false;
+alter table public.link_clicks add column if not exists robot_reason text;
 alter table public.availability_requests add column if not exists requested_items jsonb not null default '[]'::jsonb;
 
 -- Keep updated_at correct for admin edits.
@@ -155,6 +177,11 @@ create index if not exists page_visits_visitor_id_idx on public.page_visits (vis
 create index if not exists page_visits_utm_source_idx on public.page_visits (utm_source);
 create index if not exists page_visits_site_host_idx on public.page_visits (site_host);
 create index if not exists page_visits_is_robot_idx on public.page_visits (is_robot, created_at desc);
+create index if not exists link_clicks_created_idx on public.link_clicks (created_at desc);
+create index if not exists link_clicks_visitor_id_idx on public.link_clicks (visitor_id);
+create index if not exists link_clicks_site_host_idx on public.link_clicks (site_host);
+create index if not exists link_clicks_link_type_idx on public.link_clicks (link_type);
+create index if not exists link_clicks_is_robot_idx on public.link_clicks (is_robot, created_at desc);
 create index if not exists donation_interests_created_idx on public.donation_interests (created_at desc);
 create index if not exists donation_interests_country_idx on public.donation_interests (country);
 create index if not exists availability_requests_created_idx on public.availability_requests (created_at desc);
@@ -166,6 +193,7 @@ alter table public.posts enable row level security;
 alter table public.photos enable row level security;
 alter table public.affiliates enable row level security;
 alter table public.page_visits enable row level security;
+alter table public.link_clicks enable row level security;
 alter table public.donation_interests enable row level security;
 alter table public.availability_requests enable row level security;
 
@@ -188,10 +216,12 @@ create policy "Public reads active affiliates" on public.affiliates for select t
 -- No anon policies are created for analytics, donation interests, or kit
 -- requests. The public forms call /api/track; the service role bypasses RLS.
 drop policy if exists "Public insert visits" on public.page_visits;
+drop policy if exists "Public insert clicks" on public.link_clicks;
 drop policy if exists "Public insert interests" on public.donation_interests;
 drop policy if exists "Public insert availability" on public.availability_requests;
 
 revoke all on public.page_visits from anon, authenticated;
+revoke all on public.link_clicks from anon, authenticated;
 revoke all on public.donation_interests from anon, authenticated;
 revoke all on public.availability_requests from anon, authenticated;
 grant select on public.campaigns, public.posts, public.photos, public.affiliates to anon, authenticated;
@@ -211,6 +241,6 @@ from information_schema.tables
 where table_schema = 'public'
   and table_name in (
     'campaigns', 'posts', 'photos', 'affiliates',
-    'page_visits', 'donation_interests', 'availability_requests'
+    'page_visits', 'link_clicks', 'donation_interests', 'availability_requests'
   )
 order by table_name;

@@ -328,6 +328,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 .bar-track{flex:1;height:7px;background:var(--bg);border-radius:99px;overflow:hidden}
 .bar-fill{height:100%;background:var(--sidebar-active);border-radius:99px}
 .bar-count{font-size:12px;color:var(--muted);font-weight:700;min-width:30px;text-align:right}
+.people-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.person-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.person-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.person-name{font-size:14px;font-weight:800;color:var(--text)}
+.person-meta{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.person-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.person-badge{font-size:11px;font-weight:800;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.person-events{display:flex;flex-direction:column;gap:6px}
+.person-event{display:grid;grid-template-columns:58px 1fr;gap:8px;font-size:12px;color:var(--muted);line-height:1.35}
+.event-kind{font-weight:800;color:var(--sidebar-active);text-transform:uppercase;letter-spacing:.05em}
+.event-label{color:var(--text);word-break:break-word}
 .interests-table-wrap{overflow-x:auto}
 /* Live polling UI */
 .live-badge{display:inline-flex;align-items:center;gap:5px;background:#16a34a;color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em;padding:3px 8px 3px 6px;border-radius:99px;text-transform:uppercase}
@@ -642,12 +653,23 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           <div class="stat-card accent"><div class="stat-val" id="stat-visits">—</div><div class="stat-label">Total Page Visits</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-unique">—</div><div class="stat-label">Individual People</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-today">—</div><div class="stat-label">Visits today</div></div>
+          <div class="stat-card"><div class="stat-val" id="stat-clicks">—</div><div class="stat-label">Link clicks</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-interests">—</div><div class="stat-label">Interest signups</div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">👥 &nbsp;Individual people</div>
+          <div id="people-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
         <div class="res-section">
           <div class="res-section-title">📄 &nbsp;Top pages</div>
           <div id="top-pages-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">🔗 &nbsp;Clicked links</div>
+          <div id="clicks-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
         <div class="res-section">
@@ -1297,7 +1319,7 @@ function loadTraffic(showSpinner){
   fetch('/api/track?type=summary&_ts=' + Date.now(), { cache:'no-store', headers:{ 'Authorization':'Bearer '+AUTH_TOKEN } })
     .then(function(r){ return r.json(); })
     .then(function(data){
-      renderTraffic(data.visits||[], data.interests||[], data.availabilities||[], data.totals||{});
+      renderTraffic(data.visits||[], data.clicks||[], data.interests||[], data.availabilities||[], data.totals||{});
       var now = new Date();
       document.getElementById('traffic-last-updated').style.display = 'inline';
       document.getElementById('traffic-last-updated').textContent =
@@ -1312,20 +1334,67 @@ function loadTraffic(showSpinner){
     });
 }
 
-function renderTraffic(visits, interests, availabilities, totals){
+function renderTraffic(visits, clicks, interests, availabilities, totals){
   // ── Stats ────────────────────────────────────────────
   totals = totals || {};
   var todayStr = new Date().toDateString();
   var todayCount = visits.filter(function(v){ return new Date(v.created_at).toDateString()===todayStr; }).length;
   var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||''; }).filter(Boolean));
+  clicks.forEach(function(c){ if(c.visitor_id) uniqueIds.add(c.visitor_id); });
   var totalVisits = Number(totals.total_page_visits);
   var individualPeople = Number(totals.individual_people);
   var visitsToday = Number(totals.visits_today);
+  var totalClicks = Number(totals.total_link_clicks);
 
   document.getElementById('stat-visits').textContent = Number.isFinite(totalVisits) ? totalVisits : visits.length;
   document.getElementById('stat-unique').textContent = Number.isFinite(individualPeople) ? individualPeople : (uniqueIds.size || '—');
   document.getElementById('stat-today').textContent = Number.isFinite(visitsToday) ? visitsToday : todayCount;
+  document.getElementById('stat-clicks').textContent = Number.isFinite(totalClicks) ? totalClicks : clicks.length;
   document.getElementById('stat-interests').textContent = interests.length;
+
+  // ── Individual people ────────────────────────────────
+  var people = {};
+  function personFor(id){
+    var key = id || 'unknown';
+    if(!people[key]) people[key] = { id:key, visits:0, clicks:0, events:[], last:0 };
+    return people[key];
+  }
+  visits.forEach(function(v){
+    var p = personFor(v.visitor_id);
+    var time = v.created_at ? new Date(v.created_at).getTime() : 0;
+    p.visits++;
+    p.last = Math.max(p.last, time||0);
+    p.events.push({ kind:'Page', label:v.path||'/', at:v.created_at||'' });
+  });
+  clicks.forEach(function(c){
+    var p = personFor(c.visitor_id);
+    var time = c.created_at ? new Date(c.created_at).getTime() : 0;
+    p.clicks++;
+    p.last = Math.max(p.last, time||0);
+    p.events.push({
+      kind:'Click',
+      label:(c.link_text ? c.link_text + ' → ' : '') + (c.link_url||'link'),
+      at:c.created_at||''
+    });
+  });
+  var peopleRows = Object.values(people).sort(function(a,b){ return b.last-a.last; }).slice(0,18);
+  if(peopleRows.length){
+    document.getElementById('people-list').innerHTML = '<div class="people-grid">' + peopleRows.map(function(person){
+      var shortId = person.id === 'unknown' ? 'Unknown visitor' : 'Visitor ' + person.id.replace(/^vsi-visitor-?/,'').replace(/^vsi-/,'').slice(0,10);
+      var events = person.events.sort(function(a,b){ return new Date(b.at||0)-new Date(a.at||0); }).slice(0,6);
+      return '<div class="person-card">' +
+        '<div class="person-head">' +
+          '<div><div class="person-name">'+esc(shortId)+'</div><div class="person-meta">Last seen '+(person.last ? fmtDate(new Date(person.last).toISOString()) : '—')+'</div></div>' +
+          '<div class="person-badges"><span class="person-badge">'+person.visits+' visits</span><span class="person-badge">'+person.clicks+' clicks</span></div>' +
+        '</div>' +
+        '<div class="person-events">' + events.map(function(event){
+          return '<div class="person-event"><span class="event-kind">'+esc(event.kind)+'</span><span class="event-label">'+esc(event.label)+'</span></div>';
+        }).join('') + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  } else {
+    document.getElementById('people-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No individual visitor activity yet.</div></div>';
+  }
 
   // ── Top pages ────────────────────────────────────────
   var pageCounts = {};
@@ -1343,6 +1412,29 @@ function renderTraffic(visits, interests, availabilities, totals){
     }).join('');
   } else {
     document.getElementById('top-pages-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No visit data yet.</div></div>';
+  }
+
+  // ── Clicked links ────────────────────────────────────
+  var clickCounts = {};
+  var clickLabels = {};
+  clicks.forEach(function(c){
+    var url = c.link_url || 'Unknown link';
+    clickCounts[url] = (clickCounts[url]||0)+1;
+    if(c.link_text) clickLabels[url] = c.link_text;
+  });
+  var topClicks = Object.entries(clickCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+  var maxClick = topClicks.length ? topClicks[0][1] : 1;
+  if(topClicks.length){
+    document.getElementById('clicks-list').innerHTML = topClicks.map(function(row){
+      var label = clickLabels[row[0]] || row[0];
+      return '<div class="bar-row">' +
+        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(label)+'</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxClick*100)+'%"></div></div>' +
+        '<span class="bar-count">'+row[1]+'</span>' +
+      '</div>';
+    }).join('');
+  } else {
+    document.getElementById('clicks-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No link clicks recorded yet.</div></div>';
   }
 
   // ── Traffic sources ──────────────────────────────────

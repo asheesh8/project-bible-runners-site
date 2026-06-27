@@ -21,6 +21,45 @@
     }
   }
 
+  function sendTracking(type, data, preferBeacon) {
+    var endpoint = '/api/track?type=' + encodeURIComponent(type);
+    var body = JSON.stringify(data);
+    if (preferBeacon && navigator.sendBeacon && window.Blob) {
+      try {
+        var blob = new Blob([body], { type: 'application/json' });
+        if (navigator.sendBeacon(endpoint, blob)) return;
+      } catch (e) {
+        // Fall back to fetch below.
+      }
+    }
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      cache: 'no-store',
+      keepalive: true,
+      body: body
+    }).catch(function () {
+      // Analytics must never block the public resource pages.
+    });
+  }
+
+  function linkType(link, url) {
+    if (link.hasAttribute('download') || /\.(pdf|zip|docx?|xlsx?|pptx?|mp[34]|mov)(?:$|[?#])/i.test(url.href)) return 'download';
+    if (url.protocol === 'mailto:') return 'email';
+    if (url.protocol === 'tel:') return 'phone';
+    if (url.hostname && url.hostname !== location.hostname) return 'external';
+    if (url.hash && url.pathname === location.pathname) return 'anchor';
+    return 'internal';
+  }
+
+  function linkLabel(link, rawHref) {
+    return (link.getAttribute('aria-label') || link.textContent || link.title || rawHref || '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 220);
+  }
+
   var params = new URLSearchParams(location.search);
   var payload = {
     visitor_id: getVisitorId(),
@@ -36,13 +75,29 @@
     ttclid: params.get('ttclid') || ''
   };
 
-  fetch('/api/track?type=visit', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    cache: 'no-store',
-    keepalive: true,
-    body: JSON.stringify(payload)
-  }).catch(function () {
-    // Analytics must never block the public resource pages.
-  });
+  sendTracking('visit', payload, false);
+
+  document.addEventListener('click', function (event) {
+    var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+    if (!link || link.hasAttribute('data-no-track')) return;
+
+    var rawHref = link.getAttribute('href') || '';
+    if (!rawHref || /^(javascript|data):/i.test(rawHref)) return;
+
+    var url;
+    try {
+      url = new URL(rawHref, location.href);
+    } catch (e) {
+      return;
+    }
+
+    sendTracking('click', {
+      visitor_id: getVisitorId(),
+      site_host: (location.hostname || '').toLowerCase().replace(/^www\./, ''),
+      path: location.pathname || '/',
+      link_url: url.href,
+      link_text: linkLabel(link, rawHref),
+      link_type: linkType(link, url)
+    }, true);
+  }, true);
 }());

@@ -3,6 +3,7 @@
 //
 // Public (no auth):
 //   POST /api/track?type=visit     { visitor_id, site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
+//   POST /api/track?type=click     { visitor_id, site_host, path, link_url, link_text, link_type }
 //   POST /api/track?type=interest  { name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
 //
 // Admin (Authorization: Bearer <ADMIN_PASSWORD>):
@@ -64,7 +65,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { type } = req.query;
-  const VALID = ['visit', 'visits', 'interest', 'interests', 'availability', 'availabilities', 'summary', 'health'];
+  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'summary', 'health'];
   if (!VALID.includes(type)) return res.status(400).json({ error: 'Invalid type' });
 
   // ── Admin health check: report pipeline status without exposing secrets ──
@@ -75,9 +76,9 @@ export default async function handler(req, res) {
     const out = { supabase_configured: configured, admin_password_set: !!ADMIN_PASSWORD, tables: {}, visit_count: null, latest_visit_at: null };
     if (!configured) return res.status(200).json(out);
     const probeH = { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` };
-    for (const t of ['page_visits', 'donation_interests', 'availability_requests']) {
+    for (const t of ['page_visits', 'link_clicks', 'donation_interests', 'availability_requests']) {
       try {
-        const rr = t === 'page_visits'
+        const rr = (t === 'page_visits' || t === 'link_clicks')
           ? await fetchWithFallback([
             { url: `${SUPABASE_URL}/rest/v1/${t}?select=id&is_robot=not.is.true`, options: { headers: { ...probeH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store' } },
             { url: `${SUPABASE_URL}/rest/v1/${t}?select=id`, options: { headers: { ...probeH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store' } },
@@ -174,6 +175,59 @@ export default async function handler(req, res) {
     return res.status(visitResponse.ok ? 200 : 502).json({ ok: visitResponse.ok });
   }
 
+  // ── Public POST: log link click ──────────────────────────────────
+  if (req.method === 'POST' && type === 'click') {
+    const { visitor_id, site_host, path, link_url, link_text, link_type } = req.body || {};
+    const robotReason = detectRobotRequest(req);
+    if (robotReason) {
+      return res.status(200).json({ ok: true, ignored: true, robot: true, reason: robotReason });
+    }
+
+    const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+    const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
+    const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
+    const cleanLinkUrl = trimText(link_url, 1200);
+    if (!cleanLinkUrl) return res.status(200).json({ ok: true, ignored: true });
+
+    const safeTypes = new Set(['internal', 'external', 'download', 'anchor', 'email', 'phone', 'link']);
+    const payload = {
+      visitor_id: cleanVisitorId || null,
+      site_host: cleanHost,
+      path: trimText(path, 600),
+      link_url: cleanLinkUrl,
+      link_text: trimText(link_text, 220),
+      link_type: safeTypes.has(String(link_type || '')) ? String(link_type) : 'link',
+      user_agent: trimText(req.headers['user-agent'], 500) || null,
+      is_robot: false,
+      robot_reason: null,
+    };
+    const legacyPayload = (() => {
+      const p = { ...payload };
+      delete p.user_agent;
+      delete p.is_robot;
+      delete p.robot_reason;
+      return p;
+    })();
+    const payloads = [
+      payload,
+      legacyPayload,
+      (() => { const p = { ...legacyPayload }; delete p.visitor_id; return p; })(),
+      (() => { const p = { ...legacyPayload }; delete p.site_host; return p; })(),
+      (() => { const p = { ...legacyPayload }; delete p.visitor_id; delete p.site_host; return p; })(),
+    ];
+    let clickResponse;
+    for (const candidate of payloads) {
+      clickResponse = await fetch(`${SUPABASE_URL}/rest/v1/link_clicks`, {
+        method: 'POST',
+        headers: { ...sbH, Prefer: 'return=minimal' },
+        body: JSON.stringify(candidate),
+      });
+      if (clickResponse.ok) break;
+    }
+    // Keep navigation smooth even if the optional click table has not been pasted into Supabase yet.
+    return res.status(200).json({ ok: !!(clickResponse && clickResponse.ok) });
+  }
+
   // ── Public POST: log donation interest ──────────────────────────
   if (req.method === 'POST' && type === 'interest') {
     const { name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign } = req.body || {};
@@ -223,6 +277,14 @@ export default async function handler(req, res) {
     return res.status(r.status).json(await r.json());
   }
 
+  if (req.method === 'GET' && type === 'clicks') {
+    const r = await fetchWithFallback([
+      { url: `${SUPABASE_URL}/rest/v1/link_clicks?select=*&is_robot=not.is.true&order=created_at.desc&limit=500`, options: { headers: sbH, cache: 'no-store' } },
+      { url: `${SUPABASE_URL}/rest/v1/link_clicks?select=*&order=created_at.desc&limit=500`, options: { headers: sbH, cache: 'no-store' } },
+    ]);
+    return res.status(r.ok ? r.status : 200).json(r.ok ? await r.json() : []);
+  }
+
   if (req.method === 'GET' && type === 'interests') {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=*&order=created_at.desc`, { headers: sbH });
     return res.status(r.status).json(await r.json());
@@ -230,10 +292,11 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET' && type === 'summary') {
     const visitRangeHeaders = { ...sbH, Prefer: 'count=exact', Range: '0-499' };
+    const clickRangeHeaders = { ...sbH, Prefer: 'count=exact', Range: '0-499' };
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayIso = encodeURIComponent(todayStart.toISOString());
-    let [visitsR, uniqueR, todayR, interestsR, availR] = await Promise.all([
+    let [visitsR, uniqueR, todayR, clicksR, interestsR, availR] = await Promise.all([
       fetchWithFallback([
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at,is_robot,robot_reason&is_robot=not.is.true&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
@@ -248,28 +311,38 @@ export default async function handler(req, res) {
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=id&created_at=gte.${todayIso}&is_robot=not.is.true`, options: { headers: { ...sbH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store' } },
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=id&created_at=gte.${todayIso}`, options: { headers: { ...sbH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store' } },
       ]),
+      fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/link_clicks?select=visitor_id,site_host,path,link_url,link_text,link_type,created_at,is_robot,robot_reason&is_robot=not.is.true&order=created_at.desc&limit=500`, options: { headers: clickRangeHeaders, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/link_clicks?select=visitor_id,site_host,path,link_url,link_text,link_type,created_at&order=created_at.desc&limit=500`, options: { headers: clickRangeHeaders, cache: 'no-store' } },
+      ]),
       fetch(`${SUPABASE_URL}/rest/v1/donation_interests?select=country,initiative,utm_source,created_at&order=created_at.desc`, { headers: sbH }),
       fetch(`${SUPABASE_URL}/rest/v1/availability_requests?select=country,created_at&order=created_at.desc`, { headers: sbH }),
     ]);
     const totalPageVisits = exactCountFrom(visitsR);
     const visitsToday = exactCountFrom(todayR);
-    const [visits, uniqueRows, interests, availabilities] = await Promise.all([
+    const totalLinkClicks = clicksR && (clicksR.ok || clicksR.status === 206) ? exactCountFrom(clicksR) : 0;
+    const [visits, uniqueRows, clicks, interests, availabilities] = await Promise.all([
       jsonOrEmpty(visitsR),
       jsonOrEmpty(uniqueR),
+      clicksR && (clicksR.ok || clicksR.status === 206) ? jsonOrEmpty(clicksR) : Promise.resolve([]),
       jsonOrEmpty(interestsR),
       availR.ok ? jsonOrEmpty(availR) : Promise.resolve([]),
     ]);
     const uniqueIds = new Set(uniqueRows.map((v) => v.visitor_id).filter(Boolean));
     if (!uniqueIds.size) visits.forEach((v) => { if (v.visitor_id) uniqueIds.add(v.visitor_id); });
+    clicks.forEach((c) => { if (c.visitor_id) uniqueIds.add(c.visitor_id); });
     return res.status(200).json({
       visits: visits || [],
+      clicks: clicks || [],
       interests: interests || [],
       availabilities: availabilities || [],
       totals: {
         total_page_visits: totalPageVisits == null ? visits.length : totalPageVisits,
         individual_people: uniqueIds.size,
         visits_today: visitsToday == null ? visits.filter((v) => new Date(v.created_at).toDateString() === new Date().toDateString()).length : visitsToday,
+        total_link_clicks: totalLinkClicks == null ? clicks.length : totalLinkClicks,
         loaded_visits: visits.length,
+        loaded_clicks: clicks.length,
         robot_filtered: true,
       },
     });
