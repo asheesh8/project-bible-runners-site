@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Raspberry Pi VillageServer System | VillageServer Initiative</title>
-  <meta name="description" content="The Raspberry Pi stores the entire resource library and broadcasts a local Wi-Fi network — a wireless library any nearby phone can join without internet.">
+  <meta name="description" content="A library that fits in your hand: the Raspberry Pi broadcasts local Wi-Fi and serves the language libraries carried on microSD cards.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,46 +24,44 @@
       <div class="wrap">
         <p class="meta">Raspberry Pi VillageServer System</p>
         <h1>A library that fits in your hand</h1>
-        <p class="summary">The Raspberry Pi stores the entire resource library and broadcasts a local Wi-Fi network. Power it on, and any nearby phone can join — no internet, no data plan, no technical setup needed.</p>
+        <p class="summary">The Raspberry Pi broadcasts the VillageServer Wi-Fi network while microSD cards plugged into USB readers decide which languages and resources are available.</p>
       </div>
     </section>
     <section class="page-body">
       <div class="wrap board-layout">
         <article class="article-body">
-          <p class="article-lead">The Raspberry Pi is a small computer — about the size of a deck of cards — that stores the entire resource library and broadcasts a private Wi-Fi network. When you power it on in the field, it becomes a wireless library that any nearby phone can join without a data plan.</p>
+          <p class="article-lead">The Raspberry Pi is a small offline library. The language library is determined by the microSD card or cards placed in USB readers and plugged into the Pi. Nearby phones connect to the Pi's Wi-Fi and open the local library in a browser.</p>
 
           <figure class="fig-full">
-            <img src="./img/kit-pi.webp" alt="Raspberry Pi field server with attached USB storage — the core of the VillageServer kit" loading="lazy">
-            <figcaption>The Raspberry Pi field server with attached storage — the core of the VillageServer kit.</figcaption>
+            <img src="./img/villageserver-case-usb-readers.jpeg" alt="VillageServer case with Raspberry Pi and USB readers during a field test" loading="lazy">
+            <figcaption>VillageServer case, Raspberry Pi, phone, and USB readers during a field test.</figcaption>
           </figure>
 
-          <h2>Think of it this way</h2>
-          <p>When someone joins the VillageServer Wi-Fi on their phone, it feels exactly like connecting to Wi-Fi at a coffee shop. They tap a link, a browser opens, and they're browsing the library. The difference is that the library is sitting right in front of them — on a device the size of a credit card — and it works whether there's internet or not.</p>
-          <p>One Pi can serve multiple phones at the same time, making it ideal for group settings: churches, schools, training workshops, or community gatherings. People read, listen, download files, and share them to other phones — all without any of it touching the internet.</p>
+          <h2>How the library is loaded</h2>
+          <p>The server hosts the language or languages carried on the microSD cards. Each card sits inside a USB reader or adapter, and those readers plug into the Raspberry Pi's USB ports. Changing the card changes the available library.</p>
+          <p>That means the kit can be prepared before travel with Scripture, audio, video, PDFs, and training material in the right language. In the field, the user should not have to understand servers. They should only need to join Wi-Fi and open the local address.</p>
 
           <figure class="fig-half">
             <img src="./img/test-run-table.jpeg" alt="Team testing phones and the VillageServer case during a field readiness check" loading="lazy">
             <figcaption>Team testing phones and the VillageServer case during a field readiness exercise.</figcaption>
           </figure>
 
-          <h2>How a session works</h2>
-          <p>The whole process takes under two minutes once someone is trained. Here's what it looks like from power-on to first file:</p>
+          <h2>How a phone opens the library</h2>
           <ol class="article-steps">
-            <li><div><strong>Plug in power</strong><p>Use a wall outlet, charged battery, or solar-supported source. The Pi draws very little current — a standard battery pack runs it for several hours.</p></div></li>
-            <li><div><strong>Wait for the network</strong><p>The Pi takes about 60 seconds to boot. The VillageServer Wi-Fi name appears on nearby phones when it's ready.</p></div></li>
-            <li><div><strong>Connect a phone</strong><p>Go to Wi-Fi settings and join the VillageServer network. No password needed unless the kit is configured for one.</p></div></li>
-            <li><div><strong>Open the library</strong><p>Tap the address shown on the included card, or wait for the captive portal to appear automatically in the browser.</p></div></li>
-            <li><div><strong>Find a resource</strong><p>Browse to a Bible chapter, audio file, gospel film, or PDF. The library is organized by Read, Listen, Watch, and Children.</p></div></li>
-            <li><div><strong>Save and share</strong><p>Download the file so it stays on the phone after the server is packed away. Then share it to another phone using AirDrop, Quick Share, or LocalSend.</p></div></li>
+            <li><div><strong>Load the language cards</strong><p>Place the needed microSD cards into USB readers or adapters. Each card can carry a language-specific library.</p></div></li>
+            <li><div><strong>Plug in the readers</strong><p>Connect the USB readers to the available USB ports on the Raspberry Pi.</p></div></li>
+            <li><div><strong>Power the server</strong><p>Turn on the Raspberry Pi and wait for it to begin broadcasting the VillageServer Wi-Fi network.</p></div></li>
+            <li><div><strong>Join the Wi-Fi</strong><p>On the phone, choose the VillageServer network and enter the one-time password: <strong>village123</strong>.</p></div></li>
+            <li><div><strong>Open the local address</strong><p>Open a browser and type <strong>10.43.0.1</strong> to reach the VillageServer library pages.</p></div></li>
+            <li><div><strong>View or download</strong><p>Read, listen, watch, or download text, audio, video, and PDF files for offline use and sharing.</p></div></li>
           </ol>
 
           <h2>What it can do</h2>
           <ul class="article-bullets">
-            <li><strong>Serve 5–15 phones simultaneously</strong> — the whole group connects at once</li>
-            <li><strong>Run from battery for hours</strong> — no wall power needed in the field</li>
-            <li><strong>Store a large library</strong> — audio, video, PDFs, and full Bible text</li>
-            <li><strong>Work completely offline</strong> — no internet required at any point during use</li>
-            <li><strong>Load custom content</strong> — libraries can be configured with specific languages and resources before deployment</li>
+            <li><strong>Serve nearby phones locally</strong> — people join the VillageServer Wi-Fi instead of using mobile data</li>
+            <li><strong>Host language-specific libraries</strong> — the microSD cards determine what content appears</li>
+            <li><strong>Work completely offline</strong> — no internet is required to browse, view, or download the library</li>
+            <li><strong>Support sharing</strong> — once a file is saved to one phone, it can move to other phones by AirDrop, Quick Share, LocalSend, USB, or microSD</li>
           </ul>
 
           <div class="article-cta">
@@ -74,9 +72,10 @@
         <aside class="side-card" aria-label="Page summary">
           <h2 class="side-title">Key points</h2>
           <ul class="side-list">
-            <li>The Pi creates a private local Wi-Fi — phones connect like they're joining any network</li>
-            <li>No internet required at any point during use</li>
-            <li>Serves 5–15 devices simultaneously; runs on battery for hours</li>
+            <li>Language libraries come from microSD cards in USB readers</li>
+            <li>Phones join the VillageServer Wi-Fi with password <strong>village123</strong></li>
+            <li>The local library opens at <strong>10.43.0.1</strong></li>
+            <li>Users can view or download text, audio, video, and PDFs without mobile data</li>
           </ul>
           <a class="pdf-button" href="./downloads/villageserver-raspberry-pi-system.pdf" download>Download PDF</a>
           <p class="mini-note">Printable and shareable offline.</p>

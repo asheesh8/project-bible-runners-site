@@ -191,8 +191,8 @@ grant select on public.campaigns, public.posts, public.photos, public.affiliates
 
 -- Initial affiliates. Re-running this does not create duplicates.
 insert into public.affiliates (name, description, active, sort_order)
-select 'Project Bible Runners', 'Scripture access and field relationships.', true, 10
-where not exists (select 1 from public.affiliates where name = 'Project Bible Runners');
+select 'VillageServer Initiative', 'Offline gospel access and field technology initiative.', true, 10
+where not exists (select 1 from public.affiliates where name = 'VillageServer Initiative');
 
 insert into public.affiliates (name, description, active, sort_order)
 select 'Digital Bible Society', 'Digital Bible resources and library support.', true, 20

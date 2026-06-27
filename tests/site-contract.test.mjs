@@ -126,12 +126,14 @@ test('the board stylesheet protects the older-reader design system', () => {
   assert.match(css, /\.test-run-section/);
   assert.match(css, /\.test-run-media/);
   assert.match(css, /\.board-hero/);
-  assert.match(css, /\.plain-answer/);
-  assert.match(css, /\.step-section/);
-  assert.match(css, /\.step-list/);
   assert.match(css, /\.pdf-button/);
-  assert.match(css, /\.brief-grid/);
   assert.match(css, /\.side-card/);
+  assert.match(css, /\.article-body/);
+  assert.match(css, /\.article-lead/);
+  assert.match(css, /\.article-steps/);
+  assert.match(css, /\.article-bullets/);
+  assert.match(css, /\.fig-full/);
+  assert.match(css, /\.side-list/);
   assert.match(css, /@media\(max-width:560px\)/);
   assert.doesNotMatch(css, /JOURNEY PROGRESS|\.journey|\.caravan|--journey-|model-hotspot|setup-widget/);
 });
@@ -173,7 +175,7 @@ test('the homepage directory exposes every public informational page', () => {
     assert.ok(existsSync(join(root, 'landing', page)), `${page} should exist`);
   }
 
-  for (const asset of ['kit-pi.webp', 'dish.webp', 'projector.webp', 'solar-field.webp']) {
+  for (const asset of ['villageserver-case-usb-readers.jpeg', 'satellite-lnb-retrofit.jpeg', 'projector.webp', 'solar-field.webp']) {
     assert.match(html, new RegExp(`\\./img/${asset}`));
     assert.ok(existsSync(join(root, 'landing/img', asset)), `${asset} should exist for homepage technology photos`);
   }
@@ -191,20 +193,22 @@ test('every informational page follows the same short blog-style board template'
 
   for (const page of boardPages) {
     const html = read(page);
-    assert.match(html, /<link rel="stylesheet" href="\.\/css\/board\.css\?v=1">/, `${page} should use the board stylesheet`);
+    assert.match(html, /<link rel="stylesheet" href="\.\/css\/board\.css\?v=2">/, `${page} should use the board article stylesheet`);
     assert.match(html, /class="board-top"/, `${page} should have a simple top bar`);
     assert.match(html, /class="board-hero"/, `${page} should have a short page hero`);
-    assert.match(html, /class="plain-answer"/, `${page} should lead with a plain answer`);
-    assert.match(html, /class="step-list"/, `${page} should include field steps`);
+    assert.match(html, /class="article-body"/, `${page} should use the blog-style article layout`);
+    assert.match(html, /class="article-lead"/, `${page} should open with a readable lead`);
+    assert.match(html, /class="article-steps"/, `${page} should include field steps`);
     assert.ok([...html.matchAll(/<li><div><strong>/g)].length >= 4, `${page} should include at least four field steps`);
-    assert.match(html, /class="brief-grid"/, `${page} should summarize with small cards`);
-    assert.match(html, /class="side-card"/, `${page} should have one visual summary card`);
-    const pdfMatch = html.match(/<a class="pdf-button" href="\.\/downloads\/([^"]+\.pdf)" download>Download PDF<\/a>/);
+    assert.match(html, /class="fig-full"/, `${page} should include a main supporting image`);
+    assert.match(html, /class="side-card"/, `${page} should have a visual summary card`);
+    assert.match(html, /class="side-list"/, `${page} should summarize key points`);
+    const pdfMatch = html.match(/<a class="pdf-button" href="\.\/downloads\/([^"]+\.pdf)" download>[^<]*PDF<\/a>/);
     assert.ok(pdfMatch, `${page} should have a primary PDF download`);
     assert.ok(existsSync(join(root, 'landing/downloads', pdfMatch[1])), `${page} should reference a deployed PDF`);
     assert.ok(existsSync(join(root, 'output/pdf', pdfMatch[1])), `${page} should retain the source PDF`);
     assert.match(html, /class="related"/, `${page} should link to related pages`);
-    assert.match(html, /Read this page when/, `${page} should explain when to use it`);
+    assert.doesNotMatch(html, /Read this page when|Download and use|<strong>Read this page when/i, `${page} should not expose internal template phrasing`);
     assert.match(html, /\.\/js\/site-language\.js/, `${page} should keep translation controls`);
     assert.match(html, /\.\/js\/site-tracking\.js/, `${page} should keep analytics tracking`);
     assert.doesNotMatch(html, removedPatterns, `${page} should not contain the removed long-scroll/campaign system`);
@@ -213,17 +217,25 @@ test('every informational page follows the same short blog-style board template'
 });
 
 test('core page copy is plain, ministry-focused, and non-technical', () => {
-  assert.match(read('landing/mission.html'), /The mission is simple: make gospel access feel obvious/i);
-  assert.match(read('landing/initiative.html'), /technology project/i);
-  assert.match(read('landing/phone-distribution.html'), /If one phone has the resource, nearby people can receive it/i);
-  assert.match(read('landing/raspberry-pi.html'), /small local server/i);
+  assert.match(read('landing/mission.html'), /carry Scripture, gospel media, and practical ministry resources/i);
+  assert.match(read('landing/initiative.html'), /offline library, local Wi-Fi, phone sharing/i);
+  assert.match(read('landing/phone-distribution.html'), /Once one phone has a resource/i);
+  assert.match(read('landing/raspberry-pi.html'), /A library that fits in your hand/i);
+  assert.match(read('landing/raspberry-pi.html'), /village123/);
+  assert.match(read('landing/raspberry-pi.html'), /10\.43\.0\.1/);
+  assert.match(read('landing/raspberry-pi.html'), /microSD cards/);
   assert.match(read('landing/power.html'), /Power is the first field question/i);
-  assert.match(read('landing/projector-media.html'), /A projector turns one library into a group teaching moment/i);
-  assert.match(read('landing/satellite.html'), /Satellite is optional/i);
-  assert.match(read('landing/field-faq.html'), /do not inspect packet payloads/i);
-  assert.match(read('landing/affiliates.html'), /Project Bible Runners/);
+  assert.match(read('landing/projector-media.html'), /Gospel film nights/i);
+  assert.match(read('landing/satellite.html'), /receive-and-replay broadcast path/i);
+  assert.match(read('landing/satellite.html'), /Free-to-Air Christian/i);
+  assert.match(read('landing/satellite.html'), /Repurposed satellite dish retrofitted with a generic LNB/i);
+  assert.doesNotMatch(read('landing/satellite.html'), /optional uplink|updates and remote coordination|Remote content updates/i);
+  assert.match(read('landing/field-faq.html'), /Satellite broadcasts are handled separately/i);
+  assert.match(read('landing/affiliates.html'), /VillageServer Initiative/);
   assert.match(read('landing/affiliates.html'), /Digital Bible Society/);
   assert.match(read('landing/affiliates.html'), /TechSoup/);
+  assert.doesNotMatch(read('landing/admin.html'), /Project Bible Runners|project-bible-runners-site|projectbiblerunners/i);
+  assert.doesNotMatch(read('supabase/schema.sql'), /Project Bible Runners|projectbiblerunners/i);
 });
 
 test('pamphlets page exposes the printable field handouts and files exist', () => {
@@ -283,16 +295,14 @@ test('every public page records visits for individual people and total visits', 
 
 test('admin still polls smoothly and separates individual people from total visits', () => {
   const admin = read('landing/admin.html');
-  assert.match(admin, /POLL_INTERVAL_MS = 4000/);
-  assert.match(admin, /setInterval\(pollActiveTab, POLL_INTERVAL_MS\)/);
-  assert.match(admin, /visibilitychange/);
+  assert.match(admin, /_trafficPoll/);
+  assert.match(admin, /setInterval\(function\(\)/);
+  assert.match(admin, /}, 4000\)/);
+  assert.match(admin, /traffic-countdown-bar/);
   assert.match(admin, /cache:'no-store'/);
   assert.match(admin, /&_ts=' \+ Date\.now\(\)/);
-  assert.match(admin, /villageserver\.com \+ villageserver\.org/);
   assert.match(admin, /Individual People/);
   assert.match(admin, /Total Page Visits/);
-  assert.match(admin, /uniqueVisitorCount/);
-  assert.match(admin, /visitorBreakdown/);
   assert.match(admin, /visitor_id/);
   assert.match(admin, /this is not packet scraping/i);
   assert.match(admin, /does not inspect packets/);

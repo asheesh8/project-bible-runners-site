@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Admin — Project Bible Runners</title>
+<title>Admin — VillageServer Initiative</title>
 <meta name="robots" content="noindex, nofollow" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -355,7 +355,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       <svg viewBox="0 0 20 28" fill="white" width="14" height="19"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg>
     </div>
     <h1>PBR Admin</h1>
-    <p>Project Bible Runners &mdash; Content panel</p>
+    <p>VillageServer Initiative &mdash; Content panel</p>
     <input type="password" id="pw-input" placeholder="Admin password" autocomplete="current-password" />
     <p class="login-err" id="login-err">Incorrect password. Try again.</p>
     <button class="btn-primary" id="login-btn">Sign in</button>
@@ -371,7 +371,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       <svg viewBox="0 0 20 28" fill="white" width="12" height="17"><rect x="7.5" y="0" width="5" height="28" rx="1.5"/><rect x="0" y="7" width="20" height="5" rx="1.5"/></svg>
     </div>
     <div class="topbar-title">
-      Project Bible Runners
+      VillageServer Initiative
       <span class="topbar-badge">Admin</span>
     </div>
     <div class="topbar-right">
@@ -511,7 +511,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
             <div class="field"><label>Body</label><textarea id="pf-body" rows="6"></textarea></div>
           </div>
           <div class="form-row">
-            <div class="field"><label>Author</label><input type="text" id="pf-author" value="Project Bible Runners" /></div>
+            <div class="field"><label>Author</label><input type="text" id="pf-author" value="VillageServer Initiative" /></div>
             <div class="field"><label>Image URL (optional)</label><input type="url" id="pf-img" /></div>
           </div>
           <div class="form-row">
@@ -639,8 +639,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         <div id="traffic-countdown-wrap"><div id="traffic-countdown-bar"></div></div>
 
         <div class="stat-grid">
-          <div class="stat-card accent"><div class="stat-val" id="stat-visits">—</div><div class="stat-label">Total visits</div></div>
-          <div class="stat-card"><div class="stat-val" id="stat-unique">—</div><div class="stat-label">Unique visitors</div></div>
+          <div class="stat-card accent"><div class="stat-val" id="stat-visits">—</div><div class="stat-label">Total Page Visits</div></div>
+          <div class="stat-card"><div class="stat-val" id="stat-unique">—</div><div class="stat-label">Individual People</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-today">—</div><div class="stat-label">Visits today</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-interests">—</div><div class="stat-label">Interest signups</div></div>
         </div>
@@ -658,6 +658,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         <div class="res-section">
           <div class="res-section-title">🌍 &nbsp;Users by country</div>
           <div id="country-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">🔒 &nbsp;Admin FAQ: this is not packet scraping</div>
+          <div class="qa-card">
+            <p class="qa-q">What can the traffic tracker see?</p>
+            <p class="qa-a">It records page visits, anonymous visitor IDs, site host, referrer, UTM fields, and ad click IDs such as <code>fbclid</code> and <code>ttclid</code>. This helps separate <strong>Total Page Visits</strong> from <strong>Individual People</strong>.</p>
+          </div>
+          <div class="qa-card">
+            <p class="qa-q">What can it not see?</p>
+            <p class="qa-a">VillageServer does not inspect packets, view another website's traffic, collect passwords, or browse files on a visitor's device. Network packet payloads are not read.</p>
+          </div>
         </div>
 
         <div class="res-section">
@@ -1098,7 +1110,7 @@ document.getElementById('cancel-post-btn').addEventListener('click', function(){
 
 function clearPostForm(){
   ['post-id','pf-title','pf-body','pf-img','pf-date'].forEach(function(id){ document.getElementById(id).value=''; });
-  document.getElementById('pf-author').value = 'Project Bible Runners';
+  document.getElementById('pf-author').value = 'VillageServer Initiative';
   document.getElementById('pf-published').checked = false;
   document.getElementById('post-msg').style.display = 'none';
 }
@@ -1107,7 +1119,7 @@ function fillPostForm(p){
   document.getElementById('post-id').value = p.id||'';
   document.getElementById('pf-title').value = p.title||'';
   document.getElementById('pf-body').value = p.body||'';
-  document.getElementById('pf-author').value = p.author||'Project Bible Runners';
+  document.getElementById('pf-author').value = p.author||'VillageServer Initiative';
   document.getElementById('pf-img').value = p.image_url||'';
   document.getElementById('pf-published').checked = !!p.published;
   document.getElementById('pf-date').value = p.published_at ? p.published_at.slice(0,16) : '';
@@ -1117,7 +1129,7 @@ document.getElementById('save-post-btn').addEventListener('click', function(){
   var body = {
     title: document.getElementById('pf-title').value.trim(),
     body: document.getElementById('pf-body').value.trim(),
-    author: document.getElementById('pf-author').value.trim()||'Project Bible Runners',
+    author: document.getElementById('pf-author').value.trim()||'VillageServer Initiative',
     image_url: document.getElementById('pf-img').value.trim()||null,
     published: document.getElementById('pf-published').checked,
     published_at: document.getElementById('pf-date').value ? new Date(document.getElementById('pf-date').value).toISOString() : new Date().toISOString(),
@@ -1294,7 +1306,7 @@ function loadTraffic(showSpinner){
     btn.textContent = 'Loading…';
   }
 
-  fetch('/api/track?type=summary', { headers:{ 'Authorization':'Bearer '+AUTH_TOKEN } })
+  fetch('/api/track?type=summary&_ts=' + Date.now(), { cache:'no-store', headers:{ 'Authorization':'Bearer '+AUTH_TOKEN } })
     .then(function(r){ return r.json(); })
     .then(function(data){
       renderTraffic(data.visits||[], data.interests||[], data.availabilities||[]);
@@ -1316,7 +1328,7 @@ function renderTraffic(visits, interests, availabilities){
   // ── Stats ────────────────────────────────────────────
   var todayStr = new Date().toDateString();
   var todayCount = visits.filter(function(v){ return new Date(v.created_at).toDateString()===todayStr; }).length;
-  var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||v.site_host||''; }).filter(Boolean));
+  var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||v.id||''; }).filter(Boolean));
 
   document.getElementById('stat-visits').textContent = visits.length;
   document.getElementById('stat-unique').textContent = uniqueIds.size || '—';

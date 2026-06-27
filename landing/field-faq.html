@@ -40,7 +40,7 @@
           <h2>Common questions and plain answers</h2>
 
           <h3 class="faq-q">Does it need internet to work?</h3>
-          <p>No. The local library runs completely offline. Once the Raspberry Pi is powered on and a phone connects to its Wi-Fi, all content is available without any internet connection. Internet or satellite is only needed if you want to download new content updates — the core library works in fully offline settings.</p>
+          <p>No. The local library runs completely offline. Once the Raspberry Pi is powered on and a phone connects to its Wi-Fi, all content is available without any internet connection. The core library works in fully offline settings. Satellite, when used, is a separate receive-and-replay path for Free-to-Air broadcasts — not required for normal library access.</p>
 
           <h3 class="faq-q">Does every phone need a special app?</h3>
           <p>No. Basic library access through the Raspberry Pi Wi-Fi just needs a browser — nothing extra to install. Some sharing methods (like LocalSend) use a free app for cross-device transfers, but for joining the VillageServer library, a standard browser is all that's needed.</p>
@@ -58,7 +58,7 @@
           <p>Try a different file first to confirm the connection is working. If one file fails but others open, the specific file may be corrupted — delete and re-download it. If no files open, the problem is the connection or browser, not the content. Clear the browser cache and try again.</p>
 
           <h3 class="faq-q">How do we update the content?</h3>
-          <p>Content is updated by connecting the Pi to the internet (at a location with Wi-Fi or via satellite in truly remote settings) and running the update process. In areas with cellular data, a personal hotspot can also work. The library doesn't need to go back to a central location for updates — it can receive new content wherever connectivity is available.</p>
+          <p>Content is updated before deployment or anywhere normal internet is available. In the field, a personal hotspot or local Wi-Fi can be used when practical. Satellite broadcasts are handled separately as received or recorded media, not as the normal Pi update path.</p>
 
           <h2>How to handle confusion in the field</h2>
           <ol class="article-steps">

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Satellite Systems and Content Acquisition | VillageServer Initiative</title>
-  <meta name="description" content="Satellite is optional — a bridge for remote content updates and field coordination, not the foundation. The local library should work completely offline without it.">
+  <meta name="description" content="Satellite systems receive Free-to-Air Christian radio or video already broadcasting over a region so communities can stream, project, record, and replay it locally.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,27 +23,30 @@
     <section class="board-hero">
       <div class="wrap">
         <p class="meta">Satellite Systems and Content Acquisition</p>
-        <h1>A bridge, not the foundation</h1>
-        <p class="summary">Satellite is the optional part of the VillageServer kit. Useful for remote content downloads and field coordination — but the local library should work completely offline before satellite ever enters the plan.</p>
+        <h1>Receive broadcasts. Replay locally.</h1>
+        <p class="summary">The satellite piece repurposes unused dishes to receive Free-to-Air Christian radio or video already broadcasting over a region, then plays or records it for local ministry use.</p>
       </div>
     </section>
     <section class="page-body">
       <div class="wrap board-layout">
         <article class="article-body">
-          <p class="article-lead">Satellite is helpful in the right setting — a team working days from the nearest town, needing to pull down fresh content or send field updates. But it's a bridge, not the road. VillageServer is strongest when the local library is already working offline.</p>
+          <p class="article-lead">This satellite path is not a remote-control system for VillageServer. It is a receive-and-replay broadcast path: a repurposed dish, a generic LNB, a receiver or recorder, and a local screen, wall, speaker, or projector.</p>
 
           <figure class="fig-full">
-            <img src="./img/dish.webp" alt="Satellite dish aligned for a content update during a remote VillageServer field deployment" loading="lazy">
-            <figcaption>Satellite dish aligned for a content update during a remote VillageServer field test.</figcaption>
+            <img src="./img/satellite-lnb-retrofit.jpeg" alt="Repurposed satellite dish retrofitted with a generic LNB" loading="lazy">
+            <figcaption>A repurposed satellite dish retrofitted with a generic LNB for Free-to-Air broadcast reception.</figcaption>
           </figure>
 
-          <h2>When satellite actually helps</h2>
-          <p>Most VillageServer deployments don't need satellite at all. The library is loaded before the team leaves, and everything runs offline in the field. Satellite becomes useful in specific situations:</p>
+          <h2>What the satellite part really does</h2>
+          <p>First, an unused satellite dish is repurposed. The team retrofits it with a generic LNB, aims it at a satellite that covers the region, and receives Christian radio or video content that is already being broadcast Free-to-Air.</p>
+          <p>The stream can be played live through a TV, projector, speaker, wall, or screen in a home, church, school, or community center. With an HTML recorder or similar recorder, a pastor or local leader can save programs and replay them later as often as needed.</p>
+
+          <h2>What it is not</h2>
           <ul class="article-bullets">
-            <li><strong>Remote content updates</strong> — downloading a new language version or updated resource pack when too far from cellular data</li>
-            <li><strong>Field reports</strong> — sending observations, reach numbers, or testimonials back to base during extended deployments</li>
-            <li><strong>New resource acquisition</strong> — pulling a specific file or library that wasn't included in the original kit</li>
-            <li><strong>Emergency communication</strong> — when no other connectivity is available and contact with the team is necessary</li>
+            <li><strong>Not a Raspberry Pi update link</strong> — it does not currently update the VillageServer live unless a recorded stream is later copied to microSD and loaded into the library.</li>
+            <li><strong>Not remote team coordination</strong> — unless custom uplink work is added through a teleport organization, this is not how the field team sends messages back.</li>
+            <li><strong>Not the emergency-comms plan</strong> — amateur radio may become a future path, but it is separate from this satellite receive model.</li>
+            <li><strong>Not required for the core kit</strong> — the offline VillageServer library should still work without the dish.</li>
           </ul>
 
           <figure class="fig-half">
@@ -51,31 +54,32 @@
             <figcaption>Checking satellite hardware alignment during the VillageServer field test run.</figcaption>
           </figure>
 
-          <h2>Setting it up in the field</h2>
+          <h2>How a field setup works</h2>
           <ol class="article-steps">
-            <li><div><strong>Confirm satellite is actually needed</strong><p>If cellular data is available — even slow 3G — use it instead. Satellite adds cost, complexity, and setup time that isn't worth it when a hotspot works.</p></div></li>
-            <li><div><strong>Find open sky</strong><p>The dish needs an unobstructed line to the satellite. Even a single tree branch can break the link. Scout the location before setting up.</p></div></li>
-            <li><div><strong>Set up on stable ground</strong><p>The dish must stay aligned during use. Wind, soft ground, or accidental movement will drop the connection mid-download.</p></div></li>
-            <li><div><strong>Power it properly</strong><p>Satellite hardware draws more current than the Pi or projector. Plan this separately in your battery and solar budget.</p></div></li>
-            <li><div><strong>Download only what the mission needs</strong><p>Avoid pulling large files out of habit. Every unnecessary download wastes battery, data allowance, and time.</p></div></li>
-            <li><div><strong>Test the local library offline after</strong><p>Disconnect the satellite and confirm all core content still works without it. The session should never depend on the satellite link staying active.</p></div></li>
+            <li><div><strong>Repurpose an unused dish</strong><p>Start with a satellite dish that can be safely mounted, moved, and held in alignment for the field setting.</p></div></li>
+            <li><div><strong>Retrofit a generic LNB</strong><p>Attach the LNB and receiver path needed to capture the Free-to-Air broadcast signal for that region.</p></div></li>
+            <li><div><strong>Aim at the regional satellite</strong><p>Point the dish toward a satellite already broadcasting Christian radio or video content over the area being served.</p></div></li>
+            <li><div><strong>Play the content locally</strong><p>Send the radio or video to a speaker, TV, projector, wall, or screen where the group can listen or watch together.</p></div></li>
+            <li><div><strong>Record useful programs</strong><p>With an HTML recorder or similar recorder, save broadcasts so the local leader can replay them later without waiting for the live signal.</p></div></li>
+            <li><div><strong>Bridge to VillageServer only if needed</strong><p>If a saved program should live in the local library, copy the recorded file to microSD and load it through the Raspberry Pi VillageServer.</p></div></li>
           </ol>
 
           <div class="article-callout">
-            <p>Build the offline library first. Satellite is a bridge for updates — not the heart of the system.</p>
+            <p>Think of satellite as a regional content receiver, not the heart of the system. The VillageServer library remains local, offline-first, and useful without a live signal.</p>
           </div>
 
           <div class="article-cta">
-            <p>Download the Satellite Systems overview as a printable PDF for kit planning and field briefings.</p>
+            <p>Download the corrected Satellite Systems overview as a printable PDF for kit planning and field briefings.</p>
             <a class="pdf-button" href="./downloads/villageserver-satellite-systems.pdf" download>Download Satellite Systems PDF</a>
           </div>
         </article>
         <aside class="side-card" aria-label="Page summary">
           <h2 class="side-title">Key points</h2>
           <ul class="side-list">
-            <li>The offline library should work completely before satellite is part of the plan</li>
-            <li>Satellite needs open sky, stable ground, and its own power budget</li>
-            <li>Use cellular data instead whenever it's available — satellite is for truly remote settings</li>
+            <li>Receives Free-to-Air Christian radio or video already broadcasting over the region</li>
+            <li>Can project or play the stream live for a group</li>
+            <li>Can record programs for later replay with a dedicated recorder</li>
+            <li>Only connects to the Raspberry Pi library if saved files are copied to microSD afterward</li>
           </ul>
           <a class="pdf-button" href="./downloads/villageserver-satellite-systems.pdf" download>Download PDF</a>
           <p class="mini-note">Printable and shareable offline.</p>
