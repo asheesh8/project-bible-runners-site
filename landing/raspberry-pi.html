@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Raspberry Pi VillageServer System | VillageServer Initiative</title>
-  <meta name="description" content="A library that fits in your hand: the Raspberry Pi broadcasts local Wi-Fi and serves the language libraries carried on microSD cards.">
+  <title>Raspberry Pi VillageServer — Full Setup Guide | VillageServer Initiative</title>
+  <meta name="description" content="Step-by-step guide to building a VillageServer on Raspberry Pi: flash the OS, configure a Wi-Fi hotspot, load language libraries, and set up a WireGuard VPN tunnel for remote access.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,73 +22,459 @@
   <main id="main">
     <section class="board-hero">
       <div class="wrap">
-        <p class="meta">Raspberry Pi VillageServer System</p>
-        <h1>A library that fits in your hand</h1>
-        <p class="summary">The Raspberry Pi broadcasts the VillageServer Wi-Fi network while microSD cards plugged into USB readers decide which languages and resources are available.</p>
+        <p class="meta">Technology · Raspberry Pi VillageServer</p>
+        <h1>A library that fits in your hand — full setup guide</h1>
+        <p class="summary">The Raspberry Pi broadcasts a local Wi-Fi hotspot and serves offline Bible libraries to any nearby phone. This guide walks through flashing the device, loading language libraries, and optionally setting up a WireGuard tunnel so a technician can manage the server remotely from anywhere in the world.</p>
       </div>
     </section>
+
     <section class="page-body">
       <div class="wrap board-layout">
         <article class="article-body">
-          <p class="article-lead">The Raspberry Pi is a small offline library. The language library is determined by the microSD card or cards placed in USB readers and plugged into the Pi. Nearby phones connect to the Pi's Wi-Fi and open the local library in a browser.</p>
+
+          <!-- ── WHAT IT LOOKS LIKE ──────────────────── -->
+          <h2>What the VillageServer interface looks like</h2>
+          <p class="article-lead">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.43.0.1</span> in a browser, it sees a clean library home page. The interface is fully offline — no internet required.</p>
+
+          <p>The home page shows the available language libraries. In Eric's demo unit, both English and Spanish libraries are loaded. Each language tile opens into a content grid with four sections:</p>
+          <ul class="article-bullets">
+            <li><strong>Bible</strong> — full Scripture text, chapter by chapter</li>
+            <li><strong>Audio</strong> — dramatised audio Bible recordings</li>
+            <li><strong>Video</strong> — LUMO gospel films (Matthew, Mark, Luke, John) and other gospel media</li>
+            <li><strong>Books</strong> — commentaries, discipleship materials, and reference PDFs</li>
+          </ul>
 
           <figure class="fig-full">
-            <img src="./img/villageserver-case-usb-readers.jpeg" alt="VillageServer case with Raspberry Pi and USB readers during a field test" loading="lazy">
-            <figcaption>VillageServer case, Raspberry Pi, phone, and USB readers during a field test.</figcaption>
+            <img src="./img/villageserver-case-usb-readers.jpeg" alt="VillageServer case with Raspberry Pi and USB card readers during a field test" loading="lazy">
+            <figcaption>The VillageServer case: Raspberry Pi, power bank, and USB readers holding language microSD cards — all fitting in a small carry case.</figcaption>
           </figure>
 
-          <h2>How the library is loaded</h2>
-          <p>The server hosts the language or languages carried on the microSD cards. Each card sits inside a USB reader or adapter, and those readers plug into the Raspberry Pi's USB ports. Changing the card changes the available library.</p>
-          <p>That means the kit can be prepared before travel with Scripture, audio, video, PDFs, and training material in the right language. In the field, the user should not have to understand servers. They should only need to join Wi-Fi and open the local address.</p>
+          <p>When content is being updated remotely, the interface displays an "Updating Libraries — please wait" banner so users know a refresh is in progress. The server continues to serve existing content while the update runs in the background.</p>
+
+          <!-- ── HOW THE LIBRARY LOADS ───────────────── -->
+          <h2>How language libraries are loaded</h2>
+          <p>Each microSD card carries one language library. The card sits inside a USB reader or adapter, and those readers plug into the Raspberry Pi's USB ports. Swapping or adding a card changes the available languages immediately on the next server restart.</p>
+          <p>This means a kit can be prepared before travel with the right languages already on the cards. In the field, the operator only needs to join Wi-Fi and open a browser — no understanding of servers is required.</p>
 
           <figure class="fig-half">
             <img src="./img/test-run-table.jpeg" alt="Team testing phones and the VillageServer case during a field readiness check" loading="lazy">
-            <figcaption>Team testing phones and the VillageServer case during a field readiness exercise.</figcaption>
+            <figcaption>Team testing the setup indoors before field deployment.</figcaption>
           </figure>
 
-          <h2>How a phone opens the library</h2>
+          <!-- ── PART 1: SERVER SETUP ───────────────── -->
+          <h2 id="setup">Part 1 — Setting up the Raspberry Pi server</h2>
+
+          <h3>What you need</h3>
+          <ul class="article-bullets">
+            <li>Raspberry Pi 4 (2 GB RAM or more recommended) or Raspberry Pi 3B+</li>
+            <li>MicroSD card for the Pi OS (16 GB minimum, 32 GB recommended)</li>
+            <li>One or more USB microSD readers loaded with language library cards</li>
+            <li>Power supply (5V USB-C for Pi 4, or a compatible power bank)</li>
+            <li>A laptop with Raspberry Pi Imager installed (free download from raspberrypi.com)</li>
+          </ul>
+
+          <!-- Step 1 -->
           <ol class="article-steps">
-            <li><div><strong>Load the language cards</strong><p>Place the needed microSD cards into USB readers or adapters. Each card can carry a language-specific library.</p></div></li>
-            <li><div><strong>Plug in the readers</strong><p>Connect the USB readers to the available USB ports on the Raspberry Pi.</p></div></li>
-            <li><div><strong>Power the server</strong><p>Turn on the Raspberry Pi and wait for it to begin broadcasting the VillageServer Wi-Fi network.</p></div></li>
-            <li><div><strong>Join the Wi-Fi</strong><p>On the phone, choose the VillageServer network and enter the one-time password: <strong>village123</strong>.</p></div></li>
-            <li><div><strong>Open the local address</strong><p>Open a browser and type <strong>10.43.0.1</strong> to reach the VillageServer library pages.</p></div></li>
-            <li><div><strong>View or download</strong><p>Read, listen, watch, or download text, audio, video, and PDF files for offline use and sharing.</p></div></li>
+            <li>
+              <div>
+                <span class="step-label">Step 1</span>
+                <strong>Flash Raspberry Pi OS to the system card</strong>
+                <p>Download and open <strong>Raspberry Pi Imager</strong> on your laptop. Choose <strong>Raspberry Pi OS Lite (64-bit)</strong> — the version without a desktop, which runs lighter and faster as a server. Select your system microSD card as the destination.</p>
+                <p>Before writing, click the settings gear and configure:</p>
+                <ul class="article-bullets">
+                  <li>Hostname: <span class="inline-code">villageserver</span></li>
+                  <li>Enable SSH with password authentication</li>
+                  <li>Username: <span class="inline-code">pi</span>, Password: choose a strong password and note it</li>
+                  <li>Wi-Fi credentials for your setup laptop's network (so the Pi can reach the internet on first boot)</li>
+                </ul>
+                <p>Write the image and insert the card into the Raspberry Pi.</p>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 2</span>
+                <strong>First boot and SSH in</strong>
+                <p>Power on the Pi. Wait about 60 seconds for first boot. Find the Pi's IP address from your router's device list (look for hostname <span class="inline-code">villageserver</span>), then connect:</p>
+                <div class="code-block"><code><span class="code-comment"># Replace 192.168.x.x with your Pi's actual IP</span>
+ssh pi@192.168.x.x</code></div>
+                <p>Accept the fingerprint prompt and enter the password you set in Imager. You are now at the Pi's command line.</p>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 3</span>
+                <strong>Update the system</strong>
+                <div class="code-block"><code>sudo apt update && sudo apt upgrade -y</code></div>
+                <p>This takes a few minutes on first run. Let it complete before moving on.</p>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 4</span>
+                <strong>Install Kiwix and the VillageServer web interface</strong>
+                <p>Kiwix is the offline library engine that serves the content libraries from ZIM files stored on the microSD cards.</p>
+                <div class="code-block"><code><span class="code-comment"># Install Kiwix server</span>
+sudo apt install -y kiwix-tools
+
+<span class="code-comment"># Install nginx as a front-end reverse proxy</span>
+sudo apt install -y nginx
+
+<span class="code-comment"># Create the content mount point</span>
+sudo mkdir -p /mnt/library</code></div>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 5</span>
+                <strong>Mount the language library cards</strong>
+                <p>Plug the USB readers (with language cards inserted) into the Pi's USB ports. List the connected devices to find them:</p>
+                <div class="code-block"><code>lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL</code></div>
+                <p>Each card will appear as a device like <span class="inline-code">sda</span>, <span class="inline-code">sdb</span>, etc. Mount them so Kiwix can read the ZIM files:</p>
+                <div class="code-block"><code><span class="code-comment"># Example: mount first card to /mnt/library/english</span>
+sudo mkdir -p /mnt/library/english
+sudo mount /dev/sda1 /mnt/library/english
+
+<span class="code-comment"># Repeat for each language card</span>
+sudo mkdir -p /mnt/library/spanish
+sudo mount /dev/sdb1 /mnt/library/spanish</code></div>
+                <p>To make mounts persist across reboots, add them to <span class="inline-code">/etc/fstab</span> using the card's UUID (find it with <span class="inline-code">blkid</span>).</p>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 6</span>
+                <strong>Start the Kiwix server</strong>
+                <p>Point Kiwix at the ZIM files on the mounted cards and start it as a background service:</p>
+                <div class="code-block"><code><span class="code-comment"># Start Kiwix on port 8080, scanning all ZIM files under /mnt/library</span>
+kiwix-serve --library --port=8080 /mnt/library/**/*.zim &amp;</code></div>
+                <p>Create a systemd service file to start Kiwix automatically on boot:</p>
+                <div class="code-block"><code>sudo nano /etc/systemd/system/kiwix.service</code></div>
+                <p>Paste the following, then save:</p>
+                <div class="code-block"><code>[Unit]
+Description=Kiwix VillageServer
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/kiwix-serve --library --port=8080 /mnt/library/**/*.zim
+Restart=on-failure
+User=pi
+
+[Install]
+WantedBy=multi-user.target</code></div>
+                <div class="code-block"><code>sudo systemctl daemon-reload
+sudo systemctl enable kiwix
+sudo systemctl start kiwix</code></div>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 7</span>
+                <strong>Configure nginx to serve the library on port 80</strong>
+                <p>Edit the default nginx site to proxy requests to Kiwix:</p>
+                <div class="code-block"><code>sudo nano /etc/nginx/sites-available/default</code></div>
+                <p>Replace the contents with:</p>
+                <div class="code-block"><code>server {
+    listen 80 default_server;
+    server_name _;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}</code></div>
+                <div class="code-block"><code>sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code></div>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 8</span>
+                <strong>Set up the Wi-Fi hotspot</strong>
+                <p>Install the hostapd access point daemon and dnsmasq for DHCP:</p>
+                <div class="code-block"><code>sudo apt install -y hostapd dnsmasq
+sudo systemctl unmask hostapd</code></div>
+                <p>Configure the hotspot. Edit <span class="inline-code">/etc/hostapd/hostapd.conf</span>:</p>
+                <div class="code-block"><code>sudo nano /etc/hostapd/hostapd.conf</code></div>
+                <div class="code-block"><code>interface=wlan0
+driver=nl80211
+ssid=VillageServer
+hw_mode=g
+channel=7
+wmm_enabled=0
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=village123
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP</code></div>
+                <p>Configure dnsmasq to give connected phones the address <span class="inline-code">10.43.0.x</span> and point DNS to the Pi:</p>
+                <div class="code-block"><code>sudo nano /etc/dnsmasq.conf</code></div>
+                <div class="code-block"><code>interface=wlan0
+dhcp-range=10.43.0.2,10.43.0.50,255.255.255.0,24h
+address=/#/10.43.0.1</code></div>
+                <p>Give <span class="inline-code">wlan0</span> a static IP and enable IP forwarding:</p>
+                <div class="code-block"><code>sudo nano /etc/dhcpcd.conf</code></div>
+                <p>Add at the end:</p>
+                <div class="code-block"><code>interface wlan0
+    static ip_address=10.43.0.1/24
+    nohook wpa_supplicant</code></div>
+                <div class="code-block"><code>sudo systemctl enable hostapd dnsmasq
+sudo systemctl restart dhcpcd
+sudo systemctl start hostapd dnsmasq</code></div>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 9</span>
+                <strong>Test the library from a phone</strong>
+                <p>On a phone, go to Wi-Fi settings and connect to <strong>VillageServer</strong> with password <strong>village123</strong>. Open a browser and go to <span class="inline-code">10.43.0.1</span>. You should see the language library grid. Tap a language, then a content section, and verify that Bible text, audio, or video loads without any internet connection.</p>
+              </div>
+            </li>
           </ol>
 
-          <h2>What it can do</h2>
+          <!-- ── PART 2: WIREGUARD TUNNEL ───────────── -->
+          <h2 id="wireguard">Part 2 — Remote access via WireGuard tunnel</h2>
+          <p>Once deployed in a village, the Pi may be unreachable from the outside world — behind a cellular NAT, a private router, or simply a dynamic IP that changes daily. WireGuard solves this by having the Pi connect outward to a relay server (VPS) that you control. You also connect to that same VPS. Both the Pi and your laptop are on the same private WireGuard network, so you can SSH into the Pi as if it were sitting next to you.</p>
+
+          <div class="article-callout">
+            <strong>What you need for this section</strong>
+            <ul>
+              <li>A VPS (virtual private server) with a public IP — any provider works (DigitalOcean, Linode, Vultr, AWS, etc.). The cheapest tier ($4–6/month) is sufficient.</li>
+              <li>Ubuntu 22.04 or Debian 12 on the VPS</li>
+              <li>WireGuard installed on: the VPS, the Pi, and your laptop</li>
+            </ul>
+          </div>
+
+          <h3>How the tunnel works</h3>
+          <p>Each device gets a private WireGuard IP on a shared subnet (e.g., <span class="inline-code">10.99.0.0/24</span>):</p>
           <ul class="article-bullets">
-            <li><strong>Serve nearby phones locally</strong> — people join the VillageServer Wi-Fi instead of using mobile data</li>
-            <li><strong>Host language-specific libraries</strong> — the microSD cards determine what content appears</li>
-            <li><strong>Work completely offline</strong> — no internet is required to browse, view, or download the library</li>
-            <li><strong>Support sharing</strong> — once a file is saved to one phone, it can move to other phones by AirDrop, Quick Share, LocalSend, USB, or microSD</li>
+            <li>VPS (relay): <span class="inline-code">10.99.0.1</span></li>
+            <li>Raspberry Pi (field device): <span class="inline-code">10.99.0.2</span></li>
+            <li>Your laptop (admin): <span class="inline-code">10.99.0.3</span></li>
+          </ul>
+          <p>The Pi and your laptop both connect to the VPS at boot. To reach the Pi you SSH to <span class="inline-code">10.99.0.2</span> — the VPS relays the packets transparently.</p>
+
+          <ol class="article-steps">
+            <li>
+              <div>
+                <span class="step-label">VPS · Step 1</span>
+                <strong>Install WireGuard on the VPS</strong>
+                <div class="code-block"><code>sudo apt update && sudo apt install -y wireguard
+sudo mkdir -p /etc/wireguard
+cd /etc/wireguard
+
+<span class="code-comment"># Generate VPS keypair</span>
+wg genkey | tee vps_private.key | wg pubkey > vps_public.key
+chmod 600 vps_private.key</code></div>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">VPS · Step 2</span>
+                <strong>Create the VPS WireGuard config</strong>
+                <div class="code-block"><code>sudo nano /etc/wireguard/wg0.conf</code></div>
+                <div class="code-block"><code>[Interface]
+Address = 10.99.0.1/24
+ListenPort = 51820
+PrivateKey = &lt;contents of vps_private.key&gt;
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+<span class="code-comment"># Raspberry Pi peer</span>
+[Peer]
+PublicKey = &lt;Pi public key — generated in next step&gt;
+AllowedIPs = 10.99.0.2/32
+
+<span class="code-comment"># Admin laptop peer</span>
+[Peer]
+PublicKey = &lt;Laptop public key — generated later&gt;
+AllowedIPs = 10.99.0.3/32</code></div>
+                <div class="code-block"><code><span class="code-comment"># Enable IP forwarding on the VPS</span>
+echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+<span class="code-comment"># Start WireGuard on the VPS</span>
+sudo systemctl enable wg-quick@wg0
+sudo systemctl start wg-quick@wg0</code></div>
+                <p>Make sure port <span class="inline-code">51820/udp</span> is open in the VPS firewall (UFW: <span class="inline-code">sudo ufw allow 51820/udp</span>).</p>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Pi · Step 1</span>
+                <strong>Install WireGuard on the Pi</strong>
+                <div class="code-block"><code>sudo apt install -y wireguard
+sudo mkdir -p /etc/wireguard
+cd /etc/wireguard
+
+<span class="code-comment"># Generate Pi keypair</span>
+wg genkey | tee pi_private.key | wg pubkey > pi_public.key
+chmod 600 pi_private.key
+
+<span class="code-comment"># Print the public key — copy it into the VPS config above</span>
+cat pi_public.key</code></div>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Pi · Step 2</span>
+                <strong>Create the Pi WireGuard config</strong>
+                <div class="code-block"><code>sudo nano /etc/wireguard/wg0.conf</code></div>
+                <div class="code-block"><code>[Interface]
+Address = 10.99.0.2/24
+PrivateKey = &lt;contents of pi_private.key&gt;
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = &lt;contents of VPS vps_public.key&gt;
+Endpoint = &lt;VPS_PUBLIC_IP&gt;:51820
+AllowedIPs = 10.99.0.0/24
+PersistentKeepalive = 25</code></div>
+                <p><span class="inline-code">PersistentKeepalive = 25</span> sends a keepalive packet every 25 seconds so the tunnel stays open even through cellular NAT.</p>
+                <div class="code-block"><code><span class="code-comment"># Enable the tunnel — starts at boot, connects out to VPS</span>
+sudo systemctl enable wg-quick@wg0
+sudo systemctl start wg-quick@wg0
+
+<span class="code-comment"># Verify the tunnel is up</span>
+sudo wg show</code></div>
+                <p>You should see <span class="inline-code">latest handshake</span> for the VPS peer if everything is configured correctly. Go back to the VPS and add the Pi's public key to its <span class="inline-code">wg0.conf</span> if you haven't already, then run <span class="inline-code">sudo wg addconf wg0 &lt;(wg-quick strip wg0)</span> or restart the VPS tunnel.</p>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Laptop · Step 1</span>
+                <strong>Install WireGuard on your admin laptop</strong>
+                <p>On macOS, download the WireGuard app from the Mac App Store. On Linux:</p>
+                <div class="code-block"><code>sudo apt install -y wireguard</code></div>
+                <p>Generate a keypair and create your client config:</p>
+                <div class="code-block"><code>wg genkey | tee laptop_private.key | wg pubkey > laptop_public.key</code></div>
+                <div class="code-block"><code>[Interface]
+Address = 10.99.0.3/24
+PrivateKey = &lt;contents of laptop_private.key&gt;
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = &lt;contents of VPS vps_public.key&gt;
+Endpoint = &lt;VPS_PUBLIC_IP&gt;:51820
+AllowedIPs = 10.99.0.0/24
+PersistentKeepalive = 25</code></div>
+                <p>Add your laptop's public key to the VPS <span class="inline-code">wg0.conf</span> under a new <span class="inline-code">[Peer]</span> block, then reload the VPS tunnel:</p>
+                <div class="code-block"><code><span class="code-comment"># On the VPS after editing wg0.conf</span>
+sudo systemctl restart wg-quick@wg0</code></div>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Laptop · Step 2</span>
+                <strong>Connect and SSH into the field Pi</strong>
+                <p>Activate the WireGuard tunnel on your laptop (toggle it on in the WireGuard app, or run <span class="inline-code">sudo wg-quick up wg0</span> on Linux). Then SSH directly to the Pi's WireGuard IP:</p>
+                <div class="code-block"><code>ssh pi@10.99.0.2</code></div>
+                <p>You are now on the Pi's command line from anywhere in the world — no port-forwarding, no dynamic DNS, no public IP on the Pi required.</p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- ── PART 3: REMOTE CONTENT UPDATE ──────── -->
+          <h2 id="update">Part 3 — Updating content libraries remotely</h2>
+          <p>Once you have SSH access through the WireGuard tunnel, you can push new or updated ZIM files to the Pi without physically touching it.</p>
+
+          <ol class="article-steps">
+            <li>
+              <div>
+                <span class="step-label">Step 1</span>
+                <strong>Copy a new ZIM file to the Pi over the tunnel</strong>
+                <div class="code-block"><code><span class="code-comment"># Run this on your laptop, not the Pi</span>
+scp new-library-english.zim pi@10.99.0.2:/home/pi/incoming/</code></div>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 2</span>
+                <strong>Move the file and restart Kiwix</strong>
+                <div class="code-block"><code><span class="code-comment"># SSH into the Pi first (see Part 2, Step 2)</span>
+ssh pi@10.99.0.2
+
+<span class="code-comment"># Move the new ZIM to the library mount</span>
+sudo mv /home/pi/incoming/new-library-english.zim /mnt/library/english/
+
+<span class="code-comment"># Restart Kiwix to pick up the new file</span>
+sudo systemctl restart kiwix</code></div>
+                <p>The VillageServer interface shows an "Updating Libraries" banner to connected phones while Kiwix restarts. Within about 30 seconds the new content is live.</p>
+              </div>
+            </li>
+
+            <li>
+              <div>
+                <span class="step-label">Step 3</span>
+                <strong>Verify from a connected phone</strong>
+                <p>On a phone already connected to the VillageServer Wi-Fi, reload <span class="inline-code">10.43.0.1</span> and confirm the new or updated library tile appears. Tap through to verify the content opens correctly.</p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- ── TROUBLESHOOTING ─────────────────────── -->
+          <h2>Quick troubleshooting</h2>
+          <ul class="article-bullets">
+            <li><strong>Phone connects to VillageServer Wi-Fi but can't reach 10.43.0.1</strong> — Check that nginx and Kiwix are running: <span class="inline-code">sudo systemctl status nginx kiwix</span>. Also confirm the <span class="inline-code">wlan0</span> static IP is set correctly with <span class="inline-code">ip addr show wlan0</span>.</li>
+            <li><strong>WireGuard tunnel shows no handshake</strong> — Confirm the VPS has port <span class="inline-code">51820/udp</span> open and the public keys are copied correctly into each peer's config. Run <span class="inline-code">sudo wg show</span> on both the Pi and VPS to compare.</li>
+            <li><strong>Kiwix returns no libraries</strong> — The ZIM files may not be mounted. Run <span class="inline-code">df -h</span> to confirm the USB cards are mounted, and <span class="inline-code">ls /mnt/library/</span> to confirm ZIM files are present.</li>
+            <li><strong>Pi loses Wi-Fi hotspot after update</strong> — This can happen if <span class="inline-code">wlan0</span> is reconfigured by <span class="inline-code">dhcpcd</span> during a package update. Recheck <span class="inline-code">/etc/dhcpcd.conf</span> and restart hostapd: <span class="inline-code">sudo systemctl restart hostapd</span>.</li>
           </ul>
 
           <div class="article-cta">
             <p>Download the Raspberry Pi system overview as a printable PDF for field briefings or board packets.</p>
             <a class="pdf-button" href="./downloads/villageserver-raspberry-pi-system.pdf" download>Download Raspberry Pi PDF</a>
           </div>
+
         </article>
-        <aside class="side-card" aria-label="Page summary">
-          <h2 class="side-title">Key points</h2>
+
+        <aside class="side-card" aria-label="Page navigation">
+          <h2 class="side-title">On this page</h2>
           <ul class="side-list">
-            <li>Language libraries come from microSD cards in USB readers</li>
-            <li>Phones join the VillageServer Wi-Fi with password <strong>village123</strong></li>
-            <li>The local library opens at <strong>10.43.0.1</strong></li>
-            <li>Users can view or download text, audio, video, and PDFs without mobile data</li>
+            <li><a href="#setup">Part 1 — Server setup</a></li>
+            <li><a href="#wireguard">Part 2 — WireGuard remote access</a></li>
+            <li><a href="#update">Part 3 — Remote content update</a></li>
           </ul>
-          <a class="pdf-button" href="./downloads/villageserver-raspberry-pi-system.pdf" download>Download PDF</a>
+
+          <h2 class="side-title" style="margin-top:24px">Quick reference</h2>
+          <ul class="side-list">
+            <li>Wi-Fi network: <strong>VillageServer</strong></li>
+            <li>Wi-Fi password: <strong>village123</strong></li>
+            <li>Library address: <strong>10.43.0.1</strong></li>
+            <li>WireGuard port: <strong>51820/udp</strong></li>
+          </ul>
+
+          <a class="pdf-button" href="./downloads/villageserver-raspberry-pi-system.pdf" download style="margin-top:16px">Download PDF</a>
           <p class="mini-note">Printable and shareable offline.</p>
+
           <div class="related" aria-label="Related pages">
             <a href="./guide.html">Setup Guide</a>
             <a href="./custom-libraries.html">Content Libraries</a>
             <a href="./power.html">Power Systems and Solar</a>
             <a href="./kit-levels.html">Kit Levels and Costs</a>
+            <a href="./satellite.html">Satellite Systems</a>
           </div>
         </aside>
       </div>
     </section>
   </main>
+
   <footer class="footer"><div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
