@@ -22,7 +22,7 @@ a{color:inherit}
 .board-top{background:var(--blue);color:#fff;padding:16px 0}
 .board-top .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px}
 .board-brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:800}
-.board-brand img{width:58px;height:58px;object-fit:contain;background:#fff;border-radius:14px;padding:5px}
+.board-brand img{width:80px;height:80px;object-fit:contain;background:#fff;border-radius:16px;padding:5px}
 .board-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;text-decoration:none;font-weight:800;font-size:.92rem}
 .board-back:hover,.board-back:focus-visible{background:#fff;color:var(--blue-dark);outline:0}
 .language-select{appearance:auto;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.42);border-radius:999px;padding:9px 14px;font:700 .9rem "DM Sans",sans-serif}
@@ -31,7 +31,7 @@ a{color:inherit}
 .logo-button{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;margin:0 auto 14px;padding:0;border:0;border-radius:26px;background:transparent;color:#d7e7fb;cursor:pointer;overflow:hidden}
 .logo-button::after{content:"";position:absolute;inset:0;border-radius:24px;background:linear-gradient(110deg,rgba(255,255,255,0) 18%,rgba(255,255,255,.5) 45%,rgba(255,255,255,0) 64%);mix-blend-mode:screen;pointer-events:none;transform:translateX(-145%) rotate(4deg);animation:logoSweep 3.4s ease-in-out infinite;z-index:2;opacity:.75}
 .logo-button:focus-visible{outline:2px solid #fff;outline-offset:8px}
-.home-hero-logo{position:relative;z-index:1;width:clamp(160px,15vw,230px);height:auto;padding:0;border-radius:24px;background:transparent;box-shadow:0 16px 38px rgba(8,35,64,.24);transition:transform .2s ease,box-shadow .2s ease;animation:logoGlow 4s ease-in-out infinite}
+.home-hero-logo{position:relative;z-index:1;width:clamp(280px,42vw,520px);height:auto;padding:0;border-radius:16px;background:transparent;box-shadow:0 20px 50px rgba(8,35,64,.28);transition:transform .2s ease,box-shadow .2s ease;animation:logoGlow 4s ease-in-out infinite}
 .logo-button:hover .home-hero-logo,.logo-button:focus-visible .home-hero-logo{transform:scale(1.045) rotate(-.4deg);box-shadow:0 20px 48px rgba(8,35,64,.32)}
 .home-hero h1,.board-hero h1{font-family:"Newsreader",Georgia,serif;font-weight:600;letter-spacing:-.04em;line-height:1.02;margin:0}
 .home-hero h1{font-size:clamp(3.2rem,8vw,7.2rem)}
@@ -150,4 +150,4 @@ figcaption{padding:9px 2px 0;color:var(--muted);font-size:.87rem;line-height:1.4
 @keyframes logoSweep{0%,34%{transform:translateX(-145%) rotate(4deg)}54%,100%{transform:translateX(145%) rotate(4deg)}}
 @media(prefers-reduced-motion:reduce){.logo-button::after,.home-hero-logo{animation:none}}
 @media(max-width:900px){.board-layout{grid-template-columns:1fr}.side-card{position:static}.photo-grid,.brief-grid{grid-template-columns:1fr 1fr}.test-run-media{grid-template-columns:1fr}.test-run-video,.test-run-video video{min-height:360px}}
-@media(max-width:560px){body{font-size:17px}.board-top .wrap{align-items:flex-start;flex-direction:column}.home-hero-logo{width:min(58vw,210px)}.link-band a{width:100%;font-size:1.35rem}.photo-grid,.brief-grid,.test-run-gallery,.download-list-compact,.fig-pair{grid-template-columns:1fr}.fig-pair img{height:200px}.step-list li{grid-template-columns:1fr}.photo-card{min-height:250px}.test-run-video,.test-run-video video{min-height:300px}.board-hero h1{font-size:2.75rem}.button{width:100%}}
+@media(max-width:560px){body{font-size:17px}.board-top .wrap{align-items:flex-start;flex-direction:column}.home-hero-logo{width:min(88vw,380px)}.link-band a{width:100%;font-size:1.35rem}.photo-grid,.brief-grid,.test-run-gallery,.download-list-compact,.fig-pair{grid-template-columns:1fr}.fig-pair img{height:200px}.step-list li{grid-template-columns:1fr}.photo-card{min-height:250px}.test-run-video,.test-run-video video{min-height:300px}.board-hero h1{font-size:2.75rem}.button{width:100%}}
