@@ -186,6 +186,66 @@ figcaption{padding:9px 2px 0;color:var(--muted);font-size:.87rem;line-height:1.4
 .code-comment{color:#4e7fa0}
 .inline-code{background:#edf5ff;color:var(--blue-dark);font-family:"Courier New",Courier,monospace;font-size:.88em;padding:2px 7px;border-radius:5px;font-weight:700}
 .step-label{display:inline-block;background:var(--blue);color:#fff;font-size:.7rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:8px}
+/* ── Pi page — sticky sidenav layout ─────────────────────────── */
+.pi-layout{display:grid;grid-template-columns:230px 1fr;gap:0 52px;align-items:start}
+.pi-sidenav{position:sticky;top:24px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;max-height:calc(100vh - 48px);overflow-y:auto}
+.pi-sidenav-label{font-size:.61rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin:12px 0 5px;display:block}
+.pi-sidenav-label:first-child{margin-top:0}
+.pi-sidenav a{display:block;font-size:.875rem;font-weight:500;color:var(--muted);padding:5px 0 5px 12px;margin-left:-12px;border-left:2px solid transparent;text-decoration:none;line-height:1.3;transition:color .12s,border-color .12s}
+.pi-sidenav a:hover,.pi-sidenav a.pi-active{color:var(--blue);border-left-color:var(--blue);font-weight:700}
+.pi-sidenav .pi-sub{font-size:.8rem;padding-left:24px}
+.pi-sidenav hr{border:none;border-top:1px solid var(--line);margin:12px 0}
+.pi-qref-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:.81rem;gap:8px}
+.pi-qref-row:last-child{border-bottom:none}
+.pi-qref-label{color:var(--muted);flex-shrink:0}
+.pi-qref-val{font-weight:800;color:var(--ink);font-family:"Courier New",monospace;font-size:.82rem;text-align:right}
+/* ── Pi page sections ────────────────────────────────────────── */
+.pi-section{scroll-margin-top:24px;padding-bottom:44px;border-bottom:1px solid var(--line);margin-bottom:44px}
+.pi-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.pi-eyebrow{font-size:.62rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 5px}
+.pi-section > h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.75rem,2.7vw,2.5rem);line-height:1.1;color:var(--ink);margin:0 0 12px;letter-spacing:-.02em}
+.pi-intro{font-size:clamp(1rem,.3vw+.94rem,1.15rem);color:var(--muted);line-height:1.7;margin:0 0 22px;font-family:"Newsreader",Georgia,serif;font-weight:500}
+/* ── UI browser mockup ───────────────────────────────────────── */
+.ui-mock{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 6px 28px rgba(22,58,107,.1);margin:18px 0 26px}
+.ui-mock-bar{background:#e2e8ef;padding:10px 14px;display:flex;gap:6px;align-items:center}
+.ui-mock-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.ui-mock-dot:nth-child(1){background:#ff6058}.ui-mock-dot:nth-child(2){background:#ffbd2e}.ui-mock-dot:nth-child(3){background:#28c840}
+.ui-mock-url{background:#fff;flex:1;border-radius:6px;padding:4px 12px;font-family:"Courier New",monospace;font-size:.78rem;color:var(--muted);margin-left:8px}
+.ui-mock-body{background:#f4f7fb;padding:22px 18px}
+.ui-mock-head{font-weight:900;color:var(--ink);font-size:.92rem;margin:0 0 12px;text-align:center;text-transform:uppercase;letter-spacing:.07em}
+.ui-lang-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ui-lang-card{padding:20px 14px;border-radius:12px;text-align:center;font-weight:800;font-size:.95rem;color:#fff}
+.ui-lang-en{background:var(--blue)}.ui-lang-es{background:var(--gold)}
+.ui-lang-card small{display:block;font-weight:500;font-size:.73rem;opacity:.8;margin-top:3px}
+.ui-types-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.ui-type-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 6px;text-align:center;font-size:.78rem;font-weight:700;color:var(--ink)}
+.ui-type-icon{font-size:1.4rem;display:block;margin-bottom:5px}
+.ui-tap{display:inline-flex;align-items:center;gap:4px;background:var(--gold);color:#fff;font-size:.72rem;font-weight:900;padding:3px 9px;border-radius:99px;white-space:nowrap;vertical-align:middle;margin-left:4px}
+/* ── Visual step timeline ────────────────────────────────────── */
+.vi-steps{display:flex;flex-direction:column;margin:20px 0 0}
+.vi-step{display:grid;grid-template-columns:52px 1fr;gap:0 18px;position:relative}
+.vi-step-line{position:absolute;left:25px;top:52px;bottom:-4px;width:2px;background:var(--line)}
+.vi-step:last-child .vi-step-line{display:none}
+.vi-step-num{width:52px;height:52px;border-radius:50%;background:var(--blue);color:#fff;font-weight:900;font-size:1.05rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;box-shadow:0 0 0 4px #fff}
+.vi-step-body{padding:10px 0 36px}
+.vi-step-body h4{margin:0 0 7px;font-size:1rem;font-weight:800;color:var(--ink);line-height:1.25}
+.vi-step-body p{color:var(--muted);font-size:.95rem;line-height:1.6;margin:0 0 8px}
+.vi-step-body p:last-child{margin-bottom:0}
+/* ── Tip / warning boxes ─────────────────────────────────────── */
+.tip-box{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid #16a34a;border-radius:12px;padding:12px 16px;margin:14px 0;font-size:.9rem;line-height:1.55;color:#15803d}
+.tip-box strong{color:#15803d}
+.warn-box{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:12px;padding:12px 16px;margin:14px 0;font-size:.9rem;line-height:1.55;color:#92400e}
+.warn-box strong{color:#92400e}
+/* ── Hardware spec table ─────────────────────────────────────── */
+.hw-table{width:100%;border-collapse:collapse;margin:10px 0 20px;font-size:.92rem}
+.hw-table th{text-align:left;font-size:.61rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:7px 0;border-bottom:1px solid var(--line)}
+.hw-table td{padding:8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.hw-table td:first-child{color:var(--muted);width:42%;padding-right:16px}
+.hw-table td:last-child{font-weight:700;color:var(--ink)}
+.hw-table tr:last-child td{border-bottom:none}
+/* ── Pi page responsive ──────────────────────────────────────── */
+@media(max-width:860px){.pi-layout{grid-template-columns:1fr}.pi-sidenav{position:static;max-height:none;margin-bottom:32px}}
+@media(max-width:560px){.ui-types-row{grid-template-columns:repeat(2,1fr)}.vi-step{grid-template-columns:40px 1fr}.vi-step-num{width:40px;height:40px;font-size:.88rem}.vi-step-line{left:19px}.pi-sidenav{padding:14px 16px}}
 @keyframes logoGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.08)}}
 @keyframes logoSweep{0%,34%{transform:translateX(-145%) rotate(4deg)}54%,100%{transform:translateX(145%) rotate(4deg)}}
 @media(prefers-reduced-motion:reduce){.logo-button::after,.home-hero-logo{animation:none}}
