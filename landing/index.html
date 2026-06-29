@@ -3,36 +3,237 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Start here | VillageServer Initiative</title>
-  <meta name="description" content="Board-friendly directory for the VillageServer Initiative.">
+  <title>VillageServer Initiative — Placing God's Word in Every Village</title>
+  <meta name="description" content="VillageServer places offline Bible libraries, teaching resources, and gospel media within reach of every village — even without internet, power, or trained technicians.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=1">
+  <link rel="stylesheet" href="./css/board.css?v=2">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <main id="main">
+
+    <!-- ── HERO ─────────────────────────────────────────── -->
     <section class="home-hero" id="top">
       <div class="wrap">
-        <div class="home-tools"><select class="language-select" id="language-select" aria-label="Choose language"><option value="en">English</option><option value="es">Español / Spanish</option><option value="zh-CN">中文 / Chinese</option><option value="hi">हिन्दी / Hindi</option><option value="ar">العربية / Arabic</option><option value="fr">Français / French</option><option value="pt">Português / Portuguese</option><option value="ru">Русский / Russian</option><option value="bn">বাংলা / Bengali</option><option value="id">Bahasa Indonesia / Indonesian</option><option value="ur">اردو / Urdu</option><option value="sw">Kiswahili / Swahili</option><option value="vi">Tiếng Việt / Vietnamese</option><option value="tl">Tagalog / Filipino</option><option value="ne">नेपाली / Nepali</option><option value="sd">سنڌي / Sindhi</option></select></div>
-        <button class="logo-button" type="button" aria-label="Open enlarged VillageServer Initiative logo" aria-haspopup="dialog" aria-controls="logo-modal"><img class="home-hero-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high"></button>
+        <div class="home-tools">
+          <select class="language-select" id="language-select" aria-label="Choose language">
+            <option value="en">English</option>
+            <option value="es">Español / Spanish</option>
+            <option value="zh-CN">中文 / Chinese</option>
+            <option value="hi">हिन्दी / Hindi</option>
+            <option value="ar">العربية / Arabic</option>
+            <option value="fr">Français / French</option>
+            <option value="pt">Português / Portuguese</option>
+            <option value="ru">Русский / Russian</option>
+            <option value="bn">বাংলা / Bengali</option>
+            <option value="id">Bahasa Indonesia / Indonesian</option>
+            <option value="ur">اردو / Urdu</option>
+            <option value="sw">Kiswahili / Swahili</option>
+            <option value="vi">Tiếng Việt / Vietnamese</option>
+            <option value="tl">Tagalog / Filipino</option>
+            <option value="ne">नेपाली / Nepali</option>
+            <option value="sd">سنڌي / Sindhi</option>
+          </select>
+        </div>
+        <button class="logo-button" type="button" aria-label="Open enlarged VillageServer Initiative logo" aria-haspopup="dialog" aria-controls="logo-modal">
+          <img class="home-hero-logo" src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high">
+        </button>
         <h1 class="visually-hidden">VillageServer Initiative</h1>
-        <p>Using technology to help place God's Word, biblical teaching, and ministry resources within reach of every village.</p>
+        <p class="hero-tagline">Placing God's Word within reach of every village — even where there is no internet, no power grid, and no trained technician.</p>
+        <p class="hero-verse">Matthew 24:14 &nbsp;·&nbsp; Project 42: 42% of the world has never heard that Jesus loves them</p>
+        <div class="hero-actions">
+          <a class="btn-give" id="hero-give-btn" href="./initiative.html">Explore the Initiative</a>
+          <a class="btn-outline-white" href="./mission.html">Read the Mission →</a>
+        </div>
       </div>
     </section>
-    <section class="white-band" id="directory"><nav class="wrap link-band" aria-label="VillageServer directory"><a href="./mission.html">Mission Statement</a><a href="./initiative.html">Explore the Initiative</a><a href="./about.html">About Us</a><a href="./programs.html">Programs &amp; Services</a><a href="./visuals.html">Photos / Visuals</a><a href="./testimonials.html">Testimonials</a><a href="./phone-distribution.html">Phone-Based Gospel Distribution</a><a href="./raspberry-pi.html">Raspberry Pi VillageServer System</a><a href="./power.html">Power Systems and Solar Solutions</a><a href="./projector-media.html">Projector Systems and Audio Solutions</a><a href="./custom-libraries.html">Content Libraries and Custom Ministry Resources</a><a href="./satellite.html">Satellite Systems and Content Acquisition</a><a href="./affiliates.html">Ministry Resource Partners</a><a href="./access.html">Get and Share Resources</a><a href="./transfer.html">Transfer Resources Between Devices</a><a href="./sharing-library.html">Sharing the Library</a><a href="./guide.html">Setup Guide</a><a href="./pamphlets.html">Printable Pamphlets and Field FAQ</a><a href="./kit-levels.html">Kit Levels and Costs</a><a href="./rollout.html">Rollout and Reach</a><a href="./field-faq.html">Field FAQ</a></nav></section>
-    <section class="photo-row" aria-label="Field technology photos"><div class="wrap photo-grid"><a class="photo-card" href="./raspberry-pi.html"><img src="./img/villageserver-case-usb-readers.jpeg" alt="VillageServer case with Raspberry Pi and USB readers"><span>Hand-held library</span></a><a class="photo-card" href="./satellite.html"><img src="./img/satellite-lnb-retrofit.jpeg" alt="Repurposed satellite dish with generic LNB"><span>Satellite receive path</span></a><a class="photo-card" href="./projector-media.html"><img src="./img/projector.webp" alt="Portable projector"><span>Projector system</span></a><a class="photo-card" href="./power.html"><img src="./img/solar-field.webp" alt="Solar power setup"><span>Solar field kit</span></a></div></section>
-    <section class="test-run-section" aria-labelledby="test-run-title"><div class="wrap"><div class="test-run-head"><p class="meta">Field test run</p><h2 id="test-run-title">The team setting up the kit.</h2><p>These photos and video show a practical test run: phones, solar power, the VillageServer case, and satellite hardware being checked before field use.</p></div><div class="test-run-media"><div class="test-run-video"><video controls preload="metadata" poster="./img/test-run-video-poster.jpeg"><source src="./media/test-run-setup.mp4" type="video/mp4">Your browser does not support the test run video.</video></div><div class="test-run-gallery"><figure><img src="./img/test-run-table.jpeg" alt="Team testing phones and the VillageServer case indoors" loading="lazy"><figcaption>Phone and case setup</figcaption></figure><figure><img src="./img/test-run-solar.jpeg" alt="Team checking solar power with the VillageServer case outdoors" loading="lazy"><figcaption>Solar power check</figcaption></figure><figure><img src="./img/test-run-workshop.jpeg" alt="Team assembling field kit components in a workshop" loading="lazy"><figcaption>Workshop assembly</figcaption></figure><figure><img src="./img/test-run-satellite.jpeg" alt="Team testing satellite hardware outside" loading="lazy"><figcaption>Satellite alignment</figcaption></figure></div></div></div></section>
+
+    <!-- ── IMPACT STATS ──────────────────────────────────── -->
+    <section class="impact-band" aria-label="Key facts">
+      <div class="wrap">
+        <div class="impact-row">
+          <div class="impact-stat">
+            <div class="impact-val">42%</div>
+            <div class="impact-label">of the world has never heard that Jesus loves them</div>
+          </div>
+          <div class="impact-stat">
+            <div class="impact-val">7,000+</div>
+            <div class="impact-label">languages with little or no Scripture access</div>
+          </div>
+          <div class="impact-stat">
+            <div class="impact-val">4</div>
+            <div class="impact-label">kit levels — from a single microSD card to full satellite</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DIRECTORY ─────────────────────────────────────── -->
+    <section class="white-band" id="directory">
+      <nav class="wrap directory-grid" aria-label="VillageServer directory">
+        <div class="directory-group">
+          <div class="directory-group-label">The Initiative</div>
+          <div class="link-band-col">
+            <a href="./mission.html">Mission Statement</a>
+            <a href="./initiative.html">Explore the Initiative</a>
+            <a href="./about.html">About Us</a>
+            <a href="./programs.html">Programs &amp; Services</a>
+            <a href="./testimonials.html">Testimonials</a>
+            <a href="./visuals.html">Photos &amp; Visuals</a>
+            <a href="./affiliates.html">Ministry Partners</a>
+          </div>
+        </div>
+        <div class="directory-group">
+          <div class="directory-group-label">Technology &amp; Kits</div>
+          <div class="link-band-col">
+            <a href="./raspberry-pi.html">Raspberry Pi VillageServer</a>
+            <a href="./power.html">Power &amp; Solar Solutions</a>
+            <a href="./projector-media.html">Projector &amp; Audio Systems</a>
+            <a href="./satellite.html">Satellite Systems</a>
+            <a href="./kit-levels.html">Kit Levels &amp; Costs</a>
+            <a href="./custom-libraries.html">Content Libraries</a>
+          </div>
+        </div>
+        <div class="directory-group">
+          <div class="directory-group-label">Field Operations</div>
+          <div class="link-band-col">
+            <a href="./phone-distribution.html">Phone-Based Distribution</a>
+            <a href="./access.html">Get &amp; Share Resources</a>
+            <a href="./transfer.html">Transfer Between Devices</a>
+            <a href="./sharing-library.html">Sharing the Library</a>
+            <a href="./guide.html">Setup Guide</a>
+            <a href="./rollout.html">Rollout &amp; Reach</a>
+          </div>
+        </div>
+        <div class="directory-group">
+          <div class="directory-group-label">Printable Resources</div>
+          <div class="link-band-col">
+            <a href="./pamphlets.html">Printable Pamphlets</a>
+            <a href="./field-faq.html">Field FAQ</a>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+    <!-- ── PHOTOS ────────────────────────────────────────── -->
+    <section class="photo-row" aria-label="Field technology photos">
+      <div class="wrap photo-grid">
+        <a class="photo-card" href="./raspberry-pi.html">
+          <img src="./img/villageserver-case-usb-readers.jpeg" alt="VillageServer case with Raspberry Pi and USB readers">
+          <span>Hand-held library</span>
+        </a>
+        <a class="photo-card" href="./satellite.html">
+          <img src="./img/satellite-lnb-retrofit.jpeg" alt="Repurposed satellite dish with generic LNB">
+          <span>Satellite receive path</span>
+        </a>
+        <a class="photo-card" href="./projector-media.html">
+          <img src="./img/projector.webp" alt="Portable projector">
+          <span>Projector system</span>
+        </a>
+        <a class="photo-card" href="./power.html">
+          <img src="./img/solar-field.webp" alt="Solar power setup">
+          <span>Solar field kit</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ── DONATE CTA (shown only when an active campaign has a Zeffy URL) ── -->
+    <section class="donate-band" id="donate-band" hidden>
+      <div class="wrap donate-inner">
+        <div class="donate-text">
+          <h2 id="donate-campaign-name">Support the Mission</h2>
+          <p>Every gift helps place God's Word in the hands of someone who may never have access otherwise.</p>
+        </div>
+        <a class="btn-give" id="donate-give-btn" href="./initiative.html" target="_blank" rel="noopener">Give Now →</a>
+      </div>
+    </section>
+
+    <!-- ── TEST RUN ───────────────────────────────────────── -->
+    <section class="test-run-section" aria-labelledby="test-run-title">
+      <div class="wrap">
+        <div class="test-run-head">
+          <p class="meta">Field test run</p>
+          <h2 id="test-run-title">The team setting up the kit.</h2>
+          <p>These photos and video show a practical test run: phones, solar power, the VillageServer case, and satellite hardware being checked before field use.</p>
+        </div>
+        <div class="test-run-media">
+          <div class="test-run-video">
+            <video controls preload="metadata" poster="./img/test-run-video-poster.jpeg">
+              <source src="./media/test-run-setup.mp4" type="video/mp4">
+              Your browser does not support the test run video.
+            </video>
+          </div>
+          <div class="test-run-gallery">
+            <figure><img src="./img/test-run-table.jpeg" alt="Team testing phones and the VillageServer case indoors" loading="lazy"><figcaption>Phone and case setup</figcaption></figure>
+            <figure><img src="./img/test-run-solar.jpeg" alt="Team checking solar power with the VillageServer case outdoors" loading="lazy"><figcaption>Solar power check</figcaption></figure>
+            <figure><img src="./img/test-run-workshop.jpeg" alt="Team assembling field kit components in a workshop" loading="lazy"><figcaption>Workshop assembly</figcaption></figure>
+            <figure><img src="./img/test-run-satellite.jpeg" alt="Team testing satellite hardware outside" loading="lazy"><figcaption>Satellite alignment</figcaption></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
-  <div class="logo-modal" id="logo-modal" role="dialog" aria-modal="true" aria-label="VillageServer Initiative logo enlarged" hidden><div class="logo-dialog"><button class="logo-close" type="button" aria-label="Close enlarged logo">&times;</button><img src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo enlarged" width="1254" height="1254" loading="lazy"></div></div>
-  <footer class="footer"><div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
+
+  <div class="logo-modal" id="logo-modal" role="dialog" aria-modal="true" aria-label="VillageServer Initiative logo enlarged" hidden>
+    <div class="logo-dialog">
+      <button class="logo-close" type="button" aria-label="Close enlarged logo">&times;</button>
+      <img src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative logo enlarged" width="1254" height="1254" loading="lazy">
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div>
+  </footer>
+
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/i18n.js?v=2"></script>
   <script>
-    (function(){var openButton=document.querySelector('.logo-button'),modal=document.getElementById('logo-modal'),closeButton=document.querySelector('.logo-close');if(!openButton||!modal||!closeButton)return;function openLogo(){modal.hidden=false;closeButton.focus({preventScroll:true});}function closeLogo(){modal.hidden=true;openButton.focus({preventScroll:true});}openButton.addEventListener('click',openLogo);closeButton.addEventListener('click',closeLogo);modal.addEventListener('click',function(event){if(event.target===modal)closeLogo();});document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!modal.hidden)closeLogo();});})();
-    (function(){var el=document.getElementById('arki-credit'),n=0,t;if(!el)return;el.addEventListener('click',function(){clearTimeout(t);n++;if(n>=3){n=0;window.location.href='./admin.html';}t=setTimeout(function(){n=0;},600);});})();
+    // Logo modal
+    (function(){
+      var openButton=document.querySelector('.logo-button'),modal=document.getElementById('logo-modal'),closeButton=document.querySelector('.logo-close');
+      if(!openButton||!modal||!closeButton)return;
+      function openLogo(){modal.hidden=false;closeButton.focus({preventScroll:true});}
+      function closeLogo(){modal.hidden=true;openButton.focus({preventScroll:true});}
+      openButton.addEventListener('click',openLogo);
+      closeButton.addEventListener('click',closeLogo);
+      modal.addEventListener('click',function(e){if(e.target===modal)closeLogo();});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)closeLogo();});
+    })();
+    // Admin easter egg
+    (function(){
+      var el=document.getElementById('arki-credit'),n=0,t;
+      if(!el)return;
+      el.addEventListener('click',function(){clearTimeout(t);n++;if(n>=3){n=0;window.location.href='./admin.html';}t=setTimeout(function(){n=0;},600);});
+    })();
+    // Load active campaign donate button
+    (function(){
+      fetch('/api/content?type=campaigns')
+        .then(function(r){return r.json();})
+        .then(function(data){
+          var active=Array.isArray(data)&&data.find(function(c){return c.active&&c.zeffy_url;});
+          if(!active)return;
+          var donateBand=document.getElementById('donate-band');
+          if(donateBand){
+            donateBand.hidden=false;
+            var nameEl=document.getElementById('donate-campaign-name');
+            if(nameEl&&active.title)nameEl.textContent=active.title;
+            var giveBtn=document.getElementById('donate-give-btn');
+            if(giveBtn){giveBtn.href=active.zeffy_url;}
+          }
+          var heroBtn=document.getElementById('hero-give-btn');
+          if(heroBtn){
+            heroBtn.href=active.zeffy_url;
+            heroBtn.target='_blank';
+            heroBtn.rel='noopener';
+            heroBtn.textContent='Give Now →';
+          }
+        })
+        .catch(function(){});
+    })();
   </script>
   <script src="./js/site-tracking.js?v=1"></script>
 </body>
