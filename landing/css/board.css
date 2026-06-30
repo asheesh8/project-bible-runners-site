@@ -354,6 +354,34 @@ details[open]>.pi-accordion-head::after{transform:translateY(-50%) rotate(90deg)
 .btn-join:hover{opacity:.88}
 @media(max-width:760px){.aff-body-inner{grid-template-columns:1fr}.aff-visual{flex-direction:row;flex-wrap:wrap}.aff-photo{flex:1;min-width:140px;height:130px}.join-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:500px){.aff-summary{gap:12px;padding:16px 14px}.aff-avatar,.aff-avatar-init{width:52px;height:52px;font-size:1.05rem}.join-grid{grid-template-columns:1fr}}
+/* ── Satellite aiming calculator ─────────────────────────────── */
+.sat-calc-widget{margin:2.5rem 0}
+.sat-calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;margin:1.5rem 0}
+.sat-form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.sat-form-group label{font-weight:800;font-size:.92rem;color:var(--ink)}
+.sat-label-note{font-weight:400;font-size:.8rem;color:var(--muted);margin-left:6px}
+.sat-loc-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+.sat-form-group input[type=number],.sat-form-group select{font:inherit;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);width:100%;box-sizing:border-box}
+.sat-form-group input[type=number]:focus,.sat-form-group select:focus{outline:0;border-color:var(--blue);background:#fff}
+.sat-gps-btn{font:inherit;padding:10px 12px;border-radius:12px;border:1.5px solid var(--blue);background:var(--blue-soft);color:var(--blue);font-weight:700;cursor:pointer;white-space:nowrap;line-height:1.2}
+.sat-gps-btn:hover{background:var(--blue);color:#fff}
+.sat-gps-btn:disabled{opacity:.6;cursor:default}
+.sat-loc-hint{font-size:.78rem;color:var(--muted);margin:0}
+.sat-calc-results{background:var(--blue-soft);border-radius:18px;padding:20px}
+.sat-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.sat-result-card{background:#fff;border-radius:12px;padding:14px 16px;text-align:center;box-shadow:0 1px 4px rgba(22,58,107,.06)}
+.sat-result-val{font-size:1.5rem;font-weight:900;color:var(--blue);letter-spacing:-.02em;line-height:1.1}
+.sat-result-lbl{font-size:.7rem;font-weight:700;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.09em}
+.sat-signal-bar{margin-top:4px}
+.sat-signal-label{font-weight:800;font-size:.88rem;color:var(--ink);margin-bottom:8px}
+.sat-signal-track{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.sat-signal-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#dc2626 0%,#f59e0b 50%,#22c55e 100%);transition:width .5s ease}
+.sat-signal-desc{font-size:.88rem;color:var(--muted);margin:8px 0 0;line-height:1.5}
+.sat-calc-error{font-size:.88rem;color:#b3271d;font-weight:700;margin:8px 0 0;min-height:1.1em}
+.sat-map-canvas{display:block;width:100%;height:auto;border-radius:16px;border:1px solid var(--line);margin:16px 0 6px}
+.sat-map-note{font-size:.82rem;color:var(--muted);line-height:1.55;margin:0}
+@media(max-width:800px){.sat-calc-grid{grid-template-columns:1fr}.sat-loc-row{grid-template-columns:1fr 1fr}.sat-gps-btn{grid-column:1/-1}}
+@media(max-width:480px){.sat-result-grid{grid-template-columns:1fr 1fr}}
 /* ── Print styles ────────────────────────────────────────────── */
 @media print{.board-top,.footer,.skip-link,.pi-sidenav,.logo-modal{display:none!important}.pi-layout{display:block!important}.board-hero{background:var(--blue)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.code-block{border:1px solid #ccc;background:#f4f7fb!important;color:#17283c!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.code-comment{color:#5d7a8a!important}.ui-mock{box-shadow:none}.ui-lang-en{background:var(--blue)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.ui-lang-es{background:var(--gold)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.vi-step-num{-webkit-print-color-adjust:exact;print-color-adjust:exact}.tip-box,.warn-box,.article-callout{-webkit-print-color-adjust:exact;print-color-adjust:exact}a{color:inherit;text-decoration:none}.pi-section{break-inside:avoid-page;page-break-inside:avoid}.vi-step{break-inside:avoid}.code-block{break-inside:avoid}}
 @keyframes logoGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.08)}}
