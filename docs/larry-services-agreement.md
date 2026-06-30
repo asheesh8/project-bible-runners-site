@@ -29,10 +29,21 @@ Contractor will provide the following services to Client:
 
 ## 3. Payment
 
-- **One-time / project work:** $[____] for [describe milestone, e.g. "initial build of villageservers.com/.org and admin tooling"], due [on completion / net 15 / etc.].
-- **Retainer (ongoing site maintenance + ad campaign management):** $[____] per [week/month], due [date].
+- **One-time / project work:** $[____] for the initial build (villageservers.com + .org, admin dashboard, and the custom logistics polling system), due [on completion / net 15 / etc.].
+- **Retainer (ongoing site maintenance + admin/logistics tool support + ad campaign management for all three brands):** $[____] per month, due [date].
 - **Late payment:** [e.g., "payments more than 14 days late may pause work until resolved"].
 - Payment method: [____]
+
+### Pricing rationale (2026 market rates)
+
+Numbers below are for reference when filling in the blanks above — not legally binding, just the market data behind the ask.
+
+| Item | Agency cost | Solo freelancer cost | What's fair here |
+|---|---|---|---|
+| Initial build (2 sites + admin dashboard + logistics tool) | $15,000–$40,000+ | $7,000–$24,000 | **$8,000–$18,000** one-time |
+| Site/tool retainer + ad management, 3 brands, combined | $5,500–$19,500+/mo | $3,600–$9,500/mo (separate freelancers per service) | **$2,500–$5,500/mo**, or **$65–$100/hr** with a monthly minimum |
+
+One person covering dev + admin tooling + logistics software + marketing for three brands should land below what it'd cost to hire an agency or several separate freelancers for the same scope, but above a single-skill freelancer rate. Full source breakdown available on request.
 
 ## 4. Ownership & IP Rights
 
