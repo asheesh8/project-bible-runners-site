@@ -127,6 +127,10 @@ a{color:inherit}
 .related a::after,.download-link::after{content:"→";color:var(--gold)}
 .pdf-button{display:flex;align-items:center;justify-content:center;min-height:54px;margin-top:16px;padding:12px 16px;border-radius:999px;background:var(--blue);color:#fff;text-decoration:none;font-weight:900;box-shadow:0 12px 26px rgba(31,87,149,.2)}
 .pdf-button:hover,.pdf-button:focus-visible{background:var(--blue-dark);outline:0}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.cta-row .pdf-button{margin-top:0}
+.cta-outline-button{display:flex;align-items:center;justify-content:center;min-height:54px;padding:12px 20px;border-radius:999px;border:2px solid var(--blue);background:#fff;color:var(--blue-dark);text-decoration:none;font-weight:900}
+.cta-outline-button:hover,.cta-outline-button:focus-visible{background:var(--blue-soft);outline:0}
 .mini-note{margin-top:12px;font-size:.92rem;color:var(--muted)}
 .download-list{display:grid;gap:10px;margin-top:14px}
 .download-list-compact{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -269,31 +273,6 @@ figcaption{padding:9px 2px 0;color:var(--muted);font-size:.87rem;line-height:1.4
 .hw-table tr:last-child td{border-bottom:none}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0 20px}
 .table-wrap .hw-table{margin:0}
-/* ── Collapsible technical commands (hidden by default) ───────── */
-.tech-toggle{margin:14px 0 6px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
-.tech-toggle summary{display:flex;align-items:center;gap:9px;cursor:pointer;list-style:none;font-weight:700;font-size:.89rem;color:var(--blue);padding:12px 16px;background:var(--blue-soft);-webkit-user-select:none;user-select:none}
-.tech-toggle summary::-webkit-details-marker{display:none}
-.tech-toggle summary::before{content:'▸';font-size:.72rem;color:var(--blue);transition:transform .15s;flex-shrink:0}
-.tech-toggle[open] summary::before{transform:rotate(90deg)}
-.tech-toggle[open] summary{border-bottom:1px solid var(--line)}
-.tech-toggle-body{padding:14px 16px 2px}
-.tech-toggle-body .code-block:last-child{margin-bottom:8px}
-.tech-toggle-body p{color:var(--muted);font-size:.9rem;line-height:1.55;margin:0 0 8px}
-/* ── Interactive tunnel status demo ────────────────────────────── */
-.tunnel-demo{margin:16px 0 26px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
-.tunnel-demo-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;flex-wrap:wrap}
-.tunnel-demo-devices{display:flex;align-items:center;gap:10px;font-size:.85rem;font-weight:700;color:var(--ink)}
-.tunnel-demo-dot{width:10px;height:10px;border-radius:50%;background:#cbd5e1;transition:background .2s,box-shadow .2s;flex-shrink:0}
-.tunnel-demo.is-connected .tunnel-demo-dot{background:#16a34a;box-shadow:0 0 0 3px rgba(22,163,74,.18)}
-.tunnel-demo-line{flex:1;min-width:60px;height:2px;background:#cbd5e1;position:relative;overflow:hidden;border-radius:2px}
-.tunnel-demo.is-connected .tunnel-demo-line{background:#16a34a}
-.tunnel-demo-status{font-size:.8rem;color:var(--muted);font-weight:600}
-.tunnel-demo.is-connected .tunnel-demo-status{color:#15803d}
-.tunnel-demo-btn{background:var(--blue);color:#fff;font-weight:800;font-size:.85rem;border:none;border-radius:999px;padding:10px 20px;cursor:pointer;transition:opacity .15s}
-.tunnel-demo-btn:hover{opacity:.88}
-.tunnel-demo.is-connected .tunnel-demo-btn{background:#16a34a}
-.tunnel-demo-log{background:#0f1923;color:#c9dff0;font-family:"Courier New",Courier,monospace;font-size:.78rem;line-height:1.6;padding:14px 18px;border-top:1px solid var(--line);white-space:pre-line;min-height:1.6em}
-.tunnel-demo-log span{color:#7fb88a}
 /* ── Pi nav collapsible (desktop: transparent wrapper) ───────── */
 .pi-nav-details{display:contents}
 .pi-nav-summary{display:none}
@@ -307,7 +286,7 @@ figcaption{padding:9px 2px 0;color:var(--muted);font-size:.87rem;line-height:1.4
   .pi-nav-details[open] .pi-sidenav{border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;padding-top:12px}
   .pi-sidenav{position:static;max-height:none;margin-bottom:0}
 }
-@media(max-width:560px){.ui-types-row{grid-template-columns:repeat(2,1fr)}.vi-step{grid-template-columns:40px 1fr}.vi-step-num{width:40px;height:40px;font-size:.88rem}.vi-step-line{left:19px}.pi-sidenav{padding:14px 16px}.code-block{font-size:.78rem;padding:14px 14px}.tunnel-demo-row{padding:16px}.tunnel-demo-devices{font-size:.78rem}.tunnel-demo-btn{padding:9px 16px;font-size:.8rem}.tunnel-demo-row:first-child{flex-direction:column;align-items:stretch;gap:8px}.tunnel-demo-line{display:none}}
+@media(max-width:560px){.ui-types-row{grid-template-columns:repeat(2,1fr)}.vi-step{grid-template-columns:40px 1fr}.vi-step-num{width:40px;height:40px;font-size:.88rem}.vi-step-line{left:19px}.pi-sidenav{padding:14px 16px}.code-block{font-size:.78rem;padding:14px 14px}}
 /* ── Affiliates accordion ────────────────────────────────────── */
 .aff-list{display:flex;flex-direction:column;gap:12px;margin:24px 0}
 .aff-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;transition:box-shadow .2s,border-color .2s}

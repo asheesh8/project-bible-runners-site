@@ -291,10 +291,108 @@ def overview():
     save_canvas(c, filename)
 
 
+def quickstart():
+    filename = "villageserver-quick-start-guide.pdf"
+    c = Canvas(str(OUT / filename), pagesize=letter)
+    c.setTitle("VillageServer Pi - Quick Start Guide")
+    c.setAuthor("VillageServer Initiative")
+
+    c.setFillColor(FOREST)
+    c.rect(0, 0, W, H, fill=1, stroke=0)
+    logo(c, 42, H - 60, 160, on_dark=True)
+    pill(c, "Field quick start", 42, H - 103, fill=LEAF)
+    c.setFillColor(white)
+    c.setFont("Times-Bold", 40)
+    y = H - 170
+    for line in ["Power it on.", "Connect. Browse."]:
+        c.drawString(42, y, line)
+        y -= 44
+    text_block(c, "Every VillageServer Pi kit ships pre-configured - no setup, no code, no internet required. This guide gets you from box to browsing in under five minutes.", 42, H - 280, 440, size=13, color=white, leading=18)
+    c.setStrokeColor(HexColor("#40675B"))
+    c.line(42, H - 363, W - 42, H - 363)
+    c.setFillColor(LIME)
+    c.setFont("Helvetica-Bold", 8)
+    c.drawString(42, H - 389, "ONE SIMPLE FIELD FLOW")
+    labels = [("01", "Power the kit"), ("02", "Join local Wi-Fi"), ("03", "Open the library"), ("04", "Browse and download")]
+    x = 42
+    for number, label in labels:
+        c.setFillColor(HexColor("#1C4A3C"))
+        c.roundRect(x, H - 496, 120, 82, 10, fill=1, stroke=0)
+        c.setFillColor(LIME)
+        c.setFont("Helvetica-Bold", 8)
+        c.drawString(x + 13, H - 437, number)
+        text_block(c, label, x + 13, H - 459, 94, font="Helvetica-Bold", size=9.2, color=white, leading=12)
+        x += 132
+    c.setFillColor(LIME)
+    c.roundRect(42, 109, W - 84, 88, 12, fill=1, stroke=0)
+    c.setFillColor(FOREST_DARK)
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(58, 173, "THE IMPORTANT PART")
+    text_block(c, "Connecting feels just like joining any Wi-Fi network and opening a website. No app to install, no account, no data plan needed.", 58, 151, W - 116, size=10.5, color=FOREST_DARK, leading=15)
+    footer(c, "1 of 2")
+    c.showPage()
+
+    c.setFillColor(PAPER)
+    c.rect(0, 0, W, H, fill=1, stroke=0)
+    logo(c, 42, H - 58, 145)
+    pill(c, "Step-by-step", 42, H - 94, fill=LEAF)
+    c.setFillColor(INK)
+    c.setFont("Times-Bold", 28)
+    c.drawString(42, H - 138, "Get a kit running in the field")
+    steps = [
+        ("Power on", "Plug in the power supply or power bank. Give the Pi about 60 seconds to fully start up."),
+        ("Join the Wi-Fi", 'On your phone, open Wi-Fi settings and join "VillageServer" using the password "village123".'),
+        ("Open the library", 'Open any browser and go to 10.43.0.1. Some phones warn "no internet connection" - that is expected, continue anyway.'),
+        ("Choose a language and type", "Tap a language card, then choose Bible, Audio, Video, or Books."),
+        ("Download to keep", "Tap any file to download it to the phone. Once downloaded, it works completely offline, even after leaving the area."),
+    ]
+    y = H - 175
+    left_width = 338
+    for index, (step_title, body) in enumerate(steps, 1):
+        y = numbered_step(c, index, step_title, body, 42, y, left_width)
+
+    side_x = 414
+    side_w = W - side_x - 42
+    c.setFillColor(FOREST_DARK)
+    c.roundRect(side_x, H - 493, side_w, 208, 12, fill=1, stroke=0)
+    c.setFillColor(LIME)
+    c.setFont("Helvetica-Bold", 8)
+    c.drawString(side_x + 16, H - 171, "SUCCESS CHECK")
+    checks = [
+        'The "VillageServer" Wi-Fi network appears in range.',
+        "10.43.0.1 loads the library home screen.",
+        "A downloaded file opens with airplane mode turned on.",
+    ]
+    sy = H - 196
+    for item in checks:
+        c.setFillColor(LIME)
+        c.circle(side_x + 20, sy + 3, 3, fill=1, stroke=0)
+        sy = text_block(c, item, side_x + 30, sy + 7, side_w - 46, size=8.2, color=white, leading=11) - 9
+    c.setStrokeColor(HexColor("#3D5D52"))
+    c.line(side_x + 16, sy + 4, side_x + side_w - 16, sy + 4)
+    c.setFillColor(LIME)
+    c.setFont("Helvetica-Bold", 8)
+    c.drawString(side_x + 16, sy - 14, "FIELD NOTE")
+    text_block(c, "If a language or file seems to be missing, that is a content update, not a device problem - flag it to the team rather than troubleshooting the Pi itself.", side_x + 16, sy - 32, side_w - 32, size=8.2, color=white, leading=11)
+
+    c.setFillColor(SAND)
+    c.roundRect(42, 71, W - 84, 78, 12, fill=1, stroke=0)
+    c.setFillColor(LEAF)
+    c.setFont("Helvetica-Bold", 8)
+    c.drawString(56, 126, "GO DEEPER")
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 9)
+    c.drawString(56, 108, "VillageServer OS companion site")
+    text_block(c, "Content management, technical configuration, and full documentation live there - this guide only covers using a kit in the field.", 56, 92, W - 112, size=7.2, color=MUTED, leading=9, max_lines=2)
+    footer(c, "Keep with the kit")
+    save_canvas(c, filename)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     WEB.mkdir(parents=True, exist_ok=True)
     overview()
+    quickstart()
     routes = [
         ("villageserver-transfer-iphone-to-iphone.pdf", "iPhone to iPhone", "AirDrop", "Both people have nearby Apple devices and want the fastest direct handoff.", [
             ("Prepare both phones", "Turn on Wi-Fi and Bluetooth. Keep both iPhones unlocked, awake, and close together."),
