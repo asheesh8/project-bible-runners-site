@@ -56,17 +56,28 @@
 
           <h2>How a field setup works</h2>
           <ol class="article-steps">
-            <li><div><strong>Repurpose an unused dish</strong><p>Start with a satellite dish that can be safely mounted, moved, and held in alignment for the field setting.</p></div></li>
-            <li><div><strong>Retrofit a generic LNB</strong><p>Attach the LNB and receiver path needed to capture the Free-to-Air broadcast signal for that region.</p></div></li>
-            <li><div><strong>Aim at the regional satellite</strong><p>Point the dish toward a satellite already broadcasting Christian radio or video content over the area being served.</p></div></li>
+            <li><div><strong>Repurpose an unused dish</strong><p>Find a dish that's already mounted and aimed at something — most owners are happy to let it stay up and simply not be used, rather than having it taken down.</p></div></li>
+            <li><div><strong>Swap in a generic LNB</strong><p>Remove the dish's existing proprietary LNB (the part at the dish's focal point that downconverts the ~12GHz satellite signal to the ~1GHz frequency a receiver can use) and replace it with a generic, universal LNB.</p></div></li>
+            <li><div><strong>Connect a satellite finder</strong><p>Run a coax cable from the new LNB to a satellite finder/meter. This gives a live signal reading while the dish is being moved, so you know when you're on target.</p></div></li>
+            <li><div><strong>Look up the satellite on LyngSat.com</strong><p>LyngSat.com lists the satellites broadcasting over a given region and the technical details for each Free-to-Air Christian station: the transponder's frequency, polarization, and symbol rate.</p></div></li>
+            <li><div><strong>Get the aiming numbers from a Satfinder app</strong><p>A satellite-finder app (such as Satfinder) converts your location and the chosen satellite into the skew angle, azimuth, and elevation needed to physically point the dish. Both the LyngSat numbers and the Satfinder numbers are needed before the dish can be aimed.</p></div></li>
+            <li><div><strong>Aim the dish and confirm lock</strong><p>Adjust azimuth, elevation, and skew while watching the satellite finder for a signal lock on the correct transponder.</p></div></li>
             <li><div><strong>Play the content locally</strong><p>Send the radio or video to a speaker, TV, projector, wall, or screen where the group can listen or watch together.</p></div></li>
             <li><div><strong>Record useful programs</strong><p>With an HTML recorder or similar recorder, save broadcasts so the local leader can replay them later without waiting for the live signal.</p></div></li>
             <li><div><strong>Bridge to VillageServer only if needed</strong><p>If a saved program should live in the local library, copy the recorded file to microSD and load it through the Raspberry Pi VillageServer.</p></div></li>
           </ol>
 
-          <div class="article-callout">
-            <p>Think of satellite as a regional content receiver, not the heart of the system. The VillageServer library remains local, offline-first, and useful without a live signal.</p>
+          <div class="tip-box">
+            <strong>Two tools, two different jobs:</strong> LyngSat.com tells you what you're aiming for — frequency, polarization, and symbol rate for the satellite and station. The Satfinder app tells you how to aim — skew angle, azimuth, and elevation for your location. You need numbers from both before the dish can be pointed correctly.
           </div>
+
+          <p>As an example of what this looks like in practice: at his home, Eric points a dish at Galaxy 19, tuned to a transponder at 12.053GHz, vertically polarized. The exact satellite, frequency, and polarization will be different for every region — always confirm the current numbers on LyngSat.com rather than reusing this example.</p>
+
+          <div class="article-callout">
+            <p>Think of satellite as a regional content receiver, not the heart of the system. It is completely separate from the Raspberry Pi VillageServer — the dish, LNB, finder, and recorder are their own self-contained setup, and the VillageServer library remains local, offline-first, and useful without a live signal.</p>
+          </div>
+
+          <p>Questions about a specific satellite setup, LNB swap, or aiming problem in the field? Email <a href="mailto:villageserverinitiative@gmail.com">villageserverinitiative@gmail.com</a> and the team can help troubleshoot.</p>
 
           <div class="article-cta">
             <p>Download the corrected Satellite Systems overview as a printable PDF for kit planning and field briefings.</p>
@@ -77,9 +88,11 @@
           <h2 class="side-title">Key points</h2>
           <ul class="side-list">
             <li>Receives Free-to-Air Christian radio or video already broadcasting over the region</li>
+            <li>Use LyngSat.com for frequency, polarization, and symbol rate</li>
+            <li>Use a Satfinder app for skew angle, azimuth, and elevation</li>
             <li>Can project or play the stream live for a group</li>
             <li>Can record programs for later replay with a dedicated recorder</li>
-            <li>Only connects to the Raspberry Pi library if saved files are copied to microSD afterward</li>
+            <li>Completely separate from the Raspberry Pi VillageServer</li>
           </ul>
           <a class="pdf-button" href="./downloads/villageserver-satellite-systems.pdf" download>Download PDF</a>
           <p class="mini-note">Printable and shareable offline.</p>
