@@ -355,6 +355,17 @@ details[open]>.pi-accordion-head::after{transform:translateY(-50%) rotate(90deg)
 @media(max-width:760px){.aff-body-inner{grid-template-columns:1fr}.aff-visual{flex-direction:row;flex-wrap:wrap}.aff-photo{flex:1;min-width:140px;height:130px}.join-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:500px){.aff-summary{gap:12px;padding:16px 14px}.aff-avatar,.aff-avatar-init{width:52px;height:52px;font-size:1.05rem}.join-grid{grid-template-columns:1fr}}
 /* ── Satellite aiming calculator ─────────────────────────────── */
+.sat-calc-accordion{border:1.5px solid var(--line);border-radius:18px;overflow:hidden;margin:2rem 0;background:#fff}
+.sat-calc-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;cursor:pointer;list-style:none;-webkit-user-select:none;user-select:none;background:var(--blue-soft)}
+.sat-calc-summary::-webkit-details-marker,.sat-calc-summary::marker{display:none;content:''}
+.sat-calc-summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:16px}
+.sat-calc-summary-text{display:flex;flex-direction:column;gap:3px}
+.sat-calc-summary-text strong{font-size:1.04rem;color:var(--ink)}
+.sat-calc-summary-sub{font-size:.8rem;color:var(--muted)}
+.sat-calc-chevron{font-size:1.5rem;font-weight:900;color:var(--blue);line-height:1;transition:transform .2s ease;flex-shrink:0}
+.sat-calc-accordion[open] .sat-calc-chevron{transform:rotate(90deg)}
+.sat-calc-accordion[open] .sat-calc-summary{border-bottom:1px solid var(--line)}
+.sat-calc-accordion>*:not(summary){padding:0 22px 22px}
 .sat-calc-widget{margin:2.5rem 0}
 .sat-calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;margin:1.5rem 0}
 .sat-form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
