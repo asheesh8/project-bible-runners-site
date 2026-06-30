@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=5">
+  <link rel="stylesheet" href="./css/board.css?v=6">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -101,41 +101,49 @@
           <section class="pi-section" id="interface">
             <p class="pi-eyebrow">The interface</p>
             <h2>What you see on a phone</h2>
-            <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.43.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required.</p>
+            <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.43.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required. Try the demo below — tap a language, then a section, then a file to download it.</p>
 
-            <!-- Browser mockup: language selection -->
-            <div class="ui-mock">
-              <div class="ui-mock-bar">
-                <div class="ui-mock-dot"></div><div class="ui-mock-dot"></div><div class="ui-mock-dot"></div>
-                <div class="ui-mock-url">10.43.0.1</div>
-              </div>
-              <div class="ui-mock-body">
-                <p class="ui-mock-head">VillageServer Library</p>
-                <div class="ui-lang-row">
-                  <div class="ui-lang-card ui-lang-en">English<small>Tap to open →</small></div>
-                  <div class="ui-lang-card ui-lang-es">Español<small>Tap to open →</small></div>
+            <!-- Interactive phone demo -->
+            <div class="iphone-demo-wrap">
+              <div class="iphone-frame">
+                <div class="iphone-notch"></div>
+                <div class="iphone-screen">
+                  <div class="iphone-statusbar"><span>9:41</span><span>📶 🔋</span></div>
+                  <div class="iphone-urlbar"><span class="iphone-url-text" id="iphone-url">10.43.0.1</span></div>
+                  <div class="iphone-body" id="iphone-body">
+
+                    <div class="iphone-screen-state" data-screen="home">
+                      <p class="ui-mock-head">VillageServer Library</p>
+                      <div class="ui-lang-row">
+                        <button type="button" class="ui-lang-card ui-lang-en" data-lang="english" data-label="English">English<small>Tap to open →</small></button>
+                        <button type="button" class="ui-lang-card ui-lang-es" data-lang="espanol" data-label="Español">Español<small>Tap to open →</small></button>
+                      </div>
+                    </div>
+
+                    <div class="iphone-screen-state" data-screen="types" hidden>
+                      <button type="button" class="iphone-back" data-back="home">‹ Back</button>
+                      <p class="ui-mock-head" id="iphone-lang-title">English Library</p>
+                      <div class="ui-types-row">
+                        <button type="button" class="ui-type-card" data-type="bible"><span class="ui-type-icon">📖</span>Bible</button>
+                        <button type="button" class="ui-type-card" data-type="audio"><span class="ui-type-icon">🎵</span>Audio</button>
+                        <button type="button" class="ui-type-card" data-type="video"><span class="ui-type-icon">🎬</span>Video</button>
+                        <button type="button" class="ui-type-card" data-type="books"><span class="ui-type-icon">📚</span>Books</button>
+                      </div>
+                    </div>
+
+                    <div class="iphone-screen-state" data-screen="files" hidden>
+                      <button type="button" class="iphone-back" data-back="types">‹ Back</button>
+                      <p class="ui-mock-head" id="iphone-type-title">Bible</p>
+                      <div class="iphone-file-list" id="iphone-file-list"></div>
+                    </div>
+
+                  </div>
+                  <div class="iphone-toast" id="iphone-toast">Download complete — saved to Files</div>
                 </div>
               </div>
+              <p class="iphone-demo-caption">This is a live click-through demo — tap your way through it.</p>
             </div>
-            <p style="font-size:.88rem;color:var(--muted);margin:-14px 0 18px;text-align:center">The home page shows every loaded language. Tap a card to open that library.</p>
-
-            <!-- Browser mockup: content types -->
-            <div class="ui-mock">
-              <div class="ui-mock-bar">
-                <div class="ui-mock-dot"></div><div class="ui-mock-dot"></div><div class="ui-mock-dot"></div>
-                <div class="ui-mock-url">10.43.0.1/english</div>
-              </div>
-              <div class="ui-mock-body">
-                <p class="ui-mock-head">English Library</p>
-                <div class="ui-types-row">
-                  <div class="ui-type-card"><span class="ui-type-icon">📖</span>Bible</div>
-                  <div class="ui-type-card"><span class="ui-type-icon">🎵</span>Audio</div>
-                  <div class="ui-type-card"><span class="ui-type-icon">🎬</span>Video</div>
-                  <div class="ui-type-card"><span class="ui-type-icon">📚</span>Books</div>
-                </div>
-              </div>
-            </div>
-            <p style="font-size:.88rem;color:var(--muted);margin:-14px 0 18px;text-align:center">Each language has four content sections — tap any tile to browse.</p>
+            <p style="font-size:.88rem;color:var(--muted);margin:-6px 0 18px;text-align:center">Each language has four content sections, and tapping a file downloads it straight to the phone for offline use.</p>
 
             <p><strong>Bible</strong> — full Scripture text, chapter by chapter.<br>
             <strong>Audio</strong> — dramatised audio Bible recordings, playable directly in the browser.<br>
@@ -694,6 +702,113 @@ ls /mnt/library/</code></div>
         };
         step();
       });
+    })();
+
+    /* iPhone library demo — simulates browsing and downloading, no real network calls */
+    (function(){
+      var wrap = document.querySelector('.iphone-demo-wrap');
+      if(!wrap) return;
+      var screens = wrap.querySelectorAll('.iphone-screen-state');
+      var urlEl = document.getElementById('iphone-url');
+      var langTitle = document.getElementById('iphone-lang-title');
+      var typeTitle = document.getElementById('iphone-type-title');
+      var fileList = document.getElementById('iphone-file-list');
+      var toast = document.getElementById('iphone-toast');
+      var toastTimer = null;
+      var currentLang = { code: 'english', label: 'English' };
+
+      var TYPE_LABEL = { bible: 'Bible', audio: 'Audio', video: 'Video', books: 'Books' };
+      var FILES = {
+        bible: [
+          { name: 'Full Bible (KJV)', meta: '.zim · 180 MB' },
+          { name: 'Genesis', meta: '.pdf · 1.2 MB' },
+          { name: 'Gospel of John', meta: '.pdf · 0.8 MB' },
+          { name: 'Book of Revelation', meta: '.pdf · 0.6 MB' }
+        ],
+        audio: [
+          { name: 'Genesis — Audio Drama', meta: '.mp3 · 42 MB' },
+          { name: 'Gospel of John — Audio', meta: '.mp3 · 38 MB' },
+          { name: 'Psalms — Audio', meta: '.mp3 · 51 MB' }
+        ],
+        video: [
+          { name: 'Gospel of John — LUMO Film', meta: '.mp4 · 740 MB' },
+          { name: 'Gospel of Mark — LUMO Film', meta: '.mp4 · 610 MB' },
+          { name: 'Gospel of Luke — LUMO Film', meta: '.mp4 · 690 MB' }
+        ],
+        books: [
+          { name: 'Discipleship Guide', meta: '.pdf · 3.1 MB' },
+          { name: 'Bible Commentary', meta: '.pdf · 5.4 MB' },
+          { name: "Leader's Handbook", meta: '.pdf · 2.2 MB' }
+        ]
+      };
+
+      function showScreen(name){
+        screens.forEach(function(s){ s.hidden = s.getAttribute('data-screen') !== name; });
+      }
+
+      wrap.querySelectorAll('[data-lang]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          currentLang = { code: btn.getAttribute('data-lang'), label: btn.getAttribute('data-label') };
+          langTitle.textContent = currentLang.label + ' Library';
+          urlEl.textContent = '10.43.0.1/' + currentLang.code;
+          showScreen('types');
+        });
+      });
+
+      wrap.querySelectorAll('[data-type]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var type = btn.getAttribute('data-type');
+          typeTitle.textContent = TYPE_LABEL[type];
+          urlEl.textContent = '10.43.0.1/' + currentLang.code + '/' + type;
+          renderFiles(type);
+          showScreen('files');
+        });
+      });
+
+      wrap.querySelectorAll('[data-back]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          showScreen(btn.getAttribute('data-back'));
+        });
+      });
+
+      function renderFiles(type){
+        fileList.innerHTML = '';
+        (FILES[type] || []).forEach(function(f){
+          var row = document.createElement('button');
+          row.type = 'button';
+          row.className = 'iphone-file-row';
+          row.innerHTML = '<span>' + f.name + '<small>' + f.meta + '</small></span><span class="iphone-file-dl">⬇</span><span class="iphone-file-progress"></span>';
+          row.addEventListener('click', function(){ downloadFile(row); });
+          fileList.appendChild(row);
+        });
+      }
+
+      function downloadFile(row){
+        if(row.classList.contains('is-downloading') || row.classList.contains('is-done')) return;
+        row.classList.add('is-downloading');
+        var dl = row.querySelector('.iphone-file-dl');
+        var bar = row.querySelector('.iphone-file-progress');
+        dl.textContent = '…';
+        var pct = 0;
+        var timer = setInterval(function(){
+          pct += 14 + Math.random() * 10;
+          if(pct >= 100){
+            pct = 100;
+            clearInterval(timer);
+            row.classList.remove('is-downloading');
+            row.classList.add('is-done');
+            dl.textContent = '✓';
+            showToast();
+          }
+          bar.style.width = pct + '%';
+        }, 130);
+      }
+
+      function showToast(){
+        toast.classList.add('is-shown');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){ toast.classList.remove('is-shown'); }, 2200);
+      }
     })();
   </script>
 </body>

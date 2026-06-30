@@ -220,6 +220,30 @@ figcaption{padding:9px 2px 0;color:var(--muted);font-size:.87rem;line-height:1.4
 .ui-types-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
 .ui-type-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 6px;text-align:center;font-size:.78rem;font-weight:700;color:var(--ink)}
 .ui-type-icon{font-size:1.4rem;display:block;margin-bottom:5px}
+.ui-lang-row button,.ui-types-row button,.iphone-back,.iphone-file-row{font:inherit;-webkit-appearance:none;appearance:none;cursor:pointer}
+.ui-lang-card,.ui-type-card{cursor:pointer}
+
+/* ── Interactive phone (iPhone-style) library demo ─────────────── */
+.iphone-demo-wrap{margin:18px 0 26px;text-align:center}
+.iphone-frame{width:300px;max-width:100%;margin:0 auto;background:#111;border-radius:44px;padding:14px;box-shadow:0 18px 40px rgba(22,58,107,.22);position:relative}
+.iphone-notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:24px;background:#111;border-radius:0 0 16px 16px;z-index:2}
+.iphone-screen{background:#fff;border-radius:32px;overflow:hidden;min-height:520px;display:flex;flex-direction:column;position:relative}
+.iphone-statusbar{display:flex;justify-content:space-between;align-items:center;padding:10px 22px 2px;font-size:.72rem;font-weight:800;color:#000}
+.iphone-urlbar{background:#e9ebef;margin:6px 12px 0;border-radius:9px;padding:6px 10px;text-align:center}
+.iphone-url-text{font-family:"Courier New",Courier,monospace;font-size:.72rem;color:#555;font-weight:600}
+.iphone-body{flex:1;padding:14px 14px 20px;background:#f4f7fb;overflow-y:auto}
+.iphone-back{background:none;border:none;color:var(--blue);font-weight:800;font-size:.85rem;padding:0 0 12px;display:block}
+.iphone-screen-state .ui-mock-head{margin-top:0}
+.iphone-file-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.iphone-file-row{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 12px;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.8rem;font-weight:700;color:var(--ink);position:relative;overflow:hidden;width:100%}
+.iphone-file-row small{display:block;font-weight:500;color:var(--muted);font-size:.7rem;margin-top:2px}
+.iphone-file-dl{flex-shrink:0;font-size:1.05rem;color:var(--blue)}
+.iphone-file-row.is-done .iphone-file-dl{color:#16a34a}
+.iphone-file-row.is-downloading .iphone-file-dl{color:var(--muted)}
+.iphone-file-progress{position:absolute;left:0;bottom:0;height:2px;background:var(--blue);width:0%;transition:width .12s linear}
+.iphone-toast{position:absolute;left:14px;right:14px;bottom:14px;background:rgba(15,25,35,.92);color:#fff;font-size:.78rem;font-weight:700;text-align:center;padding:11px 14px;border-radius:12px;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .25s,transform .25s}
+.iphone-toast.is-shown{opacity:1;transform:translateY(0)}
+.iphone-demo-caption{font-size:.85rem;color:var(--muted);margin:12px 0 0}
 .ui-tap{display:inline-flex;align-items:center;gap:4px;background:var(--gold);color:#fff;font-size:.72rem;font-weight:900;padding:3px 9px;border-radius:99px;white-space:nowrap;vertical-align:middle;margin-left:4px}
 /* ── Visual step timeline ────────────────────────────────────── */
 .vi-steps{display:flex;flex-direction:column;margin:20px 0 0}
