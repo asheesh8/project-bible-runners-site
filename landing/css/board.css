@@ -222,10 +222,18 @@ figcaption{padding:9px 2px 0;color:var(--muted);font-size:.87rem;line-height:1.4
 .pi-qref-label{color:var(--muted);flex-shrink:0}
 .pi-qref-val{font-weight:800;color:var(--ink);font-family:"Courier New",monospace;font-size:.82rem;text-align:right}
 /* ── Pi page sections ────────────────────────────────────────── */
-.pi-section{scroll-margin-top:24px;padding-bottom:44px;border-bottom:1px solid var(--line);margin-bottom:44px}
-.pi-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.pi-section{scroll-margin-top:24px;border-bottom:1px solid var(--line)}
+.pi-section:last-of-type{border-bottom:none}
 .pi-eyebrow{font-size:.62rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 5px}
-.pi-section > h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.75rem,2.7vw,2.5rem);line-height:1.1;color:var(--ink);margin:0 0 12px;letter-spacing:-.02em}
+.pi-accordion{border:none;padding:0;margin:0}
+.pi-accordion-head{list-style:none;cursor:pointer;display:flex;flex-direction:column;padding:20px 36px 20px 0;position:relative;user-select:none}
+.pi-accordion-head::-webkit-details-marker,.pi-accordion-head::marker{display:none;content:''}
+.pi-accordion-head::after{content:'›';position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:1.5rem;font-weight:900;color:var(--blue);transition:transform .2s ease;line-height:1}
+details[open]>.pi-accordion-head::after{transform:translateY(-50%) rotate(90deg)}
+.pi-accordion-head:focus-visible{outline:2px solid var(--blue);outline-offset:4px;border-radius:4px}
+.pi-accordion-head h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.75rem,2.7vw,2.5rem);line-height:1.1;color:var(--ink);margin:4px 0 0;letter-spacing:-.02em;transition:color .15s}
+.pi-accordion-head:hover h2,.pi-accordion-head:focus-visible h2{color:var(--blue-dark)}
+.pi-accordion-body{padding:0 0 36px}
 .pi-intro{font-size:clamp(1rem,.3vw+.94rem,1.15rem);color:var(--muted);line-height:1.7;margin:0 0 22px;font-family:"Newsreader",Georgia,serif;font-weight:500}
 /* ── UI browser mockup ───────────────────────────────────────── */
 .ui-mock{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 6px 28px rgba(22,58,107,.1);margin:18px 0 26px}

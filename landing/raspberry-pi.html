@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=8">
+  <link rel="stylesheet" href="./css/board.css?v=9">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -56,8 +56,12 @@
 
           <!-- OVERVIEW -->
           <section class="pi-section" id="overview">
-            <p class="pi-eyebrow">Overview</p>
-            <h2>What is the VillageServer Pi?</h2>
+            <details class="pi-accordion" open>
+            <summary class="pi-accordion-head">
+              <p class="pi-eyebrow">Overview</p>
+              <h2>What is the VillageServer Pi?</h2>
+            </summary>
+            <div class="pi-accordion-body">
             <p class="pi-intro">A Raspberry Pi pre-loaded with VillageServer OS — a self-contained offline library server. Every kit ships ready to go: no flashing, no installing, no code. Power it on and it broadcasts its own Wi-Fi network. Anyone within range joins that network and opens the library in a phone browser — like having a small offline internet made entirely of Scripture and gospel resources.</p>
 
             <figure class="fig-full">
@@ -90,12 +94,18 @@
             </table>
             </div>
             <p style="font-size:.88rem;color:var(--muted);margin-top:10px">We walk you through every step — from sourcing the hardware to loading the OS. See the <a href="#quickstart" style="color:var(--blue);font-weight:700">quick start guide</a> below, and the full setup documentation on the VillageServer OS site.</p>
+            </div><!-- end pi-accordion-body -->
+            </details>
           </section>
 
           <!-- QUICK START -->
           <section class="pi-section" id="quickstart">
-            <p class="pi-eyebrow">Get started</p>
-            <h2>Quick start guide</h2>
+            <details class="pi-accordion">
+            <summary class="pi-accordion-head">
+              <p class="pi-eyebrow">Get started</p>
+              <h2>Quick start guide</h2>
+            </summary>
+            <div class="pi-accordion-body">
             <p class="pi-intro">The fastest way to get a field kit running, plus where to go for anything deeper — technical configuration, the full VillageServer OS documentation, and instructions for loading library content.</p>
 
             <div class="article-cta">
@@ -107,12 +117,18 @@
             </div>
 
             <p style="font-size:.88rem;color:var(--muted);margin-top:14px">The VillageServer OS site has the full technical documentation and setup instructions. Library content packs are shared via Google Drive — the OS site explains how to download and load them onto microSD cards.</p>
+            </div><!-- end pi-accordion-body -->
+            </details>
           </section>
 
           <!-- WHAT IT LOOKS LIKE -->
           <section class="pi-section" id="interface">
-            <p class="pi-eyebrow">The interface</p>
-            <h2>What you see on a phone</h2>
+            <details class="pi-accordion">
+            <summary class="pi-accordion-head">
+              <p class="pi-eyebrow">The interface</p>
+              <h2>What you see on a phone</h2>
+            </summary>
+            <div class="pi-accordion-body">
             <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.42.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required. Try the demo below — tap a language, then a section, then a file to download it.</p>
 
             <!-- Interactive phone demo -->
@@ -165,12 +181,18 @@
             <div class="tip-box">
               <strong>Updating Libraries banner:</strong> the interface may show "Updating Libraries — please wait" while a new microSD card is being read. The server continues to serve existing content while it loads.
             </div>
+            </div><!-- end pi-accordion-body -->
+            </details>
           </section>
 
           <!-- FIELD USE -->
           <section class="pi-section" id="field-use">
-            <p class="pi-eyebrow">For the field</p>
-            <h2>Using the library — step by step</h2>
+            <details class="pi-accordion">
+            <summary class="pi-accordion-head">
+              <p class="pi-eyebrow">For the field</p>
+              <h2>Using the library — step by step</h2>
+            </summary>
+            <div class="pi-accordion-body">
             <p class="pi-intro">This is all a person in the field needs to know. The server handles everything else automatically.</p>
 
             <div class="vi-steps">
@@ -222,12 +244,18 @@
               </div>
 
             </div>
+            </div><!-- end pi-accordion-body -->
+            </details>
           </section>
 
           <!-- TROUBLESHOOTING -->
           <section class="pi-section" id="troubleshoot">
-            <p class="pi-eyebrow">Troubleshooting</p>
-            <h2>Common issues</h2>
+            <details class="pi-accordion">
+            <summary class="pi-accordion-head">
+              <p class="pi-eyebrow">Troubleshooting</p>
+              <h2>Common issues</h2>
+            </summary>
+            <div class="pi-accordion-body">
             <p class="pi-intro">Below are the few things worth checking on-site if something looks off. For deeper technical questions, the VillageServer OS site has full documentation.</p>
 
             <p><strong>Phone joins the Wi-Fi but the page won't load</strong></p>
@@ -247,7 +275,8 @@
               <div class="cta-row">
                 <a class="cta-outline-button" href="https://sites.google.com/view/villageserver-initiative/" target="_blank" rel="noopener">Visit VillageServer OS site →</a>
               </div>
-            </div>
+            </div><!-- end pi-accordion-body -->
+            </details>
           </section>
 
         </div><!-- end main content -->
@@ -260,9 +289,19 @@
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
   <script>
-    /* Sticky sidenav — highlight the active section as you scroll */
+    /* Sidenav — open accordion if closed, then scroll to section */
     (function(){
       var links = document.querySelectorAll('.pi-sidenav a[href^="#"]');
+      links.forEach(function(a){
+        a.addEventListener('click', function(){
+          var target = document.querySelector(a.getAttribute('href'));
+          if(!target) return;
+          var acc = target.querySelector('.pi-accordion');
+          if(acc && !acc.open) acc.open = true;
+        });
+      });
+
+      /* Highlight active section on scroll */
       var sections = Array.from(links).map(function(a){
         return document.querySelector(a.getAttribute('href'));
       }).filter(Boolean);
