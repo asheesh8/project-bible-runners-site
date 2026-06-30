@@ -47,7 +47,7 @@
           <span class="pi-sidenav-label" style="margin-top:0">Quick reference</span>
           <div class="pi-qref-row"><span class="pi-qref-label">Wi-Fi name</span><span class="pi-qref-val">VillageServer</span></div>
           <div class="pi-qref-row"><span class="pi-qref-label">Password</span><span class="pi-qref-val">village123</span></div>
-          <div class="pi-qref-row"><span class="pi-qref-label">Library URL</span><span class="pi-qref-val">10.43.0.1</span></div>
+          <div class="pi-qref-row"><span class="pi-qref-label">Library URL</span><span class="pi-qref-val">10.42.0.1</span></div>
         </nav>
         </details>
 
@@ -68,50 +68,52 @@
             <h3 style="margin:24px 0 10px;font-size:1.1rem;font-weight:800;color:var(--ink)">What's on the OS</h3>
             <ul class="article-bullets">
               <li><strong>Auto-broadcasting Wi-Fi hotspot</strong> — turns on the moment the Pi powers up, no router or internet needed</li>
-              <li><strong>A built-in offline library server</strong> — reachable at <span class="inline-code">10.43.0.1</span> from any phone browser, no app to install</li>
+              <li><strong>A built-in offline library server</strong> — reachable at <span class="inline-code">10.42.0.1</span> from any phone browser, no app to install</li>
               <li><strong>Multi-language support</strong> — one library per language, swappable by microSD card</li>
               <li><strong>Four content sections per language</strong> — Bible, Audio, Video, and Books, browsable and downloadable straight from the phone</li>
-              <li><strong>Remote content management</strong> — our team can push new or updated libraries to a deployed Pi without anyone in the field touching it</li>
+              <li><strong>Library content shared via Google Drive</strong> — updated language libraries and new content packs are distributed through a shared Google Drive folder; swap the microSD card to update a kit</li>
               <li><strong>Fully offline operation</strong> — works indefinitely with no internet connection, anywhere there's power</li>
             </ul>
 
             <h3 style="margin:24px 0 10px;font-size:1.1rem;font-weight:800;color:var(--ink)">What's in the kit</h3>
+            <p style="margin:0 0 12px;color:var(--muted);font-size:.97rem">We're not selling a product — we provide the technical guidance and instruction to help you get this tool into the field. A typical kit is built around these components:</p>
             <div class="table-wrap">
             <table class="hw-table">
-              <thead><tr><th>Item</th><th>Details</th></tr></thead>
+              <thead><tr><th>Component</th><th>Role</th></tr></thead>
               <tbody>
-                <tr><td>Raspberry Pi</td><td>Pre-configured with VillageServer OS — arrives ready to power on</td></tr>
-                <tr><td>Language library cards</td><td>One microSD per language, already loaded, seated in USB readers</td></tr>
-                <tr><td>Power supply / power bank</td><td>5V USB-C or USB Micro-B depending on Pi model</td></tr>
-                <tr><td>Carry case</td><td>Keeps everything together for field deployment</td></tr>
+                <tr><td>Raspberry Pi</td><td>Runs VillageServer OS and broadcasts the offline Wi-Fi library</td></tr>
+                <tr><td>microSD cards</td><td>One card per language library — loaded with Bible, Audio, Video, and Books content</td></tr>
+                <tr><td>USB card readers</td><td>Plugged into the Pi so each language card is accessible at the same time</td></tr>
+                <tr><td>Power bank or supply</td><td>5V USB-C or Micro-B depending on the Pi model; a solar-charged power bank works well in the field</td></tr>
+                <tr><td>Carry case</td><td>Keeps everything together and protected for transport</td></tr>
               </tbody>
             </table>
             </div>
-            <p style="font-size:.88rem;color:var(--muted);margin-top:10px">Nothing to flash, install, or configure — that's all done before the kit ships. Jump to the <a href="#quickstart" style="color:var(--blue);font-weight:700">quick start guide</a> below to get a kit running in the field.</p>
+            <p style="font-size:.88rem;color:var(--muted);margin-top:10px">We walk you through every step — from sourcing the hardware to loading the OS. See the <a href="#quickstart" style="color:var(--blue);font-weight:700">quick start guide</a> below, and the full setup documentation on the VillageServer OS site.</p>
           </section>
 
           <!-- QUICK START -->
           <section class="pi-section" id="quickstart">
             <p class="pi-eyebrow">Get started</p>
             <h2>Quick start guide</h2>
-            <p class="pi-intro">The fastest way to get a field kit running, plus where to go for anything deeper — content management, technical configuration, and the full VillageServer OS documentation.</p>
+            <p class="pi-intro">The fastest way to get a field kit running, plus where to go for anything deeper — technical configuration, the full VillageServer OS documentation, and instructions for loading library content.</p>
 
             <div class="article-cta">
               <p>Download the printable Quick Start Guide — covers powering on, joining the Wi-Fi, and using the library, in plain language for anyone in the field.</p>
               <div class="cta-row">
                 <a class="pdf-button" href="./downloads/villageserver-quick-start-guide.pdf" download>Download Quick Start Guide (PDF)</a>
-                <a class="cta-outline-button" href="https://[COMPANION_SITE_URL]" target="_blank" rel="noopener">Visit VillageServer OS site →</a>
+                <a class="cta-outline-button" href="https://sites.google.com/view/villageserver-initiative/" target="_blank" rel="noopener">Visit VillageServer OS site →</a>
               </div>
             </div>
 
-            <p style="font-size:.88rem;color:var(--muted);margin-top:14px">The VillageServer OS site is where the full technical documentation, remote content management, and admin tools live. This page is the plain-language overview — head there once you've got the gist here.</p>
+            <p style="font-size:.88rem;color:var(--muted);margin-top:14px">The VillageServer OS site has the full technical documentation and setup instructions. Library content packs are shared via Google Drive — the OS site explains how to download and load them onto microSD cards.</p>
           </section>
 
           <!-- WHAT IT LOOKS LIKE -->
           <section class="pi-section" id="interface">
             <p class="pi-eyebrow">The interface</p>
             <h2>What you see on a phone</h2>
-            <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.43.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required. Try the demo below — tap a language, then a section, then a file to download it.</p>
+            <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.42.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required. Try the demo below — tap a language, then a section, then a file to download it.</p>
 
             <!-- Interactive phone demo -->
             <div class="iphone-demo-wrap">
@@ -119,7 +121,7 @@
                 <div class="iphone-notch"></div>
                 <div class="iphone-screen">
                   <div class="iphone-statusbar"><span>9:41</span><span>📶 🔋</span></div>
-                  <div class="iphone-urlbar"><span class="iphone-url-text" id="iphone-url">10.43.0.1</span></div>
+                  <div class="iphone-urlbar"><span class="iphone-url-text" id="iphone-url">10.42.0.1</span></div>
                   <div class="iphone-body" id="iphone-body">
 
                     <div class="iphone-screen-state" data-screen="home">
@@ -161,7 +163,7 @@
             <strong>Books</strong> — commentaries, discipleship materials, and reference PDFs.</p>
 
             <div class="tip-box">
-              <strong>Updating Libraries banner:</strong> when content is being refreshed remotely, the interface shows "Updating Libraries — please wait." The server continues to serve existing content while the update runs in the background.
+              <strong>Updating Libraries banner:</strong> the interface may show "Updating Libraries — please wait" while a new microSD card is being read. The server continues to serve existing content while it loads.
             </div>
           </section>
 
@@ -197,7 +199,7 @@
                 <div class="vi-step-num">3</div>
                 <div class="vi-step-body">
                   <h4>Open the library in a browser</h4>
-                  <p>Open any browser (Chrome, Safari, Firefox) and type <span class="inline-code">10.43.0.1</span> into the address bar. Hit Go. The library home page loads instantly.</p>
+                  <p>Open any browser (Chrome, Safari, Firefox) and type <span class="inline-code">10.42.0.1</span> into the address bar. Hit Go. The library home page loads instantly.</p>
                 </div>
               </div>
 
@@ -226,10 +228,10 @@
           <section class="pi-section" id="troubleshoot">
             <p class="pi-eyebrow">Troubleshooting</p>
             <h2>Common issues</h2>
-            <p class="pi-intro">Content updates and deeper technical management are handled remotely by our team through the VillageServer OS site — nobody in the field needs to touch the Pi for that. Below are the few things worth checking on-site if something looks off.</p>
+            <p class="pi-intro">Below are the few things worth checking on-site if something looks off. For deeper technical questions, the VillageServer OS site has full documentation.</p>
 
             <p><strong>Phone joins the Wi-Fi but the page won't load</strong></p>
-            <p>Double-check the address bar shows exactly <span class="inline-code">10.43.0.1</span>, not a search. Some phones auto-correct it into a Google search instead of visiting the address directly — retype it if needed.</p>
+            <p>Double-check the address bar shows exactly <span class="inline-code">10.42.0.1</span>, not a search. Some phones auto-correct it into a Google search instead of visiting the address directly — retype it if needed.</p>
 
             <p><strong>Phone warns "no internet connection"</strong></p>
             <p>That's expected and normal — the VillageServer network is intentionally offline. Tap "Stay connected" or "Use anyway" and continue.</p>
@@ -238,12 +240,12 @@
             <p>Give the Pi a full 60 seconds after power-on to finish starting up. If it still doesn't appear, power-cycle it (unplug, wait 10 seconds, plug back in).</p>
 
             <p><strong>A language or file seems missing</strong></p>
-            <p>That's a content update, not a device problem — flag it to our team through the VillageServer OS site and it'll be pushed remotely.</p>
+            <p>This usually means the microSD card for that language isn't seated or the content hasn't been loaded yet. Check that the USB reader is plugged in, then flag it to the team so the correct library can be shared from Google Drive.</p>
 
             <div class="article-cta">
-              <p>For anything beyond these basics — content management, technical configuration, or deeper diagnostics — head to the VillageServer OS companion site.</p>
+              <p>For anything beyond these basics — technical configuration, loading new libraries, or deeper diagnostics — head to the VillageServer OS site.</p>
               <div class="cta-row">
-                <a class="cta-outline-button" href="https://[COMPANION_SITE_URL]" target="_blank" rel="noopener">Visit VillageServer OS site →</a>
+                <a class="cta-outline-button" href="https://sites.google.com/view/villageserver-initiative/" target="_blank" rel="noopener">Visit VillageServer OS site →</a>
               </div>
             </div>
           </section>
@@ -322,7 +324,7 @@
         btn.addEventListener('click', function(){
           currentLang = { code: btn.getAttribute('data-lang'), label: btn.getAttribute('data-label') };
           langTitle.textContent = currentLang.label + ' Library';
-          urlEl.textContent = '10.43.0.1/' + currentLang.code;
+          urlEl.textContent = '10.42.0.1/' + currentLang.code;
           showScreen('types');
         });
       });
@@ -331,7 +333,7 @@
         btn.addEventListener('click', function(){
           var type = btn.getAttribute('data-type');
           typeTitle.textContent = TYPE_LABEL[type];
-          urlEl.textContent = '10.43.0.1/' + currentLang.code + '/' + type;
+          urlEl.textContent = '10.42.0.1/' + currentLang.code + '/' + type;
           renderFiles(type);
           showScreen('files');
         });
