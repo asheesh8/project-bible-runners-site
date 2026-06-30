@@ -325,56 +325,118 @@
     });
 
     // ── World map canvas ──────────────────────────────────────────────────────
-    var CW=900,CH=400;
+    var CW=900,CH=430;
 
     function toXY(lon,lat){return[(lon+180)/360*CW,(90-lat)/180*CH];}
 
     function continents(){
       return[
         // North America
-        [[-168,71],[-141,60],[-125,49],[-124,37],[-118,33],[-107,23],[-90,16],[-83,10],[-77,8],[-80,10],[-84,16],[-80,32],[-75,44],[-67,47],[-52,46],[-53,53],[-58,58],[-65,60],[-80,62],[-86,64],[-90,68],[-96,70],[-115,72],[-130,68]],
+        [[-168,71],[-141,60],[-133,56],[-126,50],[-124,48],[-124,37],[-120,35],[-118,33],
+         [-110,24],[-97,18],[-90,16],[-84,10],[-78,8],[-80,10],[-84,16],[-90,20],[-87,22],
+         [-82,24],[-81,25],[-81,32],[-76,35],[-76,38],[-74,41],[-71,42],[-68,44],
+         [-67,47],[-61,46],[-60,47],[-52,46],[-55,47],[-53,52],[-58,56],
+         [-65,60],[-68,63],[-80,63],[-86,64],[-90,68],[-96,70],[-115,73],[-130,70]],
         // Greenland
         [[-44,60],[-22,63],[-18,73],[-20,80],[-50,83],[-68,77],[-51,67]],
         // South America
-        [[-73,11],[-61,10],[-50,2],[-35,-5],[-34,-13],[-38,-21],[-51,-34],[-65,-55],[-68,-46],[-75,-15],[-80,-4],[-77,4]],
+        [[-73,11],[-63,10],[-50,2],[-35,-5],[-34,-13],[-39,-22],[-48,-28],
+         [-51,-34],[-64,-55],[-68,-46],[-72,-30],[-75,-15],[-80,-2],[-77,4]],
         // Europe
-        [[-10,36],[-2,36],[2,43],[7,43],[10,44],[15,38],[25,36],[28,37],[36,37],[37,39],[40,43],[30,46],[28,55],[25,60],[26,66],[20,71],[14,70],[10,58],[8,58],[5,54],[2,51],[-2,48],[-9,39]],
+        [[-10,36],[-2,36],[2,43],[3,44],[7,43],[9,44],[15,38],[18,40],
+         [25,36],[28,37],[36,37],[37,39],[40,43],[30,46],[28,55],
+         [25,60],[26,66],[28,71],[20,71],[14,70],[10,58],[8,58],
+         [5,54],[2,51],[-2,48],[-2,44],[-9,39]],
         // British Isles
-        [[-5,50],[0,52],[0,54],[-2,57],[0,58],[-3,58],[-5,56],[-8,53]],
+        [[-5,50],[0,51],[2,52],[0,54],[-2,57],[0,58],[-3,59],[-5,58],[-5,56],[-3,54],[-5,52]],
+        // Iceland
+        [[-24,63],[-13,63],[-13,66],[-18,66],[-22,65],[-24,64]],
         // Africa
-        [[-18,16],[-15,24],[-5,38],[2,37],[14,37],[25,37],[36,37],[43,12],[51,0],[43,-12],[36,-25],[26,-34],[18,-35],[12,-18],[2,4],[8,4],[1,9],[-16,12]],
-        // Asia (Russia+Central Asia to Japan)
-        [[28,37],[35,37],[37,39],[40,43],[44,42],[50,37],[57,21],[60,22],[70,22],[78,8],[80,10],[100,10],[105,10],[120,22],[130,38],[140,46],[143,55],[155,68],[140,73],[120,74],[100,78],[68,78],[55,72],[45,70],[42,63],[28,55],[30,46]],
-        // SE Asia / Malay peninsula
-        [[100,5],[103,1],[104,-2],[106,-8],[108,-7],[110,-7],[112,-8],[115,-4],[118,5],[117,5],[115,8],[107,10],[100,10]],
+        [[-18,16],[-16,24],[-5,38],[2,37],[10,37],[22,37],[37,37],
+         [43,12],[51,0],[44,-12],[36,-25],[26,-34],[18,-35],
+         [14,-22],[10,-18],[2,4],[8,4],[1,9],[-16,12]],
+        // Madagascar
+        [[44,-13],[50,-13],[50,-25],[44,-25]],
+        // Asia (Russia to Korea)
+        [[28,37],[35,37],[37,39],[40,43],[44,42],[50,37],
+         [57,21],[60,22],[68,22],[78,8],[80,10],[100,10],[105,10],
+         [108,15],[120,22],[122,31],[130,38],[133,42],[140,46],[143,55],
+         [155,68],[140,73],[120,74],[100,78],[68,78],[55,72],[45,70],
+         [42,63],[28,55],[30,46]],
+        // Indian subcontinent
+        [[68,22],[72,20],[76,10],[80,8],[80,10],[70,22]],
+        // SE Asia / Indochina + Malay
+        [[100,22],[105,12],[108,11],[104,2],[104,-1],[106,-8],
+         [108,-7],[110,-7],[112,-8],[115,-4],[118,5],[117,5],
+         [115,8],[107,10],[100,10]],
+        // Borneo
+        [[108,-4],[116,-4],[117,-1],[119,4],[115,7],[109,2]],
         // Japan
-        [[130,31],[131,33],[135,35],[138,35],[141,38],[141,43],[140,45],[133,44],[129,34]],
+        [[130,31],[131,33],[135,35],[138,35],[141,38],[141,43],[142,45],[140,45],[133,44],[129,34]],
         // Australia
-        [[115,-22],[122,-34],[129,-33],[137,-35],[140,-38],[144,-39],[148,-38],[152,-28],[148,-20],[136,-12],[130,-11],[122,-18]],
-        // New Zealand (N.Island)
-        [[172,-37],[174,-37],[178,-39],[175,-41],[173,-40]]
+        [[114,-22],[122,-34],[128,-33],[131,-31],[137,-36],[140,-38],
+         [144,-39],[148,-38],[154,-28],[153,-27],[148,-20],
+         [136,-12],[131,-11],[122,-18]],
+        // New Zealand N+S
+        [[172,-37],[174,-36],[178,-38],[176,-41],[174,-41]],
+        [[168,-45],[170,-46],[171,-44],[169,-43]]
       ];
     }
 
+    // Draw a pill-shaped label on the canvas
+    function pill(ctx,text,x,y,bg,fg){
+      ctx.save();
+      ctx.font='bold 10px sans-serif';
+      var w=ctx.measureText(text).width,pad=5,h=16;
+      ctx.fillStyle=bg||'rgba(15,23,42,0.82)';
+      if(ctx.roundRect){ctx.beginPath();ctx.roundRect(x-pad,y-h+3,w+pad*2,h,3);ctx.fill();}
+      else{ctx.fillRect(x-pad,y-h+3,w+pad*2,h);}
+      ctx.fillStyle=fg||'#fff';
+      ctx.fillText(text,x,y);
+      ctx.restore();
+    }
+
     function drawBase(ctx){
-      ctx.fillStyle='#dbeafe'; ctx.fillRect(0,0,CW,CH);
-      ctx.fillStyle='#e8e8d0'; ctx.strokeStyle='#c5c5b0'; ctx.lineWidth=0.6;
+      // Dark ocean gradient
+      var og=ctx.createLinearGradient(0,0,0,CH);
+      og.addColorStop(0,'#0c2340');
+      og.addColorStop(0.5,'#0f3460');
+      og.addColorStop(1,'#0c2340');
+      ctx.fillStyle=og; ctx.fillRect(0,0,CW,CH);
+
+      // Subtle lat/lon grid
+      ctx.save();
+      ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=0.5;
+      for(var g=-150;g<=180;g+=30){
+        var p1=toXY(g,90),p2=toXY(g,-90);
+        ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();
+      }
+      for(var g=-60;g<=90;g+=30){
+        var p1=toXY(-180,g),p2=toXY(180,g);
+        ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();
+      }
+      ctx.restore();
+
+      // Land masses
+      ctx.save();
+      ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=5;
+      ctx.fillStyle='#2d5a3d';
+      ctx.strokeStyle='rgba(80,180,110,0.3)'; ctx.lineWidth=0.8;
       continents().forEach(function(shape){
         ctx.beginPath();
         shape.forEach(function(pt,i){var p=toXY(pt[0],pt[1]);i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]);});
         ctx.closePath(); ctx.fill(); ctx.stroke();
       });
-      // Equator
-      ctx.save(); ctx.strokeStyle='rgba(100,140,180,0.45)'; ctx.lineWidth=0.7; ctx.setLineDash([]);
-      var e1=toXY(-180,0),e2=toXY(180,0);
-      ctx.beginPath(); ctx.moveTo(e1[0],e1[1]); ctx.lineTo(e2[0],e2[1]); ctx.stroke();
-      // Tropics
-      ctx.strokeStyle='rgba(100,140,180,0.2)'; ctx.lineWidth=0.5;
-      [23.5,-23.5,66.5,-66.5].forEach(function(lat){
-        var p1=toXY(-180,lat),p2=toXY(180,lat);
-        ctx.beginPath(); ctx.moveTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]); ctx.stroke();
-      });
       ctx.restore();
+
+      // Equator dashed line
+      ctx.save();
+      ctx.strokeStyle='rgba(255,255,255,0.22)'; ctx.lineWidth=0.8; ctx.setLineDash([4,4]);
+      var e1=toXY(-180,0),e2=toXY(180,0);
+      ctx.beginPath();ctx.moveTo(e1[0],e1[1]);ctx.lineTo(e2[0],e2[1]);ctx.stroke();
+      ctx.restore();
+      ctx.font='9px sans-serif'; ctx.fillStyle='rgba(255,255,255,0.2)';
+      ctx.fillText('EQUATOR',toXY(-175,0)[0]+2,toXY(0,0)[1]-4);
     }
 
     function drawMap(obsLat,obsLon,sat){
@@ -383,34 +445,71 @@
       ctx.clearRect(0,0,CW,CH);
       drawBase(ctx);
 
-      // Beam footprint
+      // ── Beam: concentric glowing ellipses ──
       var bc=toXY(sat.bx,sat.by);
       var rx=sat.brx/360*CW, ry=sat.bry/180*CH;
+      [4,3,2,1,0].forEach(function(ring){
+        var sc=1+ring*0.18, al=0.04+ring*0.038;
+        ctx.save();
+        ctx.beginPath(); ctx.ellipse(bc[0],bc[1],rx*sc,ry*sc,0,0,2*Math.PI);
+        ctx.fillStyle='rgba(96,165,250,'+al+')'; ctx.fill();
+        ctx.restore();
+      });
       ctx.save();
       ctx.beginPath(); ctx.ellipse(bc[0],bc[1],rx,ry,0,0,2*Math.PI);
-      ctx.fillStyle='rgba(37,99,235,0.10)'; ctx.fill();
-      ctx.strokeStyle='rgba(37,99,235,0.4)'; ctx.lineWidth=1.5; ctx.setLineDash([5,3]); ctx.stroke();
+      ctx.strokeStyle='rgba(147,197,253,0.65)'; ctx.lineWidth=1.5; ctx.setLineDash([6,3]); ctx.stroke();
       ctx.restore();
 
-      // Sub-satellite point
+      // ── Satellite icon (body + solar panels + glow) ──
       var sp=toXY(sat.lon,0);
-      ctx.beginPath(); ctx.arc(sp[0],sp[1],5,0,2*Math.PI);
-      ctx.fillStyle='#1d4ed8'; ctx.fill();
-      ctx.fillStyle='#1d4ed8'; ctx.font='bold 11px sans-serif';
-      ctx.fillText('SAT',sp[0]+7,sp[1]-3);
+      ctx.save();
+      ctx.shadowColor='rgba(147,197,253,0.9)'; ctx.shadowBlur=14;
+      var sb=7;
+      ctx.fillStyle='#1e40af'; // left panel
+      ctx.fillRect(sp[0]-sb*2.2,sp[1]-sb*0.35,sb*1.3,sb*0.7);
+      ctx.fillRect(sp[0]+sb*0.9,sp[1]-sb*0.35,sb*1.3,sb*0.7); // right panel
+      ctx.fillStyle='#93c5fd'; // body
+      ctx.fillRect(sp[0]-sb*0.7,sp[1]-sb*0.5,sb*1.4,sb);
+      ctx.shadowBlur=0;
+      ctx.strokeStyle='rgba(147,197,253,0.4)'; ctx.lineWidth=0.4;
+      for(var k=1;k<=2;k++){
+        var lx=sp[0]-sb*2.2+k*sb*0.43;
+        ctx.beginPath();ctx.moveTo(lx,sp[1]-sb*0.35);ctx.lineTo(lx,sp[1]+sb*0.35);ctx.stroke();
+        lx=sp[0]+sb*0.9+k*sb*0.43;
+        ctx.beginPath();ctx.moveTo(lx,sp[1]-sb*0.35);ctx.lineTo(lx,sp[1]+sb*0.35);ctx.stroke();
+      }
+      ctx.restore();
 
-      // Line observer → sub-sat point
+      // ── Signal line: gradient red→blue ──
       var op=toXY(obsLon,obsLat);
-      ctx.beginPath(); ctx.moveTo(op[0],op[1]); ctx.lineTo(sp[0],sp[1]);
-      ctx.strokeStyle='rgba(220,38,38,0.55)'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]); ctx.stroke();
+      ctx.save();
+      var lg=ctx.createLinearGradient(op[0],op[1],sp[0],sp[1]);
+      lg.addColorStop(0,'rgba(239,68,68,0.9)');
+      lg.addColorStop(1,'rgba(96,165,250,0.9)');
+      ctx.strokeStyle=lg; ctx.lineWidth=1.5; ctx.setLineDash([5,3]);
+      ctx.beginPath(); ctx.moveTo(op[0],op[1]); ctx.lineTo(sp[0],sp[1]); ctx.stroke();
       ctx.setLineDash([]);
+      ctx.restore();
 
-      // Observer pin
-      ctx.beginPath(); ctx.arc(op[0],op[1],7,0,2*Math.PI);
-      ctx.fillStyle='#dc2626'; ctx.fill();
-      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-      ctx.fillStyle='#991b1b'; ctx.font='bold 11px sans-serif';
-      ctx.fillText('YOU',op[0]+9,op[1]-4);
+      // ── Observer pin ──
+      ctx.save();
+      // Outer pulse ring
+      ctx.beginPath(); ctx.arc(op[0],op[1],14,0,2*Math.PI);
+      ctx.fillStyle='rgba(239,68,68,0.18)'; ctx.fill();
+      // Drop shadow circle
+      ctx.shadowColor='rgba(0,0,0,0.55)'; ctx.shadowBlur=8; ctx.shadowOffsetY=2;
+      ctx.beginPath(); ctx.arc(op[0],op[1],8,0,2*Math.PI);
+      ctx.fillStyle='#ef4444'; ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+      ctx.beginPath(); ctx.arc(op[0],op[1],2.5,0,2*Math.PI);
+      ctx.fillStyle='#fff'; ctx.fill();
+      ctx.restore();
+
+      // ── Labels ──
+      pill(ctx,'YOU',op[0]+12,op[1]+4,'rgba(153,27,27,0.88)','#fff');
+      var satShort=sat.name.split('(')[0].trim();
+      pill(ctx,satShort,sp[0]+16,sp[1]+4,'rgba(30,64,175,0.88)','#fff');
     }
 
     // Initial map render
@@ -420,10 +519,12 @@
       canvas.width=CW*dpr; canvas.height=CH*dpr;
       var ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
       drawBase(ctx);
-      ctx.fillStyle='rgba(93,107,125,0.65)';
-      ctx.font='13px sans-serif'; ctx.textAlign='center';
-      ctx.fillText('Enter your location and satellite above, then click Calculate',CW/2,CH-12);
-      ctx.textAlign='left';
+      ctx.save();
+      ctx.font='bold 13px sans-serif';
+      ctx.fillStyle='rgba(255,255,255,0.4)';
+      ctx.textAlign='center';
+      ctx.fillText('Enter your location and satellite above, then click Calculate',CW/2,CH-16);
+      ctx.restore();
     })();
   })();
   </script>
