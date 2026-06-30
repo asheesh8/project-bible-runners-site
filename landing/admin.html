@@ -660,6 +660,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           <div class="stat-card"><div class="stat-val" id="stat-today">—</div><div class="stat-label">Visits today</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-clicks">—</div><div class="stat-label">Link clicks</div></div>
           <div class="stat-card"><div class="stat-val" id="stat-interests">—</div><div class="stat-label">Interest signups</div></div>
+          <div class="stat-card"><div class="stat-val" id="stat-contacts">—</div><div class="stat-label">Contact messages</div></div>
         </div>
 
         <div class="res-section">
@@ -690,6 +691,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         <div class="res-section">
           <div class="res-section-title">🙋 &nbsp;Donation interests</div>
           <div class="interests-table-wrap" id="interests-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">✉️ &nbsp;Contact messages</div>
+          <div class="interests-table-wrap" id="contacts-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
         <div class="res-section">
@@ -1324,7 +1330,7 @@ function loadTraffic(showSpinner){
   fetch('/api/track?type=summary&_ts=' + Date.now(), { cache:'no-store', headers:{ 'Authorization':'Bearer '+AUTH_TOKEN } })
     .then(function(r){ return r.json(); })
     .then(function(data){
-      renderTraffic(data.visits||[], data.clicks||[], data.interests||[], data.availabilities||[], data.totals||{});
+      renderTraffic(data.visits||[], data.clicks||[], data.interests||[], data.availabilities||[], data.totals||{}, data.contacts||[]);
       var now = new Date();
       document.getElementById('traffic-last-updated').style.display = 'inline';
       document.getElementById('traffic-last-updated').textContent =
@@ -1339,15 +1345,17 @@ function loadTraffic(showSpinner){
     });
 }
 
-function renderTraffic(visits, clicks, interests, availabilities, totals){
+function renderTraffic(visits, clicks, interests, availabilities, totals, contacts){
   // ── Stats ────────────────────────────────────────────
   totals = totals || {};
+  contacts = contacts || [];
   var todayStr = new Date().toDateString();
   var todayCount = visits.filter(function(v){ return new Date(v.created_at).toDateString()===todayStr; }).length;
   var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||''; }).filter(Boolean));
   clicks.forEach(function(c){ if(c.visitor_id) uniqueIds.add(c.visitor_id); });
   interests.forEach(function(i){ if(i.visitor_id) uniqueIds.add(i.visitor_id); });
   availabilities.forEach(function(a){ if(a.visitor_id) uniqueIds.add(a.visitor_id); });
+  contacts.forEach(function(c){ if(c.visitor_id) uniqueIds.add(c.visitor_id); });
   var totalVisits = Number(totals.total_page_visits);
   var individualPeople = Number(totals.individual_people);
   var visitsToday = Number(totals.visits_today);
@@ -1358,6 +1366,7 @@ function renderTraffic(visits, clicks, interests, availabilities, totals){
   document.getElementById('stat-today').textContent = Number.isFinite(visitsToday) ? visitsToday : todayCount;
   document.getElementById('stat-clicks').textContent = Number.isFinite(totalClicks) ? totalClicks : clicks.length;
   document.getElementById('stat-interests').textContent = interests.length;
+  document.getElementById('stat-contacts').textContent = contacts.length;
 
   // ── Individual people ────────────────────────────────
   var people = {};
@@ -1428,6 +1437,12 @@ function renderTraffic(visits, clicks, interests, availabilities, totals){
     var loc = formattedLocation(a.country, a.region);
     addLocation(p, loc, 'kit request');
     addEvent(p, 'kit', 'Kit request' + (loc ? ': ' + loc : ''), a.created_at, loc);
+  });
+  contacts.forEach(function(c){
+    if(!c.visitor_id) return;
+    var p = personFor(c.visitor_id);
+    p.forms++;
+    addEvent(p, 'form', 'Contact message' + (c.name ? ' from ' + c.name : ''), c.created_at, c.message);
   });
   var peopleRows = Object.values(people).sort(function(a,b){ return b.last-a.last; }).slice(0,18);
   if(peopleRows.length){
@@ -1545,6 +1560,23 @@ function renderTraffic(visits, clicks, interests, availabilities, totals){
     document.getElementById('interests-list').innerHTML = intHtml;
   } else {
     document.getElementById('interests-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No donation interests captured yet.</div></div>';
+  }
+
+  // ── Contact messages ──────────────────────────────────
+  if(contacts.length){
+    var conHtml = '<table class="items-table"><thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th></tr></thead><tbody>';
+    contacts.forEach(function(c){
+      conHtml += '<tr>' +
+        '<td>'+esc(c.name||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+esc(c.email||'—')+'</td>' +
+        '<td style="font-size:13px;max-width:340px">'+esc(c.message||'—')+'</td>' +
+        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(c.created_at)+'</td>' +
+      '</tr>';
+    });
+    conHtml += '</tbody></table>';
+    document.getElementById('contacts-list').innerHTML = conHtml;
+  } else {
+    document.getElementById('contacts-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No contact messages yet.</div></div>';
   }
 
   // ── Recent visits ─────────────────────────────────────

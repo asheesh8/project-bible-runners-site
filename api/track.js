@@ -1,14 +1,16 @@
-// /api/track.js — Visit tracking + donation interest capture
-// Env vars: SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD
+// /api/track.js — Visit tracking + donation interest capture + contact form
+// Env vars: SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD, RESEND_API_KEY, CONTACT_FROM_EMAIL
 //
 // Public (no auth):
 //   POST /api/track?type=visit     { visitor_id, site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
 //   POST /api/track?type=click     { visitor_id, site_host, path, link_url, link_text, link_type }
 //   POST /api/track?type=interest  { visitor_id, site_host, name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
+//   POST /api/track?type=contact   { visitor_id, site_host, name, email, message } — emails villageserverinitiative@gmail.com via Resend
 //
 // Admin (Authorization: Bearer <ADMIN_PASSWORD>):
 //   GET  /api/track?type=visits
 //   GET  /api/track?type=interests
+//   GET  /api/track?type=contacts
 //   GET  /api/track?type=summary
 
 const ROBOT_USER_AGENT_RE = /bot|crawler|spider|crawl|slurp|bingpreview|facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|google-inspectiontool|googleother|adsbot|mediapartners-google|apis-google|feedfetcher|monitor|uptime|pingdom|headlesschrome|phantomjs|lighthouse|pagespeed|semrush|ahrefs|mj12bot|dotbot|petalbot|bytespider|yandex|baiduspider|duckduckbot|archive\.org|wget|curl|python-requests|httpclient/i;
@@ -52,6 +54,27 @@ async function fetchWithFallback(attempts) {
   return lastResponse;
 }
 
+async function sendContactEmail({ name, email, message, site_host }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return false;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        from: process.env.CONTACT_FROM_EMAIL || 'VillageServer Initiative <onboarding@resend.dev>',
+        to: ['villageserverinitiative@gmail.com'],
+        reply_to: email,
+        subject: `New website contact message${name ? ` from ${name}` : ''}`,
+        text: `Name: ${name || '—'}\nEmail: ${email}\nSite: ${site_host || '—'}\n\n${message}`,
+      }),
+    });
+    return r.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
 export default async function handler(req, res) {
   const { ADMIN_PASSWORD } = process.env;
   // Accept either our own names or the ones the Supabase–Vercel integration creates.
@@ -65,7 +88,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { type } = req.query;
-  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'summary', 'health'];
+  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'contact', 'contacts', 'summary', 'health'];
   if (!VALID.includes(type)) return res.status(400).json({ error: 'Invalid type' });
 
   // ── Admin health check: report pipeline status without exposing secrets ──
@@ -108,6 +131,36 @@ export default async function handler(req, res) {
       } catch (e) { /* ignore */ }
     }
     return res.status(200).json(out);
+  }
+
+  // ── Public POST: contact form — emails the team and stores a copy ──
+  // Handled before the Supabase-configured check below so the email still
+  // sends even on a deploy where Supabase hasn't been wired up yet.
+  if (req.method === 'POST' && type === 'contact') {
+    const { visitor_id, site_host, name, email, message } = req.body || {};
+    const cleanEmail = trimText(email, 255);
+    const cleanMessage = trimText(message, 4000);
+    const cleanName = trimText(name, 160);
+    if (!cleanEmail || !cleanMessage) return res.status(400).json({ error: 'email and message are required' });
+
+    const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+    const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
+    const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
+
+    let stored = false;
+    if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
+      const sbHeaders = { 'Content-Type': 'application/json', apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` };
+      const payload = { visitor_id: cleanVisitorId || null, site_host: cleanHost, name: cleanName, email: cleanEmail, message: cleanMessage };
+      const legacyPayload = (() => { const p = { ...payload }; delete p.visitor_id; delete p.site_host; return p; })();
+      const r = await fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/contact_messages`, options: { method: 'POST', headers: { ...sbHeaders, Prefer: 'return=minimal' }, body: JSON.stringify(payload) } },
+        { url: `${SUPABASE_URL}/rest/v1/contact_messages`, options: { method: 'POST', headers: { ...sbHeaders, Prefer: 'return=minimal' }, body: JSON.stringify(legacyPayload) } },
+      ]);
+      stored = !!(r && r.ok);
+    }
+
+    const emailed = await sendContactEmail({ name: cleanName, email: cleanEmail, message: cleanMessage, site_host: cleanHost });
+    return res.status(200).json({ ok: true, stored, emailed });
   }
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
@@ -298,13 +351,18 @@ export default async function handler(req, res) {
     return res.status(r.status).json(await r.json());
   }
 
+  if (req.method === 'GET' && type === 'contacts') {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/contact_messages?select=*&order=created_at.desc`, { headers: sbH });
+    return res.status(r.status).json(await r.json());
+  }
+
   if (req.method === 'GET' && type === 'summary') {
     const visitRangeHeaders = { ...sbH, Prefer: 'count=exact', Range: '0-499' };
     const clickRangeHeaders = { ...sbH, Prefer: 'count=exact', Range: '0-499' };
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayIso = encodeURIComponent(todayStart.toISOString());
-    let [visitsR, uniqueR, todayR, clicksR, interestsR, availR] = await Promise.all([
+    let [visitsR, uniqueR, todayR, clicksR, interestsR, availR, contactsR] = await Promise.all([
       fetchWithFallback([
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at,is_robot,robot_reason&is_robot=not.is.true&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
@@ -331,27 +389,34 @@ export default async function handler(req, res) {
         { url: `${SUPABASE_URL}/rest/v1/availability_requests?select=visitor_id,site_host,country,region,requested_items,created_at&order=created_at.desc`, options: { headers: sbH, cache: 'no-store' } },
         { url: `${SUPABASE_URL}/rest/v1/availability_requests?select=country,created_at&order=created_at.desc`, options: { headers: sbH, cache: 'no-store' } },
       ]),
+      fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/contact_messages?select=visitor_id,site_host,name,email,message,created_at&order=created_at.desc`, options: { headers: sbH, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/contact_messages?select=name,email,message,created_at&order=created_at.desc`, options: { headers: sbH, cache: 'no-store' } },
+      ]),
     ]);
     const totalPageVisits = exactCountFrom(visitsR);
     const visitsToday = exactCountFrom(todayR);
     const totalLinkClicks = clicksR && (clicksR.ok || clicksR.status === 206) ? exactCountFrom(clicksR) : 0;
-    const [visits, uniqueRows, clicks, interests, availabilities] = await Promise.all([
+    const [visits, uniqueRows, clicks, interests, availabilities, contacts] = await Promise.all([
       jsonOrEmpty(visitsR),
       jsonOrEmpty(uniqueR),
       clicksR && (clicksR.ok || clicksR.status === 206) ? jsonOrEmpty(clicksR) : Promise.resolve([]),
       jsonOrEmpty(interestsR),
       availR.ok ? jsonOrEmpty(availR) : Promise.resolve([]),
+      contactsR && (contactsR.ok || contactsR.status === 206) ? jsonOrEmpty(contactsR) : Promise.resolve([]),
     ]);
     const uniqueIds = new Set(uniqueRows.map((v) => v.visitor_id).filter(Boolean));
     if (!uniqueIds.size) visits.forEach((v) => { if (v.visitor_id) uniqueIds.add(v.visitor_id); });
     clicks.forEach((c) => { if (c.visitor_id) uniqueIds.add(c.visitor_id); });
     interests.forEach((i) => { if (i.visitor_id) uniqueIds.add(i.visitor_id); });
     availabilities.forEach((a) => { if (a.visitor_id) uniqueIds.add(a.visitor_id); });
+    contacts.forEach((c) => { if (c.visitor_id) uniqueIds.add(c.visitor_id); });
     return res.status(200).json({
       visits: visits || [],
       clicks: clicks || [],
       interests: interests || [],
       availabilities: availabilities || [],
+      contacts: contacts || [],
       totals: {
         total_page_visits: totalPageVisits == null ? visits.length : totalPageVisits,
         individual_people: uniqueIds.size,

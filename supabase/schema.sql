@@ -123,6 +123,16 @@ create table if not exists public.availability_requests (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.contact_messages (
+  id uuid primary key default gen_random_uuid(),
+  visitor_id text,
+  site_host text,
+  name text,
+  email text not null,
+  message text not null,
+  created_at timestamptz not null default now()
+);
+
 -- Add newer columns when upgrading an older database.
 alter table public.campaigns add column if not exists updated_at timestamptz not null default now();
 alter table public.posts add column if not exists updated_at timestamptz not null default now();
@@ -196,6 +206,8 @@ create index if not exists donation_interests_visitor_id_idx on public.donation_
 create index if not exists availability_requests_created_idx on public.availability_requests (created_at desc);
 create index if not exists availability_requests_country_idx on public.availability_requests (country);
 create index if not exists availability_requests_visitor_id_idx on public.availability_requests (visitor_id);
+create index if not exists contact_messages_created_idx on public.contact_messages (created_at desc);
+create index if not exists contact_messages_visitor_id_idx on public.contact_messages (visitor_id);
 
 -- ── Row Level Security ──────────────────────────────────────────────
 alter table public.campaigns enable row level security;
@@ -206,6 +218,7 @@ alter table public.page_visits enable row level security;
 alter table public.link_clicks enable row level security;
 alter table public.donation_interests enable row level security;
 alter table public.availability_requests enable row level security;
+alter table public.contact_messages enable row level security;
 
 -- Public content may be read with the anon key. Draft posts and hidden
 -- affiliates stay private. Admin writes use the server-only service role.
@@ -234,6 +247,7 @@ revoke all on public.page_visits from anon, authenticated;
 revoke all on public.link_clicks from anon, authenticated;
 revoke all on public.donation_interests from anon, authenticated;
 revoke all on public.availability_requests from anon, authenticated;
+revoke all on public.contact_messages from anon, authenticated;
 grant select on public.campaigns, public.posts, public.photos, public.affiliates to anon, authenticated;
 
 -- Initial affiliates. Re-running this does not create duplicates.
@@ -251,6 +265,7 @@ from information_schema.tables
 where table_schema = 'public'
   and table_name in (
     'campaigns', 'posts', 'photos', 'affiliates',
-    'page_visits', 'link_clicks', 'donation_interests', 'availability_requests'
+    'page_visits', 'link_clicks', 'donation_interests', 'availability_requests',
+    'contact_messages'
   )
 order by table_name;

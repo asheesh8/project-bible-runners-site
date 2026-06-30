@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/board.css?v=7">
+  <link rel="stylesheet" href="./css/board.css?v=8">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -176,6 +176,37 @@
       </div>
     </section>
 
+    <!-- ── CONTACT US ─────────────────────────────────────── -->
+    <section class="contact-section" id="contact" aria-labelledby="contact-title">
+      <div class="wrap">
+        <div class="contact-card">
+          <div class="contact-intro">
+            <p class="meta">Get in touch</p>
+            <h2 id="contact-title">Contact Us</h2>
+            <p>Questions, partnership ideas, or a story to share? Send a message and our team will reply by email.</p>
+          </div>
+          <form class="contact-form" id="contact-form" novalidate>
+            <div class="contact-field">
+              <label for="contact-name">Name</label>
+              <input type="text" id="contact-name" name="name" autocomplete="name" maxlength="160">
+            </div>
+            <div class="contact-field">
+              <label for="contact-email">Email <span aria-hidden="true">*</span></label>
+              <input type="email" id="contact-email" name="email" autocomplete="email" required maxlength="255">
+            </div>
+            <div class="contact-field contact-field-full">
+              <label for="contact-message">Message <span aria-hidden="true">*</span></label>
+              <textarea id="contact-message" name="message" rows="5" required maxlength="4000"></textarea>
+            </div>
+            <div class="contact-actions">
+              <button type="submit" class="pdf-button" id="contact-submit-btn">Send message</button>
+              <p class="contact-status" id="contact-status" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <div class="logo-modal" id="logo-modal" role="dialog" aria-modal="true" aria-label="VillageServer Initiative logo enlarged" hidden>
@@ -236,5 +267,51 @@
     })();
   </script>
   <script src="./js/site-tracking.js?v=1"></script>
+  <script>
+    // Contact form
+    (function(){
+      var form=document.getElementById('contact-form');
+      if(!form)return;
+      var statusEl=document.getElementById('contact-status');
+      var btn=document.getElementById('contact-submit-btn');
+      form.addEventListener('submit',function(e){
+        e.preventDefault();
+        var name=document.getElementById('contact-name').value.trim();
+        var email=document.getElementById('contact-email').value.trim();
+        var message=document.getElementById('contact-message').value.trim();
+        if(!email||!message){
+          statusEl.textContent='Please fill in your email and a message.';
+          statusEl.className='contact-status is-error';
+          return;
+        }
+        btn.disabled=true;
+        btn.textContent='Sending…';
+        statusEl.textContent='';
+        statusEl.className='contact-status';
+        var payload={name:name,email:email,message:message};
+        if(window.VSITracking&&window.VSITracking.enrich)payload=window.VSITracking.enrich(payload);
+        fetch('/api/track?type=contact',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        })
+          .then(function(r){return r.json().then(function(data){return {ok:r.ok,data:data};});})
+          .then(function(result){
+            if(!result.ok||!result.data||!result.data.ok)throw new Error('failed');
+            statusEl.textContent='Thank you — your message has been sent. We will reply by email soon.';
+            statusEl.className='contact-status is-success';
+            form.reset();
+          })
+          .catch(function(){
+            statusEl.textContent='Something went wrong sending your message. Please try again or email villageserverinitiative@gmail.com directly.';
+            statusEl.className='contact-status is-error';
+          })
+          .then(function(){
+            btn.disabled=false;
+            btn.textContent='Send message';
+          });
+      });
+    })();
+  </script>
 </body>
 </html>
