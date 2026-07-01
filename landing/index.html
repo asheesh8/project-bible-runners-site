@@ -65,7 +65,7 @@
           </div>
           <div class="impact-stat">
             <div class="impact-val">4</div>
-            <div class="impact-label">kit levels — from a single microSD card to full satellite</div>
+            <div class="impact-label">field configurations — from a single microSD card to satellite receive-and-replay</div>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@
             <a href="./power.html">Power &amp; Solar Solutions</a>
             <a href="./projector-media.html">Projector &amp; Audio Systems</a>
             <a href="./satellite.html">Satellite Systems</a>
-            <a href="./kit-levels.html">Kit Levels &amp; Costs</a>
+            <a href="./kit-levels.html">Field Configurations</a>
             <a href="./custom-libraries.html">Content Libraries</a>
           </div>
         </div>
@@ -137,17 +137,6 @@
           <img src="./img/solar-field.webp" alt="Solar power setup">
           <span>Solar field kit</span>
         </a>
-      </div>
-    </section>
-
-    <!-- ── DONATE CTA (shown only when an active campaign has a Zeffy URL) ── -->
-    <section class="donate-band" id="donate-band" hidden>
-      <div class="wrap donate-inner">
-        <div class="donate-text">
-          <h2 id="donate-campaign-name">Support the Mission</h2>
-          <p>Every gift helps place God's Word in the hands of someone who may never have access otherwise.</p>
-        </div>
-        <a class="btn-give" id="donate-give-btn" href="./initiative.html" target="_blank" rel="noopener">Give Now →</a>
       </div>
     </section>
 
@@ -239,31 +228,6 @@
       var el=document.getElementById('arki-credit'),n=0,t;
       if(!el)return;
       el.addEventListener('click',function(){clearTimeout(t);n++;if(n>=3){n=0;window.location.href='./admin.html';}t=setTimeout(function(){n=0;},600);});
-    })();
-    // Load active campaign donate button
-    (function(){
-      fetch('/api/content?type=campaigns')
-        .then(function(r){return r.json();})
-        .then(function(data){
-          var active=Array.isArray(data)&&data.find(function(c){return c.active&&c.zeffy_url;});
-          if(!active)return;
-          var donateBand=document.getElementById('donate-band');
-          if(donateBand){
-            donateBand.hidden=false;
-            var nameEl=document.getElementById('donate-campaign-name');
-            if(nameEl&&active.title)nameEl.textContent=active.title;
-            var giveBtn=document.getElementById('donate-give-btn');
-            if(giveBtn){giveBtn.href=active.zeffy_url;}
-          }
-          var heroBtn=document.getElementById('hero-give-btn');
-          if(heroBtn){
-            heroBtn.href=active.zeffy_url;
-            heroBtn.target='_blank';
-            heroBtn.rel='noopener';
-            heroBtn.textContent='Give Now →';
-          }
-        })
-        .catch(function(){});
     })();
   </script>
   <script src="./js/site-tracking.js?v=1"></script>

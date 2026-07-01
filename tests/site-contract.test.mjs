@@ -65,6 +65,7 @@ const topicPdfs = [
   'villageserver-testimonials.pdf',
   'villageserver-phone-based-gospel-distribution.pdf',
   'villageserver-raspberry-pi-system.pdf',
+  'villageserver-quick-start-guide.pdf',
   'villageserver-power-and-solar.pdf',
   'villageserver-projector-and-audio.pdf',
   'villageserver-custom-libraries.pdf',
@@ -122,7 +123,7 @@ test('the board stylesheet protects the older-reader design system', () => {
   assert.match(css, /\.photo-row/);
   assert.match(css, /logoSweep/);
   assert.doesNotMatch(css, /logoAura/);
-  assert.match(css, /width:clamp\(160px,15vw,230px\)/);
+  assert.match(css, /width:clamp\(280px,42vw,520px\)/);
   assert.match(css, /\.test-run-section/);
   assert.match(css, /\.test-run-media/);
   assert.match(css, /\.board-hero/);
@@ -152,7 +153,7 @@ test('the homepage is a simple blue and white directory with photos below the li
     assert.match(html, /<h1 class="visually-hidden">VillageServer Initiative<\/h1>/);
     assert.match(html, /aria-label="Open enlarged VillageServer Initiative logo"/);
     assert.doesNotMatch(html, /logo-hint|Click logo to enlarge/i);
-    assert.match(html, /Using technology to help place God's Word/);
+    assert.match(html, /Placing God's Word within reach of every village/);
     assert.doesNotMatch(html, /class="home-actions"/);
     assert.match(html, /class="test-run-section"/);
     assert.match(html, /test-run-setup\.mp4/);
@@ -193,21 +194,37 @@ test('every informational page follows the same short blog-style board template'
 
   for (const page of boardPages) {
     const html = read(page);
-    assert.match(html, /<link rel="stylesheet" href="\.\/css\/board\.css\?v=2">/, `${page} should use the board article stylesheet`);
+    const isPiGuide = page === 'landing/raspberry-pi.html';
+    const isAffiliates = page === 'landing/affiliates.html';
+    const isCustomGuide = isPiGuide || isAffiliates;
+    assert.match(html, /<link rel="stylesheet" href="\.\/css\/board\.css\?v=11">/, `${page} should use the board article stylesheet`);
     assert.match(html, /class="board-top"/, `${page} should have a simple top bar`);
     assert.match(html, /class="board-hero"/, `${page} should have a short page hero`);
-    assert.match(html, /class="article-body"/, `${page} should use the blog-style article layout`);
-    assert.match(html, /class="article-lead"/, `${page} should open with a readable lead`);
-    assert.match(html, /class="article-steps"/, `${page} should include field steps`);
-    assert.ok([...html.matchAll(/<li><div><strong>/g)].length >= 4, `${page} should include at least four field steps`);
-    assert.match(html, /class="fig-full"/, `${page} should include a main supporting image`);
-    assert.match(html, /class="side-card"/, `${page} should have a visual summary card`);
-    assert.match(html, /class="side-list"/, `${page} should summarize key points`);
+    if (isPiGuide) {
+      assert.match(html, /class="[^"]*\bpi-layout\b[^"]*"/, `${page} should use the interactive Pi guide layout`);
+      assert.match(html, /class="[^"]*\bpi-sidenav\b[^"]*"/, `${page} should have quick reference navigation`);
+      assert.match(html, /class="[^"]*\bvi-steps\b[^"]*"/, `${page} should include step-by-step field use`);
+      assert.match(html, /class="[^"]*\biphone-demo-wrap\b[^"]*"/, `${page} should include the phone interface demo`);
+    } else if (isAffiliates) {
+      assert.match(html, /class="[^"]*\barticle-lead\b[^"]*"/, `${page} should open with a readable lead`);
+      assert.match(html, /class="[^"]*\baff-list\b[^"]*"/, `${page} should use the partner accordion list`);
+      assert.ok([...html.matchAll(/class="[^"]*\baff-card\b[^"]*"/g)].length >= 3, `${page} should include partner cards`);
+    } else {
+      assert.match(html, /class="article-body"/, `${page} should use the blog-style article layout`);
+      assert.match(html, /class="article-lead"/, `${page} should open with a readable lead`);
+      assert.match(html, /class="article-steps"/, `${page} should include field steps`);
+      assert.ok([...html.matchAll(/<li><div><strong>/g)].length >= 4, `${page} should include at least four field steps`);
+    }
+    if (!isCustomGuide) assert.match(html, /class="fig-full"/, `${page} should include a main supporting image`);
+    if (!isCustomGuide) {
+      assert.match(html, /class="side-card"/, `${page} should have a visual summary card`);
+      assert.match(html, /class="side-list"/, `${page} should summarize key points`);
+    }
     const pdfMatch = html.match(/<a class="pdf-button" href="\.\/downloads\/([^"]+\.pdf)" download>[^<]*PDF<\/a>/);
     assert.ok(pdfMatch, `${page} should have a primary PDF download`);
     assert.ok(existsSync(join(root, 'landing/downloads', pdfMatch[1])), `${page} should reference a deployed PDF`);
     assert.ok(existsSync(join(root, 'output/pdf', pdfMatch[1])), `${page} should retain the source PDF`);
-    assert.match(html, /class="related"/, `${page} should link to related pages`);
+    if (!isCustomGuide) assert.match(html, /class="related"/, `${page} should link to related pages`);
     assert.doesNotMatch(html, /Read this page when|Download and use|<strong>Read this page when/i, `${page} should not expose internal template phrasing`);
     assert.match(html, /\.\/js\/site-language\.js/, `${page} should keep translation controls`);
     assert.match(html, /\.\/js\/site-tracking\.js/, `${page} should keep analytics tracking`);
@@ -222,7 +239,7 @@ test('core page copy is plain, ministry-focused, and non-technical', () => {
   assert.match(read('landing/phone-distribution.html'), /Once one phone has a resource/i);
   assert.match(read('landing/raspberry-pi.html'), /A library that fits in your hand/i);
   assert.match(read('landing/raspberry-pi.html'), /village123/);
-  assert.match(read('landing/raspberry-pi.html'), /10\.43\.0\.1/);
+  assert.match(read('landing/raspberry-pi.html'), /10\.42\.0\.1/);
   assert.match(read('landing/raspberry-pi.html'), /microSD cards/);
   assert.match(read('landing/power.html'), /Power is the first field question/i);
   assert.match(read('landing/projector-media.html'), /Gospel film nights/i);

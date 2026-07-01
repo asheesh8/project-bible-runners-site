@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Raspberry Pi VillageServer — Overview &amp; Quick Start | VillageServer Initiative</title>
-  <meta name="description" content="What the VillageServer Pi does, what's loaded on the OS, and how to get a field kit running in minutes. Kits ship pre-configured — no setup or code required.">
+  <meta name="description" content="How the VillageServer Raspberry Pi creates a local offline Wi-Fi library, how microSD content cards work, and how a phone opens the library at 10.42.0.1.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +25,7 @@
       <div class="wrap">
         <p class="meta">Technology · Raspberry Pi VillageServer</p>
         <h1>A library that fits in your hand</h1>
-        <p class="summary">The Raspberry Pi broadcasts a local Wi-Fi hotspot so nearby phones can browse an offline Bible library — no internet, no data plan, no setup. Every kit ships pre-configured and ready to deploy. This page covers what it does, what's loaded on the OS, what the interface looks like, and how to get going in the field.</p>
+        <p class="summary">The Raspberry Pi broadcasts a local Wi-Fi hotspot so nearby phones can browse an offline Bible library — no internet, no data plan, and no app install. This page explains the field flow: power it on, join <strong>VillageServer</strong>, enter <strong>village123</strong>, open <strong>10.42.0.1</strong>, then read, listen, watch, download, and share.</p>
       </div>
     </section>
 
@@ -37,14 +37,14 @@
           <summary class="pi-nav-summary">Contents <span aria-hidden="true">▾</span></summary>
         <nav class="pi-sidenav" aria-label="Page sections" id="pi-sidenav">
           <span class="pi-sidenav-label">On this page</span>
-          <a href="#overview">Overview &amp; what's on the OS</a>
+          <a href="#overview">Overview &amp; content cards</a>
           <a href="#quickstart">Quick start guide</a>
           <a href="#interface">What it looks like</a>
           <a href="#field-use">Using it in the field</a>
           <a href="#troubleshoot">Troubleshooting</a>
 
           <hr>
-          <span class="pi-sidenav-label" style="margin-top:0">Quick reference</span>
+          <span class="pi-sidenav-label pi-qref-tight">Quick reference</span>
           <div class="pi-qref-row"><span class="pi-qref-label">Wi-Fi name</span><span class="pi-qref-val">VillageServer</span></div>
           <div class="pi-qref-row"><span class="pi-qref-label">Password</span><span class="pi-qref-val">village123</span></div>
           <div class="pi-qref-row"><span class="pi-qref-label">Library URL</span><span class="pi-qref-val">10.42.0.1</span></div>
@@ -62,30 +62,31 @@
               <h2>What is the VillageServer Pi?</h2>
             </summary>
             <div class="pi-accordion-body">
-            <p class="pi-intro">A Raspberry Pi pre-loaded with VillageServer OS — a self-contained offline library server. Every kit ships ready to go: no flashing, no installing, no code. Power it on and it broadcasts its own Wi-Fi network. Anyone within range joins that network and opens the library in a phone browser — like having a small offline internet made entirely of Scripture and gospel resources.</p>
+            <p class="pi-intro">A Raspberry Pi can be prepared as a self-contained offline library server. VillageServer Initiative provides the technical guidance and field instructions so a team can source the hardware, load the content, and place the tool into ministry use. Power it on and it broadcasts its own Wi-Fi network. Anyone within range joins that network and opens the library in a phone browser — like a small offline website made entirely of Scripture and gospel resources.</p>
 
             <figure class="fig-full">
               <img src="./img/villageserver-case-usb-readers.jpeg" alt="VillageServer carry case with Raspberry Pi and USB card readers" loading="lazy">
               <figcaption>The complete kit: carry case, Raspberry Pi, power bank, and USB readers holding the language library cards.</figcaption>
             </figure>
 
-            <h3 style="margin:24px 0 10px;font-size:1.1rem;font-weight:800;color:var(--ink)">What's on the OS</h3>
+            <h3 class="pi-mini-heading">What the Pi provides</h3>
             <ul class="article-bullets">
               <li><strong>Auto-broadcasting Wi-Fi hotspot</strong> — turns on the moment the Pi powers up, no router or internet needed</li>
               <li><strong>A built-in offline library server</strong> — reachable at <span class="inline-code">10.42.0.1</span> from any phone browser, no app to install</li>
-              <li><strong>Multi-language support</strong> — one library per language, swappable by microSD card</li>
+              <li><strong>MicroSD-based language libraries</strong> — the language and resources available are determined by the microSD card or cards plugged into USB readers</li>
               <li><strong>Four content sections per language</strong> — Bible, Audio, Video, and Books, browsable and downloadable straight from the phone</li>
-              <li><strong>Library content shared via Google Drive</strong> — updated language libraries and new content packs are distributed through a shared Google Drive folder; swap the microSD card to update a kit</li>
+              <li><strong>Library content shared by the team</strong> — content packs can be distributed through shared folders and loaded onto microSD cards before the device goes into the field</li>
               <li><strong>Fully offline operation</strong> — works indefinitely with no internet connection, anywhere there's power</li>
+              <li><strong>No remote content management</strong> — field updates are not pushed remotely; content is changed by preparing and swapping the storage media</li>
             </ul>
 
-            <h3 style="margin:24px 0 10px;font-size:1.1rem;font-weight:800;color:var(--ink)">What's in the kit</h3>
-            <p style="margin:0 0 12px;color:var(--muted);font-size:.97rem">We're not selling a product — we provide the technical guidance and instruction to help you get this tool into the field. A typical kit is built around these components:</p>
+            <h3 class="pi-mini-heading">What's in the field setup</h3>
+            <p class="pi-muted-tight">This is not a storefront. VillageServer provides technical guidance and instruction to help teams build, source, and support the tool locally. A typical field setup is built around these components:</p>
             <div class="table-wrap">
             <table class="hw-table">
               <thead><tr><th>Component</th><th>Role</th></tr></thead>
               <tbody>
-                <tr><td>Raspberry Pi</td><td>Runs VillageServer OS and broadcasts the offline Wi-Fi library</td></tr>
+                <tr><td>Raspberry Pi</td><td>Hosts the local library and broadcasts the offline Wi-Fi network</td></tr>
                 <tr><td>microSD cards</td><td>One card per language library — loaded with Bible, Audio, Video, and Books content</td></tr>
                 <tr><td>USB card readers</td><td>Plugged into the Pi so each language card is accessible at the same time</td></tr>
                 <tr><td>Power bank or supply</td><td>5V USB-C or Micro-B depending on the Pi model; a solar-charged power bank works well in the field</td></tr>
@@ -93,7 +94,7 @@
               </tbody>
             </table>
             </div>
-            <p style="font-size:.88rem;color:var(--muted);margin-top:10px">We walk you through every step — from sourcing the hardware to loading the OS. See the <a href="#quickstart" style="color:var(--blue);font-weight:700">quick start guide</a> below, and the full setup documentation on the VillageServer OS site.</p>
+            <p class="pi-small-note">We walk teams through the field flow — from sourcing the hardware to loading the microSD content cards. The <a href="#quickstart">quick start guide</a> below is the plain-language version to keep with the device.</p>
             </div><!-- end pi-accordion-body -->
             </details>
           </section>
@@ -106,17 +107,17 @@
               <h2>Quick start guide</h2>
             </summary>
             <div class="pi-accordion-body">
-            <p class="pi-intro">The fastest way to get a field kit running, plus where to go for anything deeper — technical configuration, the full VillageServer OS documentation, and instructions for loading library content.</p>
+            <p class="pi-intro">The fastest way to get the local library running in the field. It is written for the person holding the phone, not for an engineer.</p>
 
             <div class="article-cta">
               <p>Download the printable Quick Start Guide — covers powering on, joining the Wi-Fi, and using the library, in plain language for anyone in the field.</p>
               <div class="cta-row">
-                <a class="pdf-button" href="./downloads/villageserver-quick-start-guide.pdf" download>Download Quick Start Guide (PDF)</a>
-                <a class="cta-outline-button" href="https://sites.google.com/view/villageserver-initiative/" target="_blank" rel="noopener">Visit VillageServer OS site →</a>
+                <a class="pdf-button" href="./downloads/villageserver-quick-start-guide.pdf" download>Download Quick Start Guide PDF</a>
+                <a class="cta-outline-button" href="./pamphlets.html">See all printable guides →</a>
               </div>
             </div>
 
-            <p style="font-size:.88rem;color:var(--muted);margin-top:14px">The VillageServer OS site has the full technical documentation and setup instructions. Library content packs are shared via Google Drive — the OS site explains how to download and load them onto microSD cards.</p>
+            <p class="pi-small-note-loose">Content packs are prepared outside the field and loaded onto microSD cards. Once the Pi starts broadcasting, the local user does not need Google Drive, internet access, an account, or a remote update connection.</p>
             </div><!-- end pi-accordion-body -->
             </details>
           </section>
@@ -171,7 +172,7 @@
               </div>
               <p class="iphone-demo-caption">This is a live click-through demo — tap your way through it.</p>
             </div>
-            <p style="font-size:.88rem;color:var(--muted);margin:-6px 0 18px;text-align:center">Each language has four content sections, and tapping a file downloads it straight to the phone for offline use.</p>
+            <p class="pi-demo-note">Each language has four content sections, and tapping a file downloads it straight to the phone for offline use.</p>
 
             <p><strong>Bible</strong> — full Scripture text, chapter by chapter.<br>
             <strong>Audio</strong> — dramatised audio Bible recordings, playable directly in the browser.<br>
@@ -212,7 +213,7 @@
                 <div class="vi-step-body">
                   <h4>Join the Wi-Fi network</h4>
                   <p>On your phone, open <strong>Settings → Wi-Fi</strong> and select <span class="inline-code">VillageServer</span>. Enter the password <span class="inline-code">village123</span> when prompted.</p>
-                  <div class="tip-box" style="margin-top:10px"><strong>Note:</strong> your phone may warn that this network has no internet — that's expected. Tap "Stay connected" or "Use anyway."</div>
+                  <div class="tip-box pi-tip-space"><strong>Note:</strong> your phone may warn that this network has no internet — that's expected. Tap "Stay connected" or "Use anyway."</div>
                 </div>
               </div>
 
@@ -256,7 +257,7 @@
               <h2>Common issues</h2>
             </summary>
             <div class="pi-accordion-body">
-            <p class="pi-intro">Below are the few things worth checking on-site if something looks off. For deeper technical questions, the VillageServer OS site has full documentation.</p>
+            <p class="pi-intro">Below are the few things worth checking on-site if something looks off. Keep this section simple so a local leader can solve the common problems without calling a technician.</p>
 
             <p><strong>Phone joins the Wi-Fi but the page won't load</strong></p>
             <p>Double-check the address bar shows exactly <span class="inline-code">10.42.0.1</span>, not a search. Some phones auto-correct it into a Google search instead of visiting the address directly — retype it if needed.</p>
@@ -271,10 +272,8 @@
             <p>This usually means the microSD card for that language isn't seated or the content hasn't been loaded yet. Check that the USB reader is plugged in, then flag it to the team so the correct library can be shared from Google Drive.</p>
 
             <div class="article-cta">
-              <p>For anything beyond these basics — technical configuration, loading new libraries, or deeper diagnostics — head to the VillageServer OS site.</p>
-              <div class="cta-row">
-                <a class="cta-outline-button" href="https://sites.google.com/view/villageserver-initiative/" target="_blank" rel="noopener">Visit VillageServer OS site →</a>
-              </div>
+              <p>For anything beyond these basics — hardware preparation, loading new content cards, or deeper diagnostics — use the internal technical notes shared by the VillageServer team.</p>
+            </div>
             </div><!-- end pi-accordion-body -->
             </details>
           </section>

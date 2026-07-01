@@ -307,7 +307,7 @@ def quickstart():
     for line in ["Power it on.", "Connect. Browse."]:
         c.drawString(42, y, line)
         y -= 44
-    text_block(c, "Every VillageServer Pi kit ships pre-configured - no setup, no code, no internet required. This guide gets you from box to browsing in under five minutes.", 42, H - 280, 440, size=13, color=white, leading=18)
+    text_block(c, "The VillageServer Pi creates a local Wi-Fi library - no internet, no app, no data plan required. This guide gets a user from power-on to browsing in under five minutes.", 42, H - 280, 440, size=13, color=white, leading=18)
     c.setStrokeColor(HexColor("#40675B"))
     c.line(42, H - 363, W - 42, H - 363)
     c.setFillColor(LIME)
@@ -342,7 +342,7 @@ def quickstart():
     steps = [
         ("Power on", "Plug in the power supply or power bank. Give the Pi about 60 seconds to fully start up."),
         ("Join the Wi-Fi", 'On your phone, open Wi-Fi settings and join "VillageServer" using the password "village123".'),
-        ("Open the library", 'Open any browser and go to 10.43.0.1. Some phones warn "no internet connection" - that is expected, continue anyway.'),
+        ("Open the library", 'Open any browser and go to 10.42.0.1. Some phones warn "no internet connection" - that is expected, continue anyway.'),
         ("Choose a language and type", "Tap a language card, then choose Bible, Audio, Video, or Books."),
         ("Download to keep", "Tap any file to download it to the phone. Once downloaded, it works completely offline, even after leaving the area."),
     ]
@@ -360,7 +360,7 @@ def quickstart():
     c.drawString(side_x + 16, H - 171, "SUCCESS CHECK")
     checks = [
         'The "VillageServer" Wi-Fi network appears in range.',
-        "10.43.0.1 loads the library home screen.",
+        "10.42.0.1 loads the library home screen.",
         "A downloaded file opens with airplane mode turned on.",
     ]
     sy = H - 196
@@ -382,8 +382,8 @@ def quickstart():
     c.drawString(56, 126, "GO DEEPER")
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 9)
-    c.drawString(56, 108, "VillageServer OS companion site")
-    text_block(c, "Content management, technical configuration, and full documentation live there - this guide only covers using a kit in the field.", 56, 92, W - 112, size=7.2, color=MUTED, leading=9, max_lines=2)
+    c.drawString(56, 108, "No remote content management")
+    text_block(c, "Languages and resources come from microSD content cards. To change the library, prepare the card before deployment or swap in an updated card later.", 56, 92, W - 112, size=7.2, color=MUTED, leading=9, max_lines=2)
     footer(c, "Keep with the kit")
     save_canvas(c, filename)
 

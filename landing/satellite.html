@@ -87,7 +87,7 @@
               </span>
               <span class="sat-calc-chevron" aria-hidden="true">›</span>
             </summary>
-          <p style="margin:12px 0 0">Enter your location and pick a satellite to get exact aiming angles for your dish, the IF frequency to tune your receiver to, and a signal quality estimate based on how high the satellite sits in your sky.</p>
+          <p class="sat-calc-intro">Enter your location and pick a satellite to get exact aiming angles for your dish, the IF frequency to tune your receiver to, and a signal quality estimate based on how high the satellite sits in your sky.</p>
 
           <div class="sat-calc-widget">
             <div class="sat-calc-grid">
@@ -122,14 +122,14 @@
                     <option value="5150">C-band standard — LO 5150 MHz (3.7–4.2 GHz)</option>
                     <option value="manual">Enter LO manually…</option>
                   </select>
-                  <input type="number" id="sat-lnb-manual" placeholder="LO frequency in MHz" min="3000" max="20000" style="display:none;margin-top:8px">
+                  <input class="sat-lnb-manual" type="number" id="sat-lnb-manual" placeholder="LO frequency in MHz" min="3000" max="20000">
                 </div>
                 <button type="button" id="sat-calc-btn" class="pdf-button">Calculate</button>
                 <p class="sat-calc-error" id="sat-calc-error"></p>
               </div>
 
               <!-- ── Results ── -->
-              <div class="sat-calc-results" id="sat-results" style="display:none">
+              <div class="sat-calc-results is-hidden" id="sat-results">
                 <div class="sat-result-grid">
                   <div class="sat-result-card">
                     <div class="sat-result-val" id="res-el">—</div>
@@ -151,7 +151,7 @@
                 <div class="sat-signal-bar">
                   <p class="sat-signal-label">Signal quality estimate</p>
                   <div class="sat-signal-track">
-                    <div class="sat-signal-fill" id="sat-sig-fill" style="width:0%"></div>
+                    <div class="sat-signal-fill is-zero" id="sat-sig-fill"></div>
                   </div>
                   <p class="sat-signal-desc" id="sat-sig-desc"></p>
                 </div>
@@ -185,7 +185,7 @@
             <a href="./power.html">Power Systems and Solar</a>
             <a href="./raspberry-pi.html">Raspberry Pi System</a>
             <a href="./custom-libraries.html">Content Libraries</a>
-            <a href="./kit-levels.html">Kit Levels and Costs</a>
+            <a href="./kit-levels.html">Field Configurations</a>
           </div>
         </aside>
       </div>
@@ -215,7 +215,7 @@
 
     // LNB manual field toggle
     document.getElementById('sat-lnb').addEventListener('change',function(){
-      document.getElementById('sat-lnb-manual').style.display=this.value==='manual'?'':'none';
+      document.getElementById('sat-lnb-manual').classList.toggle('is-visible',this.value==='manual');
     });
 
     // Auto-suggest LNB type based on frequency
@@ -225,7 +225,7 @@
       if(f>=10700&&f<11700)ls.value='9750';
       else if(f>=11700&&f<=12750)ls.value='10600';
       else if(f>=3700&&f<=4200)ls.value='5150';
-      document.getElementById('sat-lnb-manual').style.display='none';
+      document.getElementById('sat-lnb-manual').classList.remove('is-visible');
     });
 
     // GPS locate
@@ -319,7 +319,7 @@
       document.getElementById('res-if').textContent=ifTxt;
       document.getElementById('sat-sig-fill').style.width=pct+'%';
       document.getElementById('sat-sig-desc').textContent=desc;
-      document.getElementById('sat-results').style.display='block';
+      document.getElementById('sat-results').classList.remove('is-hidden');
 
       drawMap(lat,lon,sat);
     });
