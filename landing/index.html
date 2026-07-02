@@ -61,6 +61,17 @@
     .guide-desc{color:var(--muted);font-size:.96rem;line-height:1.55;margin:0 0 18px}
     .guide-link-btn{display:inline-block;background:var(--blue);color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:.9rem;transition:background .15s}
     .guide-link-btn:hover,.guide-link-btn:focus-visible{background:var(--blue-dark);color:#fff;outline:0}
+
+    /* ── Section wave dividers ── */
+    .s-wave{display:block;line-height:0;overflow:hidden;margin:0;padding:0;position:relative;z-index:1}
+    .s-wave svg{display:block;width:100%;height:auto}
+    /* Hero wave sits at the very bottom of the hero section */
+    .hero-wave{line-height:0;margin-top:clamp(20px,3vw,36px)}
+    .hero-wave svg{display:block;width:100%}
+    /* Remove the hard border between mission-lede and impact-band — wave handles it */
+    .mission-lede{border-bottom:none!important}
+    /* Mission lede — slightly more spacious now that wave handles the divide */
+    .mission-lede-text{font-size:clamp(1.4rem,2.6vw,2.2rem)!important;line-height:1.28!important}
   </style>
 </head>
 <body>
@@ -110,6 +121,12 @@
           <a class="btn-outline-white" href="./mission.html">Read the Mission →</a>
         </div>
       </div>
+      <!-- Wave: blue hero → white mission lede -->
+      <div class="hero-wave" aria-hidden="true">
+        <svg viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,90 C480,16 960,68 1440,10 L1440,90 L0,90 Z" fill="#ffffff"/>
+        </svg>
+      </div>
     </section>
 
     <!-- ── MISSION LEDE ──────────────────────────────────── -->
@@ -120,6 +137,12 @@
         <a class="mission-lede-link" href="./mission.html">Read the full mission →</a>
       </div>
     </section>
+    <!-- Wave: white → dark-blue impact band -->
+    <div class="s-wave" aria-hidden="true" style="background:#fff;margin-top:-1px">
+      <svg viewBox="0 0 1440 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,24 C360,72 1080,12 1440,56 L1440,72 L0,72 Z" fill="#143a6b"/>
+      </svg>
+    </div>
 
     <!-- ── IMPACT STATS ──────────────────────────────────── -->
     <section class="impact-band" aria-label="Key facts">
@@ -140,6 +163,12 @@
         </div>
       </div>
     </section>
+    <!-- Wave: dark-blue → light blue reach scale -->
+    <div class="s-wave" aria-hidden="true" style="background:#143a6b">
+      <svg viewBox="0 0 1440 72" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,72 C360,12 1080,58 1440,4 L1440,72 L0,72 Z" fill="#edf5ff"/>
+      </svg>
+    </div>
 
     <!-- ── REACH SCALE ───────────────────────────────────── -->
     <section class="reach-scale" aria-labelledby="reach-title">
@@ -315,6 +344,12 @@
     </section>
 
   </main>
+  <!-- Wave: light-blue contact → dark-blue footer -->
+  <div class="s-wave" aria-hidden="true" style="background:#edf5ff">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,32 C480,60 960,8 1440,48 L1440,60 L0,60 Z" fill="#143a6b"/>
+    </svg>
+  </div>
 
   <div class="guide-card" id="guide-card" role="dialog" aria-modal="true" aria-labelledby="guide-title" hidden>
     <div class="guide-card-inner">
