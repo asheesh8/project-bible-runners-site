@@ -41,10 +41,10 @@
     /* ── Interactive logo hotspots ── */
     .logo-interactive{position:relative;display:inline-block;margin:0 auto 14px;border-radius:16px}
     .logo-interactive .home-hero-logo{display:block;margin:0;border-radius:16px;box-shadow:0 20px 50px rgba(8,35,64,.28)}
-    .logo-hs{position:absolute;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;border:2.5px solid rgba(255,210,0,.75);background:rgba(255,210,0,.14);cursor:pointer;padding:0;z-index:5;transition:background .2s,border-color .2s,box-shadow .2s}
-    .logo-hs:hover,.logo-hs:focus-visible{background:rgba(255,210,0,.3);border-color:rgba(255,225,0,1);box-shadow:0 0 0 5px rgba(255,210,0,.18),0 0 20px rgba(255,210,0,.4);outline:0}
+    .logo-hs{position:absolute;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,210,0,.75);background:rgba(255,210,0,.14);cursor:pointer;padding:0;z-index:5;transition:background .2s,border-color .2s,box-shadow .2s}
+    .logo-hs:hover,.logo-hs:focus-visible{background:rgba(255,210,0,.3);border-color:rgba(255,225,0,1);box-shadow:0 0 0 4px rgba(255,210,0,.18),0 0 16px rgba(255,210,0,.4);outline:0}
     /* Rotating gold shine ring — comet sweep */
-    .logo-hs::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0% 28%,rgba(255,230,0,1) 40%,rgba(255,200,0,.55) 55%,transparent 68% 100%);animation:hs-spin 2.4s linear infinite;mask:radial-gradient(circle,transparent 87%,#000 89%);-webkit-mask:radial-gradient(circle,transparent 87%,#000 89%);pointer-events:none}
+    .logo-hs::before{content:'';position:absolute;inset:-2px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0% 28%,rgba(255,230,0,1) 40%,rgba(255,200,0,.55) 55%,transparent 68% 100%);animation:hs-spin 2.4s linear infinite;mask:radial-gradient(circle,transparent 86%,#000 88%);-webkit-mask:radial-gradient(circle,transparent 86%,#000 88%);pointer-events:none}
     .logo-hs:nth-child(2)::before{animation-delay:-0.0s}.logo-hs:nth-child(3)::before{animation-delay:-0.45s}.logo-hs:nth-child(4)::before{animation-delay:-0.9s}.logo-hs:nth-child(5)::before{animation-delay:-1.35s}.logo-hs:nth-child(6)::before{animation-delay:-1.8s}.logo-hs:nth-child(7)::before{animation-delay:-0.24s}.logo-hs:nth-child(8)::before{animation-delay:-0.68s}.logo-hs:nth-child(9)::before{animation-delay:-1.12s}.logo-hs:nth-child(10)::before{animation-delay:-1.56s}.logo-hs:nth-child(11)::before{animation-delay:-2.0s}
     @keyframes hs-spin{to{transform:rotate(360deg)}}
     /* Guide card modal */
