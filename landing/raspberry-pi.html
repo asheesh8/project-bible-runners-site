@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Raspberry Pi VillageServer — Overview &amp; Quick Start | VillageServer Initiative</title>
-  <meta name="description" content="How the VillageServer Raspberry Pi creates a local offline Wi-Fi library, how microSD content cards work, and how a phone opens the library at 10.42.0.1.">
+  <title>Raspberry Pi VillageServer — Setup &amp; Field Guide | VillageServer Initiative</title>
+  <meta name="description" content="Step-by-step guide: build a VillageServer on Raspberry Pi, load language libraries, set up a Wi-Fi hotspot, and use it in the field.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +25,7 @@
       <div class="wrap">
         <p class="meta">Technology · Raspberry Pi VillageServer</p>
         <h1>A library that fits in your hand</h1>
-        <p class="summary">The Raspberry Pi broadcasts a local Wi-Fi hotspot so nearby phones can browse an offline Bible library — no internet, no data plan, and no app install. This page explains the field flow: power it on, join <strong>VillageServer</strong>, enter <strong>village123</strong>, open <strong>10.42.0.1</strong>, then read, listen, watch, download, and share.</p>
+        <p class="summary">The Raspberry Pi broadcasts a local Wi-Fi hotspot so nearby phones can browse an offline Bible library — no internet, no data plan. This guide covers what the interface looks like, how to use it in the field, and how to build and configure the server.</p>
       </div>
     </section>
 
@@ -37,23 +37,26 @@
           <summary class="pi-nav-summary">Contents <span aria-hidden="true">▾</span></summary>
         <nav class="pi-sidenav" aria-label="Page sections" id="pi-sidenav">
           <span class="pi-sidenav-label">On this page</span>
-          <a href="#overview">Overview &amp; content cards</a>
-          <a href="#quickstart">Quick start guide</a>
+          <a href="#overview">Overview &amp; hardware</a>
           <a href="#interface">What it looks like</a>
           <a href="#field-use">Using it in the field</a>
+
+          <span class="pi-sidenav-label">Setup guide</span>
           <a href="#setup">Building the server</a>
           <a href="#setup-flash" class="pi-sub">1 · Flash the OS</a>
           <a href="#setup-install" class="pi-sub">2 · Install software</a>
           <a href="#setup-hotspot" class="pi-sub">3 · Configure hotspot</a>
           <a href="#setup-test" class="pi-sub">4 · Test it</a>
+
+          <span class="pi-sidenav-label">Operations</span>
           <a href="#content">Loading content cards</a>
           <a href="#troubleshoot">Troubleshooting</a>
 
           <hr>
-          <span class="pi-sidenav-label pi-qref-tight">Quick reference</span>
+          <span class="pi-sidenav-label" style="margin-top:0">Quick reference</span>
           <div class="pi-qref-row"><span class="pi-qref-label">Wi-Fi name</span><span class="pi-qref-val">VillageServer</span></div>
           <div class="pi-qref-row"><span class="pi-qref-label">Password</span><span class="pi-qref-val">village123</span></div>
-          <div class="pi-qref-row"><span class="pi-qref-label">Library URL</span><span class="pi-qref-val">10.42.0.1</span></div>
+          <div class="pi-qref-row"><span class="pi-qref-label">Library URL</span><span class="pi-qref-val">10.43.0.1</span></div>
         </nav>
         </details>
 
@@ -62,81 +65,36 @@
 
           <!-- OVERVIEW -->
           <section class="pi-section" id="overview">
-            <details class="pi-accordion" open>
-            <summary class="pi-accordion-head">
-              <p class="pi-eyebrow">Overview</p>
-              <h2>What is the VillageServer Pi?</h2>
-            </summary>
-            <div class="pi-accordion-body">
-            <p class="pi-intro">A Raspberry Pi can be prepared as a self-contained offline library server. VillageServer Initiative provides the technical guidance and field instructions so a team can source the hardware, load the content, and place the tool into ministry use. Power it on and it broadcasts its own Wi-Fi network. Anyone within range joins that network and opens the library in a phone browser — like a small offline website made entirely of Scripture and gospel resources.</p>
+            <p class="pi-eyebrow">Overview</p>
+            <h2>What is the VillageServer Pi?</h2>
+            <p class="pi-intro">A Raspberry Pi running a local web server. Plug in microSD cards loaded with language libraries, power it on, and it broadcasts a Wi-Fi network. Anyone within range can join that network and open the library in a phone browser — like having a small offline internet made entirely of Scripture and gospel resources.</p>
 
             <figure class="fig-full">
               <img src="./img/villageserver-case-usb-readers.jpeg" alt="VillageServer carry case with Raspberry Pi and USB card readers" loading="lazy">
               <figcaption>The complete kit: carry case, Raspberry Pi, power bank, and USB readers holding the language library cards.</figcaption>
             </figure>
 
-            <h3 class="pi-mini-heading">What the Pi provides</h3>
-            <ul class="article-bullets">
-              <li><strong>Auto-broadcasting Wi-Fi hotspot</strong> — turns on the moment the Pi powers up, no router or internet needed</li>
-              <li><strong>A built-in offline library server</strong> — reachable at <span class="inline-code">10.42.0.1</span> from any phone browser, no app to install</li>
-              <li><strong>MicroSD-based language libraries</strong> — the language and resources available are determined by the microSD card or cards plugged into USB readers</li>
-              <li><strong>Four content sections per language</strong> — Bible, Audio, Video, and Books, browsable and downloadable straight from the phone</li>
-              <li><strong>Library content shared by the team</strong> — content packs can be distributed through shared folders and loaded onto microSD cards before the device goes into the field</li>
-              <li><strong>Fully offline operation</strong> — works indefinitely with no internet connection, anywhere there's power</li>
-              <li><strong>No remote content management</strong> — field updates are not pushed remotely; content is changed by preparing and swapping the storage media</li>
-            </ul>
-
-            <h3 class="pi-mini-heading">What's in the field setup</h3>
-            <p class="pi-muted-tight">This is not a storefront. VillageServer provides technical guidance and instruction to help teams build, source, and support the tool locally. A typical field setup is built around these components:</p>
+            <h3 style="margin:24px 0 10px;font-size:1.1rem;font-weight:800;color:var(--ink)">Hardware you need</h3>
             <div class="table-wrap">
             <table class="hw-table">
-              <thead><tr><th>Component</th><th>Role</th></tr></thead>
+              <thead><tr><th>Item</th><th>Details</th></tr></thead>
               <tbody>
-                <tr><td>Raspberry Pi</td><td>Hosts the local library and broadcasts the offline Wi-Fi network</td></tr>
-                <tr><td>microSD cards</td><td>One card per language library — loaded with Bible, Audio, Video, and Books content</td></tr>
-                <tr><td>USB card readers</td><td>Plugged into the Pi so each language card is accessible at the same time</td></tr>
-                <tr><td>Power bank or supply</td><td>5V USB-C or Micro-B depending on the Pi model; a solar-charged power bank works well in the field</td></tr>
-                <tr><td>Carry case</td><td>Keeps everything together and protected for transport</td></tr>
+                <tr><td>Raspberry Pi</td><td>Pi 4 (2 GB+ RAM recommended) or Pi 3B+</td></tr>
+                <tr><td>System microSD card</td><td>16 GB min · 32 GB recommended (for the Pi OS)</td></tr>
+                <tr><td>Language library cards</td><td>One microSD per language, in USB readers/adapters</td></tr>
+                <tr><td>Power supply</td><td>5V USB-C (Pi 4) or USB Micro-B (Pi 3) · power bank works</td></tr>
+                <tr><td>Setup laptop</td><td>Any OS · needs Raspberry Pi Imager (free)</td></tr>
+                <tr><td>Carry case (optional)</td><td>Small case keeps everything together for field use</td></tr>
               </tbody>
             </table>
             </div>
-            <p class="pi-small-note">We walk teams through the field flow — from sourcing the hardware to loading the microSD content cards. The <a href="#quickstart">quick start guide</a> below is the plain-language version to keep with the device.</p>
-            </div><!-- end pi-accordion-body -->
-            </details>
-          </section>
-
-          <!-- QUICK START -->
-          <section class="pi-section" id="quickstart">
-            <details class="pi-accordion">
-            <summary class="pi-accordion-head">
-              <p class="pi-eyebrow">Get started</p>
-              <h2>Quick start guide</h2>
-            </summary>
-            <div class="pi-accordion-body">
-            <p class="pi-intro">The fastest way to get the local library running in the field. It is written for the person holding the phone, not for an engineer.</p>
-
-            <div class="article-cta">
-              <p>Download the printable Quick Start Guide — covers powering on, joining the Wi-Fi, and using the library, in plain language for anyone in the field.</p>
-              <div class="cta-row">
-                <a class="pdf-button" href="./downloads/villageserver-quick-start-guide.pdf" download>Download Quick Start Guide PDF</a>
-                <a class="cta-outline-button" href="./pamphlets.html">See all printable guides →</a>
-              </div>
-            </div>
-
-            <p class="pi-small-note-loose">Content packs are prepared outside the field and loaded onto microSD cards. Once the Pi starts broadcasting, the local user does not need Google Drive, internet access, an account, or a remote update connection.</p>
-            </div><!-- end pi-accordion-body -->
-            </details>
           </section>
 
           <!-- WHAT IT LOOKS LIKE -->
           <section class="pi-section" id="interface">
-            <details class="pi-accordion">
-            <summary class="pi-accordion-head">
-              <p class="pi-eyebrow">The interface</p>
-              <h2>What you see on a phone</h2>
-            </summary>
-            <div class="pi-accordion-body">
-            <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.42.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required. Try the demo below — tap a language, then a section, then a file to download it.</p>
+            <p class="pi-eyebrow">The interface</p>
+            <h2>What you see on a phone</h2>
+            <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.43.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required. Try the demo below — tap a language, then a section, then a file to download it.</p>
 
             <!-- Interactive phone demo -->
             <div class="iphone-demo-wrap">
@@ -144,7 +102,7 @@
                 <div class="iphone-notch"></div>
                 <div class="iphone-screen">
                   <div class="iphone-statusbar"><span>9:41</span><span>📶 🔋</span></div>
-                  <div class="iphone-urlbar"><span class="iphone-url-text" id="iphone-url">10.42.0.1</span></div>
+                  <div class="iphone-urlbar"><span class="iphone-url-text" id="iphone-url">10.43.0.1</span></div>
                   <div class="iphone-body" id="iphone-body">
 
                     <div class="iphone-screen-state" data-screen="home">
@@ -178,7 +136,7 @@
               </div>
               <p class="iphone-demo-caption">This is a live click-through demo — tap your way through it.</p>
             </div>
-            <p class="pi-demo-note">Each language has four content sections, and tapping a file downloads it straight to the phone for offline use.</p>
+            <p style="font-size:.88rem;color:var(--muted);margin:-6px 0 18px;text-align:center">Each language has four content sections, and tapping a file downloads it straight to the phone for offline use.</p>
 
             <p><strong>Bible</strong> — full Scripture text, chapter by chapter.<br>
             <strong>Audio</strong> — dramatised audio Bible recordings, playable directly in the browser.<br>
@@ -186,20 +144,14 @@
             <strong>Books</strong> — commentaries, discipleship materials, and reference PDFs.</p>
 
             <div class="tip-box">
-              <strong>Updating Libraries banner:</strong> the interface may show "Updating Libraries — please wait" while a new microSD card is being read. The server continues to serve existing content while it loads.
+              <strong>Updating Libraries banner:</strong> when content is being refreshed, the interface shows "Updating Libraries — please wait." The server continues to serve existing content while the update runs in the background.
             </div>
-            </div><!-- end pi-accordion-body -->
-            </details>
           </section>
 
           <!-- FIELD USE -->
           <section class="pi-section" id="field-use">
-            <details class="pi-accordion">
-            <summary class="pi-accordion-head">
-              <p class="pi-eyebrow">For the field</p>
-              <h2>Using the library — step by step</h2>
-            </summary>
-            <div class="pi-accordion-body">
+            <p class="pi-eyebrow">For the field</p>
+            <h2>Using the library — step by step</h2>
             <p class="pi-intro">This is all a person in the field needs to know. The server handles everything else automatically.</p>
 
             <div class="vi-steps">
@@ -219,7 +171,7 @@
                 <div class="vi-step-body">
                   <h4>Join the Wi-Fi network</h4>
                   <p>On your phone, open <strong>Settings → Wi-Fi</strong> and select <span class="inline-code">VillageServer</span>. Enter the password <span class="inline-code">village123</span> when prompted.</p>
-                  <div class="tip-box pi-tip-space"><strong>Note:</strong> your phone may warn that this network has no internet — that's expected. Tap "Stay connected" or "Use anyway."</div>
+                  <div class="tip-box" style="margin-top:10px"><strong>Note:</strong> your phone may warn that this network has no internet — that's expected. Tap "Stay connected" or "Use anyway."</div>
                 </div>
               </div>
 
@@ -228,7 +180,7 @@
                 <div class="vi-step-num">3</div>
                 <div class="vi-step-body">
                   <h4>Open the library in a browser</h4>
-                  <p>Open any browser (Chrome, Safari, Firefox) and type <span class="inline-code">10.42.0.1</span> into the address bar. Hit Go. The library home page loads instantly.</p>
+                  <p>Open any browser (Chrome, Safari, Firefox) and type <span class="inline-code">10.43.0.1</span> into the address bar. Hit Go. The library home page loads instantly.</p>
                 </div>
               </div>
 
@@ -251,18 +203,12 @@
               </div>
 
             </div>
-            </div><!-- end pi-accordion-body -->
-            </details>
           </section>
 
           <!-- SERVER SETUP -->
           <section class="pi-section" id="setup">
-            <details class="pi-accordion">
-            <summary class="pi-accordion-head">
-              <p class="pi-eyebrow">Setup guide</p>
-              <h2>Building the server</h2>
-            </summary>
-            <div class="pi-accordion-body">
+            <p class="pi-eyebrow">Setup guide</p>
+            <h2>Building the server</h2>
             <p class="pi-intro">These steps take 1–2 hours on first run. Once done the Pi is fully self-contained and requires no laptop to operate in the field.</p>
 
             <figure class="fig-half">
@@ -270,8 +216,8 @@
               <figcaption>Workshop assembly before a field deployment.</figcaption>
             </figure>
 
-            <!-- Step 1 -->
-            <h3 id="setup-flash" class="pi-mini-heading" style="scroll-margin-top:24px">Step 1 — Flash the operating system</h3>
+            <!-- Step 1: Flash OS -->
+            <h3 id="setup-flash" style="scroll-margin-top:24px;font-size:1.2rem;font-weight:800;color:var(--ink);margin:28px 0 12px">Step 1 — Flash the operating system</h3>
             <p>Download and open <strong>Raspberry Pi Imager</strong> on your laptop (free from raspberrypi.com). Choose the device, then select:</p>
             <p><strong>OS:</strong> Raspberry Pi OS Lite (64-bit) — no desktop, runs faster as a server.<br>
             <strong>Storage:</strong> your system microSD card (not the language cards).</p>
@@ -280,36 +226,41 @@
               <li><strong>Hostname:</strong> <span class="inline-code">villageserver</span></li>
               <li><strong>Enable SSH</strong> with password authentication</li>
               <li><strong>Username/password:</strong> <span class="inline-code">pi</span> and a strong password — write it down</li>
-              <li><strong>Wi-Fi:</strong> your home or office network so the Pi can reach the internet on first boot for updates</li>
+              <li><strong>Wi-Fi:</strong> your home/office network so the Pi can reach the internet on first boot for updates</li>
             </ul>
-            <div class="tip-box">Click <strong>Save</strong> then <strong>Yes</strong> to apply settings before writing the image. This pre-configures the Pi so you don't need a monitor or keyboard.</div>
+            <div class="tip-box">Click <strong>Save</strong> then <strong>Yes</strong> to apply these settings, then write the image. This pre-configures the Pi so you don't need a monitor or keyboard.</div>
 
-            <!-- Step 2 -->
-            <h3 id="setup-install" class="pi-mini-heading" style="scroll-margin-top:24px">Step 2 — Install the server software</h3>
-            <p>Power on the Pi and SSH into it over your home network. Two programs get installed: <strong>Kiwix</strong> (serves the Bible/audio/video library) and <strong>nginx</strong> (forwards phone requests to Kiwix). Both start automatically on every boot — nothing to re-run in the field. Language card USB drives get mounted into <span class="inline-code">/mnt/library</span>.</p>
+            <!-- Step 2: Install software -->
+            <h3 id="setup-install" style="scroll-margin-top:24px;font-size:1.2rem;font-weight:800;color:var(--ink);margin:28px 0 12px">Step 2 — Install the server software</h3>
+            <p>Power on the freshly-flashed Pi and connect to it over the home network. From there, two programs get installed: <strong>Kiwix</strong>, which actually serves the Bible/audio/video library, and <strong>nginx</strong>, which forwards phone requests to Kiwix. Both are set to start automatically every time the Pi boots, so there's nothing to re-run after a power cycle in the field. The language-card USB drives get mounted into a single folder, <span class="inline-code">/mnt/library</span>, which is where Kiwix looks for content.</p>
             <details class="tech-toggle">
               <summary>Show the exact commands</summary>
               <div class="tech-toggle-body">
-                <p>Find the Pi on your router's device list (look for hostname <span class="inline-code">villageserver</span>) and SSH in:</p>
+                <p>Insert the freshly-written card into the Pi and power it on. Wait 60 seconds, then find the Pi on your router's device list (look for hostname <span class="inline-code">villageserver</span>) and SSH in:</p>
                 <div class="code-block"><code><span class="code-comment"># Replace the IP with your Pi's actual address from the router</span>
 ssh pi@192.168.x.x</code></div>
-                <div class="code-block"><code><span class="code-comment"># Update system packages</span>
+                <p>Accept the fingerprint, enter your password, then update and install the required packages:</p>
+                <div class="code-block"><code><span class="code-comment"># Update system packages first</span>
 sudo apt update && sudo apt upgrade -y
 
-<span class="code-comment"># Install Kiwix and nginx</span>
+<span class="code-comment"># Install Kiwix (offline library engine) and nginx (web server)</span>
 sudo apt install -y kiwix-tools nginx
 
 <span class="code-comment"># Create the mount point for language cards</span>
 sudo mkdir -p /mnt/library</code></div>
-                <p>Plug in the USB readers (with language cards) and mount each one:</p>
+                <p>Plug the USB readers (with language cards) into the Pi's USB ports, then mount them:</p>
                 <div class="code-block"><code><span class="code-comment"># See what cards are connected</span>
 lsblk -o NAME,SIZE,LABEL,MOUNTPOINT
 
-<span class="code-comment"># Mount each card (repeat per language)</span>
+<span class="code-comment"># Mount each card (repeat for each language)</span>
 sudo mkdir -p /mnt/library/english
-sudo mount /dev/sda1 /mnt/library/english</code></div>
-                <p>Create the Kiwix systemd service:</p>
+sudo mount /dev/sda1 /mnt/library/english
+
+sudo mkdir -p /mnt/library/spanish
+sudo mount /dev/sdb1 /mnt/library/spanish</code></div>
+                <p>Create the Kiwix service so it starts automatically on every boot:</p>
                 <div class="code-block"><code>sudo nano /etc/systemd/system/kiwix.service</code></div>
+                <p>Paste this content, save with <strong>Ctrl+O</strong>, then exit with <strong>Ctrl+X</strong>:</p>
                 <div class="code-block"><code>[Unit]
 Description=Kiwix VillageServer
 After=network.target
@@ -324,8 +275,9 @@ WantedBy=multi-user.target</code></div>
                 <div class="code-block"><code>sudo systemctl daemon-reload
 sudo systemctl enable kiwix
 sudo systemctl start kiwix</code></div>
-                <p>Configure nginx to proxy to Kiwix:</p>
+                <p>Configure nginx to forward requests on port 80 to Kiwix:</p>
                 <div class="code-block"><code>sudo nano /etc/nginx/sites-available/default</code></div>
+                <p>Replace the file contents with:</p>
                 <div class="code-block"><code>server {
     listen 80 default_server;
     server_name _;
@@ -339,14 +291,15 @@ sudo systemctl start kiwix</code></div>
               </div>
             </details>
 
-            <!-- Step 3 -->
-            <h3 id="setup-hotspot" class="pi-mini-heading" style="scroll-margin-top:24px">Step 3 — Configure the Wi-Fi hotspot</h3>
-            <p>This turns the Pi into a Wi-Fi access point named <span class="inline-code">VillageServer</span> with password <span class="inline-code">village123</span>. Every phone that joins gets an address in the <span class="inline-code">10.42.0.x</span> range and can reach the library at <span class="inline-code">10.42.0.1</span>. No internet involved — the Pi creates its own self-contained network.</p>
+            <!-- Step 3: Hotspot -->
+            <h3 id="setup-hotspot" style="scroll-margin-top:24px;font-size:1.2rem;font-weight:800;color:var(--ink);margin:28px 0 12px">Step 3 — Configure the Wi-Fi hotspot</h3>
+            <p>This step turns the Pi itself into a Wi-Fi access point named <span class="inline-code">VillageServer</span> with the password <span class="inline-code">village123</span>, and gives every phone that joins an address in the <span class="inline-code">10.43.0.x</span> range so it can find the library at <span class="inline-code">10.43.0.1</span>. No router or internet connection is involved — the Pi creates its own self-contained network.</p>
             <details class="tech-toggle">
               <summary>Show the exact commands</summary>
               <div class="tech-toggle-body">
                 <div class="code-block"><code>sudo apt install -y hostapd dnsmasq
 sudo systemctl unmask hostapd</code></div>
+                <p>Set the hotspot name and password:</p>
                 <div class="code-block"><code>sudo nano /etc/hostapd/hostapd.conf</code></div>
                 <div class="code-block"><code>interface=wlan0
 driver=nl80211
@@ -357,14 +310,16 @@ wpa=2
 wpa_passphrase=village123
 wpa_key_mgmt=WPA-PSK
 rsn_pairwise=CCMP</code></div>
+                <p>Tell dnsmasq to hand out addresses in the <span class="inline-code">10.43.0.x</span> range:</p>
                 <div class="code-block"><code>sudo nano /etc/dnsmasq.conf</code></div>
                 <div class="code-block"><code>interface=wlan0
-dhcp-range=10.42.0.2,10.42.0.50,255.255.255.0,24h
-address=/#/10.42.0.1</code></div>
+dhcp-range=10.43.0.2,10.43.0.50,255.255.255.0,24h
+address=/#/10.43.0.1</code></div>
+                <p>Give the wireless interface a fixed IP address:</p>
                 <div class="code-block"><code>sudo nano /etc/dhcpcd.conf</code></div>
-                <p>Add to end of file:</p>
+                <p>Add to the end of the file:</p>
                 <div class="code-block"><code>interface wlan0
-    static ip_address=10.42.0.1/24
+    static ip_address=10.43.0.1/24
     nohook wpa_supplicant</code></div>
                 <div class="code-block"><code>sudo systemctl enable hostapd dnsmasq
 sudo systemctl restart dhcpcd
@@ -372,100 +327,98 @@ sudo systemctl start hostapd dnsmasq</code></div>
               </div>
             </details>
 
-            <!-- Step 4 -->
-            <h3 id="setup-test" class="pi-mini-heading" style="scroll-margin-top:24px">Step 4 — Test from a phone</h3>
+            <!-- Step 4: Test -->
+            <h3 id="setup-test" style="scroll-margin-top:24px;font-size:1.2rem;font-weight:800;color:var(--ink);margin:28px 0 12px">Step 4 — Test from a phone</h3>
+
             <figure class="fig-half">
-              <img src="./img/test-run-table.jpeg" alt="Team testing phones connected to the VillageServer indoors" loading="lazy">
-              <figcaption>Testing phone connections before field deployment.</figcaption>
+              <img src="./img/test-run-table.jpeg" alt="Team testing phones connected to the VillageServer case indoors" loading="lazy">
+              <figcaption>Testing phone connections to the VillageServer before field deployment.</figcaption>
             </figure>
-            <p>Follow the field-use steps above: join <span class="inline-code">VillageServer</span> Wi-Fi → open browser → go to <span class="inline-code">10.42.0.1</span>. Verify language tiles appear, tap into a section, and confirm audio or video plays without mobile data.</p>
-            <div class="tip-box"><strong>All good?</strong> The server is field-ready. Power it off, pack it in the case with language cards seated in the USB readers, and it's ready to go.</div>
-            </div><!-- end pi-accordion-body -->
-            </details>
+
+            <p>Pick up a phone and follow the field-use steps above: join <span class="inline-code">VillageServer</span> Wi-Fi → open browser → go to <span class="inline-code">10.43.0.1</span>. Verify language tiles appear, tap into a content section, and confirm audio or video plays without any mobile data.</p>
+            <div class="tip-box"><strong>All good?</strong> The server is ready for field deployment. Power it off, pack it in the case with the language cards seated in the USB readers, and it's field-ready.</div>
           </section>
 
-          <!-- LOADING CONTENT -->
+          <!-- CONTENT LOADING -->
           <section class="pi-section" id="content">
-            <details class="pi-accordion">
-            <summary class="pi-accordion-head">
-              <p class="pi-eyebrow">Operations</p>
-              <h2>Loading content cards</h2>
-            </summary>
-            <div class="pi-accordion-body">
-            <p class="pi-intro">Content is updated by preparing microSD cards with new library files and swapping them in the USB readers. No internet connection is needed on the Pi — all preparation happens on a laptop before going to the field.</p>
+            <p class="pi-eyebrow">Operations</p>
+            <h2>Loading content cards</h2>
+            <p class="pi-intro">Content is stored on microSD cards inside USB readers plugged into the Pi. Swapping a card updates the library without touching the Pi's software.</p>
 
             <div class="vi-steps">
+
               <div class="vi-step">
                 <div class="vi-step-line"></div>
                 <div class="vi-step-num">1</div>
                 <div class="vi-step-body">
                   <h4>Get the library file</h4>
-                  <p>Obtain the <span class="inline-code">.zim</span> file for the language from the shared Google Drive folder the VillageServer team provides. Each language is one file — download it to your laptop.</p>
+                  <p>Download the <span class="inline-code">.zim</span> file for the language you need from the shared Google Drive folder. Each language is one file — roughly 1–5 GB depending on the content.</p>
                 </div>
               </div>
+
               <div class="vi-step">
                 <div class="vi-step-line"></div>
                 <div class="vi-step-num">2</div>
                 <div class="vi-step-body">
-                  <h4>Format and copy to the microSD card</h4>
-                  <p>Format the microSD card as <strong>exFAT</strong> (readable by the Pi and most systems). Copy the <span class="inline-code">.zim</span> file onto the card. You can put multiple languages on one card or one card per language — the Pi reads all of them.</p>
-                  <details class="tech-toggle">
-                    <summary>Copy via command line</summary>
-                    <div class="tech-toggle-body">
-                      <div class="code-block"><code><span class="code-comment"># macOS/Linux — replace /dev/disk2 with your card's path (check Disk Utility or lsblk)</span>
-cp ~/Downloads/bible-english.zim /Volumes/LIBRARY/</code></div>
-                    </div>
-                  </details>
+                  <h4>Format a card and copy the file</h4>
+                  <p>Format a microSD card as <strong>exFAT</strong> (works on Mac, Windows, and Linux without any extra drivers). Copy the <span class="inline-code">.zim</span> file onto it. That's the entire card — one file per card.</p>
                 </div>
               </div>
+
               <div class="vi-step">
                 <div class="vi-step-line"></div>
                 <div class="vi-step-num">3</div>
                 <div class="vi-step-body">
                   <h4>Swap the card in the field</h4>
-                  <p>Power down the Pi, pull the old USB reader, insert the prepared one, and power back on. Kiwix auto-detects the new file and the language tile appears in the library within about 30 seconds.</p>
+                  <p>Power down the Pi, pull the old card from its USB reader, push the new card in, and power the Pi back on. The reader stays plugged into the Pi — only the card inside changes. The Pi remounts it automatically on boot.</p>
                 </div>
               </div>
+
               <div class="vi-step">
                 <div class="vi-step-line"></div>
                 <div class="vi-step-num">4</div>
                 <div class="vi-step-body">
                   <h4>Verify on a phone</h4>
-                  <p>Join the <span class="inline-code">VillageServer</span> Wi-Fi, open <span class="inline-code">10.42.0.1</span> in a browser, and confirm the new language tile appears and content opens correctly.</p>
+                  <p>Join the <span class="inline-code">VillageServer</span> Wi-Fi and open <span class="inline-code">10.43.0.1</span>. The new language tile should appear on the home screen. Tap through to confirm the content opens correctly.</p>
                 </div>
               </div>
+
             </div>
-            </div><!-- end pi-accordion-body -->
-            </details>
           </section>
 
           <!-- TROUBLESHOOTING -->
           <section class="pi-section" id="troubleshoot">
-            <details class="pi-accordion">
-            <summary class="pi-accordion-head">
-              <p class="pi-eyebrow">Troubleshooting</p>
-              <h2>Common issues</h2>
-            </summary>
-            <div class="pi-accordion-body">
-            <p class="pi-intro">Below are the few things worth checking on-site if something looks off. Keep this section simple so a local leader can solve the common problems without calling a technician.</p>
+            <p class="pi-eyebrow">Troubleshooting</p>
+            <h2>Common issues</h2>
 
-            <p><strong>Phone joins the Wi-Fi but the page won't load</strong></p>
-            <p>Double-check the address bar shows exactly <span class="inline-code">10.42.0.1</span>, not a search. Some phones auto-correct it into a Google search instead of visiting the address directly — retype it if needed.</p>
+            <p><strong>Phone joins Wi-Fi but can't reach 10.43.0.1</strong></p>
+            <p>Check that nginx and Kiwix are both running, and that <span class="inline-code">wlan0</span> still has the static address <span class="inline-code">10.43.0.1/24</span>. If not, restart dhcpcd and hostapd.</p>
+            <details class="tech-toggle">
+              <summary>Show the diagnostic commands</summary>
+              <div class="tech-toggle-body">
+                <div class="code-block"><code>sudo systemctl status nginx kiwix</code></div>
+                <div class="code-block"><code>ip addr show wlan0</code></div>
+              </div>
+            </details>
 
-            <p><strong>Phone warns "no internet connection"</strong></p>
-            <p>That's expected and normal — the VillageServer network is intentionally offline. Tap "Stay connected" or "Use anyway" and continue.</p>
+            <p><strong>Kiwix returns no libraries</strong></p>
+            <p>If the mount point is empty, the USB card may have ejected or the device path changed. Re-plug the reader and re-mount.</p>
+            <details class="tech-toggle">
+              <summary>Show the diagnostic commands</summary>
+              <div class="tech-toggle-body">
+                <div class="code-block"><code><span class="code-comment"># Check if cards are mounted</span>
+df -h
+ls /mnt/library/</code></div>
+              </div>
+            </details>
 
-            <p><strong>Wi-Fi network isn't showing up</strong></p>
-            <p>Give the Pi a full 60 seconds after power-on to finish starting up. If it still doesn't appear, power-cycle it (unplug, wait 10 seconds, plug back in).</p>
-
-            <p><strong>A language or file seems missing</strong></p>
-            <p>This usually means the microSD card for that language isn't seated or the content hasn't been loaded yet. Check that the USB reader is plugged in, then flag it to the team so the correct library can be shared from Google Drive.</p>
+            <p><strong>Hotspot disappears after a Pi update</strong></p>
+            <p>A system update can overwrite dhcpcd config. Re-check <span class="inline-code">/etc/dhcpcd.conf</span> for the <span class="inline-code">wlan0</span> static IP block, then restart: <span class="inline-code">sudo systemctl restart hostapd dhcpcd</span></p>
 
             <div class="article-cta">
-              <p>For hardware setup and content loading, see the <a href="#setup">Building the server</a> and <a href="#content">Loading content cards</a> sections above.</p>
+              <p>Download the Raspberry Pi system overview as a printable PDF for field briefings or board packets.</p>
+              <a class="pdf-button" href="./downloads/villageserver-raspberry-pi-system.pdf" download>Download Raspberry Pi PDF</a>
             </div>
-            </div><!-- end pi-accordion-body -->
-            </details>
           </section>
 
         </div><!-- end main content -->
@@ -478,19 +431,9 @@ cp ~/Downloads/bible-english.zim /Volumes/LIBRARY/</code></div>
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
   <script>
-    /* Sidenav — open accordion if closed, then scroll to section */
+    /* Sticky sidenav — highlight the active section as you scroll */
     (function(){
       var links = document.querySelectorAll('.pi-sidenav a[href^="#"]');
-      links.forEach(function(a){
-        a.addEventListener('click', function(){
-          var target = document.querySelector(a.getAttribute('href'));
-          if(!target) return;
-          var acc = target.querySelector('.pi-accordion');
-          if(acc && !acc.open) acc.open = true;
-        });
-      });
-
-      /* Highlight active section on scroll */
       var sections = Array.from(links).map(function(a){
         return document.querySelector(a.getAttribute('href'));
       }).filter(Boolean);
@@ -552,7 +495,7 @@ cp ~/Downloads/bible-english.zim /Volumes/LIBRARY/</code></div>
         btn.addEventListener('click', function(){
           currentLang = { code: btn.getAttribute('data-lang'), label: btn.getAttribute('data-label') };
           langTitle.textContent = currentLang.label + ' Library';
-          urlEl.textContent = '10.42.0.1/' + currentLang.code;
+          urlEl.textContent = '10.43.0.1/' + currentLang.code;
           showScreen('types');
         });
       });
@@ -561,7 +504,7 @@ cp ~/Downloads/bible-english.zim /Volumes/LIBRARY/</code></div>
         btn.addEventListener('click', function(){
           var type = btn.getAttribute('data-type');
           typeTitle.textContent = TYPE_LABEL[type];
-          urlEl.textContent = '10.42.0.1/' + currentLang.code + '/' + type;
+          urlEl.textContent = '10.43.0.1/' + currentLang.code + '/' + type;
           renderFiles(type);
           showScreen('files');
         });
