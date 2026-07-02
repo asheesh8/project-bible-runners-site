@@ -41,10 +41,10 @@
     /* ── Interactive logo hotspots ── */
     .logo-interactive{position:relative;display:inline-block;margin:0 auto 14px;border-radius:16px}
     .logo-interactive .home-hero-logo{display:block;margin:0;border-radius:16px;box-shadow:0 20px 50px rgba(8,35,64,.28)}
-    .logo-hs{position:absolute;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);cursor:pointer;padding:0;z-index:5;transition:background .2s,border-color .2s,box-shadow .2s}
-    .logo-hs:hover,.logo-hs:focus-visible{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.85);box-shadow:0 0 0 5px rgba(255,255,255,.12),0 0 18px rgba(255,255,255,.3);outline:0}
-    /* Rotating shine ring — comet sweep around each hotspot */
-    .logo-hs::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0% 28%,rgba(255,255,255,.9) 40%,rgba(255,255,255,.5) 55%,transparent 68% 100%);animation:hs-spin 2.4s linear infinite;mask:radial-gradient(circle,transparent 87%,#000 89%);-webkit-mask:radial-gradient(circle,transparent 87%,#000 89%);pointer-events:none}
+    .logo-hs{position:absolute;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;border:2.5px solid rgba(255,210,0,.75);background:rgba(255,210,0,.14);cursor:pointer;padding:0;z-index:5;transition:background .2s,border-color .2s,box-shadow .2s}
+    .logo-hs:hover,.logo-hs:focus-visible{background:rgba(255,210,0,.3);border-color:rgba(255,225,0,1);box-shadow:0 0 0 5px rgba(255,210,0,.18),0 0 20px rgba(255,210,0,.4);outline:0}
+    /* Rotating gold shine ring — comet sweep */
+    .logo-hs::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0% 28%,rgba(255,230,0,1) 40%,rgba(255,200,0,.55) 55%,transparent 68% 100%);animation:hs-spin 2.4s linear infinite;mask:radial-gradient(circle,transparent 87%,#000 89%);-webkit-mask:radial-gradient(circle,transparent 87%,#000 89%);pointer-events:none}
     .logo-hs:nth-child(2)::before{animation-delay:-0.0s}.logo-hs:nth-child(3)::before{animation-delay:-0.45s}.logo-hs:nth-child(4)::before{animation-delay:-0.9s}.logo-hs:nth-child(5)::before{animation-delay:-1.35s}.logo-hs:nth-child(6)::before{animation-delay:-1.8s}.logo-hs:nth-child(7)::before{animation-delay:-0.24s}.logo-hs:nth-child(8)::before{animation-delay:-0.68s}.logo-hs:nth-child(9)::before{animation-delay:-1.12s}.logo-hs:nth-child(10)::before{animation-delay:-1.56s}.logo-hs:nth-child(11)::before{animation-delay:-2.0s}
     @keyframes hs-spin{to{transform:rotate(360deg)}}
     /* Guide card modal */
@@ -92,17 +92,17 @@
         </div>
         <div class="logo-interactive" id="logo-wrap" aria-label="Interactive VillageServer diagram — click any component to learn more" role="group">
           <img class="home-hero-logo" src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative logo showing Raspberry Pi server connected to projector, speakers, satellite, TV, radio, SD card, WiFi hotspot, and smartphones" width="525" height="600" fetchpriority="high" id="logo-img">
-          <!-- hotspot buttons — left/top as % of rendered image width × height -->
-          <button class="logo-hs" title="Wi-Fi Connectivity" data-guide="wifi"         style="left:50.0%;top:21.5%"></button>
-          <button class="logo-hs" title="Projector"          data-guide="projector"     style="left:47.5%;top:30.5%"></button>
+          <!-- hotspot buttons — left/top calibrated to icon centers in the PNG -->
+          <button class="logo-hs" title="Wi-Fi Connectivity" data-guide="wifi"         style="left:49.5%;top:22.5%"></button>
+          <button class="logo-hs" title="Projector"          data-guide="projector"     style="left:47.5%;top:31.0%"></button>
           <button class="logo-hs" title="Speakers"           data-guide="speakers"      style="left:32.0%;top:36.5%"></button>
           <button class="logo-hs" title="Satellite"          data-guide="satellite"     style="left:25.5%;top:45.5%"></button>
-          <button class="logo-hs" title="TV / Display"       data-guide="tv"            style="left:28.5%;top:55.5%"></button>
-          <button class="logo-hs" title="Radio"              data-guide="radio"         style="left:47.0%;top:58.5%"></button>
-          <button class="logo-hs" title="SD Card"            data-guide="sdcard"        style="left:64.5%;top:55.5%"></button>
-          <button class="logo-hs" title="Wi-Fi Hotspot"      data-guide="wifi-hotspot"  style="left:71.5%;top:45.5%"></button>
-          <button class="logo-hs" title="Smartphones"        data-guide="smartphones"   style="left:64.0%;top:36.5%"></button>
-          <button class="logo-hs" title="Raspberry Pi"       data-guide="pi"            style="left:49.5%;top:46.5%"></button>
+          <button class="logo-hs" title="TV / Display"       data-guide="tv"            style="left:28.5%;top:53.5%"></button>
+          <button class="logo-hs" title="Radio"              data-guide="radio"         style="left:47.0%;top:57.5%"></button>
+          <button class="logo-hs" title="SD Card"            data-guide="sdcard"        style="left:64.5%;top:53.5%"></button>
+          <button class="logo-hs" title="Wi-Fi Hotspot"      data-guide="wifi-hotspot"  style="left:72.0%;top:45.5%"></button>
+          <button class="logo-hs" title="Smartphones"        data-guide="smartphones"   style="left:65.0%;top:36.5%"></button>
+          <button class="logo-hs" title="Raspberry Pi"       data-guide="pi"            style="left:48.5%;top:45.0%"></button>
         </div>
         <h1 class="visually-hidden">VillageServer Initiative</h1>
         <p class="hero-tagline">Placing God's Word within reach of every village — even where there is no internet, no power grid, and no trained technician.</p>
