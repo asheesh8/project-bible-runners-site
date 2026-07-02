@@ -360,6 +360,31 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   .main-content{padding:20px}
   .form-row{grid-template-columns:1fr}
 }
+
+/* ── Raspberry Pi / WireGuard setup guide ────────────── */
+.setup-step{margin-bottom:10px;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.setup-step summary{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;list-style:none;font-size:14px;font-weight:700;background:var(--card);user-select:none;-webkit-user-select:none}
+.setup-step summary::-webkit-details-marker{display:none}
+.setup-step[open]>summary{border-bottom:1px solid var(--border);background:var(--bg)}
+.setup-num{flex:0 0 auto;width:24px;height:24px;border-radius:99px;background:var(--sidebar-active);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.setup-chevron{margin-left:auto;font-size:18px;color:var(--muted);transition:transform .18s;flex-shrink:0}
+.setup-step[open] .setup-chevron{transform:rotate(90deg)}
+.setup-body{padding:16px 18px;font-size:14px;line-height:1.65;color:var(--text)}
+.setup-body p{margin:0 0 10px}
+.setup-body ul{padding-left:18px;margin:0 0 10px}
+.setup-body li{margin-bottom:5px}
+.code-block{position:relative;margin:10px 0}
+.code-block pre{background:#1e2732;color:#e6edf3;font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:14px 46px 14px 14px;border-radius:var(--radius);overflow-x:auto;white-space:pre;border:1px solid #30363d;margin:0}
+.code-block .cm{color:#8b949e}
+.copy-btn{position:absolute;top:8px;right:8px;padding:4px 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:5px;font-size:11px;font-weight:700;color:#e6edf3;cursor:pointer;transition:background .15s}
+.copy-btn:hover{background:rgba(255,255,255,.18)}
+.copy-btn.copied{background:#1a7f37 !important;border-color:#2ea043;color:#fff}
+.setup-note{border-radius:var(--radius);padding:10px 14px;font-size:13px;margin:10px 0;line-height:1.5}
+.setup-note.warn{background:#fff8c5;border:1px solid #d4a72c;color:#7d4e00}
+.setup-note.info{background:#ddf4ff;border-color:#54aeff;color:#0550ae}
+.setup-note.ok{background:#dafbe1;border-color:#52a55d;color:#1a4731}
+.icode{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:12px;font-family:monospace;color:var(--text)}
+.setup-section-hdr{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:28px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--border)}
 </style>
 </head>
 <body>
@@ -875,16 +900,324 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
       </div>
 
-      <!-- ── INTERNAL: FIELD GUIDES ────────────────── -->
+      <!-- ── INTERNAL: RASPBERRY PI / WIREGUARD ───── -->
       <div class="tab-view" id="tab-internal">
-        <div class="page-header"><h2 class="page-title">Field Guides — Internal</h2></div>
-        <div class="res-section">
-          <div class="res-section-title">🍓 &nbsp;Raspberry Pi VillageServer setup</div>
-          <p style="margin:0 0 14px;color:#57606a;max-width:720px">This detailed build guide is kept here in the admin only — it is no longer linked from the public site, but the work is preserved and viewable any time. <a href="./raspberry-pi.html" target="_blank" rel="noopener" style="color:#316dca;font-weight:800">Open in a new tab ↗</a></p>
-          <div style="border:1px solid #d0d7de;border-radius:12px;overflow:hidden;background:#fff">
-            <iframe src="./raspberry-pi.html" title="Raspberry Pi VillageServer setup guide" loading="lazy" style="width:100%;height:72vh;border:0;display:block"></iframe>
-          </div>
+        <div class="page-header"><h2 class="page-title">Raspberry Pi &amp; WireGuard Setup</h2></div>
+
+        <div class="flow-diagram">
+          <div class="flow-node"><div class="flow-node-icon">💾</div><div class="flow-node-label">Flash SD card</div><div class="flow-node-sub">Raspberry Pi OS Lite</div></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><div class="flow-node-icon">🖥️</div><div class="flow-node-label">Pi boots + SSH</div><div class="flow-node-sub">static IP on LAN</div></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><div class="flow-node-icon">🔒</div><div class="flow-node-label">WireGuard tunnel</div><div class="flow-node-sub">port 51820 UDP</div></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node"><div class="flow-node-icon">📱</div><div class="flow-node-label">Phone connects</div><div class="flow-node-sub">WireGuard app + QR</div></div>
         </div>
+
+        <div class="flow-note" style="background:#dafbe1;border:1px solid #52a55d;color:#1a4731">
+          ✅ &nbsp;Everything below runs on the Pi over SSH. Copy each block, paste into the terminal, run. Replace <strong>&lt;placeholders&gt;</strong> with your own values.
+        </div>
+
+        <div class="setup-section-hdr">Prerequisites</div>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">0</span>What you need before starting<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <ul>
+              <li>Raspberry Pi 3, 4, or 5 (any model with ethernet port)</li>
+              <li>MicroSD card — 16 GB or larger (32 GB recommended)</li>
+              <li>SD card reader for your laptop</li>
+              <li><strong>Raspberry Pi Imager</strong> — free download from raspberrypi.com</li>
+              <li>Ethernet cable to plug Pi into your router during setup</li>
+              <li>Router that lets you reserve a static IP and open a UDP port</li>
+              <li>A public IP address (or DDNS hostname) for your internet connection — you'll forward port 51820</li>
+            </ul>
+            <div class="setup-note info">ℹ️ &nbsp;<strong>No monitor needed.</strong> Everything after the first boot is done over SSH from your laptop.</div>
+          </div>
+        </details>
+
+        <div class="setup-section-hdr">Part 1 — Boot the Pi</div>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">1</span>Flash Raspberry Pi OS Lite (64-bit)<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <p>Open <strong>Raspberry Pi Imager</strong> → choose OS → <em>Raspberry Pi OS (other)</em> → <em>Raspberry Pi OS Lite (64-bit)</em>. Before writing, click the gear ⚙️ and set:</p>
+            <ul>
+              <li>Hostname: <span class="icode">villageserver</span></li>
+              <li>Enable SSH → Use password authentication</li>
+              <li>Username: <span class="icode">pi</span> &nbsp; Password: something strong (write it down)</li>
+              <li>Locale / timezone: yours</li>
+            </ul>
+            <p>Write to the SD card, insert into the Pi, plug in ethernet, power on.</p>
+            <div class="setup-note ok">✅ &nbsp;Lite = no desktop GUI. Smaller, faster, less battery drain on solar.</div>
+          </div>
+        </details>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">2</span>SSH in &amp; set a static LAN IP<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <p>Find the Pi's IP in your router's client list (hostname <span class="icode">villageserver</span>), then SSH in:</p>
+            <div class="code-block">
+              <pre>ssh pi@&lt;PI_CURRENT_IP&gt;</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Update the system:</p>
+            <div class="code-block">
+              <pre>sudo apt update && sudo apt upgrade -y</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p><strong>Reserve a static IP</strong> in your router's DHCP settings using the Pi's MAC address — e.g. <span class="icode">192.168.1.100</span>.</p>
+            <div class="setup-note warn">⚠️ &nbsp;Also forward UDP port <strong>51820</strong> on your router to this LAN IP.</div>
+          </div>
+        </details>
+
+        <div class="setup-section-hdr">Part 2 — WireGuard Server</div>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">3</span>Install WireGuard<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <div class="code-block">
+              <pre>sudo apt install wireguard -y</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">4</span>Generate server keys<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <div class="code-block">
+              <pre>wg genkey | sudo tee /etc/wireguard/server_private.key | wg pubkey | sudo tee /etc/wireguard/server_public.key
+sudo chmod 600 /etc/wireguard/server_private.key</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Print and save both keys:</p>
+            <div class="code-block">
+              <pre>sudo cat /etc/wireguard/server_private.key
+sudo cat /etc/wireguard/server_public.key</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="setup-note warn">⚠️ &nbsp;Never share the <strong>private</strong> key. The public key goes on clients.</div>
+          </div>
+        </details>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">5</span>Create server config — <span class="icode">/etc/wireguard/wg0.conf</span><span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <div class="code-block">
+              <pre>sudo nano /etc/wireguard/wg0.conf</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Paste this (replace private key with yours from Step 4):</p>
+            <div class="code-block">
+              <pre><span class="cm"># WireGuard server — VillageServer Pi</span>
+
+[Interface]
+Address = 10.8.0.1/24
+ListenPort = 51820
+PrivateKey = &lt;SERVER_PRIVATE_KEY&gt;
+SaveConfig = false
+
+<span class="cm"># Route: forward traffic + NAT through ethernet</span>
+PostUp   = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+<span class="cm"># ── Clients (one [Peer] block per device) ──</span>
+
+[Peer]
+<span class="cm"># Phone — Person 1</span>
+PublicKey = &lt;CLIENT_1_PUBLIC_KEY&gt;
+AllowedIPs = 10.8.0.2/32</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Save: <span class="icode">Ctrl+O</span> then <span class="icode">Ctrl+X</span>. Lock it down:</p>
+            <div class="code-block">
+              <pre>sudo chmod 600 /etc/wireguard/wg0.conf</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">6</span>Enable IP forwarding &amp; start WireGuard<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <div class="code-block">
+              <pre>echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-block">
+              <pre>sudo systemctl enable wg-quick@wg0
+sudo systemctl start wg-quick@wg0
+sudo systemctl status wg-quick@wg0</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Status should say <span class="icode">active (running)</span>. Verify the interface:</p>
+            <div class="code-block">
+              <pre>sudo wg show</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <div class="setup-section-hdr">Part 3 — Client Setup (per device)</div>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">7</span>Generate a key pair for each client<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <p>Run on the Pi — one pair per phone/laptop:</p>
+            <div class="code-block">
+              <pre><span class="cm"># Replace "person1-phone" with a label for the device</span>
+wg genkey | tee /tmp/person1-phone_private.key | wg pubkey > /tmp/person1-phone_public.key
+cat /tmp/person1-phone_private.key
+cat /tmp/person1-phone_public.key</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Copy the <strong>public key</strong> and add it as a new <span class="icode">[Peer]</span> block in <span class="icode">wg0.conf</span> on the server (Step 5 template). Then restart:</p>
+            <div class="code-block">
+              <pre>sudo systemctl restart wg-quick@wg0</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">8</span>Client config file (paste into WireGuard app)<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <div class="code-block">
+              <pre>[Interface]
+PrivateKey = &lt;CLIENT_PRIVATE_KEY&gt;
+Address = 10.8.0.2/24
+DNS = 8.8.8.8
+
+[Peer]
+PublicKey = &lt;SERVER_PUBLIC_KEY&gt;
+<span class="cm"># Your router's public IP (or a DDNS hostname)</span>
+Endpoint = &lt;YOUR_PUBLIC_IP&gt;:51820
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="setup-note info">ℹ️ &nbsp;Each client gets its own IP: 10.8.0.2, 10.8.0.3 … and its own private key. <span class="icode">AllowedIPs = 0.0.0.0/0</span> routes all traffic through the Pi. For LAN-only access use <span class="icode">10.8.0.0/24</span>.</div>
+          </div>
+        </details>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">9</span>Generate a QR code for the phone<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <div class="code-block">
+              <pre>sudo apt install qrencode -y
+<span class="cm"># Save the client config to a file first, then:</span>
+qrencode -t ansiutf8 < /tmp/person1-phone.conf</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Open <strong>WireGuard app</strong> on the phone → tap <strong>+</strong> → <em>Scan QR code</em>. Point camera at the terminal. Done — no typing needed.</p>
+          </div>
+        </details>
+
+        <div class="setup-section-hdr">Part 4 — Wi-Fi Hotspot (optional, for offline village use)</div>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">10</span>Turn the Pi into a Wi-Fi access point<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <div class="setup-note info">ℹ️ &nbsp;Only needed if people connect to the Pi over Wi-Fi directly (offline content library). Skip if everyone tunnels in over WireGuard remotely.</div>
+            <div class="code-block">
+              <pre>sudo apt install hostapd dnsmasq -y
+sudo systemctl stop hostapd dnsmasq</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Static IP on wlan0 — add to <span class="icode">/etc/dhcpcd.conf</span>:</p>
+            <div class="code-block">
+              <pre>interface wlan0
+    static ip_address=192.168.4.1/24
+    nohook wpa_supplicant</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Create <span class="icode">/etc/hostapd/hostapd.conf</span>:</p>
+            <div class="code-block">
+              <pre>interface=wlan0
+driver=nl80211
+ssid=VillageServer
+hw_mode=g
+channel=7
+wmm_enabled=0
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=ChangeMeNow
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>In <span class="icode">/etc/default/hostapd</span> set:</p>
+            <div class="code-block">
+              <pre>DAEMON_CONF="/etc/hostapd/hostapd.conf"</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Replace <span class="icode">/etc/dnsmasq.conf</span>:</p>
+            <div class="code-block">
+              <pre>interface=wlan0
+dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-block">
+              <pre>sudo systemctl unmask hostapd
+sudo systemctl enable hostapd dnsmasq
+sudo systemctl start hostapd dnsmasq</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Reboot — Pi broadcasts <span class="icode">VillageServer</span> Wi-Fi. Change password in hostapd.conf from <span class="icode">ChangeMeNow</span>.</p>
+          </div>
+        </details>
+
+        <div class="setup-section-hdr">Part 5 — Content Library</div>
+
+        <details class="setup-step">
+          <summary><span class="setup-num">11</span>Serve local content over the tunnel<span class="setup-chevron">›</span></summary>
+          <div class="setup-body">
+            <div class="code-block">
+              <pre>sudo apt install nginx -y</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Copy files (PDFs, audio, HTML) to the webroot:</p>
+            <div class="code-block">
+              <pre><span class="cm"># From your laptop to the Pi:</span>
+scp mybible.pdf pi@192.168.1.100:/var/www/html/</pre>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p>Connected clients open <span class="icode">http://10.8.0.1</span> in their phone browser — content loads offline, no internet required.</p>
+            <div class="setup-note ok">✅ &nbsp;nginx and wg-quick auto-start on boot (from Steps 6 + enable above). Pi recovers fully after power loss.</div>
+          </div>
+        </details>
+
+        <div class="setup-section-hdr">Troubleshooting</div>
+
+        <div class="qa-card">
+          <p class="qa-q">WireGuard starts but client can't connect</p>
+          <p class="qa-a">Check: (1) UDP port 51820 forwarded on router to Pi's LAN IP. (2) <code>Endpoint</code> in client config is your current public IP — run <code>curl ifconfig.me</code> on Pi. (3) Run <code>sudo ufw allow 51820/udp</code> if ufw is enabled. (4) <code>sudo wg show</code> — the peer appears once a handshake succeeds.</p>
+        </div>
+
+        <div class="qa-card">
+          <p class="qa-q">Handshake says "latest: never"</p>
+          <p class="qa-a">Client public key in <code>wg0.conf</code> doesn't match the actual client private key. Regenerate the client key pair (Step 7), update the <code>[Peer]</code> block with the new public key, restart <code>wg-quick@wg0</code>, regenerate the client config, rescan QR.</p>
+        </div>
+
+        <div class="qa-card">
+          <p class="qa-q">Client connects but can't reach the internet</p>
+          <p class="qa-a">IP forwarding is off. Run <code>cat /proc/sys/net/ipv4/ip_forward</code> — should be <code>1</code>. If it's <code>0</code>, re-run Step 6. Also check: <code>sudo iptables -t nat -L POSTROUTING</code> should show a MASQUERADE rule for <code>eth0</code>.</p>
+        </div>
+
+        <div class="qa-card">
+          <p class="qa-q">How do I add a new device later?</p>
+          <p class="qa-a">SSH to Pi → generate new key pair (Step 7) → add new <code>[Peer]</code> block to <code>wg0.conf</code> with next IP (10.8.0.3, 10.8.0.4…) → restart <code>wg-quick@wg0</code> → build client config (Step 8) → QR code (Step 9). Takes about 3 minutes.</p>
+        </div>
+
+        <div class="qa-card">
+          <p class="qa-q">How do I see who's currently connected?</p>
+          <p class="qa-a">Run <code>sudo wg show</code>. Each peer shows its last handshake and transfer stats. If latest handshake was within the last 3 minutes, the peer is actively connected (PersistentKeepalive = 25 s keeps it alive).</p>
+        </div>
+
       </div>
 
     </main>
@@ -1012,6 +1345,20 @@ function loadTab(tab){
   else if(tab === 'traffic') startTrafficPoll();
   else if(tab === 'applications') loadApplications();
   // 'resources' and 'internal' are static — nothing to load
+}
+
+// ── Copy-code button ─────────────────────────────────────
+function copyCode(btn){
+  var pre = btn.closest('.code-block').querySelector('pre');
+  var text = (pre.innerText || pre.textContent).replace(/​/g,'').trim();
+  navigator.clipboard.writeText(text).then(function(){
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+  }).catch(function(){
+    btn.textContent = 'Failed';
+    setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+  });
 }
 
 // ════════════════════════════════════════════════════════
