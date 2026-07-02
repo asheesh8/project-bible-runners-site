@@ -41,18 +41,25 @@
     /* ── Interactive logo hotspots ── */
     .logo-interactive{position:relative;display:inline-block;margin:0 auto 14px;border-radius:16px}
     .logo-interactive .home-hero-logo{display:block;margin:0;border-radius:16px;box-shadow:0 20px 50px rgba(8,35,64,.28)}
-    .logo-hs{position:absolute;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;border:2.5px solid transparent;background:transparent;cursor:pointer;padding:0;transition:background .18s,border-color .18s,box-shadow .18s;z-index:5}
-    .logo-hs:hover,.logo-hs:focus-visible{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.85);box-shadow:0 0 0 6px rgba(255,255,255,.12),0 0 16px rgba(255,255,255,.28);outline:0}
+    .logo-hs{position:absolute;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);cursor:pointer;padding:0;z-index:5;transition:background .2s,border-color .2s,box-shadow .2s}
+    .logo-hs:hover,.logo-hs:focus-visible{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.85);box-shadow:0 0 0 5px rgba(255,255,255,.12),0 0 18px rgba(255,255,255,.3);outline:0}
+    /* Rotating shine ring — comet sweep around each hotspot */
+    .logo-hs::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0% 28%,rgba(255,255,255,.9) 40%,rgba(255,255,255,.5) 55%,transparent 68% 100%);animation:hs-spin 2.4s linear infinite;mask:radial-gradient(circle,transparent 87%,#000 89%);-webkit-mask:radial-gradient(circle,transparent 87%,#000 89%);pointer-events:none}
+    .logo-hs:nth-child(2)::before{animation-delay:-0.0s}.logo-hs:nth-child(3)::before{animation-delay:-0.45s}.logo-hs:nth-child(4)::before{animation-delay:-0.9s}.logo-hs:nth-child(5)::before{animation-delay:-1.35s}.logo-hs:nth-child(6)::before{animation-delay:-1.8s}.logo-hs:nth-child(7)::before{animation-delay:-0.24s}.logo-hs:nth-child(8)::before{animation-delay:-0.68s}.logo-hs:nth-child(9)::before{animation-delay:-1.12s}.logo-hs:nth-child(10)::before{animation-delay:-1.56s}.logo-hs:nth-child(11)::before{animation-delay:-2.0s}
+    @keyframes hs-spin{to{transform:rotate(360deg)}}
     /* Guide card modal */
     .guide-card{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;padding:24px;background:rgba(8,28,52,.78);backdrop-filter:blur(8px)}
     .guide-card[hidden]{display:none}
-    .guide-card-inner{position:relative;background:#fff;border-radius:20px;padding:36px 28px 28px;max-width:390px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.35)}
-    .guide-close{position:absolute;top:10px;right:12px;border:0;background:transparent;font-size:22px;line-height:1;padding:4px 8px;cursor:pointer;color:var(--muted);border-radius:6px}
-    .guide-close:hover{color:var(--ink);background:var(--line)}
-    .guide-emoji{font-size:44px;margin-bottom:10px;line-height:1}
-    .guide-title{font-family:"Newsreader",Georgia,serif;font-size:1.55rem;font-weight:700;color:var(--ink);margin:0 0 10px}
-    .guide-desc{color:var(--muted);font-size:.98rem;line-height:1.55;margin:0 0 22px}
-    .guide-link-btn{display:inline-block;background:var(--blue);color:#fff;padding:11px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:.93rem;transition:background .15s}
+    .guide-card-inner{position:relative;background:#fff;border-radius:20px;overflow:hidden;max-width:420px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+    .guide-close{position:absolute;top:10px;right:10px;z-index:10;width:30px;height:30px;border:0;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .guide-close:hover{background:rgba(0,0,0,.7)}
+    .guide-photo-wrap{height:195px;overflow:hidden;background:var(--blue-soft)}
+    .guide-photo{width:100%;height:100%;object-fit:cover;display:block}
+    .guide-body{padding:18px 22px 24px;text-align:left}
+    .guide-category{font-size:.71rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:0 0 5px}
+    .guide-title{font-family:"Newsreader",Georgia,serif;font-size:1.42rem;font-weight:700;color:var(--ink);margin:0 0 9px}
+    .guide-desc{color:var(--muted);font-size:.96rem;line-height:1.55;margin:0 0 18px}
+    .guide-link-btn{display:inline-block;background:var(--blue);color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:.9rem;transition:background .15s}
     .guide-link-btn:hover,.guide-link-btn:focus-visible{background:var(--blue-dark);color:#fff;outline:0}
   </style>
 </head>
@@ -85,17 +92,17 @@
         </div>
         <div class="logo-interactive" id="logo-wrap" aria-label="Interactive VillageServer diagram — click any component to learn more" role="group">
           <img class="home-hero-logo" src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative logo showing Raspberry Pi server connected to projector, speakers, satellite, TV, radio, SD card, WiFi hotspot, and smartphones" width="525" height="600" fetchpriority="high" id="logo-img">
-          <!-- hotspot buttons — percentages are relative to the rendered image dimensions -->
-          <button class="logo-hs" title="Wi-Fi Connectivity" data-guide="wifi"         style="left:50%;top:22%"></button>
-          <button class="logo-hs" title="Projector"          data-guide="projector"     style="left:47%;top:30%"></button>
-          <button class="logo-hs" title="Speakers"           data-guide="speakers"      style="left:31%;top:37%"></button>
-          <button class="logo-hs" title="Satellite"          data-guide="satellite"     style="left:26%;top:46%"></button>
-          <button class="logo-hs" title="TV / Display"       data-guide="tv"            style="left:29%;top:56%"></button>
-          <button class="logo-hs" title="Radio"              data-guide="radio"         style="left:47%;top:60%"></button>
-          <button class="logo-hs" title="SD Card"            data-guide="sdcard"        style="left:65%;top:56%"></button>
-          <button class="logo-hs" title="Wi-Fi Hotspot"      data-guide="wifi-hotspot"  style="left:71%;top:46%"></button>
-          <button class="logo-hs" title="Smartphones"        data-guide="smartphones"   style="left:63%;top:37%"></button>
-          <button class="logo-hs" title="Raspberry Pi"       data-guide="pi"            style="left:49%;top:47%"></button>
+          <!-- hotspot buttons — left/top as % of rendered image width × height -->
+          <button class="logo-hs" title="Wi-Fi Connectivity" data-guide="wifi"         style="left:50.0%;top:21.5%"></button>
+          <button class="logo-hs" title="Projector"          data-guide="projector"     style="left:47.5%;top:30.5%"></button>
+          <button class="logo-hs" title="Speakers"           data-guide="speakers"      style="left:32.0%;top:36.5%"></button>
+          <button class="logo-hs" title="Satellite"          data-guide="satellite"     style="left:25.5%;top:45.5%"></button>
+          <button class="logo-hs" title="TV / Display"       data-guide="tv"            style="left:28.5%;top:55.5%"></button>
+          <button class="logo-hs" title="Radio"              data-guide="radio"         style="left:47.0%;top:58.5%"></button>
+          <button class="logo-hs" title="SD Card"            data-guide="sdcard"        style="left:64.5%;top:55.5%"></button>
+          <button class="logo-hs" title="Wi-Fi Hotspot"      data-guide="wifi-hotspot"  style="left:71.5%;top:45.5%"></button>
+          <button class="logo-hs" title="Smartphones"        data-guide="smartphones"   style="left:64.0%;top:36.5%"></button>
+          <button class="logo-hs" title="Raspberry Pi"       data-guide="pi"            style="left:49.5%;top:46.5%"></button>
         </div>
         <h1 class="visually-hidden">VillageServer Initiative</h1>
         <p class="hero-tagline">Placing God's Word within reach of every village — even where there is no internet, no power grid, and no trained technician.</p>
@@ -314,10 +321,15 @@
   <div class="guide-card" id="guide-card" role="dialog" aria-modal="true" aria-labelledby="guide-title" hidden>
     <div class="guide-card-inner">
       <button class="guide-close" id="guide-close" type="button" aria-label="Close guide">&times;</button>
-      <div class="guide-emoji" id="guide-emoji"></div>
-      <h3 class="guide-title" id="guide-title"></h3>
-      <p class="guide-desc" id="guide-desc"></p>
-      <a class="guide-link-btn" id="guide-link" href="#">Field Guide →</a>
+      <div class="guide-photo-wrap">
+        <img class="guide-photo" id="guide-photo" src="" alt="" loading="lazy">
+      </div>
+      <div class="guide-body">
+        <p class="guide-category" id="guide-category"></p>
+        <h3 class="guide-title" id="guide-title"></h3>
+        <p class="guide-desc" id="guide-desc"></p>
+        <a class="guide-link-btn" id="guide-link" href="#">Field Guide →</a>
+      </div>
     </div>
   </div>
 
@@ -331,16 +343,16 @@
     // Interactive logo guide
     (function(){
       var GUIDES={
-        wifi:       {icon:'📶',title:'Wi-Fi Connectivity',     desc:'The VillageServer broadcasts its own local Wi-Fi network — no internet required. Up to 40 devices can connect and browse the full library at once.',                                              link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
-        projector:  {icon:'📽',title:'Projector',              desc:'Stream gospel films and Bible teaching to a whole village at once. The Raspberry Pi outputs video directly via HDMI to any projector.',                                                           link:'./projector-media.html',    cta:'Projector & Media Guide'},
-        speakers:   {icon:'🔊',title:'Speakers',               desc:'Pair Bluetooth or wired speakers with the VillageServer for crowd-scale audio during film nights, open-air teaching, or outdoor gatherings.',                                                     link:'./projector-media.html',    cta:'Projector & Audio Guide'},
-        satellite:  {icon:'📡',title:'Satellite Receiver',     desc:'Pull fresh Scripture content directly from satellites like Galaxy 19. Receive and replay the full library across a region — no internet connection needed.',                                       link:'./satellite.html',          cta:'Satellite Systems Guide'},
-        tv:         {icon:'📺',title:'TV / Display',           desc:'Connect any TV or monitor via HDMI to play films and sermons locally. No streaming, no data — content lives on the server and plays instantly.',                                                   link:'./projector-media.html',    cta:'Display & Media Guide'},
-        radio:      {icon:'📻',title:'Radio',                  desc:'Broadcast audio Bible readings and teaching over FM to listeners with basic radios — extending reach beyond smartphones to those with only a simple receiver.',                                    link:'./guide.html',              cta:'Field Guide'},
-        sdcard:     {icon:'💾',title:'microSD Card',           desc:'The smallest deployment: one card holds the entire library. Pass it hand to hand so anyone — even without a phone or Wi-Fi — can receive the Word.',                                             link:'./access.html',             cta:'Sharing & Access Guide'},
-        'wifi-hotspot':{icon:'🌐',title:'Wi-Fi Hotspot Router',desc:'The VillageServer creates its own wireless LAN. Any phone with Wi-Fi can connect and browse the full Scripture library in a browser — no app, no data plan, no cost.',                           link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
-        smartphones:{icon:'📱',title:'Smartphones',            desc:'Any Wi-Fi-enabled phone can connect and browse the full library through a web browser. Nothing to install, no data required — just connect to the VillageServer network.',                       link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
-        pi:         {icon:'🖥',title:'Raspberry Pi Server',    desc:'The heart of the system: a credit-card-sized computer that runs the server software, hosts the full content library, and powers the local Wi-Fi network — all from a small battery or solar panel.',link:'./raspberry-pi.html',       cta:'Raspberry Pi Setup Guide'}
+        wifi:          {cat:'Wireless Network',  title:'Wi-Fi Connectivity',     img:'./img/kit-pi.webp',                         imgAlt:'Raspberry Pi VillageServer unit',                    desc:'The VillageServer creates its own local Wi-Fi network — no internet required. Up to 40 devices can connect and browse the full library simultaneously.',                                                    link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
+        projector:     {cat:'Visual Ministry',   title:'Projector',              img:'./img/projector.webp',                      imgAlt:'Portable DLP projector',                             desc:'A compact DLP projector connects via HDMI directly from the Raspberry Pi. Stream gospel films and Bible teaching to a whole village at once — no internet, no streaming service.',                          link:'./projector-media.html',    cta:'Projector & Media Guide'},
+        speakers:      {cat:'Audio Ministry',    title:'Speakers',               img:'./img/broadcast.webp',                      imgAlt:'Bible content streaming on a display',               desc:'Pair Bluetooth or wired speakers with the VillageServer for crowd-scale audio. Amplify gospel films, music, and teaching during outdoor gatherings and village film nights.',                                link:'./projector-media.html',    cta:'Projector & Audio Guide'},
+        satellite:     {cat:'Regional Reach',    title:'Satellite Receiver',     img:'./img/dish.webp',                           imgAlt:'Satellite dish for receiving Scripture content',      desc:'Pull fresh Scripture content from satellites like Galaxy 19. Receive and replay the full library across an entire region — completely off the internet and off the grid.',                                   link:'./satellite.html',          cta:'Satellite Systems Guide'},
+        tv:            {cat:'Visual Ministry',   title:'TV / Display',           img:'./img/broadcast.webp',                      imgAlt:'Bible content playing on a screen',                  desc:'Connect any TV or monitor via HDMI to play gospel films and teaching sermons locally. No streaming service, no data cost — the content lives on the server and plays instantly.',                            link:'./projector-media.html',    cta:'Display & Media Guide'},
+        radio:         {cat:'Audio Broadcast',   title:'Radio',                  img:'./img/field-distribute.webp',               imgAlt:'Scripture resources being distributed in the field',  desc:'Broadcast audio Bible readings and teaching over FM radio to listeners with basic receivers — extending the reach of the Word beyond smartphones to those with only a simple radio.',                        link:'./guide.html',              cta:'Field Guide'},
+        sdcard:        {cat:'Hand-to-Hand',      title:'microSD Card',           img:'./img/field-distribute.webp',               imgAlt:'Distributing Scripture in the field',                desc:'The smallest deployment: a single card holds the entire library. Pass it hand to hand so anyone — even without a phone or Wi-Fi access — can carry the full Word of God.',                                  link:'./access.html',             cta:'Sharing & Access Guide'},
+        'wifi-hotspot':{cat:'Wireless Network',  title:'Wi-Fi Hotspot Router',   img:'./img/kit-pi.webp',                         imgAlt:'VillageServer Raspberry Pi unit creating a hotspot', desc:'The VillageServer broadcasts its own wireless LAN. Any smartphone with Wi-Fi can connect and browse the full Scripture library in a browser — no app to install, no data plan, no cost.',                   link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
+        smartphones:   {cat:'Mobile Access',     title:'Smartphones',            img:'./img/receiving.webp',                      imgAlt:'Someone receiving Scripture content',                desc:'Any Wi-Fi-enabled phone can connect and browse the entire library through a standard web browser. Nothing to install, no data required — just connect to the VillageServer\'s local network.',                link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
+        pi:            {cat:'Core System',       title:'Raspberry Pi Server',    img:'./img/villageserver-case-usb-readers.jpeg', imgAlt:'VillageServer field kit with solar case',            desc:'The heart of the system: a credit-card-sized Raspberry Pi runs the server, hosts the full content library, and powers the Wi-Fi network — all from a small battery or a solar panel in the field.',        link:'./raspberry-pi.html',       cta:'Raspberry Pi Setup Guide'}
       };
       var card=document.getElementById('guide-card');
       var closeBtn=document.getElementById('guide-close');
@@ -348,7 +360,9 @@
       var lastFocus;
       function openGuide(key){
         var g=GUIDES[key];if(!g)return;
-        document.getElementById('guide-emoji').textContent=g.icon;
+        var photo=document.getElementById('guide-photo');
+        photo.src=g.img;photo.alt=g.imgAlt;
+        document.getElementById('guide-category').textContent=g.cat;
         document.getElementById('guide-title').textContent=g.title;
         document.getElementById('guide-desc').textContent=g.desc;
         var lnk=document.getElementById('guide-link');
