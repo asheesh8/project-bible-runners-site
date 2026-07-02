@@ -37,6 +37,23 @@
     .reach-step:nth-child(5){border-top-color:#a87020}
     @media (max-width:960px){.reach-ladder{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:520px){.reach-ladder{grid-template-columns:1fr}}
+
+    /* ── Interactive logo hotspots ── */
+    .logo-interactive{position:relative;display:inline-block;margin:0 auto 14px;border-radius:16px}
+    .logo-interactive .home-hero-logo{display:block;margin:0;border-radius:16px;box-shadow:0 20px 50px rgba(8,35,64,.28)}
+    .logo-hs{position:absolute;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;border:2.5px solid transparent;background:transparent;cursor:pointer;padding:0;transition:background .18s,border-color .18s,box-shadow .18s;z-index:5}
+    .logo-hs:hover,.logo-hs:focus-visible{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.85);box-shadow:0 0 0 6px rgba(255,255,255,.12),0 0 16px rgba(255,255,255,.28);outline:0}
+    /* Guide card modal */
+    .guide-card{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;padding:24px;background:rgba(8,28,52,.78);backdrop-filter:blur(8px)}
+    .guide-card[hidden]{display:none}
+    .guide-card-inner{position:relative;background:#fff;border-radius:20px;padding:36px 28px 28px;max-width:390px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+    .guide-close{position:absolute;top:10px;right:12px;border:0;background:transparent;font-size:22px;line-height:1;padding:4px 8px;cursor:pointer;color:var(--muted);border-radius:6px}
+    .guide-close:hover{color:var(--ink);background:var(--line)}
+    .guide-emoji{font-size:44px;margin-bottom:10px;line-height:1}
+    .guide-title{font-family:"Newsreader",Georgia,serif;font-size:1.55rem;font-weight:700;color:var(--ink);margin:0 0 10px}
+    .guide-desc{color:var(--muted);font-size:.98rem;line-height:1.55;margin:0 0 22px}
+    .guide-link-btn{display:inline-block;background:var(--blue);color:#fff;padding:11px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:.93rem;transition:background .15s}
+    .guide-link-btn:hover,.guide-link-btn:focus-visible{background:var(--blue-dark);color:#fff;outline:0}
   </style>
 </head>
 <body>
@@ -66,9 +83,20 @@
             <option value="sd">سنڌي / Sindhi</option>
           </select>
         </div>
-        <button class="logo-button" type="button" aria-label="Open enlarged VillageServer Initiative logo" aria-haspopup="dialog" aria-controls="logo-modal">
-          <img class="home-hero-logo" src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative logo" width="1254" height="1254" fetchpriority="high">
-        </button>
+        <div class="logo-interactive" id="logo-wrap" aria-label="Interactive VillageServer diagram — click any component to learn more" role="group">
+          <img class="home-hero-logo" src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative logo showing Raspberry Pi server connected to projector, speakers, satellite, TV, radio, SD card, WiFi hotspot, and smartphones" width="525" height="600" fetchpriority="high" id="logo-img">
+          <!-- hotspot buttons — percentages are relative to the rendered image dimensions -->
+          <button class="logo-hs" title="Wi-Fi Connectivity" data-guide="wifi"         style="left:50%;top:22%"></button>
+          <button class="logo-hs" title="Projector"          data-guide="projector"     style="left:47%;top:30%"></button>
+          <button class="logo-hs" title="Speakers"           data-guide="speakers"      style="left:31%;top:37%"></button>
+          <button class="logo-hs" title="Satellite"          data-guide="satellite"     style="left:26%;top:46%"></button>
+          <button class="logo-hs" title="TV / Display"       data-guide="tv"            style="left:29%;top:56%"></button>
+          <button class="logo-hs" title="Radio"              data-guide="radio"         style="left:47%;top:60%"></button>
+          <button class="logo-hs" title="SD Card"            data-guide="sdcard"        style="left:65%;top:56%"></button>
+          <button class="logo-hs" title="Wi-Fi Hotspot"      data-guide="wifi-hotspot"  style="left:71%;top:46%"></button>
+          <button class="logo-hs" title="Smartphones"        data-guide="smartphones"   style="left:63%;top:37%"></button>
+          <button class="logo-hs" title="Raspberry Pi"       data-guide="pi"            style="left:49%;top:47%"></button>
+        </div>
         <h1 class="visually-hidden">VillageServer Initiative</h1>
         <p class="hero-tagline">Placing God's Word within reach of every village — even where there is no internet, no power grid, and no trained technician.</p>
         <p class="hero-verse">Matthew 24:14 &nbsp;·&nbsp; Project 42: 42% of the world has never heard that Jesus loves them</p>
@@ -283,10 +311,13 @@
 
   </main>
 
-  <div class="logo-modal" id="logo-modal" role="dialog" aria-modal="true" aria-label="VillageServer Initiative logo enlarged" hidden>
-    <div class="logo-dialog">
-      <button class="logo-close" type="button" aria-label="Close enlarged logo">&times;</button>
-      <img src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative logo enlarged" width="1254" height="1254" loading="lazy">
+  <div class="guide-card" id="guide-card" role="dialog" aria-modal="true" aria-labelledby="guide-title" hidden>
+    <div class="guide-card-inner">
+      <button class="guide-close" id="guide-close" type="button" aria-label="Close guide">&times;</button>
+      <div class="guide-emoji" id="guide-emoji"></div>
+      <h3 class="guide-title" id="guide-title"></h3>
+      <p class="guide-desc" id="guide-desc"></p>
+      <a class="guide-link-btn" id="guide-link" href="#">Field Guide →</a>
     </div>
   </div>
 
@@ -297,16 +328,40 @@
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/i18n.js?v=2"></script>
   <script>
-    // Logo modal
+    // Interactive logo guide
     (function(){
-      var openButton=document.querySelector('.logo-button'),modal=document.getElementById('logo-modal'),closeButton=document.querySelector('.logo-close');
-      if(!openButton||!modal||!closeButton)return;
-      function openLogo(){modal.hidden=false;closeButton.focus({preventScroll:true});}
-      function closeLogo(){modal.hidden=true;openButton.focus({preventScroll:true});}
-      openButton.addEventListener('click',openLogo);
-      closeButton.addEventListener('click',closeLogo);
-      modal.addEventListener('click',function(e){if(e.target===modal)closeLogo();});
-      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!modal.hidden)closeLogo();});
+      var GUIDES={
+        wifi:       {icon:'📶',title:'Wi-Fi Connectivity',     desc:'The VillageServer broadcasts its own local Wi-Fi network — no internet required. Up to 40 devices can connect and browse the full library at once.',                                              link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
+        projector:  {icon:'📽',title:'Projector',              desc:'Stream gospel films and Bible teaching to a whole village at once. The Raspberry Pi outputs video directly via HDMI to any projector.',                                                           link:'./projector-media.html',    cta:'Projector & Media Guide'},
+        speakers:   {icon:'🔊',title:'Speakers',               desc:'Pair Bluetooth or wired speakers with the VillageServer for crowd-scale audio during film nights, open-air teaching, or outdoor gatherings.',                                                     link:'./projector-media.html',    cta:'Projector & Audio Guide'},
+        satellite:  {icon:'📡',title:'Satellite Receiver',     desc:'Pull fresh Scripture content directly from satellites like Galaxy 19. Receive and replay the full library across a region — no internet connection needed.',                                       link:'./satellite.html',          cta:'Satellite Systems Guide'},
+        tv:         {icon:'📺',title:'TV / Display',           desc:'Connect any TV or monitor via HDMI to play films and sermons locally. No streaming, no data — content lives on the server and plays instantly.',                                                   link:'./projector-media.html',    cta:'Display & Media Guide'},
+        radio:      {icon:'📻',title:'Radio',                  desc:'Broadcast audio Bible readings and teaching over FM to listeners with basic radios — extending reach beyond smartphones to those with only a simple receiver.',                                    link:'./guide.html',              cta:'Field Guide'},
+        sdcard:     {icon:'💾',title:'microSD Card',           desc:'The smallest deployment: one card holds the entire library. Pass it hand to hand so anyone — even without a phone or Wi-Fi — can receive the Word.',                                             link:'./access.html',             cta:'Sharing & Access Guide'},
+        'wifi-hotspot':{icon:'🌐',title:'Wi-Fi Hotspot Router',desc:'The VillageServer creates its own wireless LAN. Any phone with Wi-Fi can connect and browse the full Scripture library in a browser — no app, no data plan, no cost.',                           link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
+        smartphones:{icon:'📱',title:'Smartphones',            desc:'Any Wi-Fi-enabled phone can connect and browse the full library through a web browser. Nothing to install, no data required — just connect to the VillageServer network.',                       link:'./phone-distribution.html', cta:'Phone Distribution Guide'},
+        pi:         {icon:'🖥',title:'Raspberry Pi Server',    desc:'The heart of the system: a credit-card-sized computer that runs the server software, hosts the full content library, and powers the local Wi-Fi network — all from a small battery or solar panel.',link:'./raspberry-pi.html',       cta:'Raspberry Pi Setup Guide'}
+      };
+      var card=document.getElementById('guide-card');
+      var closeBtn=document.getElementById('guide-close');
+      if(!card||!closeBtn)return;
+      var lastFocus;
+      function openGuide(key){
+        var g=GUIDES[key];if(!g)return;
+        document.getElementById('guide-emoji').textContent=g.icon;
+        document.getElementById('guide-title').textContent=g.title;
+        document.getElementById('guide-desc').textContent=g.desc;
+        var lnk=document.getElementById('guide-link');
+        lnk.href=g.link;lnk.textContent=g.cta+' →';
+        card.hidden=false;closeBtn.focus({preventScroll:true});
+      }
+      function closeGuide(){card.hidden=true;if(lastFocus)lastFocus.focus({preventScroll:true});}
+      document.querySelectorAll('.logo-hs').forEach(function(btn){
+        btn.addEventListener('click',function(){lastFocus=btn;openGuide(btn.getAttribute('data-guide'));});
+      });
+      closeBtn.addEventListener('click',closeGuide);
+      card.addEventListener('click',function(e){if(e.target===card)closeGuide();});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!card.hidden)closeGuide();});
     })();
     // Admin easter egg
     (function(){
