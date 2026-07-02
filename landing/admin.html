@@ -420,10 +420,24 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
       </div>
       <div class="sidebar-section">
+        <div class="sidebar-label">Field</div>
+        <div class="nav-item" data-tab="applications">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+          Applications
+        </div>
+      </div>
+      <div class="sidebar-section">
         <div class="sidebar-label">Analytics</div>
         <div class="nav-item" data-tab="traffic">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           Traffic
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Internal</div>
+        <div class="nav-item" data-tab="internal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
+          Field Guides (Pi)
         </div>
       </div>
       <div class="sidebar-section">
@@ -842,6 +856,37 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
       </div>
 
+      <!-- ── APPLICATIONS ──────────────────────────── -->
+      <div class="tab-view" id="tab-applications">
+        <div class="page-header"><h2 class="page-title">Equipment &amp; Funding Applications</h2></div>
+
+        <div class="res-section">
+          <div class="res-section-title">🔌 &nbsp;Application section on the public site</div>
+          <p style="margin:0 0 14px;color:#57606a;max-width:640px">Turn the public <strong>Equipment &amp; Funding Application</strong> page on or off. While it is off, the link is hidden from the site and the form will not accept submissions — keep it off until the 501(c)(3) is in place.</p>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <span id="apps-flag-state" style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;font-weight:800;font-size:.85rem;background:#eaeef2;color:#57606a">Loading…</span>
+            <button type="button" id="apps-flag-toggle" style="padding:9px 18px;border-radius:8px;border:0;background:#316dca;color:#fff;font-weight:800;font-size:.9rem;cursor:pointer;opacity:.6" disabled>Loading…</button>
+          </div>
+        </div>
+
+        <div class="res-section">
+          <div class="res-section-title">📨 &nbsp;Submitted applications</div>
+          <div class="interests-table-wrap" id="applications-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+      </div>
+
+      <!-- ── INTERNAL: FIELD GUIDES ────────────────── -->
+      <div class="tab-view" id="tab-internal">
+        <div class="page-header"><h2 class="page-title">Field Guides — Internal</h2></div>
+        <div class="res-section">
+          <div class="res-section-title">🍓 &nbsp;Raspberry Pi VillageServer setup</div>
+          <p style="margin:0 0 14px;color:#57606a;max-width:720px">This detailed build guide is kept here in the admin only — it is no longer linked from the public site, but the work is preserved and viewable any time. <a href="./raspberry-pi.html" target="_blank" rel="noopener" style="color:#316dca;font-weight:800">Open in a new tab ↗</a></p>
+          <div style="border:1px solid #d0d7de;border-radius:12px;overflow:hidden;background:#fff">
+            <iframe src="./raspberry-pi.html" title="Raspberry Pi VillageServer setup guide" loading="lazy" style="width:100%;height:72vh;border:0;display:block"></iframe>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div><!-- /.app-body -->
 </div><!-- /#app -->
@@ -965,7 +1010,85 @@ function loadTab(tab){
   else if(tab === 'photos') loadPhotos();
   else if(tab === 'testimonies') loadTestimonies();
   else if(tab === 'traffic') startTrafficPoll();
-  // 'resources' is static — nothing to load
+  else if(tab === 'applications') loadApplications();
+  // 'resources' and 'internal' are static — nothing to load
+}
+
+// ════════════════════════════════════════════════════════
+// EQUIPMENT & FUNDING APPLICATIONS
+// ════════════════════════════════════════════════════════
+function trackApi(method, type, body){
+  var url = '/api/track?type=' + type;
+  var opts = { method: method, cache: 'no-store', headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN } };
+  if(body){ opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  return fetch(url, opts).then(function(r){ return r.json().catch(function(){ return null; }); });
+}
+
+function renderAppsFlag(open){
+  var state = document.getElementById('apps-flag-state');
+  var btn = document.getElementById('apps-flag-toggle');
+  if(!state || !btn) return;
+  if(open){
+    state.textContent = 'On — live on the site';
+    state.style.background = '#dafbe1'; state.style.color = '#1a7f37';
+    btn.textContent = 'Turn applications OFF';
+    btn.style.background = '#cf222e';
+  } else {
+    state.textContent = 'Off — hidden from the site';
+    state.style.background = '#ffebe9'; state.style.color = '#cf222e';
+    btn.textContent = 'Turn applications ON';
+    btn.style.background = '#1a7f37';
+  }
+  btn.style.opacity = '1';
+  btn.disabled = false;
+  btn.dataset.open = open ? '1' : '0';
+}
+
+function loadApplications(){
+  // Load the current on/off flag
+  var btn = document.getElementById('apps-flag-toggle');
+  fetch('/api/track?type=setting&key=applications_open', { cache: 'no-store' })
+    .then(function(r){ return r.json(); })
+    .then(function(data){ renderAppsFlag(!!(data && (data.value === true || data.value === 'true'))); })
+    .catch(function(){ renderAppsFlag(false); });
+
+  if(btn && !btn.dataset.bound){
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', function(){
+      var next = btn.dataset.open !== '1';
+      btn.disabled = true; btn.style.opacity = '.6'; btn.textContent = 'Saving…';
+      trackApi('POST', 'setting', { key: 'applications_open', value: next })
+        .then(function(){ renderAppsFlag(next); showStatus('Applications turned ' + (next ? 'ON' : 'OFF') + '.', 'success'); })
+        .catch(function(){ renderAppsFlag(!next); showStatus('Could not update the setting.', 'error'); });
+    });
+  }
+
+  // Load submitted applications
+  var list = document.getElementById('applications-list');
+  trackApi('GET', 'applications').then(function(rows){
+    if(!Array.isArray(rows) || !rows.length){
+      list.innerHTML = '<div class="empty-state" style="padding:20px"><div>No applications submitted yet.</div></div>';
+      return;
+    }
+    list.innerHTML = rows.map(function(a){
+      var equip = Array.isArray(a.equipment_needed) ? a.equipment_needed.join(', ') : '';
+      return '<div style="padding:16px;border:1px solid #d0d7de;border-radius:12px;background:#fff;margin-bottom:12px">'
+        + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">'
+        + '<strong style="font-size:1rem">' + esc(a.name) + '</strong>'
+        + '<span style="color:#57606a;font-size:.85rem">' + fmtDate(a.created_at) + '</span></div>'
+        + '<div style="color:#57606a;font-size:.9rem;margin-top:4px">'
+        + esc(a.email) + (a.country ? ' · ' + esc(a.country) : '') + (a.region ? ', ' + esc(a.region) : '')
+        + (a.organization ? ' · ' + esc(a.organization) : '') + (a.role ? ' · ' + esc(a.role) : '') + '</div>'
+        + (equip ? '<div style="margin-top:8px;font-size:.9rem"><strong>Equipment:</strong> ' + esc(equip) + '</div>' : '')
+        + (a.funding_needed ? '<div style="margin-top:4px;font-size:.9rem"><strong>Funding:</strong> ' + esc(a.funding_needed) + '</div>' : '')
+        + (a.timeframe ? '<div style="margin-top:4px;font-size:.9rem"><strong>Timeframe:</strong> ' + esc(a.timeframe) + '</div>' : '')
+        + (a.mission_context ? '<div style="margin-top:8px;font-size:.92rem;color:#24292f"><strong>Context:</strong> ' + esc(a.mission_context) + '</div>' : '')
+        + (a.message ? '<div style="margin-top:6px;font-size:.92rem;color:#24292f"><strong>Notes:</strong> ' + esc(a.message) + '</div>' : '')
+        + '</div>';
+    }).join('');
+  }).catch(function(){
+    list.innerHTML = '<div class="empty-state" style="padding:20px"><div>Could not load applications.</div></div>';
+  });
 }
 
 // ════════════════════════════════════════════════════════

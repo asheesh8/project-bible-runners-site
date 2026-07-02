@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Equipment &amp; Funding Application | VillageServer Initiative</title>
+  <meta name="description" content="Missionaries and field partners can apply to receive VillageServer equipment and funding to equip a mission — offline Bible libraries, phones, Raspberry Pi kits, projectors, satellite, and solar power.">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/board.css?v=11">
+  <style>
+    /* Scoped styles for the application form — reuses board.css tokens */
+    .apply-wrap{max-width:820px;margin-inline:auto}
+    .apply-card{padding:clamp(24px,4vw,40px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:var(--shadow)}
+    .apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .apply-field{display:flex;flex-direction:column;gap:6px}
+    .apply-field-full{grid-column:1/-1}
+    .apply-field label{font-weight:800;font-size:.92rem;color:var(--ink)}
+    .apply-field input,.apply-field textarea,.apply-field select{font:inherit;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);resize:vertical}
+    .apply-field input:focus,.apply-field textarea:focus,.apply-field select:focus{outline:0;border-color:var(--blue);background:#fff}
+    .apply-req{color:var(--gold)}
+    .equip-legend{font-weight:800;font-size:.92rem;color:var(--ink);margin:0 0 4px}
+    .equip-chips{display:flex;flex-wrap:wrap;gap:10px}
+    .equip-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--paper);cursor:pointer;font-weight:700;font-size:.94rem;color:var(--ink);transition:border-color .15s,background .15s}
+    .equip-chip:hover{border-color:var(--blue)}
+    .equip-chip input{accent-color:var(--blue);width:16px;height:16px}
+    .equip-chip:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
+    .apply-actions{grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px}
+    .apply-actions .pdf-button{margin-top:0;border:0;cursor:pointer;font:inherit;flex:0 0 auto}
+    .apply-actions .pdf-button:disabled{opacity:.7;cursor:default}
+    .apply-status{margin:0;font-weight:800;font-size:.94rem}
+    .apply-status.is-success{color:#1d7a4c}
+    .apply-status.is-error{color:#b3271d}
+    .apply-closed{padding:clamp(26px,4vw,42px);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:24px;background:#fff;box-shadow:var(--shadow);text-align:center}
+    .apply-closed h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.7rem,3vw,2.4rem);margin:0 0 10px;color:var(--ink)}
+    .apply-closed p{color:var(--muted);font-size:1.06rem;margin:0 auto;max-width:560px;line-height:1.5}
+    .apply-loading{padding:40px;text-align:center;color:var(--muted);font-weight:700}
+    @media (max-width:620px){.apply-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="board-top">
+    <div class="wrap">
+      <a class="board-brand" href="./index.html"><img src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative"><span>VillageServer Initiative</span></a>
+      <a class="board-back" href="./index.html#directory">Back to directory</a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="board-hero">
+      <div class="wrap">
+        <p class="meta">Equipment &amp; Funding Application</p>
+        <h1>Apply to equip your mission</h1>
+        <p class="summary">Missionaries and field partners can apply to receive VillageServer equipment and funding — offline Bible libraries, phones, Raspberry Pi kits, projectors, satellite receive-and-replay, and solar power — to carry God's Word into the villages you serve.</p>
+      </div>
+    </section>
+
+    <section class="page-body">
+      <div class="wrap apply-wrap">
+
+        <!-- Loading state while we check whether applications are open -->
+        <div class="apply-loading" id="apply-loading">Loading application…</div>
+
+        <!-- Shown when the admin has applications turned OFF -->
+        <div class="apply-closed" id="apply-closed" hidden>
+          <h2>Applications are not open yet</h2>
+          <p>We are finishing our nonprofit setup before opening equipment and funding applications. Please check back soon — or use the <a href="./index.html#contact">contact form</a> to reach the team and we will follow up when applications open.</p>
+        </div>
+
+        <!-- The application form (shown only when applications are open) -->
+        <div class="apply-card" id="apply-card" hidden>
+          <form class="apply-grid" id="apply-form" novalidate>
+            <div class="apply-field">
+              <label for="apply-name">Full name <span class="apply-req" aria-hidden="true">*</span></label>
+              <input type="text" id="apply-name" name="name" autocomplete="name" maxlength="160" required>
+            </div>
+            <div class="apply-field">
+              <label for="apply-email">Email <span class="apply-req" aria-hidden="true">*</span></label>
+              <input type="email" id="apply-email" name="email" autocomplete="email" maxlength="255" required>
+            </div>
+            <div class="apply-field">
+              <label for="apply-org">Organization / ministry</label>
+              <input type="text" id="apply-org" name="organization" maxlength="200">
+            </div>
+            <div class="apply-field">
+              <label for="apply-role">Your role</label>
+              <input type="text" id="apply-role" name="role" maxlength="120" placeholder="Missionary, pastor, field partner…">
+            </div>
+            <div class="apply-field">
+              <label for="apply-country">Country of mission <span class="apply-req" aria-hidden="true">*</span></label>
+              <input type="text" id="apply-country" name="country" maxlength="120" required>
+            </div>
+            <div class="apply-field">
+              <label for="apply-region">Region / city</label>
+              <input type="text" id="apply-region" name="region" maxlength="160">
+            </div>
+            <div class="apply-field apply-field-full">
+              <label for="apply-context">Mission context</label>
+              <textarea id="apply-context" name="mission_context" rows="4" maxlength="2000" placeholder="Who do you serve, where, and how far does your outreach currently reach?"></textarea>
+            </div>
+
+            <fieldset class="apply-field apply-field-full" style="border:0;margin:0;padding:0">
+              <legend class="equip-legend">Equipment needed</legend>
+              <div class="equip-chips" id="equip-chips">
+                <label class="equip-chip"><input type="checkbox" name="equipment" value="microSD library"> microSD library</label>
+                <label class="equip-chip"><input type="checkbox" name="equipment" value="Phones"> Phones</label>
+                <label class="equip-chip"><input type="checkbox" name="equipment" value="Wi-Fi sharing hub"> Wi-Fi sharing hub</label>
+                <label class="equip-chip"><input type="checkbox" name="equipment" value="Raspberry Pi VillageServer"> Raspberry Pi VillageServer</label>
+                <label class="equip-chip"><input type="checkbox" name="equipment" value="Projector &amp; audio"> Projector &amp; audio</label>
+                <label class="equip-chip"><input type="checkbox" name="equipment" value="Satellite system"> Satellite system</label>
+                <label class="equip-chip"><input type="checkbox" name="equipment" value="Solar / power"> Solar / power</label>
+                <label class="equip-chip"><input type="checkbox" name="equipment" value="Printed materials"> Printed materials</label>
+              </div>
+            </fieldset>
+
+            <div class="apply-field">
+              <label for="apply-funding">Funding requested / budget</label>
+              <input type="text" id="apply-funding" name="funding_needed" maxlength="200" placeholder="Optional — an estimate is fine">
+            </div>
+            <div class="apply-field">
+              <label for="apply-timeframe">Timeframe</label>
+              <input type="text" id="apply-timeframe" name="timeframe" maxlength="160" placeholder="When do you need to deploy?">
+            </div>
+            <div class="apply-field apply-field-full">
+              <label for="apply-message">Anything else</label>
+              <textarea id="apply-message" name="message" rows="4" maxlength="2000" placeholder="Partnerships, references, shipping notes, or questions."></textarea>
+            </div>
+
+            <div class="apply-actions">
+              <button type="submit" class="pdf-button" id="apply-submit-btn">Submit application</button>
+              <p class="apply-status" id="apply-status" role="status" aria-live="polite"></p>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
+
+  <script src="./js/site-language.js?v=2"></script>
+  <script src="./js/site-tracking.js?v=1"></script>
+  <script>
+    (function(){
+      var loadingEl = document.getElementById('apply-loading');
+      var closedEl = document.getElementById('apply-closed');
+      var cardEl = document.getElementById('apply-card');
+      var form = document.getElementById('apply-form');
+      var statusEl = document.getElementById('apply-status');
+      var btn = document.getElementById('apply-submit-btn');
+
+      // Ask the server whether applications are currently open.
+      fetch('/api/track?type=setting&key=applications_open', { cache: 'no-store' })
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          var open = data && (data.value === true || data.value === 'true');
+          loadingEl.hidden = true;
+          if(open){ cardEl.hidden = false; }
+          else { closedEl.hidden = false; }
+        })
+        .catch(function(){
+          // On error, fail safe to the closed state so nothing is promised prematurely.
+          loadingEl.hidden = true;
+          closedEl.hidden = false;
+        });
+
+      if(!form) return;
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        var name = document.getElementById('apply-name').value.trim();
+        var email = document.getElementById('apply-email').value.trim();
+        var country = document.getElementById('apply-country').value.trim();
+        if(!name || !email || !country){
+          statusEl.textContent = 'Please fill in your name, email, and country.';
+          statusEl.className = 'apply-status is-error';
+          return;
+        }
+        var equipment = Array.prototype.slice.call(
+          document.querySelectorAll('input[name="equipment"]:checked')
+        ).map(function(el){ return el.value; });
+
+        btn.disabled = true;
+        btn.textContent = 'Submitting…';
+        statusEl.textContent = '';
+        statusEl.className = 'apply-status';
+
+        var payload = {
+          name: name,
+          email: email,
+          organization: document.getElementById('apply-org').value.trim(),
+          role: document.getElementById('apply-role').value.trim(),
+          country: country,
+          region: document.getElementById('apply-region').value.trim(),
+          mission_context: document.getElementById('apply-context').value.trim(),
+          equipment_needed: equipment,
+          funding_needed: document.getElementById('apply-funding').value.trim(),
+          timeframe: document.getElementById('apply-timeframe').value.trim(),
+          message: document.getElementById('apply-message').value.trim()
+        };
+        if(window.VSITracking && window.VSITracking.enrich) payload = window.VSITracking.enrich(payload);
+
+        fetch('/api/track?type=application', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
+          .then(function(result){
+            if(!result.ok || !result.data || !result.data.ok) throw new Error('failed');
+            statusEl.textContent = 'Thank you — your application has been received. Our team will review it and reply by email.';
+            statusEl.className = 'apply-status is-success';
+            form.reset();
+          })
+          .catch(function(){
+            statusEl.textContent = 'Something went wrong submitting your application. Please try again, or email villageserverinitiative@gmail.com directly.';
+            statusEl.className = 'apply-status is-error';
+          })
+          .then(function(){
+            btn.disabled = false;
+            btn.textContent = 'Submit application';
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -259,6 +259,63 @@ insert into public.affiliates (name, description, active, sort_order)
 select 'Digital Bible Society', 'Digital Bible resources and library support.', true, 20
 where not exists (select 1 from public.affiliates where name = 'Digital Bible Society');
 
+-- ── Equipment & Funding Application + editable site settings ────────
+-- Missionaries and field partners apply for equipment/funding here.
+-- Submissions arrive through /api/track (service role) and are read in the
+-- admin panel. The applications_open flag lets an admin turn the public
+-- application section on or off without a code deploy.
+create table if not exists public.equipment_applications (
+  id uuid primary key default gen_random_uuid(),
+  visitor_id text,
+  site_host text,
+  name text not null,
+  email text not null,
+  organization text,
+  role text,
+  country text not null,
+  region text,
+  mission_context text,
+  equipment_needed jsonb not null default '[]'::jsonb,
+  funding_needed text,
+  timeframe text,
+  message text,
+  status text not null default 'new',
+  utm_source text,
+  utm_medium text,
+  utm_campaign text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.site_settings (
+  key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists equipment_applications_created_idx on public.equipment_applications (created_at desc);
+create index if not exists equipment_applications_status_idx on public.equipment_applications (status);
+
+drop trigger if exists site_settings_set_updated_at on public.site_settings;
+create trigger site_settings_set_updated_at before update on public.site_settings
+for each row execute function public.set_updated_at();
+
+alter table public.equipment_applications enable row level security;
+alter table public.site_settings enable row level security;
+
+-- Applications are private: writes and admin reads use the service role only.
+revoke all on public.equipment_applications from anon, authenticated;
+
+-- The applications_open flag may be read publicly so the application page
+-- knows whether to show the form. Writes still require the service role.
+drop policy if exists "Public reads settings" on public.site_settings;
+create policy "Public reads settings" on public.site_settings for select to anon, authenticated using (true);
+grant select on public.site_settings to anon, authenticated;
+
+-- Default: applications stay OFF until the nonprofit setup is complete.
+insert into public.site_settings (key, value)
+select 'applications_open', 'false'::jsonb
+where not exists (select 1 from public.site_settings where key = 'applications_open');
+
 -- Confirm all expected tables exist after running the migration.
 select table_name
 from information_schema.tables
@@ -266,6 +323,6 @@ where table_schema = 'public'
   and table_name in (
     'campaigns', 'posts', 'photos', 'affiliates',
     'page_visits', 'link_clicks', 'donation_interests', 'availability_requests',
-    'contact_messages'
+    'contact_messages', 'equipment_applications', 'site_settings'
   )
 order by table_name;

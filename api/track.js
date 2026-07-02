@@ -88,7 +88,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { type } = req.query;
-  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'contact', 'contacts', 'summary', 'health'];
+  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'contact', 'contacts', 'application', 'applications', 'setting', 'summary', 'health'];
   if (!VALID.includes(type)) return res.status(400).json({ error: 'Invalid type' });
 
   // ── Admin health check: report pipeline status without exposing secrets ──
@@ -131,6 +131,25 @@ export default async function handler(req, res) {
       } catch (e) { /* ignore */ }
     }
     return res.status(200).json(out);
+  }
+
+  // ── Public GET: read a site setting flag (e.g. applications_open) ──
+  // Placed before the Supabase-configured guard so the page degrades to a
+  // safe default (false) when the backend is not wired up yet.
+  if (req.method === 'GET' && type === 'setting') {
+    const key = String(req.query.key || '').replace(/[^a-z0-9_]/gi, '').slice(0, 60);
+    if (!key) return res.status(400).json({ error: 'key is required' });
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return res.status(200).json({ key, value: false });
+    try {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?select=value&key=eq.${encodeURIComponent(key)}`, {
+        headers: { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` },
+        cache: 'no-store',
+      });
+      const rows = await jsonOrEmpty(r);
+      return res.status(200).json({ key, value: rows.length ? rows[0].value : false });
+    } catch (e) {
+      return res.status(200).json({ key, value: false });
+    }
   }
 
   // ── Public POST: contact form — emails the team and stores a copy ──
@@ -321,9 +340,78 @@ export default async function handler(req, res) {
     return res.status(r.status).json(data);
   }
 
+  // ── Public POST: equipment & funding application ─────────────────
+  if (req.method === 'POST' && type === 'application') {
+    const { visitor_id, site_host, name, email, organization, role, country, region, mission_context, equipment_needed, funding_needed, timeframe, message, utm_source, utm_medium, utm_campaign } = req.body || {};
+    const cleanName = trimText(name, 160);
+    const cleanEmail = trimText(email, 255);
+    const cleanCountry = trimText(country, 120);
+    if (!cleanName || !cleanEmail || !cleanCountry) return res.status(400).json({ error: 'name, email, and country are required' });
+
+    // Only accept submissions while the applications_open flag is on. Fail
+    // safe to "closed" if the flag cannot be confirmed.
+    let open = false;
+    try {
+      const sr = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?select=value&key=eq.applications_open`, { headers: sbH, cache: 'no-store' });
+      const rows = await jsonOrEmpty(sr);
+      open = !!(rows.length && (rows[0].value === true || rows[0].value === 'true'));
+    } catch (e) { open = false; }
+    if (!open) return res.status(200).json({ ok: false, closed: true });
+
+    const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+    const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
+    const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
+    const cleanEquipment = Array.isArray(equipment_needed)
+      ? equipment_needed.slice(0, 20).map((item) => String(item || '').slice(0, 120)).filter(Boolean)
+      : [];
+    const payload = {
+      visitor_id: cleanVisitorId || null,
+      site_host: cleanHost,
+      name: cleanName,
+      email: cleanEmail,
+      organization: trimText(organization, 200) || null,
+      role: trimText(role, 120) || null,
+      country: cleanCountry,
+      region: trimText(region, 160) || null,
+      mission_context: trimText(mission_context, 2000) || null,
+      equipment_needed: cleanEquipment,
+      funding_needed: trimText(funding_needed, 200) || null,
+      timeframe: trimText(timeframe, 160) || null,
+      message: trimText(message, 2000) || null,
+      utm_source: trimText(utm_source) || null,
+      utm_medium: trimText(utm_medium) || null,
+      utm_campaign: trimText(utm_campaign) || null,
+    };
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications`, {
+      method: 'POST',
+      headers: { ...sbH, Prefer: 'return=minimal' },
+      body: JSON.stringify(payload),
+    });
+    return res.status(r.ok ? 200 : 502).json({ ok: r.ok });
+  }
+
   // ── Admin reads ──────────────────────────────────────────────────
   const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
   if (authHeader !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
+
+  // Admin: list equipment & funding applications
+  if (req.method === 'GET' && type === 'applications') {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications?select=*&order=created_at.desc`, { headers: sbH });
+    return res.status(r.status).json(await r.json());
+  }
+
+  // Admin: set a site setting flag (e.g. flip applications_open on/off)
+  if (req.method === 'POST' && type === 'setting') {
+    const key = String((req.body && req.body.key) || '').replace(/[^a-z0-9_]/gi, '').slice(0, 60);
+    if (!key) return res.status(400).json({ error: 'key is required' });
+    const value = req.body ? req.body.value : null;
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/site_settings`, {
+      method: 'POST',
+      headers: { ...sbH, Prefer: 'resolution=merge-duplicates,return=representation' },
+      body: JSON.stringify({ key, value }),
+    });
+    return res.status(r.status).json(await r.json());
+  }
 
   if (req.method === 'GET' && (type === 'availability' || type === 'availabilities')) {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/availability_requests?select=*&order=created_at.desc`, { headers: sbH });
