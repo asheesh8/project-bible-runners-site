@@ -245,6 +245,10 @@ details[open]>.pi-accordion-head::after{transform:translateY(-50%) rotate(90deg)
 .pi-accordion-head h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.75rem,2.7vw,2.5rem);line-height:1.1;color:var(--ink);margin:4px 0 0;letter-spacing:-.02em;transition:color .15s}
 .pi-accordion-head:hover h2,.pi-accordion-head:focus-visible h2{color:var(--blue-dark)}
 .pi-accordion-body{padding:0 0 36px}
+.pi-questions-band{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:24px 0 8px;padding:18px 22px;background:var(--blue-soft);border:1.5px solid var(--line);border-radius:14px}
+.pi-questions-text{margin:0;color:var(--muted);font-size:.97rem;line-height:1.5;flex:1;min-width:180px}
+.pi-questions-link{flex-shrink:0;display:inline-flex;align-items:center;background:var(--blue);color:#fff;padding:10px 20px;border-radius:999px;text-decoration:none;font-weight:900;font-size:.9rem;white-space:nowrap;transition:background .15s}
+.pi-questions-link:hover,.pi-questions-link:focus-visible{background:var(--blue-dark);outline:0}
 .pi-intro{font-size:clamp(1rem,.3vw+.94rem,1.15rem);color:var(--muted);line-height:1.7;margin:0 0 22px;font-family:"Newsreader",Georgia,serif;font-weight:500}
 .pi-mini-heading{margin:24px 0 10px;font-size:1.1rem;font-weight:800;color:var(--ink)}
 .pi-muted-tight{margin:0 0 12px;color:var(--muted);font-size:.97rem}
