@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Raspberry Pi VillageServer — Overview &amp; Field Guide | VillageServer Initiative</title>
-  <meta name="description" content="How the VillageServer Raspberry Pi creates a local offline Wi-Fi library, how microSD content cards work, and how a phone opens the library at 10.43.0.1.">
+  <meta name="description" content="How the VillageServer Raspberry Pi creates a local offline Wi-Fi library, how microSD content cards work, and how a phone opens the library at 10.42.0.1.">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +25,7 @@
       <div class="wrap">
         <p class="meta">Technology · Raspberry Pi VillageServer</p>
         <h1>A library that fits in your hand</h1>
-        <p class="summary">The Raspberry Pi broadcasts a local Wi-Fi hotspot so nearby phones can browse an offline Bible library — no internet, no data plan, and no app install. Power it on, join <strong>VillageServer</strong>, enter <strong>village123</strong>, open <span style="font-family:monospace">10.43.0.1</span>, and the whole library is right there.</p>
+        <p class="summary">The Raspberry Pi broadcasts a local Wi-Fi hotspot so nearby phones can browse an offline Bible library — no internet, no data plan, and no app install. Power it on, join <strong>VillageServer</strong>, enter <strong>village123</strong>, open <span class="inline-code">10.42.0.1</span>, and the whole library is right there.</p>
       </div>
     </section>
 
@@ -47,7 +47,7 @@
           <span class="pi-sidenav-label pi-qref-tight">Quick reference</span>
           <div class="pi-qref-row"><span class="pi-qref-label">Wi-Fi name</span><span class="pi-qref-val">VillageServer</span></div>
           <div class="pi-qref-row"><span class="pi-qref-label">Password</span><span class="pi-qref-val">village123</span></div>
-          <div class="pi-qref-row"><span class="pi-qref-label">Library URL</span><span class="pi-qref-val">10.43.0.1</span></div>
+          <div class="pi-qref-row"><span class="pi-qref-label">Library URL</span><span class="pi-qref-val">10.42.0.1</span></div>
         </nav>
         </details>
 
@@ -72,7 +72,7 @@
             <h3 class="pi-mini-heading">What the Pi provides</h3>
             <ul class="article-bullets">
               <li><strong>Auto-broadcasting Wi-Fi hotspot</strong> — turns on the moment the Pi powers up, no router or internet needed</li>
-              <li><strong>An offline library server</strong> — reachable at <span class="inline-code">10.43.0.1</span> from any phone browser, no app to install</li>
+              <li><strong>An offline library server</strong> — reachable at <span class="inline-code">10.42.0.1</span> from any phone browser, no app to install</li>
               <li><strong>MicroSD-based language libraries</strong> — the language and resources available are determined by the cards plugged into USB readers</li>
               <li><strong>Four content sections per language</strong> — Bible, Audio, Video, and Books, browsable and downloadable straight from the phone</li>
               <li><strong>Fully offline operation</strong> — works indefinitely with no internet connection, anywhere there's power</li>
@@ -126,7 +126,7 @@
               <h2>What you see on a phone</h2>
             </summary>
             <div class="pi-accordion-body">
-            <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.43.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required. Try the demo — tap a language, then a section, then a file.</p>
+            <p class="pi-intro">When a phone joins the VillageServer Wi-Fi and opens <span class="inline-code">10.42.0.1</span> in a browser, this is what appears — a clean offline library home. No login, no app install, no data required. Try the demo — tap a language, then a section, then a file.</p>
 
             <!-- Interactive phone demo -->
             <div class="iphone-demo-wrap">
@@ -134,7 +134,7 @@
                 <div class="iphone-notch"></div>
                 <div class="iphone-screen">
                   <div class="iphone-statusbar"><span>9:41</span><span>📶 🔋</span></div>
-                  <div class="iphone-urlbar"><span class="iphone-url-text" id="iphone-url">10.43.0.1</span></div>
+                  <div class="iphone-urlbar"><span class="iphone-url-text" id="iphone-url">10.42.0.1</span></div>
                   <div class="iphone-body" id="iphone-body">
 
                     <div class="iphone-screen-state" data-screen="home">
@@ -220,7 +220,7 @@
                 <div class="vi-step-num">3</div>
                 <div class="vi-step-body">
                   <h4>Open the library</h4>
-                  <p>Open any browser and type <span class="inline-code">10.43.0.1</span> in the address bar. The library home loads instantly.</p>
+                  <p>Open any browser and type <span class="inline-code">10.42.0.1</span> in the address bar. The library home loads instantly.</p>
                 </div>
               </div>
               <div class="vi-step">
@@ -254,7 +254,7 @@
             <div class="pi-accordion-body">
 
             <p><strong>Phone joins Wi-Fi but the page won't load</strong></p>
-            <p>Double-check the address bar shows exactly <span class="inline-code">10.43.0.1</span> — not a search. Some phones auto-correct it into Google instead of visiting the address. Retype it manually.</p>
+            <p>Double-check the address bar shows exactly <span class="inline-code">10.42.0.1</span> — not a search. Some phones auto-correct it into Google instead of visiting the address. Retype it manually.</p>
 
             <p><strong>Phone warns "no internet connection"</strong></p>
             <p>That's expected — the VillageServer network is intentionally offline. Tap "Stay connected" or "Use anyway" and continue.</p>
@@ -363,7 +363,7 @@
         btn.addEventListener('click', function(){
           currentLang = { code: btn.getAttribute('data-lang'), label: btn.getAttribute('data-label') };
           langTitle.textContent = currentLang.label + ' Library';
-          urlEl.textContent = '10.43.0.1/' + currentLang.code;
+          urlEl.textContent = '10.42.0.1/' + currentLang.code;
           showScreen('types');
         });
       });
@@ -372,7 +372,7 @@
         btn.addEventListener('click', function(){
           var type = btn.getAttribute('data-type');
           typeTitle.textContent = TYPE_LABEL[type];
-          urlEl.textContent = '10.43.0.1/' + currentLang.code + '/' + type;
+          urlEl.textContent = '10.42.0.1/' + currentLang.code + '/' + type;
           renderFiles(type);
           showScreen('files');
         });
