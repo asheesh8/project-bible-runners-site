@@ -361,6 +361,33 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   .form-row{grid-template-columns:1fr}
 }
 
+/* ── Page Editor ─────────────────────────────────────── */
+.pe-wrap{display:flex;gap:0;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;height:calc(100vh - 195px);min-height:540px}
+.pe-pagelist{width:190px;flex:0 0 190px;border-right:1.5px solid var(--border);overflow-y:auto;background:var(--card)}
+.pe-page-item{padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;border-left:3px solid transparent;transition:background .1s;display:flex;flex-direction:column;gap:1px;color:var(--text)}
+.pe-page-item:hover{background:var(--bg)}
+.pe-page-item.active{background:#ddf4ff;border-left-color:#316dca;color:#0969da}
+.pe-page-sub{font-size:10px;font-weight:400;color:var(--muted)}
+.pe-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.pe-edit-banner{display:none;align-items:center;gap:8px;padding:7px 14px;background:#fff8c5;border-bottom:1.5px solid #d4a72c;font-size:12px;font-weight:600;color:#7d4e00;flex-shrink:0}
+.pe-edit-banner.on{display:flex}
+.pe-toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1.5px solid var(--border);background:var(--card);flex-wrap:wrap;flex-shrink:0}
+.pe-page-label{font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.pe-btn{padding:6px 13px;border-radius:var(--radius);border:1.5px solid var(--border);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;background:var(--card);color:var(--text)}
+.pe-btn:hover:not(:disabled){background:var(--bg)}
+.pe-btn:disabled{opacity:.4;cursor:not-allowed}
+.pe-btn.editing{background:#0969da;border-color:#0969da;color:#fff}
+.pe-btn.editing:hover:not(:disabled){background:#0550ae;border-color:#0550ae}
+.pe-btn-save{background:var(--accent);border-color:var(--accent);color:#fff}
+.pe-btn-save:hover:not(:disabled){background:var(--accent-hover)!important;border-color:var(--accent-hover)!important}
+.pe-btn-reset{color:var(--danger)}
+.pe-btn-reset:hover:not(:disabled){background:#ffebe9;border-color:#ff8182}
+.pe-iframe-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg)}
+.pe-iframe{width:100%;height:100%;border:none;display:none}
+.pe-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--muted);font-size:13px;text-align:center;padding:24px}
+.pe-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;display:none}
+.pe-status.saved{background:#dafbe1;color:#1a4731;display:inline-block}
+.pe-status.err{background:#ffebe9;color:#cf222e;display:inline-block}
 /* ── Raspberry Pi / WireGuard setup guide ────────────── */
 .setup-step{margin-bottom:10px;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .setup-step summary{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;list-style:none;font-size:14px;font-weight:700;background:var(--card);user-select:none;-webkit-user-select:none}
@@ -463,6 +490,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         <div class="nav-item" data-tab="pamphlets">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           Pamphlets &amp; PDFs
+        </div>
+        <div class="nav-item" data-tab="pageeditor">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Page Editor
         </div>
         <div class="nav-item" data-tab="internal">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
@@ -942,6 +973,38 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
       </div>
 
+      <!-- ── PAGE EDITOR ───────────────────────────── -->
+      <div class="tab-view" id="tab-pageeditor">
+        <div class="page-header" style="margin-bottom:14px">
+          <h2 class="page-title">Page Editor</h2>
+          <span style="font-size:13px;color:var(--muted)">Select a page → click Edit Mode → click any text to edit → Save Changes.</span>
+        </div>
+        <div class="pe-wrap">
+          <!-- Page list -->
+          <div class="pe-pagelist" id="pe-pagelist"></div>
+          <!-- Preview area -->
+          <div class="pe-main">
+            <div class="pe-edit-banner" id="pe-edit-banner">
+              ✏️ &nbsp;Edit Mode — click any heading or paragraph on the page to edit it. Save when done.
+            </div>
+            <div class="pe-toolbar">
+              <span class="pe-page-label" id="pe-page-label">Select a page from the list</span>
+              <button class="pe-btn" id="pe-edit-btn" disabled>Edit Mode</button>
+              <button class="pe-btn pe-btn-save" id="pe-save-btn" disabled style="display:none">Save Changes</button>
+              <button class="pe-btn pe-btn-reset" id="pe-reset-btn" disabled style="display:none">Reset Page</button>
+              <span class="pe-status" id="pe-status"></span>
+            </div>
+            <div class="pe-iframe-wrap">
+              <div class="pe-placeholder" id="pe-placeholder">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                Select a page from the left to preview it
+              </div>
+              <iframe id="pe-iframe" class="pe-iframe" title="Page preview" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ── INTERNAL: RASPBERRY PI / WIREGUARD ───── -->
       <div class="tab-view" id="tab-internal">
         <div class="page-header"><h2 class="page-title">Raspberry Pi &amp; WireGuard Setup</h2><a href="./raspberry-pi.html" target="_blank" class="btn-add" style="text-decoration:none">Open public page ↗</a></div>
@@ -1394,6 +1457,7 @@ function loadTab(tab){
   else if(tab === 'traffic') startTrafficPoll();
   else if(tab === 'applications') loadApplications();
   else if(tab === 'pamphlets') initPamphlets();
+  else if(tab === 'pageeditor') initPageEditor();
   // 'resources' and 'internal' are static — nothing to load
 }
 
@@ -1527,6 +1591,232 @@ function persistPamphlets(cb){
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ════════════════════════════════════════════════════════
+// PAGE EDITOR
+// ════════════════════════════════════════════════════════
+var _peInited = false;
+var _pePage = null;      // current page slug (no .html)
+var _peEditing = false;
+var _peOriginals = {};   // selector → original innerHTML
+
+var PE_PAGES = [
+  { name:'Home',                file:'index.html' },
+  { name:'Mission Statement',   file:'mission.html' },
+  { name:'Initiative Overview', file:'initiative.html' },
+  { name:'About Us',            file:'about.html' },
+  { name:'Programs & Services', file:'programs.html' },
+  { name:'Raspberry Pi',        file:'raspberry-pi.html' },
+  { name:'Testimonials',        file:'testimonials.html' },
+  { name:'Affiliates',          file:'affiliates.html' },
+  { name:'Field FAQ',           file:'field-faq.html' },
+  { name:'Pamphlets',           file:'pamphlets.html' },
+  { name:'Kit Levels',          file:'kit-levels.html' },
+  { name:'Satellite',           file:'satellite.html' },
+  { name:'Projector & Audio',   file:'projector-media.html' },
+  { name:'Phone Distribution',  file:'phone-distribution.html' },
+  { name:'Power & Solar',       file:'power.html' },
+  { name:'Transfer Devices',    file:'transfer.html' },
+  { name:'Get & Share',         file:'access.html' },
+  { name:'Rollout & Reach',     file:'rollout.html' },
+  { name:'Photos & Visuals',    file:'visuals.html' }
+];
+
+function initPageEditor(){
+  if(_peInited) return;
+  _peInited = true;
+
+  var list = document.getElementById('pe-pagelist');
+  list.innerHTML = PE_PAGES.map(function(p){
+    return '<div class="pe-page-item" data-file="'+p.file+'" data-name="'+esc(p.name)+'">'
+      + esc(p.name)
+      + '<span class="pe-page-sub">'+p.file+'</span>'
+      + '</div>';
+  }).join('');
+
+  list.querySelectorAll('.pe-page-item').forEach(function(item){
+    item.addEventListener('click', function(){
+      list.querySelectorAll('.pe-page-item').forEach(function(i){ i.classList.remove('active'); });
+      item.classList.add('active');
+      peLoadPage(item.dataset.file, item.dataset.name);
+    });
+  });
+
+  document.getElementById('pe-edit-btn').addEventListener('click', peToggleEdit);
+  document.getElementById('pe-save-btn').addEventListener('click', peSave);
+  document.getElementById('pe-reset-btn').addEventListener('click', peReset);
+}
+
+function peLoadPage(file, name){
+  if(_peEditing){ _peEditing = false; peApplyEditMode(false); }
+  _pePage = file.replace(/\.html$/, '');
+  _peOriginals = {};
+
+  document.getElementById('pe-page-label').textContent = name + '  (' + file + ')';
+  document.getElementById('pe-placeholder').style.display = 'none';
+  document.getElementById('pe-status').className = 'pe-status';
+  var iframe = document.getElementById('pe-iframe');
+  iframe.style.display = 'block';
+  iframe.src = './' + file + '?_pe=' + Date.now();
+
+  var editBtn = document.getElementById('pe-edit-btn');
+  var saveBtn = document.getElementById('pe-save-btn');
+  var resetBtn = document.getElementById('pe-reset-btn');
+  editBtn.disabled = true;
+  editBtn.textContent = 'Edit Mode';
+  editBtn.classList.remove('editing');
+  saveBtn.style.display = 'none';
+  resetBtn.style.display = 'none';
+  document.getElementById('pe-edit-banner').classList.remove('on');
+
+  iframe.onload = function(){
+    editBtn.disabled = false;
+    saveBtn.style.display = '';
+    resetBtn.style.display = '';
+    saveBtn.disabled = false;
+    resetBtn.disabled = false;
+  };
+}
+
+function peToggleEdit(){
+  _peEditing = !_peEditing;
+  var editBtn = document.getElementById('pe-edit-btn');
+  editBtn.textContent = _peEditing ? 'Stop Editing' : 'Edit Mode';
+  editBtn.classList.toggle('editing', _peEditing);
+  document.getElementById('pe-edit-banner').classList.toggle('on', _peEditing);
+  peApplyEditMode(_peEditing);
+}
+
+function peApplyEditMode(on){
+  var iframe = document.getElementById('pe-iframe');
+  var iDoc = iframe.contentDocument;
+  if(!iDoc) return;
+
+  if(on){
+    var style = iDoc.createElement('style');
+    style.id = '__pe_style';
+    style.textContent =
+      '[data-pe]{outline:1.5px dashed #316dca;outline-offset:2px;border-radius:2px;cursor:text;min-height:.6em;transition:background .1s}' +
+      '[data-pe]:hover{background:rgba(49,109,202,.07)}' +
+      '[data-pe]:focus{outline:2px solid #316dca!important;background:rgba(49,109,202,.1)}';
+    iDoc.head.appendChild(style);
+
+    var targets = iDoc.querySelectorAll(
+      'main h1,main h2,main h3,main h4,' +
+      'main p,main li,main figcaption,' +
+      '.hero-tagline,.hero-verse,.mission-lede-text,' +
+      '.impact-label,.reach-head p,.reach-step h3,.reach-step p,' +
+      '.article-lead,.article-callout p,.article-cta p,' +
+      '.side-title,.side-list li,.pi-intro,.pi-mini-heading'
+    );
+
+    targets.forEach(function(el){
+      if(el.querySelector('img,iframe,video,input,select,textarea,canvas')) return;
+      if(el.closest('.board-top,.footer,.pi-sidenav,.skip-link')) return;
+      var sel = peCssPath(el, iDoc);
+      if(!_peOriginals[sel]) _peOriginals[sel] = el.innerHTML;
+      el.setAttribute('data-pe', sel);
+      el.contentEditable = 'true';
+    });
+  } else {
+    var s = iDoc.getElementById('__pe_style');
+    if(s) s.remove();
+    iDoc.querySelectorAll('[data-pe]').forEach(function(el){
+      el.removeAttribute('contentEditable');
+      el.removeAttribute('data-pe');
+    });
+  }
+}
+
+function peCssPath(el, doc){
+  if(el.id) return '#' + el.id;
+  var path = [];
+  var cur = el;
+  while(cur && cur !== doc.body && cur.nodeType === 1){
+    if(cur.id){ path.unshift('#' + cur.id); break; }
+    var tag = cur.tagName.toLowerCase();
+    var parent = cur.parentNode;
+    if(parent){
+      var sibs = Array.from(parent.children).filter(function(c){ return c.tagName === cur.tagName; });
+      if(sibs.length > 1) tag += ':nth-of-type(' + (sibs.indexOf(cur)+1) + ')';
+    }
+    path.unshift(tag);
+    cur = parent;
+  }
+  return path.join(' > ');
+}
+
+function peSave(){
+  if(!_pePage) return;
+  var iframe = document.getElementById('pe-iframe');
+  var iDoc = iframe.contentDocument;
+  var overrides = [];
+  if(iDoc){
+    Object.keys(_peOriginals).forEach(function(sel){
+      try{
+        var el = iDoc.querySelector(sel);
+        if(el && el.innerHTML !== _peOriginals[sel]){
+          overrides.push({ selector: sel, html: el.innerHTML });
+        }
+      }catch(e){}
+    });
+  }
+  var btn = document.getElementById('pe-save-btn');
+  var statusEl = document.getElementById('pe-status');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  statusEl.className = 'pe-status';
+
+  fetch('/api/page-content',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+AUTH_TOKEN},
+    body:JSON.stringify({page:_pePage, overrides:overrides})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Save Changes';
+    if(d && d.ok !== false){
+      statusEl.textContent = overrides.length + ' edit' + (overrides.length === 1 ? '' : 's') + ' saved ✓';
+      statusEl.className = 'pe-status saved';
+    } else {
+      statusEl.textContent = 'Save failed';
+      statusEl.className = 'pe-status err';
+    }
+    setTimeout(function(){ statusEl.className = 'pe-status'; }, 4000);
+  })
+  .catch(function(){
+    btn.disabled = false; btn.textContent = 'Save Changes';
+    statusEl.textContent = 'Network error';
+    statusEl.className = 'pe-status err';
+    setTimeout(function(){ statusEl.className = 'pe-status'; }, 4000);
+  });
+}
+
+function peReset(){
+  if(!_pePage) return;
+  if(!confirm('Reset "' + _pePage + '" to default? All saved edits for this page will be removed.')) return;
+  var btn = document.getElementById('pe-reset-btn');
+  var statusEl = document.getElementById('pe-status');
+  btn.disabled = true; btn.textContent = 'Resetting…';
+
+  fetch('/api/page-content',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+AUTH_TOKEN},
+    body:JSON.stringify({page:_pePage, overrides:[]})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    btn.disabled = false; btn.textContent = 'Reset Page';
+    if(d && d.ok !== false){
+      _peOriginals = {};
+      var iframe = document.getElementById('pe-iframe');
+      iframe.src = iframe.src.split('?')[0] + '?_pe=' + Date.now();
+      statusEl.textContent = 'Page reset to default ✓';
+      statusEl.className = 'pe-status saved';
+      setTimeout(function(){ statusEl.className = 'pe-status'; }, 4000);
+    }
+  })
+  .catch(function(){ btn.disabled = false; btn.textContent = 'Reset Page'; });
+}
 
 // ── Copy-code button ─────────────────────────────────────
 function copyCode(btn){
