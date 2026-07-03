@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Campaign | VillageServer Initiative</title>
+  <meta name="description" content="Support an active fundraising campaign from VillageServer Initiative — placing Scripture and gospel media in communities that need it.">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/board.css?v=12">
+  <style>
+    .campaign-loading{text-align:center;padding:80px 24px;color:var(--muted);font-size:1rem}
+    .campaign-not-found{text-align:center;padding:80px 24px}
+    .campaign-not-found h1{font-family:"Newsreader",Georgia,serif;font-size:2rem;margin:0 0 12px;color:var(--ink)}
+    .campaign-not-found p{color:var(--muted);margin:0 0 14px}
+    .campaign-not-found a{color:var(--blue-dark);font-weight:700}
+
+    .campaign-hero-img{width:100%;max-height:420px;object-fit:cover;display:block;background:var(--blue-soft)}
+    .campaign-header{padding:clamp(24px,3.5vw,48px) 0 clamp(14px,2vw,24px)}
+    .campaign-meta{font-size:.72rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}
+    .campaign-title{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.8rem,4vw,3rem);line-height:1.1;margin:0 0 14px;color:var(--ink)}
+    .campaign-desc{font-size:1.05rem;color:var(--muted);line-height:1.55;margin:0;max-width:680px}
+
+    .campaign-progress-card{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:clamp(18px,3vw,28px) clamp(18px,3vw,32px);margin:28px 0}
+    .c-stats{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:16px}
+    .c-stat-val{font-size:1.7rem;font-weight:900;color:var(--ink);line-height:1}
+    .c-stat-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+    .c-pbar-wrap{height:10px;background:var(--blue-soft);border-radius:99px;overflow:hidden;margin-bottom:8px}
+    .c-pbar-fill{height:100%;background:var(--blue);border-radius:99px;transition:width .5s ease}
+    .c-pbar-label{font-size:.78rem;color:var(--muted);font-weight:700}
+
+    .campaign-body{display:grid;grid-template-columns:1fr 300px;gap:clamp(24px,4vw,52px);align-items:start;margin:32px 0}
+    @media(max-width:740px){.campaign-body{grid-template-columns:1fr}}
+
+    .campaign-story h2{font-family:"Newsreader",Georgia,serif;font-size:1.45rem;margin:0 0 14px;color:var(--ink)}
+    .campaign-story p{color:var(--muted);line-height:1.68;margin:0 0 14px;font-size:1rem}
+
+    .donate-card{position:sticky;top:24px;background:#fff;border:2px solid var(--blue);border-radius:18px;padding:28px 24px;text-align:center}
+    .donate-card-title{font-family:"Newsreader",Georgia,serif;font-size:1.3rem;margin:0 0 8px;color:var(--ink)}
+    .donate-card-desc{font-size:.88rem;color:var(--muted);line-height:1.5;margin:0 0 20px}
+    .btn-donate{display:inline-block;background:#1a7f37;color:#fff;padding:15px 32px;border-radius:999px;text-decoration:none;font-size:1rem;font-weight:900;letter-spacing:.02em;transition:background .15s;width:100%;box-sizing:border-box}
+    .btn-donate:hover{background:#116329}
+    .donate-enddate{font-size:.78rem;color:var(--muted);margin-top:12px}
+    .donate-secure{font-size:.72rem;color:var(--muted);margin-top:8px;opacity:.75}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="board-top">
+    <div class="wrap">
+      <a class="board-brand" href="./index.html"><img src="./img/villageserver-initiative-logo.png" alt="VillageServer Initiative"><span>VillageServer Initiative</span></a>
+      <a class="board-back" href="./index.html">← Back to home</a>
+    </div>
+  </header>
+  <main id="main">
+    <div id="campaign-root">
+      <div class="campaign-loading">Loading campaign…</div>
+    </div>
+  </main>
+  <footer class="footer"><div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
+  <script src="./js/site-language.js?v=2"></script>
+  <script src="./js/site-tracking.js?v=1"></script>
+  <script>
+  (function(){
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get('slug') || '';
+    var root = document.getElementById('campaign-root');
+
+    if(!slug){
+      root.innerHTML = '<div class="campaign-not-found wrap"><h1>No campaign specified</h1><p>Please follow a campaign link from our homepage.</p><p><a href="./index.html">Return to home →</a></p></div>';
+      return;
+    }
+
+    fetch('/api/content?type=campaigns', {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(list){
+        if(!Array.isArray(list)){
+          showNotFound();
+          return;
+        }
+        var c = list.find(function(x){ return x.slug === slug; });
+        if(!c || !c.name){
+          showNotFound();
+          return;
+        }
+
+        document.title = c.name + ' | VillageServer Initiative';
+
+        var goal   = Number(c.goal_amount)  || 0;
+        var raised = Number(c.raised_amount) || 0;
+        var pct    = goal > 0 ? Math.min(100, Math.round(raised / goal * 100)) : 0;
+        var bFunded = Number(c.bibles_funded) || 0;
+        var bNeeded = Number(c.bibles_needed) || 0;
+
+        var storyParas = '';
+        if(c.story){
+          storyParas = c.story.split(/\n\n+/).map(function(p){
+            return '<p>' + esc(p.trim()) + '</p>';
+          }).join('');
+        }
+
+        var endDate = '';
+        if(c.end_date){
+          endDate = '<p class="donate-enddate">Campaign ends ' + new Date(c.end_date).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + '</p>';
+        }
+
+        var statsHtml = '<div class="c-stats">'
+          + '<div><div class="c-stat-val">$' + Number(raised).toLocaleString() + '</div><div class="c-stat-label">Raised</div></div>'
+          + '<div><div class="c-stat-val">$' + Number(goal).toLocaleString() + '</div><div class="c-stat-label">Goal</div></div>'
+          + '<div><div class="c-stat-val">' + pct + '%</div><div class="c-stat-label">Funded</div></div>'
+          + (bFunded ? '<div><div class="c-stat-val">' + bFunded + '</div><div class="c-stat-label">Bibles funded</div></div>' : '')
+          + (bNeeded ? '<div><div class="c-stat-val">' + bNeeded + '</div><div class="c-stat-label">Still needed</div></div>' : '')
+          + '</div>';
+
+        var donateCard = c.zeffy_url
+          ? '<div class="donate-card">'
+            + '<p class="donate-card-title">Give to this campaign</p>'
+            + '<p class="donate-card-desc">Every dollar helps place Scripture and gospel media in the hands of local leaders who can multiply it.</p>'
+            + '<a class="btn-donate" href="' + esc(c.zeffy_url) + '" target="_blank" rel="noopener">Give now →</a>'
+            + endDate
+            + '<p class="donate-secure">Secure donation via Zeffy — 0% platform fees</p>'
+            + '</div>'
+          : '<div class="donate-card"><p class="donate-card-desc">Donation link coming soon.</p>' + endDate + '</div>';
+
+        root.innerHTML =
+          (c.image_url ? '<img class="campaign-hero-img" src="' + esc(c.image_url) + '" alt="' + esc(c.name) + '" loading="eager">' : '')
+          + '<div class="wrap">'
+          + '<div class="campaign-header">'
+          + '<p class="campaign-meta">VillageServer Initiative · Fundraising Campaign</p>'
+          + '<h1 class="campaign-title">' + esc(c.name) + '</h1>'
+          + (c.description ? '<p class="campaign-desc">' + esc(c.description) + '</p>' : '')
+          + '</div>'
+          + '<div class="campaign-progress-card">'
+          + statsHtml
+          + '<div class="c-pbar-wrap"><div class="c-pbar-fill" style="width:' + pct + '%"></div></div>'
+          + '<p class="c-pbar-label">' + pct + '% of $' + Number(goal).toLocaleString() + ' goal reached</p>'
+          + '</div>'
+          + '<div class="campaign-body">'
+          + (storyParas ? '<div class="campaign-story"><h2>About this campaign</h2>' + storyParas + '</div>' : '<div class="campaign-story"></div>')
+          + donateCard
+          + '</div>'
+          + '</div>';
+      })
+      .catch(function(){
+        root.innerHTML = '<div class="campaign-not-found wrap"><h1>Could not load campaign</h1><p>Please try again later.</p><p><a href="./index.html">Return to home →</a></p></div>';
+      });
+
+    function showNotFound(){
+      root.innerHTML = '<div class="campaign-not-found wrap"><h1>Campaign not found</h1><p>This campaign may have ended or the link may be incorrect.</p><p><a href="./index.html">Return to home →</a></p></div>';
+    }
+  })();
+  </script>
+</body>
+</html>

@@ -454,10 +454,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
     <nav class="sidebar">
       <div class="sidebar-section">
         <div class="sidebar-label">Content</div>
-        <div class="nav-item active" data-tab="campaigns">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
-          Campaigns
-        </div>
         <div class="nav-item" data-tab="posts">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           Blog &amp; Updates
@@ -473,7 +469,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
       </div>
       <div class="sidebar-section">
         <div class="sidebar-label">Field</div>
-        <div class="nav-item" data-tab="applications">
+        <div class="nav-item active" data-tab="applications">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
           Applications
         </div>
@@ -514,72 +510,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
       <div id="api-status"></div>
 
-      <!-- ── CAMPAIGNS ──────────────────────────────── -->
-      <div class="tab-view active" id="tab-campaigns">
-
-        <!-- Live progress widget -->
-        <div class="progress-ctrl" id="progress-ctrl">
-          <div class="progress-ctrl-header">
-            <span class="progress-ctrl-title">Live Progress &nbsp;<span class="progress-ctrl-name" id="ctrl-campaign-name">—</span></span>
-            <span class="td-badge active" id="ctrl-active-badge" style="display:none">Active</span>
-          </div>
-          <div id="ctrl-body">
-            <div class="progress-no-active">No active campaign. Create one below and mark it Active.</div>
-          </div>
-        </div>
-
-        <div class="page-header">
-          <h2 class="page-title">All Campaigns</h2>
-          <button class="btn-new" id="new-campaign-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New campaign
-          </button>
-        </div>
-
-        <div class="form-panel" id="campaign-form-panel">
-          <h3 id="campaign-form-title">New campaign</h3>
-          <input type="hidden" id="campaign-id" />
-          <div class="form-row">
-            <div class="field"><label>Campaign name</label><input type="text" id="cf-name" placeholder="Spring Uganda Run 2026" /></div>
-            <div class="field"><label>URL slug</label><input type="text" id="cf-slug" placeholder="spring-uganda-2026" /></div>
-          </div>
-          <div class="form-row full">
-            <div class="field"><label>Short description (shown in hero)</label><input type="text" id="cf-desc" /></div>
-          </div>
-          <div class="form-row full">
-            <div class="field"><label>Full story (shown in About section)</label><textarea id="cf-story" rows="4"></textarea></div>
-          </div>
-          <div class="form-row">
-            <div class="field"><label>Goal amount ($)</label><input type="number" id="cf-goal" min="0" step="1" /></div>
-            <div class="field"><label>Raised so far ($)</label><input type="number" id="cf-raised" min="0" step="1" /></div>
-          </div>
-          <div class="form-row">
-            <div class="field"><label>Bibles funded</label><input type="number" id="cf-bibles-funded" min="0" /></div>
-            <div class="field"><label>Bibles still needed</label><input type="number" id="cf-bibles-needed" min="0" /></div>
-          </div>
-          <div class="form-row">
-            <div class="field"><label>End date</label><input type="date" id="cf-enddate" /></div>
-            <div class="field"><label>Zeffy fundraiser URL</label><input type="url" id="cf-zeffy" placeholder="https://www.zeffy.com/en-US/..." /></div>
-          </div>
-          <div class="form-row">
-            <div class="field"><label>Header image URL</label><input type="url" id="cf-img" placeholder="https://..." /></div>
-            <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px">
-              <label style="display:flex;align-items:center;font-size:14px;cursor:pointer">
-                <input type="checkbox" id="cf-active" /> Mark as active campaign
-              </label>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn-save" id="save-campaign-btn">Save campaign</button>
-            <button class="btn-cancel" id="cancel-campaign-btn">Cancel</button>
-          </div>
-          <p class="form-msg" id="campaign-msg"></p>
-        </div>
-
-        <div id="campaigns-list">
-          <div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v18H3z"/></svg><div>No campaigns yet. Create one above.</div></div>
-        </div>
-      </div>
 
       <!-- ── POSTS ──────────────────────────────────── -->
       <div class="tab-view" id="tab-posts">
@@ -916,10 +846,69 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 
       </div>
 
-      <!-- ── APPLICATIONS ──────────────────────────── -->
-      <div class="tab-view" id="tab-applications">
-        <div class="page-header"><h2 class="page-title">Equipment &amp; Funding Applications</h2></div>
+      <!-- ── APPLICATIONS & CAMPAIGNS ──────────────── -->
+      <div class="tab-view active" id="tab-applications">
+        <div class="page-header">
+          <h2 class="page-title">Applications &amp; Campaigns</h2>
+          <button class="btn-new" id="new-campaign-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New campaign
+          </button>
+        </div>
 
+        <!-- Live progress widget -->
+        <div class="progress-ctrl" id="progress-ctrl">
+          <div class="progress-ctrl-header">
+            <span class="progress-ctrl-title">Live Progress &nbsp;<span class="progress-ctrl-name" id="ctrl-campaign-name">—</span></span>
+            <span class="td-badge active" id="ctrl-active-badge" style="display:none">Active</span>
+          </div>
+          <div id="ctrl-body">
+            <div class="progress-no-active">No active campaign. Create one below and mark it Active.</div>
+          </div>
+        </div>
+
+        <!-- Campaign builder form -->
+        <div class="form-panel" id="campaign-form-panel">
+          <h3 id="campaign-form-title">New campaign</h3>
+          <input type="hidden" id="campaign-id" />
+          <div class="form-row">
+            <div class="field"><label>Campaign name</label><input type="text" id="cf-name" placeholder="Spring Uganda Run 2026" /></div>
+            <div class="field"><label>URL slug</label><input type="text" id="cf-slug" placeholder="spring-uganda-2026" /></div>
+          </div>
+          <div class="form-row full">
+            <div class="field"><label>Short description (shown on hero widget)</label><input type="text" id="cf-desc" /></div>
+          </div>
+          <div class="form-row full">
+            <div class="field"><label>Full story (shown on campaign page)</label><textarea id="cf-story" rows="4"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Goal amount ($)</label><input type="number" id="cf-goal" min="0" step="1" /></div>
+            <div class="field"><label>Raised so far ($)</label><input type="number" id="cf-raised" min="0" step="1" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Bibles funded</label><input type="number" id="cf-bibles-funded" min="0" /></div>
+            <div class="field"><label>Bibles still needed</label><input type="number" id="cf-bibles-needed" min="0" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>End date</label><input type="date" id="cf-enddate" /></div>
+            <div class="field"><label>Zeffy fundraiser URL</label><input type="url" id="cf-zeffy" placeholder="https://www.zeffy.com/en-US/..." /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Header image URL</label><input type="url" id="cf-img" placeholder="https://..." /></div>
+            <div class="field" style="display:flex;align-items:flex-end;padding-bottom:4px">
+              <label style="display:flex;align-items:center;font-size:14px;cursor:pointer">
+                <input type="checkbox" id="cf-active" /> Mark as active campaign
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" id="save-campaign-btn">Save campaign</button>
+            <button class="btn-cancel" id="cancel-campaign-btn">Cancel</button>
+          </div>
+          <p class="form-msg" id="campaign-msg"></p>
+        </div>
+
+        <!-- Application section on/off toggle -->
         <div class="res-section">
           <div class="res-section-title">🔌 &nbsp;Application section on the public site</div>
           <p style="margin:0 0 14px;color:#57606a;max-width:640px">Turn the public <strong>Equipment &amp; Funding Application</strong> page on or off. While it is off, the link is hidden from the site and the form will not accept submissions — keep it off until the 501(c)(3) is in place.</p>
@@ -929,9 +918,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           </div>
         </div>
 
+        <!-- Submitted applications -->
         <div class="res-section">
-          <div class="res-section-title">📨 &nbsp;Submitted applications</div>
-          <div class="interests-table-wrap" id="applications-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+          <div class="res-section-title">📨 &nbsp;Submitted applications — add notes and build campaigns</div>
+          <div id="applications-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </div>
+
+        <!-- Campaigns list -->
+        <div class="res-section" style="margin-top:8px">
+          <div class="res-section-title">🎯 &nbsp;All campaigns</div>
+          <div id="campaigns-list">
+            <div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v18H3z"/></svg><div>No campaigns yet. Click "New campaign" above.</div></div>
+          </div>
         </div>
       </div>
 
@@ -1362,7 +1360,7 @@ var AUTH_TOKEN = null;
         sessionStorage.setItem('pbr_admin_token', AUTH_TOKEN);
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
-        loadTab('campaigns');
+        loadTab('applications');
       } else {
         err.style.display = 'block';
         btn.disabled = false;
@@ -1387,7 +1385,7 @@ var AUTH_TOKEN = null;
     AUTH_TOKEN = saved;
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
-    loadTab('campaigns');
+    loadTab('applications');
   }
 })();
 
@@ -1450,8 +1448,7 @@ function fmtDate(d){ if(!d) return '—'; return new Date(d).toLocaleDateString(
 
 // ── Load tab ─────────────────────────────────────────────
 function loadTab(tab){
-  if(tab === 'campaigns') loadCampaigns();
-  else if(tab === 'posts') loadPosts();
+  if(tab === 'posts') loadPosts();
   else if(tab === 'photos') loadPhotos();
   else if(tab === 'testimonies') loadTestimonies();
   else if(tab === 'traffic') startTrafficPoll();
@@ -1833,7 +1830,7 @@ function copyCode(btn){
 }
 
 // ════════════════════════════════════════════════════════
-// EQUIPMENT & FUNDING APPLICATIONS
+// EQUIPMENT & FUNDING APPLICATIONS + CAMPAIGNS
 // ════════════════════════════════════════════════════════
 function trackApi(method, type, body){
   var url = '/api/track?type=' + type;
@@ -1862,8 +1859,77 @@ function renderAppsFlag(open){
   btn.dataset.open = open ? '1' : '0';
 }
 
+// ── Application notes (stored per-admin in Supabase settings) ─
+var _appsCache = {};
+var _allAppNotes = {};
+
+function loadAllAppNotes(cb){
+  fetch('/api/track?type=setting&key=all_app_notes', {cache:'no-store', headers:{'Authorization':'Bearer '+AUTH_TOKEN}})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      try{ _allAppNotes = JSON.parse(d && d.value ? d.value : '{}') || {}; }catch(e){ _allAppNotes = {}; }
+      if(cb) cb();
+    })
+    .catch(function(){ _allAppNotes = {}; if(cb) cb(); });
+}
+
+function saveAppNotes(appId){
+  var ta = document.getElementById('app-notes-ta-' + appId);
+  var statusEl = document.getElementById('app-notes-st-' + appId);
+  if(!ta) return;
+  _allAppNotes[appId] = ta.value;
+  if(statusEl) statusEl.textContent = '— saving…';
+  trackApi('POST', 'setting', {key:'all_app_notes', value: JSON.stringify(_allAppNotes)})
+    .then(function(){
+      if(statusEl){ statusEl.textContent = '— saved ✓'; setTimeout(function(){ statusEl.textContent=''; }, 2500); }
+    })
+    .catch(function(){
+      if(statusEl){ statusEl.textContent = '— error saving'; }
+    });
+}
+
+function buildCampaignFromApp(appId){
+  var a = _appsCache[appId];
+  if(!a) return;
+  clearCampaignForm();
+  document.getElementById('campaign-form-title').textContent = 'New Campaign — from: ' + a.name;
+  document.getElementById('cf-name').value = (a.name || '') + ' Campaign';
+  document.getElementById('cf-slug').value = (a.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  document.getElementById('cf-desc').value = (a.mission_context || '').slice(0, 120);
+  document.getElementById('cf-story').value = [a.mission_context, a.message].filter(Boolean).join('\n\n');
+  document.getElementById('campaign-form-panel').classList.add('open');
+  document.getElementById('campaign-form-panel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderApplicationCard(a){
+  var equip = Array.isArray(a.equipment_needed) ? a.equipment_needed.join(', ') : '';
+  var notes = _allAppNotes[a.id] || '';
+  return '<div style="padding:16px 20px;border:1px solid #d0d7de;border-radius:12px;background:#fff;margin-bottom:12px">'
+    + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">'
+    + '<div><strong style="font-size:1rem">' + esc(a.name) + '</strong>'
+    + (a.organization ? '<span style="margin-left:8px;font-size:.82rem;color:#57606a;font-weight:600">' + esc(a.organization) + '</span>' : '')
+    + '</div><span style="color:#57606a;font-size:.82rem;white-space:nowrap">' + fmtDate(a.created_at) + '</span></div>'
+    + '<div style="color:#57606a;font-size:.88rem;margin-top:4px">'
+    + esc(a.email)
+    + (a.country ? ' · ' + esc(a.country) : '') + (a.region ? ', ' + esc(a.region) : '')
+    + (a.role ? ' · ' + esc(a.role) : '') + '</div>'
+    + (equip ? '<div style="margin-top:8px;font-size:.88rem"><strong>Equipment:</strong> ' + esc(equip) + '</div>' : '')
+    + (a.funding_needed ? '<div style="margin-top:4px;font-size:.88rem"><strong>Funding:</strong> ' + esc(a.funding_needed) + '</div>' : '')
+    + (a.timeframe ? '<div style="margin-top:4px;font-size:.88rem"><strong>Timeframe:</strong> ' + esc(a.timeframe) + '</div>' : '')
+    + (a.mission_context ? '<div style="margin-top:8px;font-size:.9rem;color:#24292f"><strong>Context:</strong> ' + esc(a.mission_context) + '</div>' : '')
+    + (a.message ? '<div style="margin-top:6px;font-size:.9rem;color:#24292f"><strong>Message:</strong> ' + esc(a.message) + '</div>' : '')
+    + '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eaeef2">'
+    + '<label style="font-size:.82rem;font-weight:800;color:#57606a;display:block;margin-bottom:5px">'
+    + 'Admin Notes <span id="app-notes-st-' + a.id + '" style="font-weight:400;color:#1a7f37;font-style:italic"></span></label>'
+    + '<textarea id="app-notes-ta-' + a.id + '" rows="2" style="width:100%;padding:8px 10px;border:1.5px solid #d0d7de;border-radius:8px;font-size:.88rem;font-family:inherit;resize:vertical" placeholder="Internal notes — follow-up status, outreach date, decisions…">' + esc(notes) + '</textarea>'
+    + '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">'
+    + '<button onclick="saveAppNotes(\'' + a.id + '\')" style="padding:7px 16px;background:#0969da;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Save Notes</button>'
+    + '<button onclick="buildCampaignFromApp(\'' + a.id + '\')" style="padding:7px 16px;background:#1a7f37;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Build Campaign →</button>'
+    + '</div></div></div>';
+}
+
 function loadApplications(){
-  // Load the current on/off flag
+  // Load the on/off flag
   var btn = document.getElementById('apps-flag-toggle');
   fetch('/api/track?type=setting&key=applications_open', { cache: 'no-store' })
     .then(function(r){ return r.json(); })
@@ -1876,37 +1942,29 @@ function loadApplications(){
       var next = btn.dataset.open !== '1';
       btn.disabled = true; btn.style.opacity = '.6'; btn.textContent = 'Saving…';
       trackApi('POST', 'setting', { key: 'applications_open', value: next })
-        .then(function(){ renderAppsFlag(next); showStatus('Applications turned ' + (next ? 'ON' : 'OFF') + '.', 'success'); })
-        .catch(function(){ renderAppsFlag(!next); showStatus('Could not update the setting.', 'error'); });
+        .then(function(){ renderAppsFlag(next); showStatus('Applications turned ' + (next ? 'ON' : 'OFF') + '.', 'ok'); })
+        .catch(function(){ renderAppsFlag(!next); showStatus('Could not update the setting.', 'err'); });
     });
   }
 
-  // Load submitted applications
+  // Load notes first, then render applications
   var list = document.getElementById('applications-list');
-  trackApi('GET', 'applications').then(function(rows){
-    if(!Array.isArray(rows) || !rows.length){
-      list.innerHTML = '<div class="empty-state" style="padding:20px"><div>No applications submitted yet.</div></div>';
-      return;
-    }
-    list.innerHTML = rows.map(function(a){
-      var equip = Array.isArray(a.equipment_needed) ? a.equipment_needed.join(', ') : '';
-      return '<div style="padding:16px;border:1px solid #d0d7de;border-radius:12px;background:#fff;margin-bottom:12px">'
-        + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">'
-        + '<strong style="font-size:1rem">' + esc(a.name) + '</strong>'
-        + '<span style="color:#57606a;font-size:.85rem">' + fmtDate(a.created_at) + '</span></div>'
-        + '<div style="color:#57606a;font-size:.9rem;margin-top:4px">'
-        + esc(a.email) + (a.country ? ' · ' + esc(a.country) : '') + (a.region ? ', ' + esc(a.region) : '')
-        + (a.organization ? ' · ' + esc(a.organization) : '') + (a.role ? ' · ' + esc(a.role) : '') + '</div>'
-        + (equip ? '<div style="margin-top:8px;font-size:.9rem"><strong>Equipment:</strong> ' + esc(equip) + '</div>' : '')
-        + (a.funding_needed ? '<div style="margin-top:4px;font-size:.9rem"><strong>Funding:</strong> ' + esc(a.funding_needed) + '</div>' : '')
-        + (a.timeframe ? '<div style="margin-top:4px;font-size:.9rem"><strong>Timeframe:</strong> ' + esc(a.timeframe) + '</div>' : '')
-        + (a.mission_context ? '<div style="margin-top:8px;font-size:.92rem;color:#24292f"><strong>Context:</strong> ' + esc(a.mission_context) + '</div>' : '')
-        + (a.message ? '<div style="margin-top:6px;font-size:.92rem;color:#24292f"><strong>Notes:</strong> ' + esc(a.message) + '</div>' : '')
-        + '</div>';
-    }).join('');
-  }).catch(function(){
-    list.innerHTML = '<div class="empty-state" style="padding:20px"><div>Could not load applications.</div></div>';
+  loadAllAppNotes(function(){
+    trackApi('GET', 'applications').then(function(rows){
+      _appsCache = {};
+      if(!Array.isArray(rows) || !rows.length){
+        list.innerHTML = '<div class="empty-state" style="padding:20px"><div>No applications submitted yet.</div></div>';
+        return;
+      }
+      rows.forEach(function(a){ _appsCache[a.id] = a; });
+      list.innerHTML = rows.map(function(a){ return renderApplicationCard(a); }).join('');
+    }).catch(function(){
+      list.innerHTML = '<div class="empty-state" style="padding:20px"><div>Could not load applications.</div></div>';
+    });
   });
+
+  // Also load campaigns
+  loadCampaigns();
 }
 
 // ════════════════════════════════════════════════════════
