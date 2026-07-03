@@ -48,35 +48,10 @@
 
           <h2>Full PDF library</h2>
           <p>Download any PDF below to your phone, laptop, or USB drive before heading into the field. All files are designed for printing and offline use.</p>
-          <div class="download-list download-list-compact">
-            <a class="download-link" href="./downloads/villageserver-mission-statement.pdf" download>Mission Statement</a>
-            <a class="download-link" href="./downloads/villageserver-initiative-overview.pdf" download>Full Initiative Overview</a>
-            <a class="download-link" href="./downloads/villageserver-about-us.pdf" download>About Us</a>
-            <a class="download-link" href="./downloads/villageserver-programs-and-services.pdf" download>Programs and Services</a>
-            <a class="download-link" href="./downloads/villageserver-photos-and-visuals.pdf" download>Photos and Visuals</a>
-            <a class="download-link" href="./downloads/villageserver-testimonials.pdf" download>Testimonials</a>
-            <a class="download-link" href="./downloads/villageserver-phone-based-gospel-distribution.pdf" download>Phone-Based Gospel Distribution</a>
-            <a class="download-link" href="./downloads/villageserver-raspberry-pi-system.pdf" download>Raspberry Pi VillageServer — System Overview</a>
-            <a class="download-link" href="./downloads/villageserver-quick-start-guide.pdf" download>Raspberry Pi — Field Quick Start Guide</a>
-            <a class="download-link" href="./downloads/villageserver-power-and-solar.pdf" download>Power Systems and Solar Solutions</a>
-            <a class="download-link" href="./downloads/villageserver-projector-and-audio.pdf" download>Projector Systems and Audio Solutions</a>
-            <a class="download-link" href="./downloads/villageserver-custom-libraries.pdf" download>Content Libraries and Custom Ministry Resources</a>
-            <a class="download-link" href="./downloads/villageserver-satellite-systems.pdf" download>Satellite Systems and Content Acquisition</a>
-            <a class="download-link" href="./downloads/villageserver-ministry-partners.pdf" download>Ministry Resource Partners</a>
-            <a class="download-link" href="./downloads/villageserver-get-and-share-resources.pdf" download>Get and Share Resources</a>
-            <a class="download-link" href="./downloads/villageserver-transfer-resources-between-devices.pdf" download>Transfer Resources Between Devices</a>
-            <a class="download-link" href="./downloads/villageserver-sharing-the-library.pdf" download>Sharing the Library</a>
-            <a class="download-link" href="./downloads/villageserver-setup-guide.pdf" download>Setup Guide</a>
-            <a class="download-link" href="./downloads/villageserver-printable-pamphlets-and-field-faq.pdf" download>Printable Pamphlets and Field FAQ</a>
-            <a class="download-link" href="./downloads/villageserver-kit-levels-and-costs.pdf" download>Field Configurations</a>
-            <a class="download-link" href="./downloads/villageserver-rollout-and-reach.pdf" download>Rollout and Reach</a>
-            <a class="download-link" href="./downloads/villageserver-field-faq.pdf" download>Field FAQ</a>
-            <a class="download-link" href="./downloads/villageserver-transfer-iphone-to-iphone.pdf" download>iPhone to iPhone Transfer</a>
-            <a class="download-link" href="./downloads/villageserver-transfer-android-to-android.pdf" download>Android to Android Transfer</a>
-            <a class="download-link" href="./downloads/villageserver-transfer-iphone-to-android.pdf" download>iPhone to Android Transfer</a>
-            <a class="download-link" href="./downloads/villageserver-transfer-android-to-iphone.pdf" download>Android to iPhone Transfer</a>
-            <a class="download-link" href="./downloads/villageserver-transfer-computer-to-phone.pdf" download>Computer to Phone Transfer</a>
-            <a class="download-link" href="./downloads/villageserver-transfer-microsd-to-phone.pdf" download>microSD to Phone Transfer</a>
+          <div id="pamphlet-list-wrap">
+            <div id="pamphlet-list" class="download-list download-list-compact">
+              <span style="color:var(--muted);font-size:.9rem">Loading…</span>
+            </div>
           </div>
         </article>
         <aside class="side-card" aria-label="Page summary">
@@ -101,5 +76,26 @@
   <footer class="footer"><div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <span id="arki-credit" title="ArkiTech-Sol">Built by ArkiTech-Sol</span></div></footer>
   <script src="./js/site-language.js?v=2"></script>
   <script src="./js/site-tracking.js?v=1"></script>
+  <script>
+    /* Dynamically load pamphlet list */
+    (function(){
+      var list = document.getElementById('pamphlet-list');
+      if (!list) return;
+      fetch('/api/pamphlets', { cache: 'no-store' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(pamphlets){
+          if (!Array.isArray(pamphlets) || !pamphlets.length) {
+            list.innerHTML = '<span style="color:var(--muted)">Could not load pamphlets. Please refresh.</span>';
+            return;
+          }
+          list.innerHTML = pamphlets.map(function(p){
+            return '<a class="download-link" href="' + p.url + '" download>' + p.title + '</a>';
+          }).join('');
+        })
+        .catch(function(){
+          list.innerHTML = '<span style="color:var(--muted)">Could not load pamphlets. Please check your connection and refresh.</span>';
+        });
+    })();
+  </script>
 </body>
 </html>

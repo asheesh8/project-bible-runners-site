@@ -459,7 +459,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-label">Internal</div>
+        <div class="sidebar-label">Content</div>
+        <div class="nav-item" data-tab="pamphlets">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Pamphlets &amp; PDFs
+        </div>
         <div class="nav-item" data-tab="internal">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
           Field Guides (Pi)
@@ -900,9 +904,54 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
         </div>
       </div>
 
+      <!-- ── PAMPHLETS & PDFs ─────────────────────── -->
+      <div class="tab-view" id="tab-pamphlets">
+        <div class="page-header">
+          <h2 class="page-title">Pamphlets &amp; PDFs</h2>
+          <button class="btn-add" id="add-pamphlet-btn">+ Add pamphlet</button>
+        </div>
+
+        <div class="flow-note" style="margin-bottom:20px">
+          📄 &nbsp;Changes here update <strong>instantly</strong> on the public <a href="./pamphlets.html" target="_blank" style="color:var(--link)">pamphlets page</a> and anywhere a PDF is linked by slug (e.g. the Raspberry Pi page). No deploy needed.
+        </div>
+
+        <!-- Add / Edit form -->
+        <div class="form-panel" id="pamphlet-form-panel" style="display:none">
+          <h3 id="pamphlet-form-title">Add pamphlet</h3>
+          <div class="field"><label>Title</label><input type="text" id="pf-title" placeholder="e.g. Field Quick Start Guide"></div>
+          <div class="field"><label>Slug (unique ID — no spaces)</label><input type="text" id="pf-slug" placeholder="e.g. raspberry-pi-quickstart"></div>
+          <div class="field"><label>URL / Link</label><input type="text" id="pf-url" placeholder="./downloads/filename.pdf  or  https://drive.google.com/..."></div>
+          <div class="field">
+            <label>Category</label>
+            <select id="pf-category">
+              <option value="About">About</option>
+              <option value="Technology">Technology</option>
+              <option value="Field">Field</option>
+              <option value="Transfer">Transfer</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:18px">
+            <button class="btn-save" id="pamphlet-save-btn">Save</button>
+            <button class="btn-cancel" id="pamphlet-cancel-btn">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Pamphlet list table -->
+        <div id="pamphlet-list-admin">
+          <p style="color:var(--muted);font-size:.9rem">Loading…</p>
+        </div>
+      </div>
+
       <!-- ── INTERNAL: RASPBERRY PI / WIREGUARD ───── -->
       <div class="tab-view" id="tab-internal">
-        <div class="page-header"><h2 class="page-title">Raspberry Pi &amp; WireGuard Setup</h2></div>
+        <div class="page-header"><h2 class="page-title">Raspberry Pi &amp; WireGuard Setup</h2><a href="./raspberry-pi.html" target="_blank" class="btn-add" style="text-decoration:none">Open public page ↗</a></div>
+
+        <div class="res-section">
+          <div class="res-section-title">📱 &nbsp;Public-facing Raspberry Pi page (preview)</div>
+          <p style="margin:0 0 10px;color:var(--muted);font-size:.88rem">This is what visitors see. The public page has the overview, iPhone demo, and field steps. The setup guide and WireGuard config are below, admin-only.</p>
+          <iframe src="./raspberry-pi.html" title="Raspberry Pi public page preview" loading="lazy" style="width:100%;height:72vh;border:1px solid var(--border);border-radius:10px;display:block"></iframe>
+        </div>
+        <hr style="margin:32px 0;border:none;border-top:1px solid var(--border)">
 
         <div class="flow-diagram">
           <div class="flow-node"><div class="flow-node-icon">💾</div><div class="flow-node-label">Flash SD card</div><div class="flow-node-sub">Raspberry Pi OS Lite</div></div>
@@ -1344,8 +1393,140 @@ function loadTab(tab){
   else if(tab === 'testimonies') loadTestimonies();
   else if(tab === 'traffic') startTrafficPoll();
   else if(tab === 'applications') loadApplications();
+  else if(tab === 'pamphlets') initPamphlets();
   // 'resources' and 'internal' are static — nothing to load
 }
+
+// ════════════════════════════════════════════════════════
+// PAMPHLETS MANAGEMENT
+// ════════════════════════════════════════════════════════
+var _pamphlets = [];
+var _editingSlug = null;
+
+function initPamphlets(){
+  if (document.getElementById('pamphlet-list-admin')._loaded) return;
+  document.getElementById('pamphlet-list-admin')._loaded = true;
+  loadPamphletsAdmin();
+
+  document.getElementById('add-pamphlet-btn').addEventListener('click', function(){
+    _editingSlug = null;
+    document.getElementById('pamphlet-form-title').textContent = 'Add pamphlet';
+    document.getElementById('pf-title').value = '';
+    document.getElementById('pf-slug').value = '';
+    document.getElementById('pf-url').value = './downloads/';
+    document.getElementById('pf-category').value = 'Field';
+    document.getElementById('pamphlet-form-panel').style.display = 'block';
+    document.getElementById('pf-title').focus();
+  });
+
+  document.getElementById('pamphlet-cancel-btn').addEventListener('click', function(){
+    document.getElementById('pamphlet-form-panel').style.display = 'none';
+  });
+
+  document.getElementById('pamphlet-save-btn').addEventListener('click', savePamphlet);
+}
+
+function loadPamphletsAdmin(){
+  var el = document.getElementById('pamphlet-list-admin');
+  el.innerHTML = '<p style="color:var(--muted);font-size:.9rem">Loading…</p>';
+  fetch('/api/pamphlets', { cache: 'no-store' })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(list){
+      _pamphlets = Array.isArray(list) ? list : [];
+      renderPamphletsAdmin();
+    })
+    .catch(function(){
+      el.innerHTML = '<p style="color:red;font-size:.9rem">Failed to load pamphlets.</p>';
+    });
+}
+
+function renderPamphletsAdmin(){
+  var el = document.getElementById('pamphlet-list-admin');
+  if (!_pamphlets.length) { el.innerHTML = '<p style="color:var(--muted)">No pamphlets yet.</p>'; return; }
+
+  var cats = {};
+  _pamphlets.forEach(function(p){
+    if (!cats[p.category]) cats[p.category] = [];
+    cats[p.category].push(p);
+  });
+
+  var html = '<table class="items-table"><thead><tr><th>Title</th><th>Slug</th><th>Category</th><th>URL</th><th></th></tr></thead><tbody>';
+  _pamphlets.forEach(function(p, i){
+    html += '<tr>'
+      + '<td style="font-weight:600">' + esc(p.title) + '</td>'
+      + '<td><code style="font-size:.78rem;color:var(--muted)">' + esc(p.slug) + '</code></td>'
+      + '<td>' + esc(p.category) + '</td>'
+      + '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><a href="' + esc(p.url) + '" target="_blank" style="color:var(--link);font-size:.82rem">' + esc(p.url) + '</a></td>'
+      + '<td style="white-space:nowrap">'
+      + '<button onclick="editPamphlet(' + i + ')" style="margin-right:6px;padding:4px 10px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-size:.82rem">Edit</button>'
+      + '<button onclick="deletePamphlet(' + i + ')" style="padding:4px 10px;border:1px solid #fca5a5;background:#fff5f5;color:#dc2626;border-radius:6px;cursor:pointer;font-size:.82rem">Delete</button>'
+      + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function editPamphlet(i){
+  var p = _pamphlets[i];
+  _editingSlug = p.slug;
+  document.getElementById('pamphlet-form-title').textContent = 'Edit pamphlet';
+  document.getElementById('pf-title').value = p.title;
+  document.getElementById('pf-slug').value = p.slug;
+  document.getElementById('pf-url').value = p.url;
+  document.getElementById('pf-category').value = p.category || 'Field';
+  document.getElementById('pamphlet-form-panel').style.display = 'block';
+  document.getElementById('pf-title').focus();
+}
+
+function deletePamphlet(i){
+  if (!confirm('Delete "' + _pamphlets[i].title + '"?')) return;
+  _pamphlets.splice(i, 1);
+  persistPamphlets(function(){ renderPamphletsAdmin(); });
+}
+
+function savePamphlet(){
+  var title = document.getElementById('pf-title').value.trim();
+  var slug = document.getElementById('pf-slug').value.trim().replace(/\s+/g, '-').toLowerCase();
+  var url = document.getElementById('pf-url').value.trim();
+  var category = document.getElementById('pf-category').value;
+
+  if (!title || !slug || !url) { alert('Title, slug, and URL are required.'); return; }
+
+  if (_editingSlug) {
+    var idx = _pamphlets.findIndex(function(p){ return p.slug === _editingSlug; });
+    if (idx >= 0) _pamphlets[idx] = { slug: slug, title: title, url: url, category: category };
+  } else {
+    if (_pamphlets.find(function(p){ return p.slug === slug; })) { alert('A pamphlet with that slug already exists.'); return; }
+    _pamphlets.push({ slug: slug, title: title, url: url, category: category });
+  }
+
+  persistPamphlets(function(){
+    document.getElementById('pamphlet-form-panel').style.display = 'none';
+    renderPamphletsAdmin();
+  });
+}
+
+function persistPamphlets(cb){
+  var btn = document.getElementById('pamphlet-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  fetch('/api/pamphlets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + AUTH_TOKEN },
+    body: JSON.stringify({ action: 'save', pamphlets: _pamphlets })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if (btn) { btn.disabled = false; btn.textContent = 'Save'; }
+    if (data && data.ok !== false) { if (cb) cb(); }
+    else alert('Save failed — check console.');
+  })
+  .catch(function(){
+    if (btn) { btn.disabled = false; btn.textContent = 'Save'; }
+    alert('Network error — save failed.');
+  });
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ── Copy-code button ─────────────────────────────────────
 function copyCode(btn){
