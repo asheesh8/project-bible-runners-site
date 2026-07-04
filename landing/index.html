@@ -39,10 +39,10 @@
     @media (max-width:960px){.reach-ladder{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:520px){.reach-ladder{grid-template-columns:1fr}}
 
-    /* ── Logo hint ── */
-    .logo-hint{margin:8px auto 0;font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.52);text-align:center;animation:hintPulse 3s ease-in-out infinite}
-    .logo-hint span{display:inline-block;margin-right:6px;animation:hintBounce 1.6s ease-in-out infinite}
-    @keyframes hintPulse{0%,100%{opacity:.52}50%{opacity:.85}}
+    /* ── Logo hint chip ── */
+    .logo-hint{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:5px 13px 5px 9px;margin:10px auto 0;font-family:'DM Sans',system-ui,sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.62);animation:hintPulse 3s ease-in-out infinite;max-width:none;line-height:1}
+    .logo-hint span{display:inline-block;font-size:.8rem;animation:hintBounce 1.6s ease-in-out infinite}
+    @keyframes hintPulse{0%,100%{opacity:.62}50%{opacity:1}}
     @keyframes hintBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
     /* ── Interactive logo hotspots ── */
@@ -151,7 +151,7 @@
             <button class="logo-hs" title="Wi-Fi Hotspot"      data-guide="wifi-hotspot"  style="left:66.7%;top:40.8%"></button>
             <button class="logo-hs" title="Smartphones"        data-guide="smartphones"   style="left:61.4%;top:31.8%"></button>
           </div>
-          <p class="logo-hint"><span>☝</span>Click any component to explore how it works</p>
+          <div class="logo-hint"><span>☝</span>Click any component to explore</div>
           <h1 class="visually-hidden">VillageServer Initiative</h1>
           <p class="hero-tagline">Sharing the Gospel with the help of today's existing technology.</p>
           <p class="hero-tagline" style="font-size:clamp(1rem,1.6vw,1.5rem);margin-top:8px;opacity:.82">Placing God's Word within reach of every village — even where there is no internet, no power grid, and no trained technician.</p>
