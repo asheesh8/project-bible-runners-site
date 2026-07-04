@@ -146,7 +146,10 @@
     addStyles();
     protectCuratedHomepageText();
     buildSelect();
-    startTranslator();
+    // Only pull in Google Translate's third-party script when a non-English
+    // language is actually selected. English (the default) needs no translation,
+    // so default visitors pay zero third-party cost.
+    if (saved !== 'en') startTranslator();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
