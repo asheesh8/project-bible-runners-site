@@ -354,6 +354,33 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
 #traffic-countdown-bar{height:3px;background:#16a34a;border-radius:99px;width:100%;animation:cdShrink 4s linear forwards}
 @keyframes cdShrink{from{width:100%}to{width:0%}}
 
+/* ── Analytics: insights, charts, collapsible sections ── */
+.insight-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px;margin-bottom:24px}
+.insight-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:13px 15px;display:flex;gap:11px;align-items:flex-start;overflow:hidden}
+.insight-icon{font-size:20px;line-height:1;flex:0 0 auto;margin-top:2px}
+.insight-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px}
+.insight-val{font-size:15px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.insight-sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+details.res-section{margin-bottom:36px}
+details.res-section > summary{
+  list-style:none;cursor:pointer;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:8px;border-bottom:1.5px solid var(--border);
+  user-select:none;outline:none;
+}
+details.res-section > summary::-webkit-details-marker{display:none}
+details.res-section > *:not(summary){padding-top:14px}
+.section-caret{font-size:10px;transition:transform .2s;margin-left:6px;color:var(--muted)}
+details.res-section[open] .section-caret{transform:rotate(180deg)}
+.bar-rank{font-size:11px;font-weight:700;color:var(--muted);min-width:22px;text-align:right;flex:0 0 auto}
+.donut-wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;padding:4px 0}
+.donut-legend{display:flex;flex-direction:column;gap:9px;flex:1;min-width:0}
+.donut-legend-row{display:flex;align-items:center;gap:8px}
+.donut-swatch{width:10px;height:10px;border-radius:3px;flex:0 0 10px}
+.country-flag-cell{font-size:16px;line-height:1;width:24px;flex:0 0 24px;text-align:center}
+.country-fill{background:var(--accent)!important}
+
 /* Responsive */
 @media(max-width:760px){
   .sidebar{display:none}
@@ -667,45 +694,63 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
           <div class="stat-card"><div class="stat-val" id="stat-contacts">—</div><div class="stat-label">Contact messages</div></div>
         </div>
 
+        <!-- Insight strip -->
+        <div class="insight-strip" id="insight-strip"></div>
+
+        <!-- Visits over time chart -->
         <div class="res-section">
-          <div class="res-section-title">👥 &nbsp;Individual people</div>
-          <div id="people-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+          <div class="res-section-title">📈 &nbsp;Visits over time <span id="timeline-range" style="font-weight:500;letter-spacing:0;text-transform:none;font-size:10px;margin-left:6px"></span></div>
+          <div id="visits-timeline-wrap"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
+        <!-- Top pages -->
         <div class="res-section">
           <div class="res-section-title">📄 &nbsp;Top pages</div>
           <div id="top-pages-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
-        <div class="res-section">
-          <div class="res-section-title">🔗 &nbsp;Clicked links</div>
-          <div id="clicks-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
-        </div>
-
+        <!-- Traffic sources with donut chart -->
         <div class="res-section">
           <div class="res-section-title">📣 &nbsp;Traffic sources</div>
           <div id="utm-sources-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
+        <!-- Geographic reach -->
         <div class="res-section">
-          <div class="res-section-title">🌍 &nbsp;Users by country</div>
+          <div class="res-section-title">🌍 &nbsp;Geographic reach</div>
           <div id="country-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
-        <div class="res-section">
-          <div class="res-section-title">🙋 &nbsp;Donation interests</div>
+        <!-- Individual people (collapsible) -->
+        <details class="res-section collapsible-section" open>
+          <summary>👥 &nbsp;Individual people <span class="section-caret">▾</span></summary>
+          <div id="people-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </details>
+
+        <!-- Clicked links (collapsible) -->
+        <details class="res-section collapsible-section">
+          <summary>🔗 &nbsp;Clicked links <span class="section-caret">▾</span></summary>
+          <div id="clicks-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+        </details>
+
+        <!-- Donation interests (collapsible) -->
+        <details class="res-section collapsible-section">
+          <summary>🙋 &nbsp;Donation interests <span class="section-caret">▾</span></summary>
+          <div id="interests-chart" style="margin-bottom:16px"></div>
           <div class="interests-table-wrap" id="interests-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
-        </div>
+        </details>
 
-        <div class="res-section">
-          <div class="res-section-title">✉️ &nbsp;Contact messages</div>
+        <!-- Contact messages (collapsible) -->
+        <details class="res-section collapsible-section">
+          <summary>✉️ &nbsp;Contact messages <span class="section-caret">▾</span></summary>
           <div class="interests-table-wrap" id="contacts-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
-        </div>
+        </details>
 
-        <div class="res-section">
-          <div class="res-section-title">🕓 &nbsp;Recent visits</div>
+        <!-- Recent visits (collapsible) -->
+        <details class="res-section collapsible-section">
+          <summary>🕓 &nbsp;Recent visits <span class="section-caret">▾</span></summary>
           <div id="visits-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
-        </div>
+        </details>
       </div>
 
       <!-- ── RESOURCES ─────────────────────────────── -->
@@ -2319,6 +2364,94 @@ function resetCountdownBar(){
   bar.style.animation = 'cdShrink 4s linear forwards';
 }
 
+// ── Traffic analytics helpers ──────────────────────────
+function tryHostname(url){
+  if(!url) return '';
+  try{ return new URL(url).hostname; }catch(e){ return url; }
+}
+
+var _FLAGS = {
+  uganda:'🇺🇬',kenya:'🇰🇪',tanzania:'🇹🇿',nigeria:'🇳🇬',ghana:'🇬🇭',
+  ethiopia:'🇪🇹',rwanda:'🇷🇼','south africa':'🇿🇦',zimbabwe:'🇿🇼',zambia:'🇿🇲',
+  malawi:'🇲🇼',mozambique:'🇲🇿',senegal:'🇸🇳',cameroon:'🇨🇲',congo:'🇨🇩',
+  usa:'🇺🇸','united states':'🇺🇸',us:'🇺🇸',canada:'🇨🇦',uk:'🇬🇧',
+  'united kingdom':'🇬🇧',australia:'🇦🇺','new zealand':'🇳🇿',germany:'🇩🇪',
+  france:'🇫🇷',netherlands:'🇳🇱',norway:'🇳🇴',sweden:'🇸🇪',finland:'🇫🇮',
+  india:'🇮🇳',nepal:'🇳🇵',philippines:'🇵🇭',indonesia:'🇮🇩',myanmar:'🇲🇲',
+  cambodia:'🇰🇭',laos:'🇱🇦',vietnam:'🇻🇳',thailand:'🇹🇭',
+  brazil:'🇧🇷',peru:'🇵🇪',mexico:'🇲🇽',colombia:'🇨🇴',haiti:'🇭🇹',
+  kiribati:'🇰🇮',kosovo:'🇽🇰','solomon islands':'🇸🇧','papua new guinea':'🇵🇬'
+};
+function countryFlag(name){ return _FLAGS[(name||'').toLowerCase().trim()]||'🌐'; }
+
+var _CHART_COLORS = ['#316dca','#1a7f37','#fb8500','#8338ec','#ef233c','#2ec4b6','#ff9f1c','#bc4749'];
+
+function buildDonut(slices, size){
+  if(!slices.length) return '';
+  var total = slices.reduce(function(s,x){return s+x.value;},0);
+  if(!total) return '';
+  var cx=size/2,cy=size/2,oR=size*0.41,iR=size*0.24;
+  var angle=-Math.PI/2;
+  var fx=function(n){return Math.round(n*100)/100;};
+  var paths=slices.map(function(s){
+    var sw=(s.value/total)*Math.PI*2;
+    if(sw>=Math.PI*2) sw=Math.PI*2-0.001;
+    var ea=angle+sw,lg=sw>Math.PI?1:0;
+    var x1=cx+oR*Math.cos(angle),y1=cy+oR*Math.sin(angle);
+    var x2=cx+oR*Math.cos(ea),y2=cy+oR*Math.sin(ea);
+    var ix1=cx+iR*Math.cos(angle),iy1=cy+iR*Math.sin(angle);
+    var ix2=cx+iR*Math.cos(ea),iy2=cy+iR*Math.sin(ea);
+    var d='M'+fx(x1)+' '+fx(y1)+
+      ' A'+fx(oR)+' '+fx(oR)+' 0 '+lg+' 1 '+fx(x2)+' '+fx(y2)+
+      ' L'+fx(ix2)+' '+fx(iy2)+
+      ' A'+fx(iR)+' '+fx(iR)+' 0 '+lg+' 0 '+fx(ix1)+' '+fx(iy1)+' Z';
+    angle=ea;
+    return '<path d="'+d+'" fill="'+s.color+'" stroke="#fff" stroke-width="1.5"><title>'+esc(s.label)+': '+s.value+'</title></path>';
+  }).join('');
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" style="flex:0 0 auto">'+paths+'</svg>';
+}
+
+function renderTimelineChart(visits){
+  var wrap=document.getElementById('visits-timeline-wrap');
+  if(!wrap) return;
+  var DAYS=14,now=new Date();
+  var buckets=[];
+  for(var i=DAYS-1;i>=0;i--){
+    var d=new Date(now); d.setDate(d.getDate()-i);
+    var key=d.toISOString().slice(0,10);
+    buckets.push({key:key,label:key.slice(5),count:0});
+  }
+  visits.forEach(function(v){
+    var key=(v.created_at||'').slice(0,10);
+    for(var j=0;j<buckets.length;j++){if(buckets[j].key===key){buckets[j].count++;break;}}
+  });
+  var max=Math.max.apply(null,buckets.map(function(b){return b.count;}))||1;
+  var W=580,H=130,padX=12,padY=30,bW=28;
+  var gap=(W-padX*2-bW*DAYS)/(DAYS-1);
+  var todayKey=now.toISOString().slice(0,10);
+  var bars=buckets.map(function(b,i){
+    var x=padX+i*(bW+gap);
+    var bh=Math.max(2,Math.round((b.count/max)*(H-padY-22)));
+    var y=H-padY-bh;
+    var isT=b.key===todayKey;
+    return '<g>'+
+      '<rect x="'+x+'" y="'+y+'" width="'+bW+'" height="'+bh+'" rx="4"'+
+        ' fill="'+(isT?'#1a7f37':'#316dca')+'" opacity="'+(b.count?1:.2)+'">'+
+        '<title>'+esc(b.label)+': '+b.count+' visit'+(b.count!==1?'s':'')+'</title></rect>'+
+      (b.count?'<text x="'+(x+bW/2)+'" y="'+(y-4)+'" text-anchor="middle" font-size="9" fill="#636c76" font-family="system-ui,sans-serif">'+b.count+'</text>':'')+
+      '<text x="'+(x+bW/2)+'" y="'+(H-12)+'" text-anchor="middle" font-size="8.5" fill="'+(isT?'#1a7f37':'#636c76')+'" font-family="system-ui,sans-serif"'+(isT?' font-weight="700"':'')+'>'+b.label.slice(3)+'</text>'+
+    '</g>';
+  }).join('');
+  wrap.innerHTML='<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">'+
+    '<svg viewBox="0 0 '+W+' '+H+'" style="display:block;width:100%;max-width:'+W+'px;min-width:360px;height:'+H+'px">'+
+      '<line x1="'+padX+'" y1="'+(H-padY)+'" x2="'+(W-padX)+'" y2="'+(H-padY)+'" stroke="#d0d7de" stroke-width="1"/>'+
+      bars+
+    '</svg>'+
+  '</div>';
+  var rangeEl=document.getElementById('timeline-range');
+  if(rangeEl) rangeEl.textContent='— last '+DAYS+' days';
+}
+
 function loadTraffic(showSpinner){
   var btn = document.getElementById('refresh-traffic-btn');
   if(showSpinner){
@@ -2345,9 +2478,10 @@ function loadTraffic(showSpinner){
 }
 
 function renderTraffic(visits, clicks, interests, availabilities, totals, contacts){
-  // ── Stats ────────────────────────────────────────────
   totals = totals || {};
   contacts = contacts || [];
+
+  // ── Stats ─────────────────────────────────────────────
   var todayStr = new Date().toDateString();
   var todayCount = visits.filter(function(v){ return new Date(v.created_at).toDateString()===todayStr; }).length;
   var uniqueIds = new Set(visits.map(function(v){ return v.visitor_id||''; }).filter(Boolean));
@@ -2359,7 +2493,6 @@ function renderTraffic(visits, clicks, interests, availabilities, totals, contac
   var individualPeople = Number(totals.individual_people);
   var visitsToday = Number(totals.visits_today);
   var totalClicks = Number(totals.total_link_clicks);
-
   document.getElementById('stat-visits').textContent = Number.isFinite(totalVisits) ? totalVisits : visits.length;
   document.getElementById('stat-unique').textContent = Number.isFinite(individualPeople) ? individualPeople : (uniqueIds.size || '—');
   document.getElementById('stat-today').textContent = Number.isFinite(visitsToday) ? visitsToday : todayCount;
@@ -2367,33 +2500,134 @@ function renderTraffic(visits, clicks, interests, availabilities, totals, contac
   document.getElementById('stat-interests').textContent = interests.length;
   document.getElementById('stat-contacts').textContent = contacts.length;
 
-  // ── Individual people ────────────────────────────────
+  // ── Pre-compute aggregates ────────────────────────────
+  var pageCounts = {};
+  visits.forEach(function(v){ var p=v.path||'/'; pageCounts[p]=(pageCounts[p]||0)+1; });
+
+  var srcCounts = {};
+  visits.forEach(function(v){
+    var s = v.utm_source || tryHostname(v.referrer) || 'Direct';
+    srcCounts[s]=(srcCounts[s]||0)+1;
+  });
+
+  var countryCounts = {};
+  interests.forEach(function(i){ if(i.country){ countryCounts[i.country]=(countryCounts[i.country]||0)+1; } });
+  availabilities.forEach(function(a){ if(a.country){ countryCounts[a.country]=(countryCounts[a.country]||0)+1; } });
+
+  // ── Insight strip ─────────────────────────────────────
+  var todayISO = new Date().toISOString().slice(0,10);
+  var yestISO  = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  var todayV = visits.filter(function(v){ return (v.created_at||'').slice(0,10)===todayISO; }).length;
+  var yestV  = visits.filter(function(v){ return (v.created_at||'').slice(0,10)===yestISO; }).length;
+  var trendPct = yestV ? Math.round((todayV-yestV)/yestV*100) : null;
+  var trendHTML = trendPct===null ? '<span style="color:var(--muted)">—</span>' :
+    trendPct > 0 ? '<span style="color:#16a34a">↑ +'+trendPct+'%</span> vs '+yestV+' yesterday' :
+    trendPct < 0 ? '<span style="color:var(--danger)">↓ '+trendPct+'%</span> vs '+yestV+' yesterday' :
+    '<span style="color:var(--muted)">→ Flat</span> vs '+yestV+' yesterday';
+
+  var topPageE  = Object.entries(pageCounts).sort(function(a,b){return b[1]-a[1];})[0];
+  var topSrcE   = Object.entries(srcCounts).sort(function(a,b){return b[1]-a[1];})[0];
+  var topCtryE  = Object.entries(countryCounts).sort(function(a,b){return b[1]-a[1];})[0];
+  var engRate   = visits.length ? Math.round(clicks.length/visits.length*100) : 0;
+
+  var insightStrip = document.getElementById('insight-strip');
+  if(insightStrip){
+    insightStrip.innerHTML = [
+      {icon:'📅',title:'Today',val:todayV+' visits',sub:trendHTML},
+      {icon:'🏆',title:'Top Page',val:topPageE?topPageE[0]:'—',sub:topPageE?topPageE[1]+' visits':'No data yet'},
+      {icon:'📣',title:'Top Source',val:topSrcE?topSrcE[0]:'—',sub:topSrcE?topSrcE[1]+' visits':'No data yet'},
+      {icon:'🖱',title:'Engagement',val:engRate+'%',sub:clicks.length+' clicks / '+visits.length+' visits'},
+      {icon:'🌍',title:'Top Country',val:topCtryE?topCtryE[0]:'—',sub:topCtryE?topCtryE[1]+' signups':'From interest forms'},
+    ].map(function(ins){
+      return '<div class="insight-card"><div class="insight-icon">'+ins.icon+'</div>'+
+        '<div><div class="insight-title">'+esc(ins.title)+'</div>'+
+        '<div class="insight-val">'+esc(ins.val)+'</div>'+
+        '<div class="insight-sub">'+ins.sub+'</div></div></div>';
+    }).join('');
+  }
+
+  // ── Visits over time chart ────────────────────────────
+  renderTimelineChart(visits);
+
+  // ── Top pages ─────────────────────────────────────────
+  var topPages = Object.entries(pageCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+  var maxPage = topPages.length ? topPages[0][1] : 1;
+  var totalPV  = topPages.reduce(function(s,r){return s+r[1];},0)||1;
+  if(topPages.length){
+    document.getElementById('top-pages-list').innerHTML = topPages.map(function(row,i){
+      var pct = Math.round(row[1]/maxPage*100);
+      var share = Math.round(row[1]/totalPV*100);
+      return '<div class="bar-row">'+
+        '<span class="bar-rank">#'+(i+1)+'</span>'+
+        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(row[0])+'</span>'+
+        '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div>'+
+        '<span class="bar-count">'+row[1]+' <span style="color:var(--muted);font-size:10px">('+share+'%)</span></span>'+
+      '</div>';
+    }).join('');
+  } else {
+    document.getElementById('top-pages-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No visit data yet.</div></div>';
+  }
+
+  // ── Traffic sources — donut chart ─────────────────────
+  var topSrc = Object.entries(srcCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  var totalSrc = topSrc.reduce(function(s,r){return s+r[1];},0)||1;
+  if(topSrc.length){
+    var srcSlices = topSrc.map(function(row,i){
+      return {label:row[0],value:row[1],color:_CHART_COLORS[i%_CHART_COLORS.length]};
+    });
+    var legendHtml = srcSlices.map(function(s){
+      var pct = Math.round(s.value/totalSrc*100);
+      return '<div class="donut-legend-row">'+
+        '<span class="donut-swatch" style="background:'+s.color+'"></span>'+
+        '<span style="font-size:12px;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(s.label)+'</span>'+
+        '<span style="font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;margin-left:8px">'+s.value+' ('+pct+'%)</span>'+
+      '</div>';
+    }).join('');
+    document.getElementById('utm-sources-list').innerHTML =
+      '<div class="donut-wrap">'+buildDonut(srcSlices,110)+'<div class="donut-legend">'+legendHtml+'</div></div>';
+  } else {
+    document.getElementById('utm-sources-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No source data yet.</div></div>';
+  }
+
+  // ── Geographic reach ──────────────────────────────────
+  var countryRows = Object.entries(countryCounts).sort(function(a,b){return b[1]-a[1];});
+  var totalCtry = countryRows.reduce(function(s,r){return s+r[1];},0)||1;
+  if(countryRows.length){
+    document.getElementById('country-list').innerHTML = countryRows.map(function(row){
+      var pct = Math.round(row[1]/totalCtry*100);
+      return '<div class="bar-row">'+
+        '<span class="country-flag-cell">'+countryFlag(row[0])+'</span>'+
+        '<span class="bar-label">'+esc(row[0])+'</span>'+
+        '<div class="bar-track"><div class="bar-fill country-fill" style="width:'+pct+'%"></div></div>'+
+        '<span class="bar-count">'+row[1]+' <span style="color:var(--muted);font-size:10px">('+pct+'%)</span></span>'+
+      '</div>';
+    }).join('');
+  } else {
+    document.getElementById('country-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No country data yet — comes from interest &amp; availability signups.</div></div>';
+  }
+
+  // ── Individual people ─────────────────────────────────
   var people = {};
   function personFor(id){
-    var key = id || 'unknown';
-    if(!people[key]) people[key] = { id:key, visits:0, clicks:0, forms:0, requests:0, locations:[], events:[], last:0 };
+    var key = id||'unknown';
+    if(!people[key]) people[key]={id:key,visits:0,clicks:0,forms:0,requests:0,locations:[],events:[],last:0};
     return people[key];
   }
-  function cleanLocation(value){
-    return (value||'').toString().replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
+  function cleanLoc(v){ return (v||'').toString().replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim(); }
+  function fmtLoc(country,region){
+    var c=cleanLoc(country),r=cleanLoc(region);
+    if(/kitibus/i.test(r)) r='Kitibus';
+    if(/kitui/i.test(r)) r='Kitui';
+    if(r&&c&&r.toLowerCase()!==c.toLowerCase()) return r+', '+c;
+    return r||c||'';
   }
-  function formattedLocation(country, region){
-    var c = cleanLocation(country);
-    var r = cleanLocation(region);
-    if(/kitibus/i.test(r)) r = 'Kitibus';
-    if(/kitui/i.test(r)) r = 'Kitui';
-    if(r && c && r.toLowerCase() !== c.toLowerCase()) return r + ', ' + c;
-    return r || c || '';
+  function addLoc(person,label,source){
+    label=cleanLoc(label); if(!label) return;
+    var item={label:label,source:source||'activity'};
+    if(!person.locations.some(function(x){return x.label.toLowerCase()===item.label.toLowerCase();})) person.locations.push(item);
   }
-  function addLocation(person, label, source){
-    label = cleanLocation(label);
-    if(!label) return;
-    var item = { label: label, source: source || 'activity' };
-    if(!person.locations.some(function(existing){ return existing.label.toLowerCase() === item.label.toLowerCase(); })) person.locations.push(item);
-  }
-  function inferLocationFromText(text){
-    text = (text||'').toString().toLowerCase();
-    if(!text) return '';
+  function inferLoc(text){
+    text=(text||'').toString().toLowerCase(); if(!text) return '';
     if(/kitibus/.test(text)) return 'Kitibus, Kenya';
     if(/kitui/.test(text)) return 'Kitui, Kenya';
     if(/kenya/.test(text)) return 'Kenya';
@@ -2406,193 +2640,148 @@ function renderTraffic(visits, clicks, interests, availabilities, totals, contac
     if(/asia/.test(text)) return 'Asia';
     return '';
   }
-  function addEvent(person, kind, label, at, sourceText){
-    var time = at ? new Date(at).getTime() : 0;
-    person.last = Math.max(person.last, time||0);
-    person.events.push({ kind:kind, label:label, at:at||'' });
-    addLocation(person, inferLocationFromText(sourceText || label), 'activity');
+  function addEvt(person,kind,label,at,src){
+    var t=at?new Date(at).getTime():0;
+    person.last=Math.max(person.last,t||0);
+    person.events.push({kind:kind,label:label,at:at||''});
+    addLoc(person,inferLoc(src||label),'activity');
   }
   visits.forEach(function(v){
-    var p = personFor(v.visitor_id);
-    p.visits++;
-    addEvent(p, 'page', v.path||'/', v.created_at, [v.path,v.referrer,v.utm_source,v.utm_campaign].join(' '));
+    var p=personFor(v.visitor_id); p.visits++;
+    addEvt(p,'page',v.path||'/',v.created_at,[v.path,v.referrer,v.utm_source,v.utm_campaign].join(' '));
   });
   clicks.forEach(function(c){
-    var p = personFor(c.visitor_id);
-    p.clicks++;
-    addEvent(p, 'click', (c.link_text ? c.link_text + ' → ' : '') + (c.link_url||'link'), c.created_at, [c.path,c.link_text,c.link_url].join(' '));
+    var p=personFor(c.visitor_id); p.clicks++;
+    addEvt(p,'click',(c.link_text?c.link_text+' → ':'')+( c.link_url||'link'),c.created_at,[c.path,c.link_text,c.link_url].join(' '));
   });
   interests.forEach(function(i){
     if(!i.visitor_id) return;
-    var p = personFor(i.visitor_id);
-    p.forms++;
-    addLocation(p, formattedLocation(i.country), 'interest form');
-    addEvent(p, 'form', 'Interest signup' + (i.country ? ': ' + i.country : ''), i.created_at, i.country);
+    var p=personFor(i.visitor_id); p.forms++;
+    addLoc(p,fmtLoc(i.country),'interest form');
+    addEvt(p,'form','Interest signup'+(i.country?': '+i.country:''),i.created_at,i.country);
   });
   availabilities.forEach(function(a){
     if(!a.visitor_id) return;
-    var p = personFor(a.visitor_id);
-    p.requests++;
-    var loc = formattedLocation(a.country, a.region);
-    addLocation(p, loc, 'kit request');
-    addEvent(p, 'kit', 'Kit request' + (loc ? ': ' + loc : ''), a.created_at, loc);
+    var p=personFor(a.visitor_id); p.requests++;
+    var loc=fmtLoc(a.country,a.region);
+    addLoc(p,loc,'kit request');
+    addEvt(p,'kit','Kit request'+(loc?': '+loc:''),a.created_at,loc);
   });
   contacts.forEach(function(c){
     if(!c.visitor_id) return;
-    var p = personFor(c.visitor_id);
-    p.forms++;
-    addEvent(p, 'form', 'Contact message' + (c.name ? ' from ' + c.name : ''), c.created_at, c.message);
+    var p=personFor(c.visitor_id); p.forms++;
+    addEvt(p,'form','Contact message'+(c.name?' from '+c.name:''),c.created_at,c.message);
   });
-  var peopleRows = Object.values(people).sort(function(a,b){ return b.last-a.last; }).slice(0,18);
+  var peopleRows = Object.values(people).sort(function(a,b){return b.last-a.last;}).slice(0,18);
   if(peopleRows.length){
-    document.getElementById('people-list').innerHTML = '<div class="people-grid">' + peopleRows.map(function(person){
-      var shortId = person.id === 'unknown' ? 'Unknown visitor' : 'Visitor ' + person.id.replace(/^vsi-visitor-?/,'').replace(/^vsi-/,'').slice(0,10);
-      var events = person.events.sort(function(a,b){ return new Date(b.at||0)-new Date(a.at||0); }).slice(0,6);
-      var location = person.locations.length ? person.locations[0].label : '';
-      return '<div class="person-card">' +
-        '<div class="person-head">' +
-          '<div><div class="person-name">'+esc(shortId)+'</div><div class="person-meta">Last seen '+(person.last ? fmtDate(new Date(person.last).toISOString()) : '—')+'</div>' +
-          (location ? '<span class="person-location">Potentially from '+esc(location)+'</span>' : '<span class="person-location unknown">Location unknown</span>') + '</div>' +
-          '<div class="person-badges"><span class="person-badge">'+person.visits+' visits</span><span class="person-badge">'+person.clicks+' clicks</span>' + (person.requests ? '<span class="person-badge">'+person.requests+' kit requests</span>' : '') + '</div>' +
-        '</div>' +
-        '<div class="activity-array"><div class="array-bracket">activity: [</div>' + events.map(function(event){
-          return '<div class="array-row"><span class="array-time">'+esc(event.at ? fmtDate(event.at) : '—')+'</span><span class="array-key">'+esc(event.kind)+'</span><span class="array-value">"'+esc(event.label)+'"</span></div>';
-        }).join('') + '<div class="array-bracket">]</div></div>' +
+    document.getElementById('people-list').innerHTML='<div class="people-grid">'+peopleRows.map(function(person){
+      var shortId=person.id==='unknown'?'Unknown visitor':'Visitor '+person.id.replace(/^vsi-visitor-?/,'').replace(/^vsi-/,'').slice(0,10);
+      var events=person.events.sort(function(a,b){return new Date(b.at||0)-new Date(a.at||0);}).slice(0,6);
+      var loc=person.locations.length?person.locations[0].label:'';
+      return '<div class="person-card">'+
+        '<div class="person-head">'+
+          '<div><div class="person-name">'+esc(shortId)+'</div><div class="person-meta">Last seen '+(person.last?fmtDate(new Date(person.last).toISOString()):'—')+'</div>'+
+          (loc?'<span class="person-location">'+countryFlag(loc)+' Potentially from '+esc(loc)+'</span>':'<span class="person-location unknown">Location unknown</span>')+'</div>'+
+          '<div class="person-badges"><span class="person-badge">'+person.visits+' visits</span><span class="person-badge">'+person.clicks+' clicks</span>'+(person.requests?'<span class="person-badge">'+person.requests+' kit req.</span>':'')+'</div>'+
+        '</div>'+
+        '<div class="activity-array"><div class="array-bracket">activity: [</div>'+events.map(function(e){
+          return '<div class="array-row"><span class="array-time">'+esc(e.at?fmtDate(e.at):'—')+'</span><span class="array-key">'+esc(e.kind)+'</span><span class="array-value">"'+esc(e.label)+'"</span></div>';
+        }).join('')+'<div class="array-bracket">]</div></div>'+
       '</div>';
-    }).join('') + '</div>';
+    }).join('')+'</div>';
   } else {
-    document.getElementById('people-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No individual visitor activity yet.</div></div>';
+    document.getElementById('people-list').innerHTML='<div class="empty-state" style="padding:20px"><div>No individual visitor activity yet.</div></div>';
   }
 
-  // ── Top pages ────────────────────────────────────────
-  var pageCounts = {};
-  visits.forEach(function(v){ var p=v.path||'/'; pageCounts[p]=(pageCounts[p]||0)+1; });
-  var topPages = Object.entries(pageCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
-  var maxPage = topPages.length ? topPages[0][1] : 1;
-
-  if(topPages.length){
-    document.getElementById('top-pages-list').innerHTML = topPages.map(function(row){
-      return '<div class="bar-row">' +
-        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(row[0])+'</span>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxPage*100)+'%"></div></div>' +
-        '<span class="bar-count">'+row[1]+'</span>' +
-      '</div>';
-    }).join('');
-  } else {
-    document.getElementById('top-pages-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No visit data yet.</div></div>';
-  }
-
-  // ── Clicked links ────────────────────────────────────
-  var clickCounts = {};
-  var clickLabels = {};
+  // ── Clicked links ─────────────────────────────────────
+  var clickCounts={},clickLabels={};
   clicks.forEach(function(c){
-    var url = c.link_url || 'Unknown link';
-    clickCounts[url] = (clickCounts[url]||0)+1;
-    if(c.link_text) clickLabels[url] = c.link_text;
+    var url=c.link_url||'Unknown link';
+    clickCounts[url]=(clickCounts[url]||0)+1;
+    if(c.link_text) clickLabels[url]=c.link_text;
   });
-  var topClicks = Object.entries(clickCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
-  var maxClick = topClicks.length ? topClicks[0][1] : 1;
+  var topClicks=Object.entries(clickCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+  var maxClick=topClicks.length?topClicks[0][1]:1;
   if(topClicks.length){
-    document.getElementById('clicks-list').innerHTML = topClicks.map(function(row){
-      var label = clickLabels[row[0]] || row[0];
-      return '<div class="bar-row">' +
-        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(label)+'</span>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxClick*100)+'%"></div></div>' +
-        '<span class="bar-count">'+row[1]+'</span>' +
+    document.getElementById('clicks-list').innerHTML=topClicks.map(function(row){
+      var label=clickLabels[row[0]]||row[0];
+      return '<div class="bar-row">'+
+        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(label)+'</span>'+
+        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxClick*100)+'%"></div></div>'+
+        '<span class="bar-count">'+row[1]+'</span>'+
       '</div>';
     }).join('');
   } else {
-    document.getElementById('clicks-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No link clicks recorded yet.</div></div>';
-  }
-
-  // ── Traffic sources ──────────────────────────────────
-  var srcCounts = {};
-  visits.forEach(function(v){
-    var s = v.utm_source || (v.referrer ? new URL('http://x/'+v.referrer.replace(/^\//,'')).hostname||v.referrer : null) || 'Direct / unknown';
-    srcCounts[s]=(srcCounts[s]||0)+1;
-  });
-  var topSrc = Object.entries(srcCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
-  var maxSrc = topSrc.length ? topSrc[0][1] : 1;
-
-  if(topSrc.length){
-    document.getElementById('utm-sources-list').innerHTML = topSrc.map(function(row){
-      return '<div class="bar-row">' +
-        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(row[0])+'</span>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxSrc*100)+'%"></div></div>' +
-        '<span class="bar-count">'+row[1]+'</span>' +
-      '</div>';
-    }).join('');
-  } else {
-    document.getElementById('utm-sources-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No source data yet.</div></div>';
-  }
-
-  // ── Users by country ─────────────────────────────────
-  var countryCounts = {};
-  interests.forEach(function(i){ if(i.country){ countryCounts[i.country]=(countryCounts[i.country]||0)+1; } });
-  availabilities.forEach(function(a){ if(a.country){ countryCounts[a.country]=(countryCounts[a.country]||0)+1; } });
-  var countryRows = Object.entries(countryCounts).sort(function(a,b){return b[1]-a[1];});
-  var maxC = countryRows.length ? countryRows[0][1] : 1;
-  if(countryRows.length){
-    document.getElementById('country-list').innerHTML = countryRows.map(function(row){
-      return '<div class="bar-row">' +
-        '<span class="bar-label" title="'+esc(row[0])+'">'+esc(row[0])+'</span>' +
-        '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxC*100)+'%"></div></div>' +
-        '<span class="bar-count">'+row[1]+'</span>' +
-      '</div>';
-    }).join('');
-  } else {
-    document.getElementById('country-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No country data yet — comes from interest &amp; availability signups.</div></div>';
+    document.getElementById('clicks-list').innerHTML='<div class="empty-state" style="padding:20px"><div>No link clicks recorded yet.</div></div>';
   }
 
   // ── Donation interests ────────────────────────────────
   if(interests.length){
-    var intHtml = '<table class="items-table"><thead><tr><th>Country</th><th>Initiative</th><th>UTM source</th><th>Date</th></tr></thead><tbody>';
+    var intByCountry={};
+    interests.forEach(function(i){ var c=i.country||'Unknown'; intByCountry[c]=(intByCountry[c]||0)+1; });
+    var intRows=Object.entries(intByCountry).sort(function(a,b){return b[1]-a[1];});
+    var maxInt=intRows.length?intRows[0][1]:1;
+    var intChartEl=document.getElementById('interests-chart');
+    if(intChartEl){
+      intChartEl.innerHTML='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px">By country</div>'+
+        intRows.map(function(row){
+          return '<div class="bar-row">'+
+            '<span class="country-flag-cell">'+countryFlag(row[0])+'</span>'+
+            '<span class="bar-label">'+esc(row[0])+'</span>'+
+            '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(row[1]/maxInt*100)+'%;background:#316dca"></div></div>'+
+            '<span class="bar-count">'+row[1]+'</span>'+
+          '</div>';
+        }).join('');
+    }
+    var intHtml='<table class="items-table"><thead><tr><th>Country</th><th>Initiative</th><th>UTM source</th><th>Date</th></tr></thead><tbody>';
     interests.forEach(function(i){
-      intHtml += '<tr>' +
-        '<td>'+esc(i.country||'—')+'</td>' +
-        '<td>'+esc(i.initiative||'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+esc(i.utm_source||'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(i.created_at)+'</td>' +
+      intHtml+='<tr>'+
+        '<td>'+countryFlag(i.country||'')+' '+esc(i.country||'—')+'</td>'+
+        '<td>'+esc(i.initiative||'—')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+esc(i.utm_source||'—')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(i.created_at)+'</td>'+
       '</tr>';
     });
-    intHtml += '</tbody></table>';
-    document.getElementById('interests-list').innerHTML = intHtml;
+    intHtml+='</tbody></table>';
+    document.getElementById('interests-list').innerHTML=intHtml;
   } else {
-    document.getElementById('interests-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No donation interests captured yet.</div></div>';
+    var intChartEl=document.getElementById('interests-chart');
+    if(intChartEl) intChartEl.innerHTML='';
+    document.getElementById('interests-list').innerHTML='<div class="empty-state" style="padding:20px"><div>No donation interests captured yet.</div></div>';
   }
 
   // ── Contact messages ──────────────────────────────────
   if(contacts.length){
-    var conHtml = '<table class="items-table"><thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th></tr></thead><tbody>';
+    var conHtml='<table class="items-table"><thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th></tr></thead><tbody>';
     contacts.forEach(function(c){
-      conHtml += '<tr>' +
-        '<td>'+esc(c.name||'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+esc(c.email||'—')+'</td>' +
-        '<td style="font-size:13px;max-width:340px">'+esc(c.message||'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(c.created_at)+'</td>' +
+      conHtml+='<tr>'+
+        '<td>'+esc(c.name||'—')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+esc(c.email||'—')+'</td>'+
+        '<td style="font-size:13px;max-width:340px">'+esc(c.message||'—')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(c.created_at)+'</td>'+
       '</tr>';
     });
-    conHtml += '</tbody></table>';
-    document.getElementById('contacts-list').innerHTML = conHtml;
+    conHtml+='</tbody></table>';
+    document.getElementById('contacts-list').innerHTML=conHtml;
   } else {
-    document.getElementById('contacts-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No contact messages yet.</div></div>';
+    document.getElementById('contacts-list').innerHTML='<div class="empty-state" style="padding:20px"><div>No contact messages yet.</div></div>';
   }
 
   // ── Recent visits ─────────────────────────────────────
   if(visits.length){
-    var visHtml = '<table class="items-table"><thead><tr><th>Path</th><th>Source</th><th>UTM campaign</th><th>Date</th></tr></thead><tbody>';
+    var visHtml='<table class="items-table"><thead><tr><th>Path</th><th>Source</th><th>UTM campaign</th><th>Date</th></tr></thead><tbody>';
     visits.slice(0,100).forEach(function(v){
-      visHtml += '<tr>' +
-        '<td style="font-size:13px">'+esc(v.path||'/')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+esc(v.utm_source||v.referrer||'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+esc(v.utm_campaign||'—')+'</td>' +
-        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(v.created_at)+'</td>' +
+      visHtml+='<tr>'+
+        '<td style="font-size:13px">'+esc(v.path||'/')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+esc(v.utm_source||v.referrer||'—')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+esc(v.utm_campaign||'—')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+fmtDate(v.created_at)+'</td>'+
       '</tr>';
     });
-    visHtml += '</tbody></table>';
-    document.getElementById('visits-list').innerHTML = visHtml;
+    visHtml+='</tbody></table>';
+    document.getElementById('visits-list').innerHTML=visHtml;
   } else {
-    document.getElementById('visits-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No visits recorded yet.</div></div>';
+    document.getElementById('visits-list').innerHTML='<div class="empty-state" style="padding:20px"><div>No visits recorded yet.</div></div>';
   }
 }
 
