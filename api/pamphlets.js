@@ -18,9 +18,10 @@ function cors(res) {
 }
 
 async function getSupabaseHeaders() {
+  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   return {
-    'apikey': process.env.SUPABASE_SERVICE_KEY,
-    'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+    'apikey': key,
+    'Authorization': `Bearer ${key}`,
     'Content-Type': 'application/json',
   };
 }

@@ -15,7 +15,8 @@
 const TABLES = { campaigns: true, posts: true, photos: true, testimonies: true };
 
 export default async function handler(req, res) {
-  const { SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD } = process.env;
+  const { SUPABASE_URL, ADMIN_PASSWORD } = process.env;
+  const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
