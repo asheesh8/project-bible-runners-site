@@ -89,7 +89,8 @@
       .cw{min-width:180px;max-width:200px}
     }
     /* Campaign widget cards */
-    .cw{display:block;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.22);border-top:3px solid #ffd200;border-radius:14px;overflow:hidden;text-decoration:none;transition:background .18s,border-color .18s;flex:0 0 auto}
+    .cw{display:block;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.22);border-top:3px solid #ffd200;border-radius:14px;overflow:hidden;text-decoration:none;transition:background .18s,border-color .18s;flex:0 0 auto;font-family:'DM Sans',system-ui,sans-serif;text-align:left}
+    .cw *{font-family:inherit;max-width:none;margin:0;line-height:normal}
     .cw:hover{background:rgba(255,255,255,.18)}
     .cw-img{width:100%;height:72px;object-fit:cover;display:block}
     .cw-body{padding:11px 12px 12px}
@@ -549,8 +550,8 @@
           return '<a class="cw" href="./campaign.html?slug=' + encodeURIComponent(c.slug || '') + '">'
             + (c.image_url ? '<img class="cw-img" src="' + esc(c.image_url) + '" alt="' + esc(c.name) + '" loading="lazy">' : '')
             + '<div class="cw-body">'
-            + '<p class="cw-label">Active Campaign</p>'
-            + '<p class="cw-name">' + esc(c.name) + '</p>'
+            + '<div class="cw-label">Active Campaign</div>'
+            + '<div class="cw-name">' + esc(c.name) + '</div>'
             + '<div class="cw-pbar"><div class="cw-pfill" style="width:' + pct + '%"></div></div>'
             + '<div class="cw-footer">'
             + '<span class="cw-stats">$' + Number(raised).toLocaleString() + ' · ' + pct + '%</span>'
