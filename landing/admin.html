@@ -963,6 +963,17 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
           </div>
         </div>
 
+        <!-- General Fund donation link -->
+        <div class="res-section">
+          <div class="res-section-title">💚 &nbsp;General Fund donation link</div>
+          <p style="margin:0 0 14px;color:#57606a;max-width:640px">The always-on <strong>Give to the General Fund</strong> link — paste the Zeffy form URL for overall/ongoing support (not a specific campaign). It powers the <strong>Donate</strong> button in the site header on every page and the General Fund section on the home page. Leave blank to hide them. <span style="color:#8a929b">Tip: in Zeffy, create a general "donation" form and enable the recurring/monthly option.</span></p>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <input type="url" id="donate-url-input" placeholder="https://www.zeffy.com/…" style="flex:1;min-width:260px;padding:11px 14px;border:1px solid #d0d7de;border-radius:8px;font-size:.92rem" autocomplete="off">
+            <button type="button" id="donate-url-save" style="padding:11px 20px;border-radius:8px;border:0;background:#1a7f37;color:#fff;font-weight:800;font-size:.9rem;cursor:pointer">Save link</button>
+          </div>
+          <p class="form-msg" id="donate-url-msg" style="margin:10px 0 0"></p>
+        </div>
+
         <!-- Submitted applications -->
         <div class="res-section">
           <div class="res-section-title">📨 &nbsp;Submitted applications — add notes and build campaigns</div>
@@ -1989,6 +2000,29 @@ function loadApplications(){
       trackApi('POST', 'setting', { key: 'applications_open', value: next })
         .then(function(){ renderAppsFlag(next); showStatus('Applications turned ' + (next ? 'ON' : 'OFF') + '.', 'ok'); })
         .catch(function(){ renderAppsFlag(!next); showStatus('Could not update the setting.', 'err'); });
+    });
+  }
+
+  // General Fund donation link (site setting → drives site-wide Donate button)
+  var dUrlInput = document.getElementById('donate-url-input');
+  var dUrlSave  = document.getElementById('donate-url-save');
+  var dUrlMsg   = document.getElementById('donate-url-msg');
+  if (dUrlInput && dUrlSave && !dUrlInput.dataset.bound) {
+    dUrlInput.dataset.bound = '1';
+    fetch('/api/track?type=setting&key=general_donate_url', { cache: 'no-store' })
+      .then(function(r){ return r.json(); })
+      .then(function(data){ if (data && typeof data.value === 'string') dUrlInput.value = data.value; })
+      .catch(function(){});
+    dUrlSave.addEventListener('click', function(){
+      var url = dUrlInput.value.trim();
+      if (url && !/^https?:\/\//i.test(url)) {
+        dUrlMsg.textContent = 'Enter a full URL starting with https://'; dUrlMsg.style.color = '#cf222e'; return;
+      }
+      dUrlSave.disabled = true; dUrlSave.textContent = 'Saving…';
+      trackApi('POST', 'setting', { key: 'general_donate_url', value: url })
+        .then(function(){ dUrlMsg.textContent = url ? 'Saved — the Donate button is now live site-wide.' : 'Cleared — Donate button hidden.'; dUrlMsg.style.color = '#1a7f37'; })
+        .catch(function(){ dUrlMsg.textContent = 'Could not save. Try again.'; dUrlMsg.style.color = '#cf222e'; })
+        .then(function(){ dUrlSave.disabled = false; dUrlSave.textContent = 'Save link'; });
     });
   }
 
