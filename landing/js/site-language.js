@@ -47,11 +47,22 @@
   function changeLanguage(language) {
     if (supported.indexOf(language) < 0) return;
     if (language === saved) return; // no reload if already selected
+    var previous = saved;
     localStorage.setItem('vsi-language', language);
     translationCookie(language);
     document.documentElement.lang = language;
     document.documentElement.setAttribute('data-language', language);
     window.dispatchEvent(new CustomEvent('vsi:languagechange', { detail: { language: language } }));
+    if (
+      window.VSI18N &&
+      curatedHomepageLanguages.indexOf(language) >= 0 &&
+      curatedHomepageLanguages.indexOf(previous) >= 0 &&
+      document.getElementById('language-select')
+    ) {
+      window.VSI18N.apply(language);
+      saved = language;
+      return;
+    }
     window.location.reload();
   }
 

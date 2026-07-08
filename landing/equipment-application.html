@@ -95,6 +95,14 @@
               <input type="email" id="apply-email" name="email" autocomplete="email" maxlength="255" required>
             </div>
             <div class="apply-field">
+              <label for="apply-phone-code">Phone country code</label>
+              <input type="tel" id="apply-phone-code" name="phone_country_code" autocomplete="tel-country-code" maxlength="12" placeholder="+1">
+            </div>
+            <div class="apply-field">
+              <label for="apply-phone">Phone number</label>
+              <input type="tel" id="apply-phone" name="phone" autocomplete="tel-national" maxlength="60" placeholder="Optional">
+            </div>
+            <div class="apply-field">
               <label for="apply-org">Organization / ministry</label>
               <input type="text" id="apply-org" name="organization" maxlength="200">
             </div>
@@ -214,6 +222,8 @@
         var payload = {
           name: name,
           email: email,
+          phone_country_code: document.getElementById('apply-phone-code').value.trim(),
+          phone: document.getElementById('apply-phone').value.trim(),
           organization: document.getElementById('apply-org').value.trim(),
           role: document.getElementById('apply-role').value.trim(),
           country: country,

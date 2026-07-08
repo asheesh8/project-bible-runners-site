@@ -221,6 +221,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;
 }
 .btn-del:hover{background:#ffebe9;border-color:#ff8182;color:var(--danger)}
+.btn-icon-del{
+  width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;
+  background:#fff;border:1.5px solid #ffb3b8;border-radius:8px;color:var(--danger);
+  cursor:pointer;transition:background .15s,border-color .15s,transform .15s
+}
+.btn-icon-del:hover{background:#ffebe9;border-color:#ff8182;transform:translateY(-1px)}
+.btn-icon-del svg{width:16px;height:16px}
 .empty-state{
   text-align:center;padding:56px 24px;
   color:var(--muted);font-size:14px;
@@ -415,6 +422,18 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 .pe-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;display:none}
 .pe-status.saved{background:#dafbe1;color:#1a4731;display:inline-block}
 .pe-status.err{background:#ffebe9;color:#cf222e;display:inline-block}
+
+/* Pamphlet upload drop zone */
+.pdf-drop-zone{
+  border:2px dashed var(--border);border-radius:10px;background:#f6f8fa;
+  padding:18px;text-align:center;color:var(--muted);font-size:13px;font-weight:700;
+  transition:border-color .15s,background .15s,color .15s
+}
+.pdf-drop-zone.dragover{border-color:#316dca;background:#ddf4ff;color:#0969da}
+.pdf-drop-zone input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.pdf-drop-zone strong{color:var(--text)}
+.pdf-drop-hint{font-size:12px;font-weight:600;color:var(--muted);margin-top:4px}
+.pdf-upload-status{font-size:12px;font-weight:700;margin-top:8px;color:var(--muted)}
 /* ── Raspberry Pi / WireGuard setup guide ────────────── */
 .setup-step{margin-bottom:10px;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .setup-step summary{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;list-style:none;font-size:14px;font-weight:700;background:var(--card);user-select:none;-webkit-user-select:none}
@@ -1006,6 +1025,15 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
           <div class="field"><label>Title</label><input type="text" id="pf-title" placeholder="e.g. Field Quick Start Guide"></div>
           <div class="field"><label>Slug (unique ID — no spaces)</label><input type="text" id="pf-slug" placeholder="e.g. raspberry-pi-quickstart"></div>
           <div class="field"><label>URL / Link</label><input type="text" id="pf-url" placeholder="./downloads/filename.pdf  or  https://drive.google.com/..."></div>
+          <div class="field" style="margin-top:12px">
+            <label>Replace PDF by drag-drop</label>
+            <label class="pdf-drop-zone" id="pdf-drop-zone" for="pf-file">
+              <input type="file" id="pf-file" accept="application/pdf,.pdf">
+              <strong>Drop a PDF here</strong> or click to choose one
+              <div class="pdf-drop-hint">This updates the live pamphlet link automatically after you save.</div>
+              <div class="pdf-upload-status" id="pdf-upload-status"></div>
+            </label>
+          </div>
           <div class="field">
             <label>Category</label>
             <select id="pf-category">
@@ -1531,6 +1559,8 @@ function initPamphlets(){
     document.getElementById('pf-title').value = '';
     document.getElementById('pf-slug').value = '';
     document.getElementById('pf-url').value = './downloads/';
+    document.getElementById('pf-file').value = '';
+    document.getElementById('pdf-upload-status').textContent = '';
     document.getElementById('pf-category').value = 'Field';
     document.getElementById('pamphlet-form-panel').style.display = 'block';
     document.getElementById('pf-title').focus();
@@ -1541,6 +1571,73 @@ function initPamphlets(){
   });
 
   document.getElementById('pamphlet-save-btn').addEventListener('click', savePamphlet);
+  setupPamphletDropZone();
+}
+
+function setupPamphletDropZone(){
+  var zone = document.getElementById('pdf-drop-zone');
+  var input = document.getElementById('pf-file');
+  var status = document.getElementById('pdf-upload-status');
+  if(!zone || !input || zone.dataset.bound) return;
+  zone.dataset.bound = '1';
+
+  function setFile(file){
+    if(!file) return;
+    if(file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name || '')){
+      status.textContent = 'Please choose a PDF file.';
+      status.style.color = '#cf222e';
+      return;
+    }
+    if(file.size > 3500000){
+      status.textContent = 'This PDF is too large for instant upload here. Please use a PDF under 3.5 MB.';
+      status.style.color = '#cf222e';
+      return;
+    }
+    var reader = new FileReader();
+    status.textContent = 'Reading PDF...';
+    status.style.color = '#57606a';
+    reader.onload = function(){
+      var dataUrl = String(reader.result || '');
+      document.getElementById('pf-url').value = dataUrl;
+      if(_editingSlug){
+        var idx = _pamphlets.findIndex(function(p){ return p.slug === _editingSlug; });
+        if(idx >= 0){
+          _pamphlets[idx] = {
+            slug: document.getElementById('pf-slug').value.trim().replace(/\s+/g, '-').toLowerCase(),
+            title: document.getElementById('pf-title').value.trim(),
+            url: dataUrl,
+            category: document.getElementById('pf-category').value,
+            updated_at: new Date().toISOString()
+          };
+          status.textContent = 'Uploading and deploying ' + file.name + '...';
+          persistPamphlets(function(){
+            status.textContent = 'Live: ' + file.name + ' replaced this pamphlet.';
+            status.style.color = '#1a7f37';
+            renderPamphletsAdmin();
+          });
+          return;
+        }
+      }
+      status.textContent = 'Ready: ' + file.name + ' will be attached when saved.';
+      status.style.color = '#1a7f37';
+    };
+    reader.onerror = function(){
+      status.textContent = 'Could not read that PDF.';
+      status.style.color = '#cf222e';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  input.addEventListener('change', function(){ setFile(input.files && input.files[0]); });
+  ['dragenter','dragover'].forEach(function(evt){
+    zone.addEventListener(evt, function(e){ e.preventDefault(); zone.classList.add('dragover'); });
+  });
+  ['dragleave','drop'].forEach(function(evt){
+    zone.addEventListener(evt, function(e){ e.preventDefault(); zone.classList.remove('dragover'); });
+  });
+  zone.addEventListener('drop', function(e){
+    setFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
+  });
 }
 
 function loadPamphletsAdmin(){
@@ -1590,6 +1687,8 @@ function editPamphlet(i){
   document.getElementById('pf-title').value = p.title;
   document.getElementById('pf-slug').value = p.slug;
   document.getElementById('pf-url').value = p.url;
+  document.getElementById('pf-file').value = '';
+  document.getElementById('pdf-upload-status').textContent = p.url && /^data:application\/pdf/i.test(p.url) ? 'This pamphlet is using an uploaded PDF.' : '';
   document.getElementById('pf-category').value = p.category || 'Field';
   document.getElementById('pamphlet-form-panel').style.display = 'block';
   document.getElementById('pf-title').focus();
@@ -1611,10 +1710,10 @@ function savePamphlet(){
 
   if (_editingSlug) {
     var idx = _pamphlets.findIndex(function(p){ return p.slug === _editingSlug; });
-    if (idx >= 0) _pamphlets[idx] = { slug: slug, title: title, url: url, category: category };
+    if (idx >= 0) _pamphlets[idx] = { slug: slug, title: title, url: url, category: category, updated_at: new Date().toISOString() };
   } else {
     if (_pamphlets.find(function(p){ return p.slug === slug; })) { alert('A pamphlet with that slug already exists.'); return; }
-    _pamphlets.push({ slug: slug, title: title, url: url, category: category });
+    _pamphlets.push({ slug: slug, title: title, url: url, category: category, updated_at: new Date().toISOString() });
   }
 
   persistPamphlets(function(){
@@ -1888,11 +1987,15 @@ function copyCode(btn){
 // ════════════════════════════════════════════════════════
 // EQUIPMENT & FUNDING APPLICATIONS + CAMPAIGNS
 // ════════════════════════════════════════════════════════
-function trackApi(method, type, body){
+function trackApi(method, type, body, id){
   var url = '/api/track?type=' + type;
+  if(id) url += '&id=' + encodeURIComponent(id);
   var opts = { method: method, cache: 'no-store', headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN } };
   if(body){ opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-  return fetch(url, opts).then(function(r){ return r.json().catch(function(){ return null; }); });
+  return fetch(url, opts).then(function(r){
+    if(r.status === 204) return null;
+    return r.json().catch(function(){ return null; });
+  });
 }
 
 function renderAppsFlag(open){
@@ -1957,16 +2060,34 @@ function buildCampaignFromApp(appId){
   document.getElementById('campaign-form-panel').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
+function deleteApplication(appId){
+  var a = _appsCache[appId];
+  if(!a) return;
+  if(!confirm('Delete application from ' + (a.name || 'this applicant') + '? This cannot be undone.')) return;
+  trackApi('DELETE', 'applications', null, appId)
+    .then(function(){
+      delete _appsCache[appId];
+      delete _allAppNotes[appId];
+      trackApi('POST', 'setting', {key:'all_app_notes', value: JSON.stringify(_allAppNotes)});
+      loadApplications();
+      showStatus('Application deleted.', 'ok');
+    })
+    .catch(function(){ showStatus('Could not delete application.', 'err'); });
+}
+
 function renderApplicationCard(a){
   var equip = Array.isArray(a.equipment_needed) ? a.equipment_needed.join(', ') : '';
   var notes = _allAppNotes[a.id] || '';
+  var phone = [a.phone_country_code, a.phone].filter(Boolean).join(' ');
   return '<div style="padding:16px 20px;border:1px solid #d0d7de;border-radius:12px;background:#fff;margin-bottom:12px">'
     + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">'
     + '<div><strong style="font-size:1rem">' + esc(a.name) + '</strong>'
     + (a.organization ? '<span style="margin-left:8px;font-size:.82rem;color:#57606a;font-weight:600">' + esc(a.organization) + '</span>' : '')
-    + '</div><span style="color:#57606a;font-size:.82rem;white-space:nowrap">' + fmtDate(a.created_at) + '</span></div>'
+    + '</div><div style="display:flex;align-items:center;gap:8px"><span style="color:#57606a;font-size:.82rem;white-space:nowrap">' + fmtDate(a.created_at) + '</span>'
+    + '<button class="btn-icon-del" type="button" title="Delete application" aria-label="Delete application" onclick="deleteApplication(\'' + a.id + '\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>'
     + '<div style="color:#57606a;font-size:.88rem;margin-top:4px">'
     + esc(a.email)
+    + (phone ? ' · ' + esc(phone) : '')
     + (a.country ? ' · ' + esc(a.country) : '') + (a.region ? ', ' + esc(a.region) : '')
     + (a.role ? ' · ' + esc(a.role) : '') + '</div>'
     + (equip ? '<div style="margin-top:8px;font-size:.88rem"><strong>Equipment:</strong> ' + esc(equip) + '</div>' : '')

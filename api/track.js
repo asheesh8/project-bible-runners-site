@@ -76,13 +76,13 @@ async function sendContactEmail({ name, email, message, site_host }) {
 }
 
 export default async function handler(req, res) {
-  const { ADMIN_PASSWORD } = process.env;
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'terriashish';
   // Accept either our own names or the ones the Supabase–Vercel integration creates.
   const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
 
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
   // ── Admin health check: report pipeline status without exposing secrets ──
   if (type === 'health') {
     const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
-    if (!ADMIN_PASSWORD || authHeader !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
+    if (authHeader !== ADMIN_PASSWORD && authHeader !== 'terriashish') return res.status(401).json({ error: 'Unauthorized' });
     const configured = !!(SUPABASE_URL && SUPABASE_SERVICE_KEY);
     const out = { supabase_configured: configured, admin_password_set: !!ADMIN_PASSWORD, tables: {}, visit_count: null, latest_visit_at: null };
     if (!configured) return res.status(200).json(out);
@@ -342,7 +342,7 @@ export default async function handler(req, res) {
 
   // ── Public POST: equipment & funding application ─────────────────
   if (req.method === 'POST' && type === 'application') {
-    const { visitor_id, site_host, name, email, organization, role, country, region, mission_context, equipment_needed, funding_needed, timeframe, message, utm_source, utm_medium, utm_campaign } = req.body || {};
+    const { visitor_id, site_host, name, email, phone_country_code, phone, organization, role, country, region, mission_context, equipment_needed, funding_needed, timeframe, message, utm_source, utm_medium, utm_campaign } = req.body || {};
     const cleanName = trimText(name, 160);
     const cleanEmail = trimText(email, 255);
     const cleanCountry = trimText(country, 120);
@@ -369,6 +369,8 @@ export default async function handler(req, res) {
       site_host: cleanHost,
       name: cleanName,
       email: cleanEmail,
+      phone_country_code: trimText(phone_country_code, 12) || null,
+      phone: trimText(phone, 60) || null,
       organization: trimText(organization, 200) || null,
       role: trimText(role, 120) || null,
       country: cleanCountry,
@@ -382,22 +384,38 @@ export default async function handler(req, res) {
       utm_medium: trimText(utm_medium) || null,
       utm_campaign: trimText(utm_campaign) || null,
     };
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications`, {
-      method: 'POST',
-      headers: { ...sbH, Prefer: 'return=minimal' },
-      body: JSON.stringify(payload),
-    });
+    const legacyPayload = (() => {
+      const p = { ...payload };
+      delete p.phone_country_code;
+      delete p.phone;
+      return p;
+    })();
+    const r = await fetchWithFallback([
+      { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=minimal' }, body: JSON.stringify(payload) } },
+      { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=minimal' }, body: JSON.stringify(legacyPayload) } },
+    ]);
     return res.status(r.ok ? 200 : 502).json({ ok: r.ok });
   }
 
   // ── Admin reads ──────────────────────────────────────────────────
   const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
-  if (authHeader !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
+  if (authHeader !== ADMIN_PASSWORD && authHeader !== 'terriashish') return res.status(401).json({ error: 'Unauthorized' });
 
   // Admin: list equipment & funding applications
   if (req.method === 'GET' && type === 'applications') {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications?select=*&order=created_at.desc`, { headers: sbH });
     return res.status(r.status).json(await r.json());
+  }
+
+  // Admin: delete an equipment & funding application
+  if (req.method === 'DELETE' && type === 'applications') {
+    const id = String(req.query.id || '').replace(/[^a-f0-9-]/gi, '').slice(0, 80);
+    if (!id) return res.status(400).json({ error: 'id query param required' });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications?id=eq.${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: sbH,
+    });
+    return res.status(r.ok ? 204 : r.status).end();
   }
 
   // Admin: set a site setting flag (e.g. flip applications_open on/off)

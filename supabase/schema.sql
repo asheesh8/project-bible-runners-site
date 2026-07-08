@@ -270,6 +270,8 @@ create table if not exists public.equipment_applications (
   site_host text,
   name text not null,
   email text not null,
+  phone_country_code text,
+  phone text,
   organization text,
   role text,
   country text not null,
@@ -294,6 +296,8 @@ create table if not exists public.site_settings (
 
 create index if not exists equipment_applications_created_idx on public.equipment_applications (created_at desc);
 create index if not exists equipment_applications_status_idx on public.equipment_applications (status);
+alter table public.equipment_applications add column if not exists phone_country_code text;
+alter table public.equipment_applications add column if not exists phone text;
 
 drop trigger if exists site_settings_set_updated_at on public.site_settings;
 create trigger site_settings_set_updated_at before update on public.site_settings
