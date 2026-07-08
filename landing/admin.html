@@ -387,6 +387,13 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 .donut-swatch{width:10px;height:10px;border-radius:3px;flex:0 0 10px}
 .country-flag-cell{font-size:16px;line-height:1;width:24px;flex:0 0 24px;text-align:center}
 .country-fill{background:var(--accent)!important}
+.traffic-grid-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.traffic-panel{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;min-width:0}
+.traffic-panel-title{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.geo-note{font-size:12px;color:var(--muted);line-height:1.5;margin:12px 0 0}
+.geo-pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.geo-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;color:var(--text)}
+@media(max-width:900px){.traffic-grid-2{grid-template-columns:1fr}}
 
 /* Responsive */
 @media(max-width:760px){
@@ -737,7 +744,18 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
         <!-- Geographic reach -->
         <div class="res-section">
           <div class="res-section-title">🌍 &nbsp;Geographic reach</div>
-          <div id="country-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+          <div class="traffic-grid-2">
+            <div class="traffic-panel">
+              <div class="traffic-panel-title">Countries</div>
+              <div id="country-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+            </div>
+            <div class="traffic-panel">
+              <div class="traffic-panel-title">United States</div>
+              <div id="usa-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
+            </div>
+          </div>
+          <div class="geo-pill-row" id="geo-quality"></div>
+          <p class="geo-note">Visit locations come from hosting geo headers when available. Older visits may only show location after someone submits an interest, availability, contact, or application form.</p>
         </div>
 
         <!-- Individual people (collapsible) -->
@@ -2482,9 +2500,11 @@ function deletePhoto(id){
 }
 
 // ════════════════════════════════════════════════════════
-// TRAFFIC / ANALYTICS  — live poll every 4 s
+// TRAFFIC / ANALYTICS  — live poll with overlap protection
 // ════════════════════════════════════════════════════════
 var _trafficPoll = null;
+var _trafficLoading = false;
+var _trafficIntervalMs = 10000;
 
 document.getElementById('refresh-traffic-btn').addEventListener('click', function(){
   resetCountdownBar();
@@ -2500,7 +2520,7 @@ function startTrafficPoll(){
   _trafficPoll = setInterval(function(){
     loadTraffic(false);
     resetCountdownBar();
-  }, 4000);
+  }, _trafficIntervalMs);
 }
 
 function stopTrafficPoll(){
@@ -2516,7 +2536,7 @@ function resetCountdownBar(){
   if(!bar) return;
   bar.style.animation = 'none';
   bar.offsetWidth; // force reflow to restart animation
-  bar.style.animation = 'cdShrink 4s linear forwards';
+  bar.style.animation = 'cdShrink '+(_trafficIntervalMs/1000)+'s linear forwards';
 }
 
 // ── Traffic analytics helpers ──────────────────────────
@@ -2538,6 +2558,50 @@ var _FLAGS = {
   kiribati:'🇰🇮',kosovo:'🇽🇰','solomon islands':'🇸🇧','papua new guinea':'🇵🇬'
 };
 function countryFlag(name){ return _FLAGS[(name||'').toLowerCase().trim()]||'🌐'; }
+
+var _COUNTRY_NAMES = {
+  US:'United States', USA:'United States', 'UNITED STATES':'United States', AMERICA:'United States',
+  CA:'Canada', GB:'United Kingdom', UK:'United Kingdom', UG:'Uganda', KE:'Kenya', TZ:'Tanzania',
+  NG:'Nigeria', GH:'Ghana', ET:'Ethiopia', RW:'Rwanda', ZA:'South Africa', ZW:'Zimbabwe',
+  IN:'India', NP:'Nepal', PH:'Philippines', ID:'Indonesia', PE:'Peru', BR:'Brazil', MX:'Mexico'
+};
+var _US_STATES = {
+  AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',
+  HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',
+  MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',
+  NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',
+  SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',DC:'Washington, DC'
+};
+function normalizeCountry(value){
+  var raw = String(value || '').trim();
+  if(!raw) return '';
+  var upper = raw.toUpperCase();
+  return _COUNTRY_NAMES[upper] || raw.replace(/\busa\b/i,'United States').replace(/\bus\b/i,'United States');
+}
+function normalizeUsRegion(value){
+  var raw = String(value || '').trim();
+  if(!raw) return 'Unknown';
+  var upper = raw.toUpperCase();
+  return _US_STATES[upper] || raw;
+}
+function isUnitedStates(value){
+  return normalizeCountry(value).toLowerCase() === 'united states';
+}
+function inferLocationFromText(text){
+  text=(text||'').toString().toLowerCase(); if(!text) return '';
+  if(/kitibus/.test(text)) return 'Kenya';
+  if(/kitui/.test(text)) return 'Kenya';
+  if(/kenya/.test(text)) return 'Kenya';
+  if(/uganda/.test(text)) return 'Uganda';
+  if(/tanzania/.test(text)) return 'Tanzania';
+  if(/nepal/.test(text)) return 'Nepal';
+  if(/india/.test(text)) return 'India';
+  if(/peru|peruvian|amazon/.test(text)) return 'Peru';
+  if(/united states|usa|\\bus\\b|america/.test(text)) return 'United States';
+  if(/africa/.test(text)) return 'Africa';
+  if(/asia/.test(text)) return 'Asia';
+  return '';
+}
 
 var _CHART_COLORS = ['#316dca','#1a7f37','#fb8500','#8338ec','#ef233c','#2ec4b6','#ff9f1c','#bc4749'];
 
@@ -2608,6 +2672,8 @@ function renderTimelineChart(visits){
 }
 
 function loadTraffic(showSpinner){
+  if(_trafficLoading) return;
+  _trafficLoading = true;
   var btn = document.getElementById('refresh-traffic-btn');
   if(showSpinner){
     btn.disabled = true;
@@ -2624,11 +2690,13 @@ function loadTraffic(showSpinner){
         'Updated ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
       btn.disabled = false;
       btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Refresh';
+      _trafficLoading = false;
     })
     .catch(function(){
       if(showSpinner) showStatus('Could not load traffic data — Supabase may not be configured.','warn');
       btn.disabled = false;
       btn.textContent = 'Refresh';
+      _trafficLoading = false;
     });
 }
 
@@ -2666,8 +2734,27 @@ function renderTraffic(visits, clicks, interests, availabilities, totals, contac
   });
 
   var countryCounts = {};
-  interests.forEach(function(i){ if(i.country){ countryCounts[i.country]=(countryCounts[i.country]||0)+1; } });
-  availabilities.forEach(function(a){ if(a.country){ countryCounts[a.country]=(countryCounts[a.country]||0)+1; } });
+  var countrySources = { visits: 0, forms: 0, inferred: 0 };
+  var usaCounts = {};
+  function addCountry(country, amount, source, region){
+    var c = normalizeCountry(country);
+    if(!c) return;
+    countryCounts[c] = (countryCounts[c] || 0) + (amount || 1);
+    if(source && countrySources[source] != null) countrySources[source] += (amount || 1);
+    if(isUnitedStates(c)){
+      var state = normalizeUsRegion(region);
+      usaCounts[state] = (usaCounts[state] || 0) + (amount || 1);
+    }
+  }
+  visits.forEach(function(v){
+    if(v.country) addCountry(v.country, 1, 'visits', v.region);
+    else {
+      var inferred = inferLocationFromText([v.path, v.referrer, v.utm_source, v.utm_campaign].join(' '));
+      if(inferred) addCountry(inferred, 1, 'inferred', '');
+    }
+  });
+  interests.forEach(function(i){ addCountry(i.country, 1, 'forms', ''); });
+  availabilities.forEach(function(a){ addCountry(a.country, 1, 'forms', a.region); });
 
   // ── Insight strip ─────────────────────────────────────
   var todayISO = new Date().toISOString().slice(0,10);
@@ -2758,7 +2845,33 @@ function renderTraffic(visits, clicks, interests, availabilities, totals, contac
       '</div>';
     }).join('');
   } else {
-    document.getElementById('country-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No country data yet — comes from interest &amp; availability signups.</div></div>';
+    document.getElementById('country-list').innerHTML = '<div class="empty-state" style="padding:20px"><div>No country data yet.</div></div>';
+  }
+  var usaRows = Object.entries(usaCounts).sort(function(a,b){return b[1]-a[1];});
+  var totalUsa = usaRows.reduce(function(s,r){return s+r[1];},0)||1;
+  var usaEl = document.getElementById('usa-list');
+  if(usaEl){
+    if(usaRows.length){
+      usaEl.innerHTML = usaRows.map(function(row){
+        var pct = Math.round(row[1]/totalUsa*100);
+        return '<div class="bar-row">'+
+          '<span class="country-flag-cell">🇺🇸</span>'+
+          '<span class="bar-label">'+esc(row[0])+'</span>'+
+          '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:#316dca"></div></div>'+
+          '<span class="bar-count">'+row[1]+' <span style="color:var(--muted);font-size:10px">('+pct+'%)</span></span>'+
+        '</div>';
+      }).join('');
+    } else {
+      usaEl.innerHTML = '<div class="empty-state" style="padding:20px"><div>No United States region data yet.</div></div>';
+    }
+  }
+  var geoQuality = document.getElementById('geo-quality');
+  if(geoQuality){
+    geoQuality.innerHTML =
+      '<span class="geo-pill">Visits with geo: '+countrySources.visits+'</span>'+
+      '<span class="geo-pill">Form locations: '+countrySources.forms+'</span>'+
+      '<span class="geo-pill">Inferred from pages: '+countrySources.inferred+'</span>'+
+      '<span class="geo-pill">Countries shown: '+countryRows.length+'</span>';
   }
 
   // ── Individual people ─────────────────────────────────
@@ -2781,28 +2894,15 @@ function renderTraffic(visits, clicks, interests, availabilities, totals, contac
     var item={label:label,source:source||'activity'};
     if(!person.locations.some(function(x){return x.label.toLowerCase()===item.label.toLowerCase();})) person.locations.push(item);
   }
-  function inferLoc(text){
-    text=(text||'').toString().toLowerCase(); if(!text) return '';
-    if(/kitibus/.test(text)) return 'Kitibus, Kenya';
-    if(/kitui/.test(text)) return 'Kitui, Kenya';
-    if(/kenya/.test(text)) return 'Kenya';
-    if(/uganda/.test(text)) return 'Uganda';
-    if(/tanzania/.test(text)) return 'Tanzania';
-    if(/nepal/.test(text)) return 'Nepal';
-    if(/india/.test(text)) return 'India';
-    if(/peru|peruvian|amazon/.test(text)) return 'Peruvian Amazon / Peru';
-    if(/africa/.test(text)) return 'Africa';
-    if(/asia/.test(text)) return 'Asia';
-    return '';
-  }
   function addEvt(person,kind,label,at,src){
     var t=at?new Date(at).getTime():0;
     person.last=Math.max(person.last,t||0);
     person.events.push({kind:kind,label:label,at:at||''});
-    addLoc(person,inferLoc(src||label),'activity');
+    addLoc(person,inferLocationFromText(src||label),'activity');
   }
   visits.forEach(function(v){
     var p=personFor(v.visitor_id); p.visits++;
+    if(v.country) addLoc(p,fmtLoc(normalizeCountry(v.country), v.region || v.city),'visit geo');
     addEvt(p,'page',v.path||'/',v.created_at,[v.path,v.referrer,v.utm_source,v.utm_campaign].join(' '));
   });
   clicks.forEach(function(c){
@@ -2924,10 +3024,13 @@ function renderTraffic(visits, clicks, interests, availabilities, totals, contac
 
   // ── Recent visits ─────────────────────────────────────
   if(visits.length){
-    var visHtml='<table class="items-table"><thead><tr><th>Path</th><th>Source</th><th>UTM campaign</th><th>Date</th></tr></thead><tbody>';
+    var visHtml='<table class="items-table"><thead><tr><th>Path</th><th>Location</th><th>Source</th><th>UTM campaign</th><th>Date</th></tr></thead><tbody>';
     visits.slice(0,100).forEach(function(v){
+      var visitCountry = normalizeCountry(v.country);
+      var visitLoc = visitCountry ? [v.city, v.region, visitCountry].filter(Boolean).join(', ') : '—';
       visHtml+='<tr>'+
         '<td style="font-size:13px">'+esc(v.path||'/')+'</td>'+
+        '<td style="font-size:12px;color:var(--muted)">'+(visitCountry ? countryFlag(visitCountry)+' ' : '')+esc(visitLoc)+'</td>'+
         '<td style="font-size:12px;color:var(--muted)">'+esc(v.utm_source||v.referrer||'—')+'</td>'+
         '<td style="font-size:12px;color:var(--muted)">'+esc(v.utm_campaign||'—')+'</td>'+
         '<td style="font-size:12px;color:var(--muted)">'+fmtDate(v.created_at)+'</td>'+

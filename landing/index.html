@@ -58,14 +58,15 @@
     .logo-hint span{display:inline-block;font-size:.8rem;animation:hintBounce 1.6s ease-in-out infinite}
     @keyframes hintPulse{0%,100%{opacity:.62}50%{opacity:1}}
     @keyframes hintBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-    .nonprofit-countdown{display:inline-flex;align-items:center;gap:12px;margin:0 auto 12px;padding:10px 14px;border:1.5px solid rgba(255,210,0,.38);border-radius:12px;background:rgba(8,35,64,.36);box-shadow:0 10px 26px rgba(0,0,0,.14);font-family:'DM Sans',system-ui,sans-serif;color:#fff;max-width:min(100%,520px)}
+    .nonprofit-countdown{display:flex;flex-direction:column;gap:10px;width:100%;padding:14px;border:1.5px solid rgba(255,210,0,.38);border-radius:12px;background:rgba(8,35,64,.42);box-shadow:0 10px 26px rgba(0,0,0,.14);font-family:'DM Sans',system-ui,sans-serif;color:#fff;text-align:left}
     .nonprofit-countdown-label{text-align:left;font-size:.67rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#ffd200;line-height:1.25}
     .nonprofit-countdown-label span{display:block;margin-top:2px;font-size:.78rem;letter-spacing:0;text-transform:none;color:rgba(255,255,255,.8);font-weight:800}
-    .nonprofit-countdown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+    .nonprofit-countdown-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
     .nonprofit-countdown-unit{min-width:48px;padding:5px 7px;border-radius:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.14);text-align:center}
     .nonprofit-countdown-num{display:block;font-size:1rem;font-weight:900;line-height:1;color:#fff}
     .nonprofit-countdown-text{display:block;margin-top:3px;font-size:.53rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.62)}
-    @media(max-width:560px){.nonprofit-countdown{display:flex;flex-direction:column;gap:8px}.nonprofit-countdown-label{text-align:center}.nonprofit-countdown-unit{min-width:44px}}
+    @media(max-width:860px){.nonprofit-countdown{max-width:340px;margin:0 auto 14px}.nonprofit-countdown-grid{grid-template-columns:repeat(4,1fr)}.nonprofit-countdown-label{text-align:center}}
+    @media(max-width:560px){.nonprofit-countdown{gap:8px}.nonprofit-countdown-unit{min-width:44px}}
 
     /* ── Interactive logo hotspots ── */
     .logo-interactive{position:relative;display:block;width:-moz-fit-content;width:fit-content;max-width:100%;margin:0 auto 14px;border-radius:16px}
@@ -104,13 +105,13 @@
 
     /* ── Hero 3-col grid: [card-width spacer] [logo center] [card] ── */
     .hero-grid{display:grid;grid-template-columns:180px 1fr 180px;align-items:start;gap:0}
-    .hero-spacer{/* balances the card column so logo column is truly centered */}
+    .hero-spacer{padding-top:clamp(16px,3vw,36px)}
     .hero-center{text-align:center}
     .hero-right{padding-top:clamp(16px,3vw,36px)}
     .hero-campaigns{display:flex;flex-direction:column;gap:9px;width:100%}
     @media(max-width:860px){
       .hero-grid{grid-template-columns:1fr}
-      .hero-spacer{display:none}
+      .hero-spacer{display:block;padding-top:0}
       .hero-center{text-align:center}
       .hero-right{padding-top:0;display:flex;justify-content:center}
       .hero-campaigns{flex-direction:row;overflow-x:auto;width:auto;max-width:100%;gap:9px;padding-bottom:4px;scrollbar-width:none}
@@ -149,7 +150,17 @@
     <section class="home-hero" id="top">
       <div class="wrap hero-grid">
         <!-- Left spacer: mirrors card width so center column is true page center -->
-        <div class="hero-spacer" aria-hidden="true"></div>
+        <div class="hero-spacer">
+          <div class="nonprofit-countdown" aria-label="501c3 deadline countdown">
+            <div class="nonprofit-countdown-label">501(c)(3) target<span>Done by July 31</span></div>
+            <div class="nonprofit-countdown-grid" id="nonprofit-countdown">
+              <div class="nonprofit-countdown-unit"><span class="nonprofit-countdown-num" data-countdown-days>--</span><span class="nonprofit-countdown-text">Days</span></div>
+              <div class="nonprofit-countdown-unit"><span class="nonprofit-countdown-num" data-countdown-hours>--</span><span class="nonprofit-countdown-text">Hrs</span></div>
+              <div class="nonprofit-countdown-unit"><span class="nonprofit-countdown-num" data-countdown-minutes>--</span><span class="nonprofit-countdown-text">Min</span></div>
+              <div class="nonprofit-countdown-unit"><span class="nonprofit-countdown-num" data-countdown-seconds>--</span><span class="nonprofit-countdown-text">Sec</span></div>
+            </div>
+          </div>
+        </div>
 
         <!-- Center: logo + all hero content -->
         <div class="hero-center">
@@ -184,15 +195,6 @@
             <button class="logo-hs" title="SD Card"            data-guide="sdcard"        style="left:62.8%;top:48.7%"></button>
             <button class="logo-hs" title="Wi-Fi Hotspot"      data-guide="wifi-hotspot"  style="left:66.7%;top:40.8%"></button>
             <button class="logo-hs" title="Smartphones"        data-guide="smartphones"   style="left:61.4%;top:31.8%"></button>
-          </div>
-          <div class="nonprofit-countdown" aria-label="501c3 deadline countdown">
-            <div class="nonprofit-countdown-label">501(c)(3) target<span>Done by July 31</span></div>
-            <div class="nonprofit-countdown-grid" id="nonprofit-countdown">
-              <div class="nonprofit-countdown-unit"><span class="nonprofit-countdown-num" data-countdown-days>--</span><span class="nonprofit-countdown-text">Days</span></div>
-              <div class="nonprofit-countdown-unit"><span class="nonprofit-countdown-num" data-countdown-hours>--</span><span class="nonprofit-countdown-text">Hrs</span></div>
-              <div class="nonprofit-countdown-unit"><span class="nonprofit-countdown-num" data-countdown-minutes>--</span><span class="nonprofit-countdown-text">Min</span></div>
-              <div class="nonprofit-countdown-unit"><span class="nonprofit-countdown-num" data-countdown-seconds>--</span><span class="nonprofit-countdown-text">Sec</span></div>
-            </div>
           </div>
           <div class="logo-hint"><span>☝</span>Click any component to explore</div>
           <h1 class="visually-hidden">VillageServer Initiative</h1>

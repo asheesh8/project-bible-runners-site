@@ -19,6 +19,14 @@ function trimText(value, max = 255) {
   return String(value || '').trim().slice(0, max);
 }
 
+function readGeo(req) {
+  return {
+    country: trimText(req.headers['x-vercel-ip-country'] || req.headers['x-country'] || '', 8).toUpperCase() || null,
+    region: trimText(req.headers['x-vercel-ip-country-region'] || req.headers['x-region'] || '', 80) || null,
+    city: trimText(req.headers['x-vercel-ip-city'] || req.headers['x-city'] || '', 120) || null,
+  };
+}
+
 function detectRobotRequest(req) {
   const userAgent = trimText(req.headers['user-agent'], 500);
   const purpose = trimText(req.headers.purpose || req.headers['sec-purpose'] || req.headers['x-purpose']).toLowerCase();
@@ -204,6 +212,7 @@ export default async function handler(req, res) {
     const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
     const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
     const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
+    const geo = readGeo(req);
     const payload = {
       visitor_id: cleanVisitorId || null,
       site_host: cleanHost,
@@ -217,11 +226,17 @@ export default async function handler(req, res) {
       fbclid: trimText(fbclid, 500),
       ttclid: trimText(ttclid, 500),
       user_agent: trimText(req.headers['user-agent'], 500) || null,
+      country: geo.country,
+      region: geo.region,
+      city: geo.city,
       is_robot: false,
       robot_reason: null,
     };
     const legacyPayload = (() => {
       const p = { ...payload };
+      delete p.country;
+      delete p.region;
+      delete p.city;
       delete p.user_agent;
       delete p.is_robot;
       delete p.robot_reason;
@@ -470,6 +485,8 @@ export default async function handler(req, res) {
     const todayIso = encodeURIComponent(todayStart.toISOString());
     let [visitsR, uniqueR, todayR, clicksR, interestsR, availR, contactsR] = await Promise.all([
       fetchWithFallback([
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,country,region,city,created_at,is_robot,robot_reason&is_robot=not.is.true&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
+        { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,country,region,city,created_at&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at,is_robot,robot_reason&is_robot=not.is.true&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=visitor_id,site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
         { url: `${SUPABASE_URL}/rest/v1/page_visits?select=site_host,path,referrer,utm_source,utm_medium,utm_campaign,fbclid,ttclid,created_at&order=created_at.desc&limit=500`, options: { headers: visitRangeHeaders, cache: 'no-store' } },
