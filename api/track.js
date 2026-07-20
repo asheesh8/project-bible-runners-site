@@ -227,7 +227,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { type } = req.query;
-  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'contact', 'contacts', 'application', 'applications', 'deployment', 'deployments', 'triage-backfill', 'setting', 'summary', 'health'];
+  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'contact', 'contacts', 'application', 'applications', 'deployment', 'deployments', 'setting', 'summary', 'health'];
   if (!VALID.includes(type)) return res.status(400).json({ error: 'Invalid type' });
 
   // ── Admin health check: report pipeline status without exposing secrets ──
@@ -641,30 +641,6 @@ export default async function handler(req, res) {
       body: JSON.stringify(patch),
     });
     return res.status(r.status).json(await r.json().catch(() => ({})));
-  }
-
-  // Admin: one-time triage backfill — scores applications that have no
-  // triage data yet (legacy rows from the old form). Idempotent: already
-  // scored rows are never touched.
-  if (req.method === 'POST' && type === 'triage-backfill') {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications?select=*&triage_confidence=is.null`, { headers: sbH, cache: 'no-store' });
-    if (!r.ok) return res.status(502).json({ error: 'could not load applications — has the schema migration been applied?' });
-    const rows = await jsonOrEmpty(r);
-    let scored = 0;
-    let failed = 0;
-    for (const app of rows) {
-      const triage = computeTriage(app);
-      if (!app.kit_tier) {
-        triage.triage_note = 'Backfilled score — submitted through the old form, which did not collect kit tier, reference, or website fields.\n' + triage.triage_note;
-      }
-      const pr = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications?id=eq.${encodeURIComponent(app.id)}`, {
-        method: 'PATCH',
-        headers: { ...sbH, Prefer: 'return=minimal' },
-        body: JSON.stringify(triage),
-      });
-      if (pr.ok) scored++; else failed++;
-    }
-    return res.status(200).json({ ok: true, total: rows.length, scored, failed });
   }
 
   // ── Admin: deployment log (mirrors Eric's Excel structure) ────────
