@@ -7,16 +7,17 @@
 //   GET /api/content?type=posts
 //   GET /api/content?type=photos
 //
-// Admin endpoints (Authorization: Bearer <ADMIN_PASSWORD>):
+// Admin endpoints (Authorization: Bearer <signed token from /api/auth>):
 //   POST   /api/content?type=campaigns   body={}
 //   PATCH  /api/content?type=campaigns&id=uuid  body={}
 //   DELETE /api/content?type=campaigns&id=uuid
 
 const TABLES = { campaigns: true, posts: true, photos: true, testimonies: true };
 
+import { isAuthorizedAdmin } from './_lib/admin-token.js';
+
 export default async function handler(req, res) {
   const { SUPABASE_URL } = process.env;
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'terriashish';
   const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -53,8 +54,7 @@ export default async function handler(req, res) {
   }
 
   // ── Writes require admin auth ────────────────────────────────────
-  const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
-  if (authHeader !== ADMIN_PASSWORD && authHeader !== 'terriashish') {
+  if (!isAuthorizedAdmin(req)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

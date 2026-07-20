@@ -1,17 +1,20 @@
 // /api/track.js — Visit tracking + donation interest capture + contact form
-// Env vars: SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD, RESEND_API_KEY, CONTACT_FROM_EMAIL
+// Env vars: SUPABASE_URL, SUPABASE_SERVICE_KEY, ADMIN_PASSWORD, RESEND_API_KEY, CONTACT_FROM_EMAIL, NOTIFY_EMAIL
 //
 // Public (no auth):
-//   POST /api/track?type=visit     { visitor_id, site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
-//   POST /api/track?type=click     { visitor_id, site_host, path, link_url, link_text, link_type }
-//   POST /api/track?type=interest  { visitor_id, site_host, name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
-//   POST /api/track?type=contact   { visitor_id, site_host, name, email, message } — emails villageserverinitiative@gmail.com via Resend
+//   POST /api/track?type=visit        { visitor_id, site_host, path, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid }
+//   POST /api/track?type=click        { visitor_id, site_host, path, link_url, link_text, link_type }
+//   POST /api/track?type=interest     { visitor_id, site_host, name, email, country, initiative, practical_need, utm_source, utm_medium, utm_campaign }
+//   POST /api/track?type=contact      { visitor_id, site_host, name, email, message } — emails the team via Resend
+//   POST /api/track?type=application  full intake payload — triaged, stored, emails team + applicant
 //
-// Admin (Authorization: Bearer <ADMIN_PASSWORD>):
-//   GET  /api/track?type=visits
-//   GET  /api/track?type=interests
-//   GET  /api/track?type=contacts
-//   GET  /api/track?type=summary
+// Admin (Authorization: Bearer <signed token from /api/auth>):
+//   GET    /api/track?type=visits | interests | contacts | applications | deployments | summary
+//   PATCH  /api/track?type=applications&id=…   { status?, admin_notes? }
+//   POST   /api/track?type=deployments         deployment record
+//   PATCH  /api/track?type=deployments&id=…    partial deployment record
+//   DELETE /api/track?type=applications|deployments&id=…
+import { isAuthorizedAdmin } from './_lib/admin-token.js';
 
 const ROBOT_USER_AGENT_RE = /bot|crawler|spider|crawl|slurp|bingpreview|facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|google-inspectiontool|googleother|adsbot|mediapartners-google|apis-google|feedfetcher|monitor|uptime|pingdom|headlesschrome|phantomjs|lighthouse|pagespeed|semrush|ahrefs|mj12bot|dotbot|petalbot|bytespider|yandex|baiduspider|duckduckbot|archive\.org|wget|curl|python-requests|httpclient/i;
 
@@ -83,28 +86,155 @@ async function sendContactEmail({ name, email, message, site_host }) {
   }
 }
 
+// ── Application intake: triage scoring ──────────────────────────────
+// Rule-based, never auto-rejects. Produces verification flags, a 0-3
+// score, a Low/Medium/High confidence tag, a tier/audience mismatch
+// flag, and a plain-English note explaining the result for Eric.
+const FREEMAIL_DOMAINS = new Set(['gmail.com', 'googlemail.com', 'yahoo.com', 'ymail.com', 'hotmail.com', 'outlook.com', 'live.com', 'msn.com', 'icloud.com', 'me.com', 'aol.com', 'protonmail.com', 'proton.me', 'mail.com', 'gmx.com', 'gmx.net', 'yandex.com', 'yandex.ru', 'zoho.com', 'rediffmail.com', 'qq.com', '163.com', '126.com']);
+
+const KIT_TIERS = {
+  1: 'microSD card', 2: 'Wi-Fi sharing hub', 3: 'Raspberry Pi VillageServer',
+  4: 'Projector & audio', 5: 'Satellite receive-and-replay',
+};
+const AUDIENCE_LABELS = {
+  individual: 'individual', small_group: 'small group under 20',
+  village_congregation: 'village / congregation', regional_network: 'multi-village / regional network',
+};
+
+function emailDomainOf(email) {
+  const at = String(email || '').lastIndexOf('@');
+  return at === -1 ? '' : String(email).slice(at + 1).toLowerCase().trim();
+}
+
+function websiteDomainOf(url) {
+  let u = String(url || '').trim();
+  if (!u) return '';
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  try {
+    return new URL(u).hostname.toLowerCase().replace(/^www\./, '');
+  } catch (e) {
+    return '';
+  }
+}
+
+function computeTriage(app) {
+  const eDom = emailDomainOf(app.email);
+  const wDom = websiteDomainOf(app.org_website);
+  const domainMatch = !!(eDom && ((wDom && (eDom === wDom || eDom.endsWith('.' + wDom))) || (app.organization && !FREEMAIL_DOMAINS.has(eDom))));
+  const referenceProvided = !!(app.reference_name && app.reference_contact);
+  const webPresence = !!wDom;
+  const score = (domainMatch ? 1 : 0) + (referenceProvided ? 1 : 0) + (webPresence ? 1 : 0);
+
+  const tier = Number(app.kit_tier) || null;
+  const smallAudience = app.audience_type === 'individual' || app.audience_type === 'small_group';
+  const flags = [];
+  if (tier >= 4 && smallAudience) flags.push('tier_audience_mismatch');
+
+  const confidence = score >= 3 ? 'High' : score === 2 ? 'Medium' : 'Low';
+  const fastTrack = confidence === 'High' && tier >= 1 && tier <= 3 && flags.length === 0;
+
+  const notes = [];
+  notes.push(`Verification ${score}/3 — ` + [
+    domainMatch
+      ? (wDom && (eDom === wDom || eDom.endsWith('.' + wDom))
+        ? `email domain (@${eDom}) matches the listed website`
+        : `email domain (@${eDom}) looks organizational`)
+      : `email domain (@${eDom || '—'}) is personal/free and does not match a listed website`,
+    referenceProvided ? 'reference contact provided' : 'no reference contact',
+    webPresence ? `web presence listed (${wDom})` : 'no website or social link given',
+  ].join('; ') + '.');
+  if (tier) {
+    const tierLine = `Requested tier ${tier} (${KIT_TIERS[tier] || 'unknown'}) for audience "${AUDIENCE_LABELS[app.audience_type] || app.audience_type || 'not stated'}"` +
+      (app.frequency_of_use ? `, use: ${String(app.frequency_of_use).replace(/_/g, ' ')}` : '');
+    if (flags.includes('tier_audience_mismatch')) {
+      notes.push(`${tierLine} — MISMATCH: a large-reach kit was requested for a small audience. Routed to manual review.`);
+    } else {
+      notes.push(`${tierLine} — tier and audience are consistent.`);
+    }
+  }
+  notes.push(fastTrack
+    ? 'Fast-track candidate: high confidence and a low-cost tier (1-3).'
+    : flags.length ? 'Needs manual review before any approval.' : `Standard review (${confidence.toLowerCase()} confidence).`);
+
+  return {
+    email_domain_match: domainMatch,
+    reference_provided: referenceProvided,
+    web_presence_found: webPresence,
+    triage_score: score,
+    triage_confidence: confidence,
+    triage_flags: flags,
+    triage_note: notes.join('\n'),
+    fast_track: fastTrack,
+  };
+}
+
+async function sendApplicationEmails({ app, triage }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return false;
+  const from = process.env.CONTACT_FROM_EMAIL || 'VillageServer Initiative <onboarding@resend.dev>';
+  const teamEmail = process.env.NOTIFY_EMAIL || 'villageserverinitiative@gmail.com';
+  const tierLabel = app.kit_tier ? `Tier ${app.kit_tier} — ${KIT_TIERS[app.kit_tier] || ''}` : 'No tier selected';
+  const teamBody = [
+    `New equipment & funding application`,
+    ``,
+    `Name: ${app.name}`,
+    `Organization: ${app.organization || '—'}`,
+    `Email: ${app.email}`,
+    `Phone: ${[app.phone_country_code, app.phone].filter(Boolean).join(' ') || '—'}`,
+    `Country: ${app.country}${app.region ? `, ${app.region}` : ''}`,
+    `Kit requested: ${tierLabel}`,
+    `Funding requested: ${app.funding_needed || '—'}`,
+    `Timeframe: ${app.timeframe || '—'}`,
+    ``,
+    `── Triage: ${triage.triage_confidence} confidence${triage.fast_track ? ' · FAST-TRACK CANDIDATE' : ''}${triage.triage_flags.length ? ' · FLAGGED' : ''} ──`,
+    triage.triage_note,
+    ``,
+    `Review it in the admin panel → https://villageserver.org/admin`,
+  ].join('\n');
+  const applicantBody = [
+    `Hi ${app.name},`,
+    ``,
+    `Thank you for applying to the VillageServer Initiative equipment & funding program. Your application has been received and our team will review it personally — we reply to every application by email.`,
+    ``,
+    `What you requested: ${tierLabel}`,
+    `Mission country: ${app.country}`,
+    ``,
+    `If you need to add anything to your application, just reply to this email.`,
+    ``,
+    `— The VillageServer Initiative team`,
+  ].join('\n');
+  const send = (msg) => fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify(msg),
+  }).then((r) => r.ok).catch(() => false);
+  const results = await Promise.all([
+    send({ from, to: [teamEmail], reply_to: app.email, subject: `New application — ${app.name} (${app.country}) — ${triage.triage_confidence} confidence`, text: teamBody }),
+    send({ from, to: [app.email], reply_to: teamEmail, subject: 'We received your VillageServer application', text: applicantBody }),
+  ]);
+  return results[0] || results[1];
+}
+
 export default async function handler(req, res) {
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'terriashish';
   // Accept either our own names or the ones the Supabase–Vercel integration creates.
   const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
 
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { type } = req.query;
-  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'contact', 'contacts', 'application', 'applications', 'setting', 'summary', 'health'];
+  const VALID = ['visit', 'visits', 'click', 'clicks', 'interest', 'interests', 'availability', 'availabilities', 'contact', 'contacts', 'application', 'applications', 'deployment', 'deployments', 'setting', 'summary', 'health'];
   if (!VALID.includes(type)) return res.status(400).json({ error: 'Invalid type' });
 
   // ── Admin health check: report pipeline status without exposing secrets ──
   if (type === 'health') {
-    const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
-    if (authHeader !== ADMIN_PASSWORD && authHeader !== 'terriashish') return res.status(401).json({ error: 'Unauthorized' });
+    if (!isAuthorizedAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
     const configured = !!(SUPABASE_URL && SUPABASE_SERVICE_KEY);
-    const out = { supabase_configured: configured, admin_password_set: !!ADMIN_PASSWORD, tables: {}, visit_count: null, latest_visit_at: null };
+    const out = { supabase_configured: configured, admin_password_set: !!process.env.ADMIN_PASSWORD, tables: {}, visit_count: null, latest_visit_at: null };
     if (!configured) return res.status(200).json(out);
     const probeH = { apikey: SUPABASE_SERVICE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_KEY}` };
     for (const t of ['page_visits', 'link_clicks', 'donation_interests', 'availability_requests']) {
@@ -357,11 +487,14 @@ export default async function handler(req, res) {
 
   // ── Public POST: equipment & funding application ─────────────────
   if (req.method === 'POST' && type === 'application') {
-    const { visitor_id, site_host, name, email, phone_country_code, phone, organization, role, country, region, mission_context, equipment_needed, funding_needed, timeframe, message, utm_source, utm_medium, utm_campaign } = req.body || {};
-    const cleanName = trimText(name, 160);
-    const cleanEmail = trimText(email, 255);
-    const cleanCountry = trimText(country, 120);
+    const b = req.body || {};
+    const cleanName = trimText(b.name, 160);
+    const cleanEmail = trimText(b.email, 255);
+    const cleanCountry = trimText(b.country, 120);
     if (!cleanName || !cleanEmail || !cleanCountry) return res.status(400).json({ error: 'name, email, and country are required' });
+
+    // Honeypot + crawler screening: pretend success so bots learn nothing.
+    if (trimText(b.website, 500) || detectRobotRequest(req)) return res.status(200).json({ ok: true });
 
     // Only accept submissions while the applications_open flag is on. Fail
     // safe to "closed" if the flag cannot be confirmed.
@@ -373,48 +506,103 @@ export default async function handler(req, res) {
     } catch (e) { open = false; }
     if (!open) return res.status(200).json({ ok: false, closed: true });
 
+    // Rate limit: at most 3 submissions per email address per hour.
+    try {
+      const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const rl = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications?select=id&email=eq.${encodeURIComponent(cleanEmail)}&created_at=gte.${encodeURIComponent(since)}`, {
+        headers: { ...sbH, Prefer: 'count=exact', Range: '0-0' }, cache: 'no-store',
+      });
+      const recent = exactCountFrom(rl);
+      if (Number.isFinite(recent) && recent >= 3) {
+        return res.status(429).json({ error: 'Too many submissions from this email — please wait an hour or email us directly.' });
+      }
+    } catch (e) { /* if the check fails, accept the submission */ }
+
     const forwardedHost = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
-    const cleanHost = String(site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
-    const cleanVisitorId = String(visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
-    const cleanEquipment = Array.isArray(equipment_needed)
-      ? equipment_needed.slice(0, 20).map((item) => String(item || '').slice(0, 120)).filter(Boolean)
+    const cleanHost = String(b.site_host || forwardedHost).toLowerCase().replace(/^www\./, '').replace(/:\d+$/, '').slice(0, 255);
+    const cleanVisitorId = String(b.visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120);
+    const cleanEquipment = Array.isArray(b.equipment_needed)
+      ? b.equipment_needed.slice(0, 20).map((item) => String(item || '').slice(0, 120)).filter(Boolean)
       : [];
+
+    const oneOf = (value, allowed) => (allowed.includes(String(value || '')) ? String(value) : null);
+    const kitTier = Number.isInteger(Number(b.kit_tier)) && Number(b.kit_tier) >= 1 && Number(b.kit_tier) <= 5 ? Number(b.kit_tier) : null;
+    let supportingDoc = null;
+    if (typeof b.supporting_document === 'string'
+      && /^data:(image\/(png|jpeg|webp|gif)|application\/pdf);base64,[a-zA-Z0-9+/=]+$/.test(b.supporting_document)
+      && b.supporting_document.length <= 3000000) {
+      supportingDoc = b.supporting_document;
+    }
+
     const payload = {
       visitor_id: cleanVisitorId || null,
       site_host: cleanHost,
       name: cleanName,
       email: cleanEmail,
-      phone_country_code: trimText(phone_country_code, 12) || null,
-      phone: trimText(phone, 60) || null,
-      organization: trimText(organization, 200) || null,
-      role: trimText(role, 120) || null,
+      phone_country_code: trimText(b.phone_country_code, 12) || null,
+      phone: trimText(b.phone, 60) || null,
+      organization: trimText(b.organization, 200) || null,
+      role: trimText(b.role, 120) || null,
       country: cleanCountry,
-      region: trimText(region, 160) || null,
-      mission_context: trimText(mission_context, 2000) || null,
+      region: trimText(b.region, 160) || null,
+      mission_context: trimText(b.mission_context, 2000) || null,
       equipment_needed: cleanEquipment,
-      funding_needed: trimText(funding_needed, 200) || null,
-      timeframe: trimText(timeframe, 160) || null,
-      message: trimText(message, 2000) || null,
-      utm_source: trimText(utm_source) || null,
-      utm_medium: trimText(utm_medium) || null,
-      utm_campaign: trimText(utm_campaign) || null,
+      funding_needed: trimText(b.funding_needed, 200) || null,
+      timeframe: trimText(b.timeframe, 160) || null,
+      message: trimText(b.message, 2000) || null,
+      utm_source: trimText(b.utm_source) || null,
+      utm_medium: trimText(b.utm_medium) || null,
+      utm_campaign: trimText(b.utm_campaign) || null,
+      // Structured intake fields (see supabase/schema.sql)
+      kit_tier: kitTier,
+      reach_justification: trimText(b.reach_justification, 2000) || null,
+      audience_type: oneOf(b.audience_type, ['individual', 'small_group', 'village_congregation', 'regional_network']),
+      frequency_of_use: oneOf(b.frequency_of_use, ['one_time', 'weekly', 'daily']),
+      has_gathering_infrastructure: typeof b.has_gathering_infrastructure === 'boolean' ? b.has_gathering_infrastructure : null,
+      gathering_infrastructure_desc: trimText(b.gathering_infrastructure_desc, 1000) || null,
+      languages: trimText(b.languages, 400) || null,
+      literacy_context: trimText(b.literacy_context, 1000) || null,
+      power_internet_access: oneOf(b.power_internet_access, ['none', 'limited', 'reliable']),
+      org_website: trimText(b.org_website, 400) || null,
+      sending_org: trimText(b.sending_org, 300) || null,
+      reference_name: trimText(b.reference_name, 160) || null,
+      reference_contact: trimText(b.reference_contact, 255) || null,
+      referral_source: oneOf(b.referral_source, ['existing_partner', 'church_network', 'conference', 'search', 'social_media', 'other']),
+      years_in_field: trimText(b.years_in_field, 60) || null,
+      current_reach: trimText(b.current_reach, 200) || null,
+      supporting_document: supportingDoc,
+      supporting_document_name: supportingDoc ? (trimText(b.supporting_document_name, 200) || 'document') : null,
+      receiving_plan: oneOf(b.receiving_plan, ['cover_import_costs', 'transport_partner', 'approved_retailer', 'alternative_plan', 'need_help']),
+      receiving_plan_details: trimText(b.receiving_plan_details, 1000) || null,
+      preferred_contact_method: trimText(b.preferred_contact_method, 120) || null,
+      contact_timezone: trimText(b.contact_timezone, 120) || null,
+      status: 'submitted',
     };
-    const legacyPayload = (() => {
-      const p = { ...payload };
-      delete p.phone_country_code;
-      delete p.phone;
-      return p;
-    })();
+
+    const triage = computeTriage(payload);
+    Object.assign(payload, triage);
+
+    // Legacy fallback keeps intake alive if the schema migration has not
+    // been pasted into Supabase yet — original columns only.
+    const legacyPayload = {
+      visitor_id: payload.visitor_id, site_host: payload.site_host, name: payload.name,
+      email: payload.email, phone_country_code: payload.phone_country_code, phone: payload.phone,
+      organization: payload.organization, role: payload.role, country: payload.country,
+      region: payload.region, mission_context: payload.mission_context,
+      equipment_needed: payload.equipment_needed, funding_needed: payload.funding_needed,
+      timeframe: payload.timeframe, message: payload.message,
+      utm_source: payload.utm_source, utm_medium: payload.utm_medium, utm_campaign: payload.utm_campaign,
+    };
     const r = await fetchWithFallback([
       { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=minimal' }, body: JSON.stringify(payload) } },
       { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=minimal' }, body: JSON.stringify(legacyPayload) } },
     ]);
+    if (r.ok) await sendApplicationEmails({ app: payload, triage });
     return res.status(r.ok ? 200 : 502).json({ ok: r.ok });
   }
 
-  // ── Admin reads ──────────────────────────────────────────────────
-  const authHeader = (req.headers.authorization || '').replace('Bearer ', '');
-  if (authHeader !== ADMIN_PASSWORD && authHeader !== 'terriashish') return res.status(401).json({ error: 'Unauthorized' });
+  // ── Admin endpoints — everything below requires a valid signed token ──
+  if (!isAuthorizedAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
 
   // Admin: list equipment & funding applications
   if (req.method === 'GET' && type === 'applications') {
@@ -430,6 +618,98 @@ export default async function handler(req, res) {
       method: 'DELETE',
       headers: sbH,
     });
+    return res.status(r.ok ? 204 : r.status).end();
+  }
+
+  // Admin: update an application's review status / notes
+  if (req.method === 'PATCH' && type === 'applications') {
+    const id = String(req.query.id || '').replace(/[^a-f0-9-]/gi, '').slice(0, 80);
+    if (!id) return res.status(400).json({ error: 'id query param required' });
+    const b = req.body || {};
+    const patch = {};
+    const STATUSES = ['submitted', 'under_review', 'approved', 'declined', 'waitlisted', 'new'];
+    if (b.status !== undefined) {
+      if (!STATUSES.includes(String(b.status))) return res.status(400).json({ error: 'invalid status' });
+      patch.status = String(b.status);
+      patch.status_updated_at = new Date().toISOString();
+    }
+    if (b.admin_notes !== undefined) patch.admin_notes = trimText(b.admin_notes, 4000) || null;
+    if (!Object.keys(patch).length) return res.status(400).json({ error: 'nothing to update' });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { ...sbH, Prefer: 'return=representation' },
+      body: JSON.stringify(patch),
+    });
+    return res.status(r.status).json(await r.json().catch(() => ({})));
+  }
+
+  // ── Admin: deployment log (mirrors Eric's Excel structure) ────────
+  const DEPLOYMENT_TEXT_FIELDS = [
+    'name', 'contact_information', 'country', 'region_village',
+    'raspberry_pi_5', 'power_supply', 'satellite_dish', 'lnb', 'receiver',
+    'satellite_finder', 'coax_cable', 'usb_a_to_c', 'usb_a_to_micro_b',
+    'projector', 'speakers', 'language_card', 'usb_adapter', 'newq_device',
+    'charger_100w_20_port', 'bibles', 'monetary_support', 'online_support',
+    'power_charger_for_raspberry', 'highlights', 'follow_up_needed', 'additional_notes',
+  ];
+  function cleanDeployment(body, { partial = false } = {}) {
+    const b = body || {};
+    const row = {};
+    for (const f of DEPLOYMENT_TEXT_FIELDS) {
+      if (partial && b[f] === undefined) continue;
+      row[f] = trimText(b[f], f === 'highlights' || f === 'follow_up_needed' || f === 'additional_notes' ? 4000 : 400) || null;
+    }
+    if (!partial || b.date !== undefined) {
+      row.date = /^\d{4}-\d{2}-\d{2}$/.test(String(b.date || '')) ? String(b.date) : null;
+    }
+    if (!partial || b.application_id !== undefined) {
+      const appId = String(b.application_id || '').replace(/[^a-f0-9-]/gi, '').slice(0, 80);
+      row.application_id = appId || null;
+    }
+    if (!partial || b.in_person_support !== undefined) {
+      row.in_person_support = Array.isArray(b.in_person_support)
+        ? b.in_person_support.slice(0, 40).map((w) => ({
+          label: trimText(w && w.label, 200),
+          date: /^\d{4}-\d{2}-\d{2}$/.test(String((w && w.date) || '')) ? String(w.date) : null,
+        })).filter((w) => w.label || w.date)
+        : [];
+    }
+    return row;
+  }
+
+  if (req.method === 'GET' && (type === 'deployment' || type === 'deployments')) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/deployments?select=*&order=date.desc.nullslast,created_at.desc`, { headers: sbH, cache: 'no-store' });
+    return res.status(r.ok ? 200 : r.status).json(r.ok ? await r.json() : []);
+  }
+
+  if (req.method === 'POST' && (type === 'deployment' || type === 'deployments')) {
+    const row = cleanDeployment(req.body);
+    if (!row.name) return res.status(400).json({ error: 'name is required' });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/deployments`, {
+      method: 'POST',
+      headers: { ...sbH, Prefer: 'return=representation' },
+      body: JSON.stringify(row),
+    });
+    return res.status(r.status).json(await r.json().catch(() => ({})));
+  }
+
+  if (req.method === 'PATCH' && (type === 'deployment' || type === 'deployments')) {
+    const id = String(req.query.id || '').replace(/[^a-f0-9-]/gi, '').slice(0, 80);
+    if (!id) return res.status(400).json({ error: 'id query param required' });
+    const row = cleanDeployment(req.body, { partial: true });
+    if (!Object.keys(row).length) return res.status(400).json({ error: 'nothing to update' });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/deployments?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { ...sbH, Prefer: 'return=representation' },
+      body: JSON.stringify(row),
+    });
+    return res.status(r.status).json(await r.json().catch(() => ({})));
+  }
+
+  if (req.method === 'DELETE' && (type === 'deployment' || type === 'deployments')) {
+    const id = String(req.query.id || '').replace(/[^a-f0-9-]/gi, '').slice(0, 80);
+    if (!id) return res.status(400).json({ error: 'id query param required' });
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/deployments?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: sbH });
     return res.status(r.ok ? 204 : r.status).end();
   }
 

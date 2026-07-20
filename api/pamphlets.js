@@ -5,9 +5,11 @@
 // Public:
 //   GET  /api/pamphlets           → returns array of pamphlet objects
 //
-// Admin (Authorization: Bearer <ADMIN_PASSWORD>):
+// Admin (Authorization: Bearer <signed token from /api/auth>):
 //   POST /api/pamphlets           body: { action: 'save', pamphlets: [...] }
 //     → replaces full pamphlet list
+
+import { isAuthorizedAdmin } from './_lib/admin-token.js';
 
 const SETTINGS_KEY = 'pamphlets_list';
 
@@ -103,8 +105,7 @@ export default async function handler(req, res) {
 
   // ── POST: admin save ──
   if (req.method === 'POST') {
-    const auth = (req.headers.authorization || '').replace('Bearer ', '');
-    if (!auth || (auth !== (process.env.ADMIN_PASSWORD || 'terriashish') && auth !== 'terriashish')) {
+    if (!isAuthorizedAdmin(req)) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 

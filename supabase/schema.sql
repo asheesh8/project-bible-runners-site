@@ -328,6 +328,117 @@ insert into public.site_settings (key, value)
 select 'applications_open', 'false'::jsonb
 where not exists (select 1 from public.site_settings where key = 'applications_open');
 
+-- ── Intake redesign: structured application fields ──────────────────
+-- Single-select kit tier (1 microSD · 2 Wi-Fi hub · 3 Raspberry Pi ·
+-- 4 Projector & audio · 5 Satellite), reach/audience signals, mission
+-- context, identity & verification, receiving plan, and rule-based
+-- triage output. All nullable so legacy rows stay valid.
+alter table public.equipment_applications add column if not exists kit_tier smallint check (kit_tier between 1 and 5);
+alter table public.equipment_applications add column if not exists reach_justification text;
+alter table public.equipment_applications add column if not exists audience_type text check (audience_type in ('individual','small_group','village_congregation','regional_network'));
+alter table public.equipment_applications add column if not exists frequency_of_use text check (frequency_of_use in ('one_time','weekly','daily'));
+alter table public.equipment_applications add column if not exists has_gathering_infrastructure boolean;
+alter table public.equipment_applications add column if not exists gathering_infrastructure_desc text;
+alter table public.equipment_applications add column if not exists languages text;
+alter table public.equipment_applications add column if not exists literacy_context text;
+alter table public.equipment_applications add column if not exists power_internet_access text check (power_internet_access in ('none','limited','reliable'));
+alter table public.equipment_applications add column if not exists org_website text;
+alter table public.equipment_applications add column if not exists sending_org text;
+alter table public.equipment_applications add column if not exists reference_name text;
+alter table public.equipment_applications add column if not exists reference_contact text;
+alter table public.equipment_applications add column if not exists referral_source text check (referral_source in ('existing_partner','church_network','conference','search','social_media','other'));
+alter table public.equipment_applications add column if not exists years_in_field text;
+alter table public.equipment_applications add column if not exists current_reach text;
+alter table public.equipment_applications add column if not exists supporting_document text;
+alter table public.equipment_applications add column if not exists supporting_document_name text;
+alter table public.equipment_applications add column if not exists receiving_plan text check (receiving_plan in ('cover_import_costs','transport_partner','approved_retailer','alternative_plan','need_help'));
+alter table public.equipment_applications add column if not exists receiving_plan_details text;
+alter table public.equipment_applications add column if not exists preferred_contact_method text;
+alter table public.equipment_applications add column if not exists contact_timezone text;
+-- Verification flags + triage output (computed server-side on submit)
+alter table public.equipment_applications add column if not exists email_domain_match boolean;
+alter table public.equipment_applications add column if not exists reference_provided boolean;
+alter table public.equipment_applications add column if not exists web_presence_found boolean;
+alter table public.equipment_applications add column if not exists triage_score smallint;
+alter table public.equipment_applications add column if not exists triage_confidence text check (triage_confidence in ('Low','Medium','High'));
+alter table public.equipment_applications add column if not exists triage_flags jsonb not null default '[]'::jsonb;
+alter table public.equipment_applications add column if not exists triage_note text;
+alter table public.equipment_applications add column if not exists fast_track boolean not null default false;
+-- Review workflow: submitted / under_review / approved / declined / waitlisted
+-- ('new' remains on legacy rows)
+alter table public.equipment_applications add column if not exists admin_notes text;
+alter table public.equipment_applications add column if not exists status_updated_at timestamptz;
+
+create index if not exists equipment_applications_triage_idx on public.equipment_applications (triage_confidence, fast_track);
+
+-- ── Deployment log — mirrors Eric's Excel sheet column-for-column ───
+-- One row per equipped missionary/team. Resource columns are text so the
+-- sheet's mixed values ("2", "Yes", model names) survive round-trips to
+-- CSV/Excel exactly. in_person_support holds the repeating workshop list
+-- as [{"label": "1st Workshop", "date": "2026-06-25"}].
+create table if not exists public.deployments (
+  id uuid primary key default gen_random_uuid(),
+  application_id uuid references public.equipment_applications(id) on delete set null,
+  name text not null,                      -- Name / Group / Missionary Team
+  date date,
+  contact_information text,
+  country text,
+  region_village text,
+  raspberry_pi_5 text,
+  power_supply text,                       -- e.g. Solar Suitcase
+  satellite_dish text,
+  lnb text,
+  receiver text,
+  satellite_finder text,
+  coax_cable text,
+  usb_a_to_c text,
+  usb_a_to_micro_b text,
+  projector text,
+  speakers text,
+  language_card text,
+  usb_adapter text,
+  newq_device text,
+  charger_100w_20_port text,
+  bibles text,
+  monetary_support text,
+  online_support text,
+  in_person_support jsonb not null default '[]'::jsonb,
+  power_charger_for_raspberry text,
+  highlights text,
+  follow_up_needed text,
+  additional_notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists deployments_date_idx on public.deployments (date desc);
+create index if not exists deployments_application_idx on public.deployments (application_id);
+
+drop trigger if exists deployments_set_updated_at on public.deployments;
+create trigger deployments_set_updated_at before update on public.deployments
+for each row execute function public.set_updated_at();
+
+alter table public.deployments enable row level security;
+revoke all on public.deployments from anon, authenticated;
+
+-- Seed: the four deployments from Eric's existing Excel log.
+-- Re-running does not duplicate (guarded by name).
+insert into public.deployments (name, date, contact_information, country, region_village, raspberry_pi_5, power_supply, lnb, receiver, satellite_finder, usb_a_to_c, usb_a_to_micro_b, projector, language_card, usb_adapter, newq_device, charger_100w_20_port, in_person_support, power_charger_for_raspberry)
+select 'Paul Stewart', '2026-08-15', '802-498-3773', 'Kenya', 'Lanette', 'Raspberry Pi 5', 'Solar Suitcase', 'LO 10750', 'GT Media UHD 4K', 'GT Media V8 Finder 2', '2', '4', 'Aurzen Eazze D1', 'English', '2', 'NewQ Filehub', 'Yes', '[{"label":"1st Workshop","date":"2026-06-25"}]'::jsonb, 'Insignia 45 W'
+where not exists (select 1 from public.deployments where name = 'Paul Stewart');
+
+insert into public.deployments (name, country, in_person_support)
+select 'Doug Stogsdill', 'Peru', '[{"label":"1st Workshop","date":"2026-06-25"}]'::jsonb
+where not exists (select 1 from public.deployments where name = 'Doug Stogsdill');
+
+insert into public.deployments (name, country, region_village, power_supply, lnb, satellite_finder, projector, in_person_support)
+select 'Uche Okemiri', 'Nigeria', 'Abuja', 'Solar Suitcase', 'LO 10750', 'GT Media V8 Finder 2', 'Aurzen Eazze D1', '[{"label":"2nd Workshop","date":"2026-07-14"}]'::jsonb
+where not exists (select 1 from public.deployments where name = 'Uche Okemiri');
+
+insert into public.deployments (name, country, power_supply, lnb, satellite_finder, projector, in_person_support)
+select 'Sam Sikapizye', 'Zambia', 'Solar Suitcase', 'LO 10751', 'GT Media V8 Finder 2', 'Aurzen Eazze D1', '[{"label":"2nd Workshop","date":"2026-07-14"}]'::jsonb
+where not exists (select 1 from public.deployments where name = 'Sam Sikapizye');
+
 -- Confirm all expected tables exist after running the migration.
 select table_name
 from information_schema.tables
@@ -335,6 +446,6 @@ where table_schema = 'public'
   and table_name in (
     'campaigns', 'posts', 'photos', 'affiliates',
     'page_visits', 'link_clicks', 'donation_interests', 'availability_requests',
-    'contact_messages', 'equipment_applications', 'site_settings'
+    'contact_messages', 'equipment_applications', 'site_settings', 'deployments'
   )
 order by table_name;

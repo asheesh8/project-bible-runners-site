@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const { isAuthorizedAdmin } = require('./_lib/admin-token.js');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -26,8 +27,7 @@ module.exports = async (req, res) => {
   }
 
   if (req.method === 'POST') {
-    const auth = req.headers['authorization'] || '';
-    if (!process.env.ADMIN_PASSWORD || auth !== 'Bearer ' + process.env.ADMIN_PASSWORD) {
+    if (!isAuthorizedAdmin(req)) {
       return res.status(401).json({ error: 'unauthorized' });
     }
     const body = req.body || {};
