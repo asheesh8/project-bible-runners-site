@@ -526,6 +526,10 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
           Applications
         </div>
+        <div class="nav-item" data-tab="deployments">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Deployments
+        </div>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-label">Analytics</div>
@@ -1013,7 +1017,13 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 
         <!-- Submitted applications -->
         <div class="res-section">
-          <div class="res-section-title">📨 &nbsp;Submitted applications — add notes and build campaigns</div>
+          <div class="res-section-title">📨 &nbsp;Application review queue</div>
+          <p style="margin:0 0 14px;color:#57606a;max-width:680px">Every application is scored automatically (verification 0–3 → Low/Medium/High confidence) and large-reach kits requested for small audiences are flagged. Nothing is ever auto-rejected — the score is a reading order, not a verdict.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+            <span id="app-filter-chips" style="display:flex;gap:6px;flex-wrap:wrap"></span>
+            <span style="flex:1"></span>
+            <button type="button" id="apps-export-btn" style="padding:8px 16px;border-radius:8px;border:1px solid #d0d7de;background:#fff;color:#24292f;font-weight:800;font-size:.82rem;cursor:pointer">⬇ Export CSV</button>
+          </div>
           <div id="applications-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
 
@@ -1023,6 +1033,106 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
           <div id="campaigns-list">
             <div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v18H3z"/></svg><div>No campaigns yet. Click "New campaign" above.</div></div>
           </div>
+        </div>
+      </div>
+
+      <!-- ── DEPLOYMENTS (mirrors Eric's Excel log) ── -->
+      <div class="tab-view" id="tab-deployments">
+        <div class="page-header">
+          <h2 class="page-title">Mission Deployment &amp; Impact Log</h2>
+          <div style="display:flex;gap:10px">
+            <button type="button" id="deploys-export-btn" style="padding:9px 18px;border-radius:8px;border:1px solid #d0d7de;background:#fff;color:#24292f;font-weight:800;font-size:.85rem;cursor:pointer">⬇ Export CSV (Excel format)</button>
+            <button class="btn-new" id="new-deploy-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New deployment
+            </button>
+          </div>
+        </div>
+
+        <div class="flow-note" style="margin-bottom:20px">
+          🗺 &nbsp;One row per equipped missionary or team — the same columns as the original Excel log. The CSV export matches the spreadsheet column-for-column, so Eric can keep working in Excel any time.
+        </div>
+
+        <!-- Deployment editor -->
+        <div class="form-panel" id="deploy-form-panel">
+          <h3 id="deploy-form-title">New deployment</h3>
+          <input type="hidden" id="deploy-id" />
+          <input type="hidden" id="deploy-app-id" />
+          <div class="form-row">
+            <div class="field"><label>Name / Group / Missionary Team *</label><input type="text" id="df-name" /></div>
+            <div class="field"><label>Date</label><input type="date" id="df-date" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Contact information</label><input type="text" id="df-contact" /></div>
+            <div class="field"><label>Country</label><input type="text" id="df-country" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Region / Village</label><input type="text" id="df-region" /></div>
+            <div class="field"></div>
+          </div>
+          <div class="res-section-title" style="margin:18px 0 10px">Resources provided</div>
+          <div class="form-row">
+            <div class="field"><label>Raspberry Pi 5</label><input type="text" id="df-pi" placeholder="e.g. Raspberry Pi 5" /></div>
+            <div class="field"><label>Power supply (e.g. Solar Suitcase)</label><input type="text" id="df-power" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Satellite dish</label><input type="text" id="df-dish" /></div>
+            <div class="field"><label>LNB</label><input type="text" id="df-lnb" placeholder="e.g. LO 10750" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Receiver</label><input type="text" id="df-receiver" placeholder="e.g. GT Media UHD 4K" /></div>
+            <div class="field"><label>Satellite finder</label><input type="text" id="df-finder" placeholder="e.g. GT Media V8 Finder 2" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Coax cable</label><input type="text" id="df-coax" /></div>
+            <div class="field"><label>USB A to C (qty)</label><input type="text" id="df-usbc" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>USB A to micro B (qty)</label><input type="text" id="df-usbb" /></div>
+            <div class="field"><label>Projector</label><input type="text" id="df-projector" placeholder="e.g. Aurzen Eazze D1" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Speakers</label><input type="text" id="df-speakers" /></div>
+            <div class="field"><label>Language card</label><input type="text" id="df-langcard" placeholder="e.g. English" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>USB adapter (qty)</label><input type="text" id="df-usbadapter" /></div>
+            <div class="field"><label>NewQ device</label><input type="text" id="df-newq" placeholder="e.g. NewQ Filehub" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>100W 20-port charger</label><input type="text" id="df-charger" placeholder="Yes / No" /></div>
+            <div class="field"><label>Bibles</label><input type="text" id="df-bibles" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Monetary support</label><input type="text" id="df-monetary" placeholder="e.g. $500" /></div>
+            <div class="field"><label>Online support</label><input type="text" id="df-online" /></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label>Power charger for Raspberry</label><input type="text" id="df-picharger" placeholder="e.g. Insignia 45 W" /></div>
+            <div class="field"></div>
+          </div>
+          <div class="res-section-title" style="margin:18px 0 10px">In-person support — workshops</div>
+          <div id="df-workshops"></div>
+          <button type="button" id="df-add-workshop" style="padding:7px 14px;border-radius:7px;border:1px dashed #d0d7de;background:#f6f8fa;color:#24292f;font-weight:700;font-size:.82rem;cursor:pointer;margin-bottom:14px">+ Add workshop</button>
+          <div class="form-row full">
+            <div class="field"><label>Highlights</label><textarea id="df-highlights" rows="2"></textarea></div>
+          </div>
+          <div class="form-row full">
+            <div class="field"><label>Follow-up needed</label><textarea id="df-followup" rows="2"></textarea></div>
+          </div>
+          <div class="form-row full">
+            <div class="field"><label>Additional notes</label><textarea id="df-notes" rows="2"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" id="save-deploy-btn">Save deployment</button>
+            <button class="btn-cancel" id="cancel-deploy-btn">Cancel</button>
+          </div>
+          <p class="form-msg" id="deploy-msg"></p>
+        </div>
+
+        <!-- Deployments list -->
+        <div class="res-section">
+          <div id="deployments-list"><div class="empty-state" style="padding:20px"><div>Loading…</div></div></div>
         </div>
       </div>
 
@@ -1439,6 +1549,21 @@ scp mybible.pdf pi@192.168.1.100:/var/www/html/</pre>
 <script>
 var AUTH_TOKEN = null;
 
+// Session tokens expire (7 days) — on any 401, drop back to the login
+// screen instead of showing broken tabs.
+function forceRelogin(){
+  AUTH_TOKEN = null;
+  sessionStorage.removeItem('pbr_admin_token');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  var err = document.getElementById('login-err');
+  if(err){ err.textContent = 'Your session expired — please sign in again.'; err.style.display = 'block'; }
+}
+function checkAuth(r){
+  if(r.status === 401){ forceRelogin(); throw new Error('unauthorized'); }
+  return r;
+}
+
 // ── Login ────────────────────────────────────────────────
 (function(){
   var pw = document.getElementById('pw-input');
@@ -1524,7 +1649,7 @@ function api(method, type, body, id){
     }
   };
   if(body) opts.body = JSON.stringify(body);
-  return fetch(url, opts).then(function(r){
+  return fetch(url, opts).then(checkAuth).then(function(r){
     if(r.status === 204) return null;
     return r.json();
   });
@@ -1534,7 +1659,7 @@ function apiGet(type, slug){
   var url = '/api/content?type=' + type;
   if(slug) url += '&slug=' + encodeURIComponent(slug);
   // Pass auth to get drafts too
-  return fetch(url, {headers:{'Authorization':'Bearer ' + AUTH_TOKEN}}).then(function(r){ return r.json(); });
+  return fetch(url, {headers:{'Authorization':'Bearer ' + AUTH_TOKEN}}).then(checkAuth).then(function(r){ return r.json(); });
 }
 
 function showStatus(msg, level){
@@ -1546,7 +1671,12 @@ function showStatus(msg, level){
 }
 
 function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
-function fmtDate(d){ if(!d) return '—'; return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function fmtDate(d){
+  if(!d) return '—';
+  // Date-only strings must not shift a day across time zones
+  var v = /^\d{4}-\d{2}-\d{2}$/.test(String(d)) ? d + 'T00:00:00' : d;
+  return new Date(v).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
 
 // ── Load tab ─────────────────────────────────────────────
 function loadTab(tab){
@@ -1555,6 +1685,7 @@ function loadTab(tab){
   else if(tab === 'testimonies') loadTestimonies();
   else if(tab === 'traffic') startTrafficPoll();
   else if(tab === 'applications') loadApplications();
+  else if(tab === 'deployments') loadDeployments();
   else if(tab === 'pamphlets') initPamphlets();
   else if(tab === 'pageeditor') initPageEditor();
   // 'resources' and 'internal' are static — nothing to load
@@ -2010,7 +2141,7 @@ function trackApi(method, type, body, id){
   if(id) url += '&id=' + encodeURIComponent(id);
   var opts = { method: method, cache: 'no-store', headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN } };
   if(body){ opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
-  return fetch(url, opts).then(function(r){
+  return fetch(url, opts).then(checkAuth).then(function(r){
     if(r.status === 204) return null;
     return r.json().catch(function(){ return null; });
   });
@@ -2054,15 +2185,68 @@ function saveAppNotes(appId){
   var ta = document.getElementById('app-notes-ta-' + appId);
   var statusEl = document.getElementById('app-notes-st-' + appId);
   if(!ta) return;
-  _allAppNotes[appId] = ta.value;
   if(statusEl) statusEl.textContent = '— saving…';
-  trackApi('POST', 'setting', {key:'all_app_notes', value: JSON.stringify(_allAppNotes)})
+  // Notes now live on the application row itself; keep the legacy
+  // settings blob updated too so nothing is lost if the migration
+  // has not been applied yet.
+  _allAppNotes[appId] = ta.value;
+  trackApi('PATCH', 'applications', {admin_notes: ta.value}, appId)
+    .catch(function(){ return trackApi('POST', 'setting', {key:'all_app_notes', value: JSON.stringify(_allAppNotes)}); })
     .then(function(){
       if(statusEl){ statusEl.textContent = '— saved ✓'; setTimeout(function(){ statusEl.textContent=''; }, 2500); }
     })
     .catch(function(){
       if(statusEl){ statusEl.textContent = '— error saving'; }
     });
+}
+
+// ── Review workflow ──────────────────────────────────────
+var APP_STATUSES = [
+  {value:'submitted', label:'Submitted', bg:'#ddf4ff', fg:'#0969da'},
+  {value:'under_review', label:'Under review', bg:'#fff8c5', fg:'#9a6700'},
+  {value:'approved', label:'Approved', bg:'#dafbe1', fg:'#1a7f37'},
+  {value:'waitlisted', label:'Waitlisted', bg:'#eaeef2', fg:'#57606a'},
+  {value:'declined', label:'Declined', bg:'#ffebe9', fg:'#cf222e'}
+];
+var _appFilter = 'all';
+
+function appStatusOf(a){ return (a.status === 'new' || !a.status) ? 'submitted' : a.status; }
+
+function setAppStatus(appId, status){
+  var a = _appsCache[appId];
+  if(!a) return;
+  trackApi('PATCH', 'applications', {status: status}, appId)
+    .then(function(){
+      a.status = status;
+      renderApplicationsList();
+      showStatus('Status updated to "' + status.replace(/_/g,' ') + '".', 'ok');
+    })
+    .catch(function(){ showStatus('Could not update status (has the schema migration been applied?).', 'err'); });
+}
+
+function approveAndDeploy(appId){
+  var a = _appsCache[appId];
+  if(!a) return;
+  trackApi('PATCH', 'applications', {status: 'approved'}, appId)
+    .then(function(){
+      a.status = 'approved';
+      renderApplicationsList();
+      // Prefill a deployment record from the application and open the editor
+      document.querySelectorAll('.nav-item').forEach(function(i){ i.classList.toggle('active', i.dataset.tab === 'deployments'); });
+      document.querySelectorAll('.tab-view').forEach(function(t){ t.classList.toggle('active', t.id === 'tab-deployments'); });
+      loadDeployments();
+      clearDeployForm();
+      document.getElementById('deploy-form-title').textContent = 'New deployment — from application: ' + (a.name || '');
+      document.getElementById('deploy-app-id').value = appId;
+      document.getElementById('df-name').value = a.name || '';
+      document.getElementById('df-contact').value = [a.email, [a.phone_country_code, a.phone].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+      document.getElementById('df-country').value = a.country || '';
+      document.getElementById('df-region').value = a.region || '';
+      document.getElementById('deploy-form-panel').classList.add('open');
+      document.getElementById('deploy-form-panel').scrollIntoView({behavior:'smooth', block:'start'});
+      showStatus('Application approved — finish the deployment record.', 'ok');
+    })
+    .catch(function(){ showStatus('Could not approve (has the schema migration been applied?).', 'err'); });
 }
 
 function buildCampaignFromApp(appId){
@@ -2093,14 +2277,52 @@ function deleteApplication(appId){
     .catch(function(){ showStatus('Could not delete application.', 'err'); });
 }
 
+var KIT_TIER_NAMES = {1:'microSD card', 2:'Wi-Fi sharing hub', 3:'Raspberry Pi VillageServer', 4:'Projector & audio', 5:'Satellite receive-and-replay'};
+var AUDIENCE_NAMES = {individual:'Individual', small_group:'Small group (<20)', village_congregation:'Village / congregation', regional_network:'Regional network'};
+var FREQ_NAMES = {one_time:'One-time event', weekly:'Weekly gathering', daily:'Daily access'};
+var PLAN_NAMES = {cover_import_costs:'Will cover import costs', transport_partner:'Has transport partner', approved_retailer:'Has approved retailer', alternative_plan:'Alternative plan', need_help:'Needs logistics help'};
+
+function badge(text, bg, fg, title){
+  return '<span title="' + esc(title || '') + '" style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-weight:800;font-size:.75rem;background:' + bg + ';color:' + fg + ';white-space:nowrap">' + text + '</span>';
+}
+
+function triageBadges(a){
+  var out = [];
+  if(a.triage_confidence){
+    var colors = a.triage_confidence === 'High' ? ['#dafbe1','#1a7f37'] : a.triage_confidence === 'Medium' ? ['#fff8c5','#9a6700'] : ['#eaeef2','#57606a'];
+    out.push(badge(a.triage_confidence + ' confidence ' + (a.triage_score != null ? '· ' + a.triage_score + '/3' : ''), colors[0], colors[1], 'Verification score'));
+  }
+  if(a.fast_track) out.push(badge('⚡ Fast-track', '#ddf4ff', '#0969da', 'High confidence + low-cost tier'));
+  var flags = Array.isArray(a.triage_flags) ? a.triage_flags : [];
+  if(flags.indexOf('tier_audience_mismatch') !== -1) out.push(badge('⚠ Tier/audience mismatch', '#ffebe9', '#cf222e', 'Large-reach kit requested for a small audience — review manually'));
+  var st = APP_STATUSES.filter(function(s){ return s.value === appStatusOf(a); })[0] || APP_STATUSES[0];
+  out.push(badge(st.label, st.bg, st.fg, 'Review status'));
+  return out.join(' ');
+}
+
+function detailRow(label, value){
+  if(!value) return '';
+  return '<div style="margin-top:4px;font-size:.88rem"><strong>' + label + ':</strong> ' + esc(value) + '</div>';
+}
+
 function renderApplicationCard(a){
   var equip = Array.isArray(a.equipment_needed) ? a.equipment_needed.join(', ') : '';
-  var notes = _allAppNotes[a.id] || '';
+  var notes = (a.admin_notes != null && a.admin_notes !== '') ? a.admin_notes : (_allAppNotes[a.id] || '');
   var phone = [a.phone_country_code, a.phone].filter(Boolean).join(' ');
+  var kit = a.kit_tier ? ('Tier ' + a.kit_tier + ' — ' + (KIT_TIER_NAMES[a.kit_tier] || '')) : (equip || '—');
+  var statusOptions = APP_STATUSES.map(function(s){
+    return '<option value="' + s.value + '"' + (appStatusOf(a) === s.value ? ' selected' : '') + '>' + s.label + '</option>';
+  }).join('');
+  var verif = [];
+  if(a.email_domain_match != null) verif.push((a.email_domain_match ? '✓' : '✗') + ' email domain');
+  if(a.reference_provided != null) verif.push((a.reference_provided ? '✓' : '✗') + ' reference');
+  if(a.web_presence_found != null) verif.push((a.web_presence_found ? '✓' : '✗') + ' web presence');
+
   return '<div style="padding:16px 20px;border:1px solid #d0d7de;border-radius:12px;background:#fff;margin-bottom:12px">'
     + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">'
-    + '<div><strong style="font-size:1rem">' + esc(a.name) + '</strong>'
-    + (a.organization ? '<span style="margin-left:8px;font-size:.82rem;color:#57606a;font-weight:600">' + esc(a.organization) + '</span>' : '')
+    + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:1rem">' + esc(a.name) + '</strong>'
+    + (a.organization ? '<span style="font-size:.82rem;color:#57606a;font-weight:600">' + esc(a.organization) + '</span>' : '')
+    + triageBadges(a)
     + '</div><div style="display:flex;align-items:center;gap:8px"><span style="color:#57606a;font-size:.82rem;white-space:nowrap">' + fmtDate(a.created_at) + '</span>'
     + '<button class="btn-icon-del" type="button" title="Delete application" aria-label="Delete application" onclick="deleteApplication(\'' + a.id + '\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>'
     + '<div style="color:#57606a;font-size:.88rem;margin-top:4px">'
@@ -2108,19 +2330,118 @@ function renderApplicationCard(a){
     + (phone ? ' · ' + esc(phone) : '')
     + (a.country ? ' · ' + esc(a.country) : '') + (a.region ? ', ' + esc(a.region) : '')
     + (a.role ? ' · ' + esc(a.role) : '') + '</div>'
-    + (equip ? '<div style="margin-top:8px;font-size:.88rem"><strong>Equipment:</strong> ' + esc(equip) + '</div>' : '')
-    + (a.funding_needed ? '<div style="margin-top:4px;font-size:.88rem"><strong>Funding:</strong> ' + esc(a.funding_needed) + '</div>' : '')
-    + (a.timeframe ? '<div style="margin-top:4px;font-size:.88rem"><strong>Timeframe:</strong> ' + esc(a.timeframe) + '</div>' : '')
+    + (a.triage_note ? '<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:#f6f8fa;border:1px solid #eaeef2;font-size:.84rem;color:#24292f;white-space:pre-line"><strong>Why this tag:</strong>\n' + esc(a.triage_note) + '</div>' : '')
+    + '<div style="margin-top:8px">'
+    + detailRow('Kit requested', kit)
+    + detailRow('Audience', [AUDIENCE_NAMES[a.audience_type], FREQ_NAMES[a.frequency_of_use]].filter(Boolean).join(' · '))
+    + detailRow('Reach plan', a.reach_justification)
+    + detailRow('Gathering', a.has_gathering_infrastructure == null ? '' : (a.has_gathering_infrastructure ? ('Yes' + (a.gathering_infrastructure_desc ? ' — ' + a.gathering_infrastructure_desc : '')) : 'Not yet'))
+    + detailRow('Languages', a.languages)
+    + detailRow('Literacy', a.literacy_context)
+    + detailRow('Power/internet', a.power_internet_access)
+    + detailRow('Website', a.org_website)
+    + detailRow('Sending org', a.sending_org)
+    + detailRow('Reference', [a.reference_name, a.reference_contact].filter(Boolean).join(' — '))
+    + detailRow('Heard via', a.referral_source ? a.referral_source.replace(/_/g,' ') : '')
+    + detailRow('Years in field', a.years_in_field)
+    + detailRow('Current reach', a.current_reach)
+    + detailRow('Receiving plan', PLAN_NAMES[a.receiving_plan] ? (PLAN_NAMES[a.receiving_plan] + (a.receiving_plan_details ? ' — ' + a.receiving_plan_details : '')) : '')
+    + detailRow('Funding', a.funding_needed)
+    + detailRow('Timeframe', a.timeframe)
+    + detailRow('Contact via', [a.preferred_contact_method, a.contact_timezone].filter(Boolean).join(' · '))
+    + (verif.length ? detailRow('Verification', verif.join(' · ')) : '')
     + (a.mission_context ? '<div style="margin-top:8px;font-size:.9rem;color:#24292f"><strong>Context:</strong> ' + esc(a.mission_context) + '</div>' : '')
     + (a.message ? '<div style="margin-top:6px;font-size:.9rem;color:#24292f"><strong>Message:</strong> ' + esc(a.message) + '</div>' : '')
+    + (a.supporting_document ? '<div style="margin-top:6px;font-size:.88rem"><a href="' + a.supporting_document + '" download="' + esc(a.supporting_document_name || 'document') + '" style="color:#0969da;font-weight:700">⬇ Supporting document (' + esc(a.supporting_document_name || 'file') + ')</a></div>' : '')
+    + '</div>'
     + '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eaeef2">'
     + '<label style="font-size:.82rem;font-weight:800;color:#57606a;display:block;margin-bottom:5px">'
     + 'Admin Notes <span id="app-notes-st-' + a.id + '" style="font-weight:400;color:#1a7f37;font-style:italic"></span></label>'
     + '<textarea id="app-notes-ta-' + a.id + '" rows="2" style="width:100%;padding:8px 10px;border:1.5px solid #d0d7de;border-radius:8px;font-size:.88rem;font-family:inherit;resize:vertical" placeholder="Internal notes — follow-up status, outreach date, decisions…">' + esc(notes) + '</textarea>'
-    + '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">'
+    + '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">'
+    + '<select onchange="setAppStatus(\'' + a.id + '\', this.value)" style="padding:7px 10px;border:1.5px solid #d0d7de;border-radius:7px;font-size:.82rem;font-weight:700;background:#fff;cursor:pointer">' + statusOptions + '</select>'
     + '<button onclick="saveAppNotes(\'' + a.id + '\')" style="padding:7px 16px;background:#0969da;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Save Notes</button>'
+    + '<button onclick="approveAndDeploy(\'' + a.id + '\')" style="padding:7px 16px;background:#8250df;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Approve → Deployment</button>'
     + '<button onclick="buildCampaignFromApp(\'' + a.id + '\')" style="padding:7px 16px;background:#1a7f37;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Build Campaign →</button>'
     + '</div></div></div>';
+}
+
+function renderAppFilterChips(){
+  var el = document.getElementById('app-filter-chips');
+  if(!el) return;
+  var rows = Object.keys(_appsCache).map(function(k){ return _appsCache[k]; });
+  var chips = [{value:'all', label:'All (' + rows.length + ')'}];
+  APP_STATUSES.forEach(function(s){
+    var n = rows.filter(function(a){ return appStatusOf(a) === s.value; }).length;
+    if(n) chips.push({value:s.value, label:s.label + ' (' + n + ')'});
+  });
+  var flagged = rows.filter(function(a){ return Array.isArray(a.triage_flags) && a.triage_flags.length; }).length;
+  if(flagged) chips.push({value:'flagged', label:'⚠ Flagged (' + flagged + ')'});
+  var fast = rows.filter(function(a){ return a.fast_track; }).length;
+  if(fast) chips.push({value:'fast_track', label:'⚡ Fast-track (' + fast + ')'});
+  el.innerHTML = chips.map(function(c){
+    var on = _appFilter === c.value;
+    return '<button type="button" onclick="setAppFilter(\'' + c.value + '\')" style="padding:6px 13px;border-radius:999px;border:1px solid ' + (on ? '#0969da' : '#d0d7de') + ';background:' + (on ? '#ddf4ff' : '#fff') + ';color:' + (on ? '#0969da' : '#57606a') + ';font-weight:800;font-size:.78rem;cursor:pointer">' + c.label + '</button>';
+  }).join('');
+}
+
+function setAppFilter(f){
+  _appFilter = f;
+  renderApplicationsList();
+}
+
+function renderApplicationsList(){
+  var list = document.getElementById('applications-list');
+  var rows = Object.keys(_appsCache).map(function(k){ return _appsCache[k]; })
+    .sort(function(x, y){ return new Date(y.created_at) - new Date(x.created_at); });
+  renderAppFilterChips();
+  var filtered = rows.filter(function(a){
+    if(_appFilter === 'all') return true;
+    if(_appFilter === 'flagged') return Array.isArray(a.triage_flags) && a.triage_flags.length;
+    if(_appFilter === 'fast_track') return !!a.fast_track;
+    return appStatusOf(a) === _appFilter;
+  });
+  if(!filtered.length){
+    list.innerHTML = '<div class="empty-state" style="padding:20px"><div>' + (rows.length ? 'Nothing matches this filter.' : 'No applications submitted yet.') + '</div></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(function(a){ return renderApplicationCard(a); }).join('');
+}
+
+// CSV helpers (shared by applications + deployments exports)
+function csvCell(v){
+  var s = String(v == null ? '' : v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function downloadCsv(filename, header, rows){
+  var lines = [header.map(csvCell).join(',')].concat(rows.map(function(r){ return r.map(csvCell).join(','); }));
+  var blob = new Blob(['﻿' + lines.join('\r\n')], {type: 'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+function exportApplicationsCsv(){
+  var rows = Object.keys(_appsCache).map(function(k){ return _appsCache[k]; })
+    .sort(function(x, y){ return new Date(y.created_at) - new Date(x.created_at); });
+  var header = ['Submitted', 'Status', 'Name', 'Organization', 'Email', 'Phone', 'Country', 'Region', 'Kit tier', 'Kit', 'Audience', 'Frequency', 'Reach plan', 'Gathering', 'Languages', 'Literacy', 'Power/internet', 'Website', 'Sending org', 'Reference', 'Referral source', 'Years in field', 'Current reach', 'Receiving plan', 'Receiving details', 'Funding requested', 'Timeframe', 'Preferred contact', 'Time zone', 'Confidence', 'Score', 'Fast-track', 'Flags', 'Triage note', 'Mission context', 'Message', 'Admin notes'];
+  var data = rows.map(function(a){
+    return [a.created_at, appStatusOf(a), a.name, a.organization, a.email,
+      [a.phone_country_code, a.phone].filter(Boolean).join(' '), a.country, a.region,
+      a.kit_tier, a.kit_tier ? KIT_TIER_NAMES[a.kit_tier] : (Array.isArray(a.equipment_needed) ? a.equipment_needed.join('; ') : ''),
+      AUDIENCE_NAMES[a.audience_type] || a.audience_type, FREQ_NAMES[a.frequency_of_use] || a.frequency_of_use,
+      a.reach_justification, a.has_gathering_infrastructure == null ? '' : (a.has_gathering_infrastructure ? 'Yes' : 'No'),
+      a.languages, a.literacy_context, a.power_internet_access, a.org_website, a.sending_org,
+      [a.reference_name, a.reference_contact].filter(Boolean).join(' — '), a.referral_source,
+      a.years_in_field, a.current_reach, PLAN_NAMES[a.receiving_plan] || a.receiving_plan, a.receiving_plan_details,
+      a.funding_needed, a.timeframe, a.preferred_contact_method, a.contact_timezone,
+      a.triage_confidence, a.triage_score, a.fast_track ? 'Yes' : '', (Array.isArray(a.triage_flags) ? a.triage_flags.join('; ') : ''),
+      a.triage_note, a.mission_context, a.message, a.admin_notes || _allAppNotes[a.id] || ''];
+  });
+  downloadCsv('villageserver-applications-' + new Date().toISOString().slice(0, 10) + '.csv', header, data);
 }
 
 function loadApplications(){
@@ -2165,6 +2486,13 @@ function loadApplications(){
     });
   }
 
+  // Bind the CSV export once
+  var exportBtn = document.getElementById('apps-export-btn');
+  if(exportBtn && !exportBtn.dataset.bound){
+    exportBtn.dataset.bound = '1';
+    exportBtn.addEventListener('click', exportApplicationsCsv);
+  }
+
   // Load notes first, then render applications
   var list = document.getElementById('applications-list');
   loadAllAppNotes(function(){
@@ -2172,10 +2500,11 @@ function loadApplications(){
       _appsCache = {};
       if(!Array.isArray(rows) || !rows.length){
         list.innerHTML = '<div class="empty-state" style="padding:20px"><div>No applications submitted yet.</div></div>';
+        renderAppFilterChips();
         return;
       }
       rows.forEach(function(a){ _appsCache[a.id] = a; });
-      list.innerHTML = rows.map(function(a){ return renderApplicationCard(a); }).join('');
+      renderApplicationsList();
     }).catch(function(){
       list.innerHTML = '<div class="empty-state" style="padding:20px"><div>Could not load applications.</div></div>';
     });
@@ -2183,6 +2512,231 @@ function loadApplications(){
 
   // Also load campaigns
   loadCampaigns();
+}
+
+// ════════════════════════════════════════════════════════
+// DEPLOYMENTS — mirrors Eric's Excel deployment log
+// ════════════════════════════════════════════════════════
+var _deploysCache = {};
+
+// Column order matches the original spreadsheet exactly.
+var DEPLOY_CSV_COLUMNS = [
+  ['Name/ Group/ Missionary Team', 'name'],
+  ['Date', 'date'],
+  ['Contact Information', 'contact_information'],
+  ['Country', 'country'],
+  ['Region/Village', 'region_village'],
+  ['Raspberry Pi 5', 'raspberry_pi_5'],
+  ['Power Supply (ie Solar Suitcase)', 'power_supply'],
+  ['Satellite Dish', 'satellite_dish'],
+  ['LNB', 'lnb'],
+  ['Receiver', 'receiver'],
+  ['Satellite Finder', 'satellite_finder'],
+  ['Coax Cable', 'coax_cable'],
+  ['USB A to C', 'usb_a_to_c'],
+  ['USB A to micro B', 'usb_a_to_micro_b'],
+  ['Projector', 'projector'],
+  ['Speakers', 'speakers'],
+  ['Language Card', 'language_card'],
+  ['USB Adapter', 'usb_adapter'],
+  ['NewQ Device', 'newq_device'],
+  ['100W 20 Port Charger', 'charger_100w_20_port'],
+  ['Bibles', 'bibles'],
+  ['Monetary', 'monetary_support'],
+  ['Online Support', 'online_support'],
+  ['In-Person Support', 'in_person_support'],
+  ['Power Charger for Raspberry', 'power_charger_for_raspberry'],
+  ['Highlights', 'highlights'],
+  ['Follow-Up Needed', 'follow_up_needed'],
+  ['Additional Notes', 'additional_notes']
+];
+
+function fmtWorkshops(list){
+  if(!Array.isArray(list) || !list.length) return '';
+  return list.map(function(w){
+    var d = w.date ? new Date(w.date + 'T00:00:00') : null;
+    var ds = d && !isNaN(d) ? (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear() : '';
+    return (w.label || 'Workshop') + (ds ? ' (' + ds + ')' : '');
+  }).join('; ');
+}
+
+function exportDeploymentsCsv(){
+  var rows = Object.keys(_deploysCache).map(function(k){ return _deploysCache[k]; });
+  var data = rows.map(function(d){
+    return DEPLOY_CSV_COLUMNS.map(function(col){
+      if(col[1] === 'in_person_support') return fmtWorkshops(d.in_person_support);
+      return d[col[1]];
+    });
+  });
+  downloadCsv('villageserver-deployment-log-' + new Date().toISOString().slice(0, 10) + '.csv',
+    DEPLOY_CSV_COLUMNS.map(function(c){ return c[0]; }), data);
+}
+
+var DF_FIELDS = {
+  'df-name':'name', 'df-date':'date', 'df-contact':'contact_information', 'df-country':'country',
+  'df-region':'region_village', 'df-pi':'raspberry_pi_5', 'df-power':'power_supply',
+  'df-dish':'satellite_dish', 'df-lnb':'lnb', 'df-receiver':'receiver', 'df-finder':'satellite_finder',
+  'df-coax':'coax_cable', 'df-usbc':'usb_a_to_c', 'df-usbb':'usb_a_to_micro_b',
+  'df-projector':'projector', 'df-speakers':'speakers', 'df-langcard':'language_card',
+  'df-usbadapter':'usb_adapter', 'df-newq':'newq_device', 'df-charger':'charger_100w_20_port',
+  'df-bibles':'bibles', 'df-monetary':'monetary_support', 'df-online':'online_support',
+  'df-picharger':'power_charger_for_raspberry', 'df-highlights':'highlights',
+  'df-followup':'follow_up_needed', 'df-notes':'additional_notes'
+};
+
+function clearDeployForm(){
+  document.getElementById('deploy-id').value = '';
+  document.getElementById('deploy-app-id').value = '';
+  Object.keys(DF_FIELDS).forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('df-workshops').innerHTML = '';
+  document.getElementById('deploy-msg').style.display = 'none';
+  document.getElementById('deploy-form-title').textContent = 'New deployment';
+}
+
+function addWorkshopRow(w){
+  var wrap = document.getElementById('df-workshops');
+  var row = document.createElement('div');
+  row.className = 'df-workshop-row';
+  row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap';
+  row.innerHTML = '<input type="text" placeholder="e.g. 1st Workshop" value="' + esc((w && w.label) || '') + '" style="flex:1;min-width:180px;padding:9px 12px;border:1px solid #d0d7de;border-radius:8px;font-size:.9rem" data-w="label">'
+    + '<input type="date" value="' + esc((w && w.date) || '') + '" style="padding:9px 12px;border:1px solid #d0d7de;border-radius:8px;font-size:.9rem" data-w="date">'
+    + '<button type="button" title="Remove workshop" style="border:0;background:#ffebe9;color:#cf222e;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer">✕</button>';
+  row.querySelector('button').addEventListener('click', function(){ row.remove(); });
+  wrap.appendChild(row);
+}
+
+function readWorkshops(){
+  return Array.prototype.slice.call(document.querySelectorAll('#df-workshops .df-workshop-row')).map(function(row){
+    return {
+      label: row.querySelector('[data-w="label"]').value.trim(),
+      date: row.querySelector('[data-w="date"]').value || null
+    };
+  }).filter(function(w){ return w.label || w.date; });
+}
+
+function fillDeployForm(d){
+  clearDeployForm();
+  document.getElementById('deploy-id').value = d.id || '';
+  document.getElementById('deploy-app-id').value = d.application_id || '';
+  Object.keys(DF_FIELDS).forEach(function(id){
+    var v = d[DF_FIELDS[id]];
+    document.getElementById(id).value = v == null ? '' : v;
+  });
+  (Array.isArray(d.in_person_support) ? d.in_person_support : []).forEach(addWorkshopRow);
+  document.getElementById('deploy-form-title').textContent = 'Edit deployment — ' + (d.name || '');
+}
+
+function editDeployment(id){
+  var d = _deploysCache[id];
+  if(!d) return;
+  fillDeployForm(d);
+  document.getElementById('deploy-form-panel').classList.add('open');
+  document.getElementById('deploy-form-panel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function deleteDeployment(id){
+  var d = _deploysCache[id];
+  if(!d) return;
+  if(!confirm('Delete the deployment record for ' + (d.name || 'this team') + '? This cannot be undone.')) return;
+  trackApi('DELETE', 'deployments', null, id)
+    .then(function(){ delete _deploysCache[id]; renderDeploymentsList(); showStatus('Deployment deleted.', 'ok'); })
+    .catch(function(){ showStatus('Could not delete deployment.', 'err'); });
+}
+
+function renderDeploymentsList(){
+  var list = document.getElementById('deployments-list');
+  var rows = Object.keys(_deploysCache).map(function(k){ return _deploysCache[k]; })
+    .sort(function(x, y){
+      var dx = x.date || '', dy = y.date || '';
+      if(dx !== dy) return dy < dx ? -1 : 1;
+      return new Date(y.created_at) - new Date(x.created_at);
+    });
+  if(!rows.length){
+    list.innerHTML = '<div class="empty-state" style="padding:20px"><div>No deployments logged yet. Approve an application or click "New deployment".</div></div>';
+    return;
+  }
+  list.innerHTML = rows.map(function(d){
+    var resources = DEPLOY_CSV_COLUMNS.slice(5).filter(function(col){
+      if(col[1] === 'in_person_support') return Array.isArray(d.in_person_support) && d.in_person_support.length;
+      if(col[1] === 'highlights' || col[1] === 'follow_up_needed' || col[1] === 'additional_notes') return false;
+      return d[col[1]];
+    }).map(function(col){
+      var v = col[1] === 'in_person_support' ? fmtWorkshops(d.in_person_support) : d[col[1]];
+      return '<div style="font-size:.85rem;padding:3px 0;border-bottom:1px dashed #eaeef2"><span style="color:#57606a">' + esc(col[0]) + ':</span> <strong>' + esc(v) + '</strong></div>';
+    }).join('');
+    return '<div style="padding:16px 20px;border:1px solid #d0d7de;border-radius:12px;background:#fff;margin-bottom:12px">'
+      + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">'
+      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><strong style="font-size:1rem">' + esc(d.name) + '</strong>'
+      + (d.country ? '<span style="font-size:.84rem;color:#57606a;font-weight:700">' + esc(d.country) + (d.region_village ? ' · ' + esc(d.region_village) : '') + '</span>' : '')
+      + (d.application_id ? '<span style="font-size:.75rem;font-weight:800;color:#8250df;background:#fbefff;border-radius:999px;padding:3px 10px">from application</span>' : '')
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:8px">'
+      + '<span style="color:#57606a;font-size:.82rem">' + (d.date ? fmtDate(d.date) : '—') + '</span>'
+      + '<button onclick="editDeployment(\'' + d.id + '\')" style="padding:6px 14px;background:#0969da;border:0;border-radius:7px;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer">Edit</button>'
+      + '<button class="btn-icon-del" type="button" title="Delete deployment" onclick="deleteDeployment(\'' + d.id + '\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>'
+      + '</div></div>'
+      + (d.contact_information ? '<div style="color:#57606a;font-size:.86rem;margin-top:4px">' + esc(d.contact_information) + '</div>' : '')
+      + (resources ? '<div style="margin-top:10px;columns:2 260px;column-gap:26px">' + resources + '</div>' : '')
+      + (d.highlights ? '<div style="margin-top:8px;font-size:.88rem"><strong>Highlights:</strong> ' + esc(d.highlights) + '</div>' : '')
+      + (d.follow_up_needed ? '<div style="margin-top:4px;font-size:.88rem;color:#9a6700"><strong>Follow-up:</strong> ' + esc(d.follow_up_needed) + '</div>' : '')
+      + (d.additional_notes ? '<div style="margin-top:4px;font-size:.88rem"><strong>Notes:</strong> ' + esc(d.additional_notes) + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function loadDeployments(){
+  var list = document.getElementById('deployments-list');
+  // One-time bindings
+  var newBtn = document.getElementById('new-deploy-btn');
+  if(newBtn && !newBtn.dataset.bound){
+    newBtn.dataset.bound = '1';
+    newBtn.addEventListener('click', function(){
+      clearDeployForm();
+      document.getElementById('deploy-form-panel').classList.add('open');
+    });
+    document.getElementById('cancel-deploy-btn').addEventListener('click', function(){
+      document.getElementById('deploy-form-panel').classList.remove('open');
+    });
+    document.getElementById('df-add-workshop').addEventListener('click', function(){ addWorkshopRow(); });
+    document.getElementById('deploys-export-btn').addEventListener('click', exportDeploymentsCsv);
+    document.getElementById('save-deploy-btn').addEventListener('click', saveDeployment);
+  }
+  trackApi('GET', 'deployments').then(function(rows){
+    _deploysCache = {};
+    (Array.isArray(rows) ? rows : []).forEach(function(d){ _deploysCache[d.id] = d; });
+    renderDeploymentsList();
+  }).catch(function(){
+    list.innerHTML = '<div class="empty-state" style="padding:20px"><div>Could not load deployments — has the schema migration been applied in Supabase?</div></div>';
+  });
+}
+
+function saveDeployment(){
+  var msg = document.getElementById('deploy-msg');
+  var body = {};
+  Object.keys(DF_FIELDS).forEach(function(id){
+    body[DF_FIELDS[id]] = document.getElementById(id).value.trim() || null;
+  });
+  body.in_person_support = readWorkshops();
+  var appId = document.getElementById('deploy-app-id').value;
+  if(appId) body.application_id = appId;
+  if(!body.name){
+    msg.textContent = 'Name / Group / Missionary Team is required.';
+    msg.style.color = '#cf222e'; msg.style.display = 'block';
+    return;
+  }
+  var id = document.getElementById('deploy-id').value;
+  var req = id ? trackApi('PATCH', 'deployments', body, id) : trackApi('POST', 'deployments', body);
+  req.then(function(saved){
+    var row = Array.isArray(saved) ? saved[0] : saved;
+    if(!row || !row.id) throw new Error('save failed');
+    _deploysCache[row.id] = row;
+    document.getElementById('deploy-form-panel').classList.remove('open');
+    renderDeploymentsList();
+    showStatus('Deployment saved.', 'ok');
+  }).catch(function(){
+    msg.textContent = 'Could not save. Has the schema migration been applied in Supabase?';
+    msg.style.color = '#cf222e'; msg.style.display = 'block';
+  });
 }
 
 // ════════════════════════════════════════════════════════
