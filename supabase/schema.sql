@@ -395,7 +395,6 @@ create index if not exists equipment_applications_triage_idx on public.equipment
 -- as [{"label": "1st Workshop", "date": "2026-06-25"}].
 create table if not exists public.deployments (
   id uuid primary key default gen_random_uuid(),
-  application_id uuid references public.equipment_applications(id) on delete set null,
   name text not null,                      -- Name / Group / Missionary Team
   date date,
   contact_information text,
@@ -427,6 +426,31 @@ create table if not exists public.deployments (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Link deployments to applications. Older production databases use a
+-- bigint id on equipment_applications while fresh installs use uuid, so
+-- create application_id with whatever type the live table actually has.
+do $$
+declare
+  app_id_type text;
+begin
+  select data_type into app_id_type
+  from information_schema.columns
+  where table_schema = 'public'
+    and table_name = 'equipment_applications'
+    and column_name = 'id';
+  if app_id_type is not null and not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'deployments'
+      and column_name = 'application_id'
+  ) then
+    execute format(
+      'alter table public.deployments add column application_id %s references public.equipment_applications(id) on delete set null',
+      app_id_type
+    );
+  end if;
+end $$;
 
 create index if not exists deployments_date_idx on public.deployments (date desc);
 create index if not exists deployments_application_idx on public.deployments (application_id);
