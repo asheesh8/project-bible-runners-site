@@ -302,10 +302,27 @@ create table if not exists public.site_settings (
   updated_at timestamptz not null default now()
 );
 
-create index if not exists equipment_applications_created_idx on public.equipment_applications (created_at desc);
-create index if not exists equipment_applications_status_idx on public.equipment_applications (status);
+-- Older databases created equipment_applications before some of these
+-- columns existed — add them all before any index references them.
+alter table public.equipment_applications add column if not exists visitor_id text;
+alter table public.equipment_applications add column if not exists site_host text;
 alter table public.equipment_applications add column if not exists phone_country_code text;
 alter table public.equipment_applications add column if not exists phone text;
+alter table public.equipment_applications add column if not exists organization text;
+alter table public.equipment_applications add column if not exists role text;
+alter table public.equipment_applications add column if not exists region text;
+alter table public.equipment_applications add column if not exists mission_context text;
+alter table public.equipment_applications add column if not exists equipment_needed jsonb not null default '[]'::jsonb;
+alter table public.equipment_applications add column if not exists funding_needed text;
+alter table public.equipment_applications add column if not exists timeframe text;
+alter table public.equipment_applications add column if not exists message text;
+alter table public.equipment_applications add column if not exists status text not null default 'new';
+alter table public.equipment_applications add column if not exists utm_source text;
+alter table public.equipment_applications add column if not exists utm_medium text;
+alter table public.equipment_applications add column if not exists utm_campaign text;
+
+create index if not exists equipment_applications_created_idx on public.equipment_applications (created_at desc);
+create index if not exists equipment_applications_status_idx on public.equipment_applications (status);
 
 drop trigger if exists site_settings_set_updated_at on public.site_settings;
 create trigger site_settings_set_updated_at before update on public.site_settings
