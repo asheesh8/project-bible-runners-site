@@ -26,32 +26,65 @@
   <link rel="stylesheet" href="./css/board.css?v=13">
   <style>
     /* Scoped styles for the application form — reuses board.css tokens */
-    .apply-wrap{max-width:820px;margin-inline:auto}
+    .apply-wrap [hidden],.apply-actions [hidden]{display:none !important}
+    .apply-wrap{max-width:860px;margin-inline:auto}
     .apply-card{padding:clamp(24px,4vw,40px);border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:var(--shadow)}
     .apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .apply-field{display:flex;flex-direction:column;gap:6px}
     .apply-field-full{grid-column:1/-1}
-    .apply-field label{font-weight:800;font-size:.92rem;color:var(--ink)}
+    .apply-field label,.apply-legend{font-weight:800;font-size:.92rem;color:var(--ink)}
     .apply-field input,.apply-field textarea,.apply-field select{font:inherit;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);resize:vertical}
     .apply-field input:focus,.apply-field textarea:focus,.apply-field select:focus{outline:0;border-color:var(--blue);background:#fff}
     .apply-req{color:var(--gold)}
-    .equip-legend{font-weight:800;font-size:.92rem;color:var(--ink);margin:0 0 4px}
-    .equip-chips{display:flex;flex-wrap:wrap;gap:10px}
-    .equip-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid var(--line);border-radius:999px;background:var(--paper);cursor:pointer;font-weight:700;font-size:.94rem;color:var(--ink);transition:border-color .15s,background .15s}
-    .equip-chip:hover{border-color:var(--blue)}
-    .equip-chip input{accent-color:var(--blue);width:16px;height:16px}
-    .equip-chip:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
-    .apply-actions{grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px}
+    .apply-hint{font-size:.82rem;color:var(--muted);margin:0}
+    .apply-actions{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:8px}
     .apply-actions .pdf-button{margin-top:0;border:0;cursor:pointer;font:inherit;flex:0 0 auto}
     .apply-actions .pdf-button:disabled{opacity:.7;cursor:default}
-    .apply-status{margin:0;font-weight:800;font-size:.94rem}
+    .apply-back{background:none;border:1.5px solid var(--line);border-radius:999px;padding:12px 22px;font:inherit;font-weight:800;color:var(--ink);cursor:pointer}
+    .apply-back:hover{border-color:var(--blue)}
+    .apply-status{margin:0;font-weight:800;font-size:.94rem;flex-basis:100%}
     .apply-status.is-success{color:#1d7a4c}
     .apply-status.is-error{color:#b3271d}
-    .apply-closed{padding:clamp(26px,4vw,42px);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:24px;background:#fff;box-shadow:var(--shadow);text-align:center}
-    .apply-closed h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.7rem,3vw,2.4rem);margin:0 0 10px;color:var(--ink)}
-    .apply-closed p{color:var(--muted);font-size:1.06rem;margin:0 auto;max-width:560px;line-height:1.5}
+    .apply-closed,.apply-done{padding:clamp(26px,4vw,42px);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:24px;background:#fff;box-shadow:var(--shadow);text-align:center}
+    .apply-closed h2,.apply-done h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.7rem,3vw,2.4rem);margin:0 0 10px;color:var(--ink)}
+    .apply-closed p,.apply-done p{color:var(--muted);font-size:1.06rem;margin:0 auto;max-width:560px;line-height:1.5}
+    .apply-done{border-left-color:#1d7a4c}
     .apply-loading{padding:40px;text-align:center;color:var(--muted);font-weight:700}
+    /* Progress */
+    .apply-progress{display:flex;align-items:center;gap:14px;margin:0 0 22px}
+    .apply-progress-label{font-weight:900;font-size:.88rem;color:var(--muted);white-space:nowrap}
+    .apply-progress-bar{flex:1;height:8px;border-radius:99px;background:var(--paper);border:1px solid var(--line);overflow:hidden}
+    .apply-progress-fill{height:100%;width:20%;background:var(--blue);border-radius:99px;transition:width .25s}
+    /* Steps */
+    .apply-step{display:none}
+    .apply-step.is-active{display:block}
+    .apply-step-title{font-family:"Newsreader",Georgia,serif;font-size:clamp(1.3rem,2.4vw,1.7rem);margin:0 0 4px;color:var(--ink)}
+    .apply-step-sub{color:var(--muted);font-size:.96rem;margin:0 0 18px;line-height:1.5}
+    /* Kit tier cards */
+    .tier-grid{display:grid;grid-template-columns:1fr;gap:12px}
+    .tier-card{position:relative;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;padding:16px 18px;border:1.5px solid var(--line);border-radius:18px;background:var(--paper);cursor:pointer;transition:border-color .15s,background .15s}
+    .tier-card:hover{border-color:var(--blue)}
+    .tier-card input{position:absolute;opacity:0;pointer-events:none}
+    .tier-card:has(input:checked){border-color:var(--blue);background:var(--blue-soft);box-shadow:0 0 0 1.5px var(--blue) inset}
+    .tier-rank{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#143a6b;color:#fff;font-weight:900;font-size:1.05rem}
+    .tier-body h3{margin:0;font-size:1.02rem;color:var(--ink)}
+    .tier-reach{margin:1px 0 6px;font-weight:800;font-size:.85rem;color:var(--blue)}
+    .tier-includes{margin:0;font-size:.86rem;color:var(--muted);line-height:1.45}
+    .tier-note{margin:7px 0 0;display:inline-block;font-size:.8rem;font-weight:800;color:#8a6100;background:#fff7e0;border:1px solid #f0dfa8;border-radius:8px;padding:3px 9px}
+    /* Radio option rows (receiving plan, yes/no) */
+    .opt-list{display:flex;flex-direction:column;gap:10px}
+    .opt-row{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--paper);cursor:pointer;font-size:.95rem;color:var(--ink);font-weight:600;line-height:1.4}
+    .opt-row:hover{border-color:var(--blue)}
+    .opt-row input{accent-color:var(--blue);width:17px;height:17px;margin-top:2px;flex:0 0 auto}
+    .opt-row:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
+    .opt-inline{display:flex;gap:10px;flex-wrap:wrap}
+    .opt-inline .opt-row{flex:1 1 140px}
+    /* Honeypot — hidden from humans, present for bots */
+    .apply-website-field{position:absolute !important;left:-9999px !important;width:1px;height:1px;overflow:hidden}
+    .apply-file-note{font-size:.82rem;color:var(--muted)}
+    .apply-err{color:#b3271d;font-weight:800;font-size:.88rem;margin:10px 0 0;display:none}
     @media (max-width:620px){.apply-grid{grid-template-columns:1fr}}
+    @media (min-width:720px){.tier-grid{grid-template-columns:1fr 1fr}.tier-card.tier-card-wide{grid-column:1/-1}}
   </style>
 </head>
 <body>
@@ -67,7 +100,7 @@
       <div class="wrap">
         <p class="meta">Equipment &amp; Funding Application</p>
         <h1>Apply to equip your mission</h1>
-        <p class="summary">Missionaries and field partners can apply to receive VillageServer equipment and funding — offline Bible libraries, phones, Raspberry Pi kits, projectors, satellite receive-and-replay, and solar power — to carry God's Word into the villages you serve.</p>
+        <p class="summary">Missionaries and field partners can apply to receive VillageServer equipment and funding — offline Bible libraries, phones, Raspberry Pi kits, projectors, satellite receive-and-replay, and solar power — to carry God's Word into the villages you serve. The application takes about 10 minutes.</p>
       </div>
     </section>
 
@@ -83,75 +116,287 @@
           <p>We are finishing our nonprofit setup before opening equipment and funding applications. Please check back soon — or use the <a href="./index.html#contact">contact form</a> to reach the team and we will follow up when applications open.</p>
         </div>
 
+        <!-- Shown after a successful submission -->
+        <div class="apply-done" id="apply-done" hidden>
+          <h2>Application received</h2>
+          <p>Thank you — our team reviews every application personally and will reply by email. A confirmation is on its way to your inbox. If you need to add anything, reply to that email or write to villageserverinitiative@gmail.com.</p>
+        </div>
+
         <!-- The application form (shown only when applications are open) -->
         <div class="apply-card" id="apply-card" hidden>
-          <form class="apply-grid" id="apply-form" novalidate>
-            <div class="apply-field">
-              <label for="apply-name">Full name <span class="apply-req" aria-hidden="true">*</span></label>
-              <input type="text" id="apply-name" name="name" autocomplete="name" maxlength="160" required>
-            </div>
-            <div class="apply-field">
-              <label for="apply-email">Email <span class="apply-req" aria-hidden="true">*</span></label>
-              <input type="email" id="apply-email" name="email" autocomplete="email" maxlength="255" required>
-            </div>
-            <div class="apply-field">
-              <label for="apply-phone-code">Phone country code</label>
-              <input type="tel" id="apply-phone-code" name="phone_country_code" autocomplete="tel-country-code" maxlength="12" placeholder="+1">
-            </div>
-            <div class="apply-field">
-              <label for="apply-phone">Phone number</label>
-              <input type="tel" id="apply-phone" name="phone" autocomplete="tel-national" maxlength="60" placeholder="Optional">
-            </div>
-            <div class="apply-field">
-              <label for="apply-org">Organization / ministry</label>
-              <input type="text" id="apply-org" name="organization" maxlength="200">
-            </div>
-            <div class="apply-field">
-              <label for="apply-role">Your role</label>
-              <input type="text" id="apply-role" name="role" maxlength="120" placeholder="Missionary, pastor, field partner…">
-            </div>
-            <div class="apply-field">
-              <label for="apply-country">Country of mission <span class="apply-req" aria-hidden="true">*</span></label>
-              <input type="text" id="apply-country" name="country" maxlength="120" required>
-            </div>
-            <div class="apply-field">
-              <label for="apply-region">Region / city</label>
-              <input type="text" id="apply-region" name="region" maxlength="160">
-            </div>
-            <div class="apply-field apply-field-full">
-              <label for="apply-context">Mission context</label>
-              <textarea id="apply-context" name="mission_context" rows="4" maxlength="2000" placeholder="Who do you serve, where, and how far does your outreach currently reach?"></textarea>
+          <div class="apply-progress" aria-hidden="false">
+            <span class="apply-progress-label" id="apply-progress-label">Step 1 of 5</span>
+            <div class="apply-progress-bar"><div class="apply-progress-fill" id="apply-progress-fill"></div></div>
+          </div>
+
+          <form id="apply-form" novalidate>
+
+            <!-- Honeypot: real applicants never see or fill this -->
+            <div class="apply-website-field" aria-hidden="true">
+              <label for="apply-website">Website</label>
+              <input type="text" id="apply-website" name="website" tabindex="-1" autocomplete="off">
             </div>
 
-            <fieldset class="apply-field apply-field-full" style="border:0;margin:0;padding:0">
-              <legend class="equip-legend">Equipment needed</legend>
-              <div class="equip-chips" id="equip-chips">
-                <label class="equip-chip"><input type="checkbox" name="equipment" value="microSD library"> microSD library</label>
-                <label class="equip-chip"><input type="checkbox" name="equipment" value="Phones"> Phones</label>
-                <label class="equip-chip"><input type="checkbox" name="equipment" value="Wi-Fi sharing hub"> Wi-Fi sharing hub</label>
-                <label class="equip-chip"><input type="checkbox" name="equipment" value="Raspberry Pi VillageServer"> Raspberry Pi VillageServer</label>
-                <label class="equip-chip"><input type="checkbox" name="equipment" value="Projector &amp; audio"> Projector &amp; audio</label>
-                <label class="equip-chip"><input type="checkbox" name="equipment" value="Satellite system"> Satellite system</label>
-                <label class="equip-chip"><input type="checkbox" name="equipment" value="Solar / power"> Solar / power</label>
-                <label class="equip-chip"><input type="checkbox" name="equipment" value="Printed materials"> Printed materials</label>
+            <!-- ── STEP 1: Kit selector ─────────────────── -->
+            <div class="apply-step is-active" data-step="1">
+              <h2 class="apply-step-title">Which kit fits your mission?</h2>
+              <p class="apply-step-sub">One library, five ways to reach further. Choose the single configuration that matches the people you actually gather today — smaller tiers ship faster, and you can always apply again as your reach grows.</p>
+              <div class="tier-grid" role="radiogroup" aria-label="Kit tier">
+                <label class="tier-card">
+                  <input type="radio" name="kit_tier" value="1">
+                  <span class="tier-rank">1</span>
+                  <span class="tier-body">
+                    <h3>microSD card</h3>
+                    <p class="tier-reach">Reaches 1 person</p>
+                    <p class="tier-includes">Full offline library — Bibles, teaching, and films — on a single card, with an adapter for any phone.</p>
+                  </span>
+                </label>
+                <label class="tier-card">
+                  <input type="radio" name="kit_tier" value="2">
+                  <span class="tier-rank">2</span>
+                  <span class="tier-body">
+                    <h3>Wi-Fi sharing hub</h3>
+                    <p class="tier-reach">Up to 5 phones</p>
+                    <p class="tier-includes">Pocket hub + preloaded card that broadcasts the library so nearby phones browse and download together.</p>
+                  </span>
+                </label>
+                <label class="tier-card">
+                  <input type="radio" name="kit_tier" value="3">
+                  <span class="tier-rank">3</span>
+                  <span class="tier-body">
+                    <h3>Raspberry Pi VillageServer</h3>
+                    <p class="tier-reach">20–40 people</p>
+                    <p class="tier-includes">Low-power Pi 5 server with its own Wi-Fi, power charger, and the full library — serves a gathering with no internet.</p>
+                  </span>
+                </label>
+                <label class="tier-card">
+                  <input type="radio" name="kit_tier" value="4">
+                  <span class="tier-rank">4</span>
+                  <span class="tier-body">
+                    <h3>Projector &amp; audio</h3>
+                    <p class="tier-reach">Hundreds at once</p>
+                    <p class="tier-includes">Projector, speakers, and media library for showing gospel films and teaching to a whole village at once.</p>
+                    <span class="tier-note">Best for regular gatherings of 100+</span>
+                  </span>
+                </label>
+                <label class="tier-card tier-card-wide">
+                  <input type="radio" name="kit_tier" value="5">
+                  <span class="tier-rank">5</span>
+                  <span class="tier-body">
+                    <h3>Satellite receive-and-replay</h3>
+                    <p class="tier-reach">Thousands across a region</p>
+                    <p class="tier-includes">Dish, LNB, receiver, and finder that refresh and rebroadcast the library across an entire region of villages.</p>
+                    <span class="tier-note">Best for regular gatherings of 100+ and multi-village networks</span>
+                  </span>
+                </label>
               </div>
-            </fieldset>
+              <p class="apply-err" id="err-1">Please choose the kit that fits your mission.</p>
+            </div>
 
-            <div class="apply-field">
-              <label for="apply-funding">Funding requested / budget</label>
-              <input type="text" id="apply-funding" name="funding_needed" maxlength="200" placeholder="Optional — an estimate is fine">
+            <!-- ── STEP 2: Reach & audience ─────────────── -->
+            <div class="apply-step" data-step="2">
+              <h2 class="apply-step-title">Who will this reach?</h2>
+              <p class="apply-step-sub">This is the most important part of your application — it tells us the kit you chose matches the people you serve.</p>
+              <div class="apply-grid">
+                <div class="apply-field apply-field-full">
+                  <label for="apply-reach">How will this equipment be used, and by whom? <span class="apply-req" aria-hidden="true">*</span></label>
+                  <textarea id="apply-reach" name="reach_justification" rows="4" maxlength="2000" placeholder="Describe who will use this and how."></textarea>
+                </div>
+                <div class="apply-field">
+                  <label for="apply-audience">Audience <span class="apply-req" aria-hidden="true">*</span></label>
+                  <select id="apply-audience" name="audience_type">
+                    <option value="">Choose…</option>
+                    <option value="individual">An individual</option>
+                    <option value="small_group">Small group (under 20)</option>
+                    <option value="village_congregation">Village / congregation</option>
+                    <option value="regional_network">Multi-village / regional network</option>
+                  </select>
+                </div>
+                <div class="apply-field">
+                  <label for="apply-frequency">How often will it be used? <span class="apply-req" aria-hidden="true">*</span></label>
+                  <select id="apply-frequency" name="frequency_of_use">
+                    <option value="">Choose…</option>
+                    <option value="one_time">One-time event</option>
+                    <option value="weekly">Weekly gathering</option>
+                    <option value="daily">Ongoing daily access</option>
+                  </select>
+                </div>
+                <fieldset class="apply-field apply-field-full" style="border:0;margin:0;padding:0">
+                  <legend class="apply-legend" style="margin-bottom:6px">Do you already have a regular gathering place or group?</legend>
+                  <div class="opt-inline">
+                    <label class="opt-row"><input type="radio" name="gathering_infra" value="yes"> Yes — we gather already</label>
+                    <label class="opt-row"><input type="radio" name="gathering_infra" value="no"> Not yet</label>
+                  </div>
+                </fieldset>
+                <div class="apply-field apply-field-full" id="gathering-desc-field" hidden>
+                  <label for="apply-gathering-desc">Tell us about the gathering</label>
+                  <textarea id="apply-gathering-desc" name="gathering_infrastructure_desc" rows="2" maxlength="1000" placeholder="Where do you meet, how many attend, how long has it been running?"></textarea>
+                </div>
+              </div>
+              <p class="apply-err" id="err-2">Please describe the reach and choose an audience and frequency.</p>
             </div>
-            <div class="apply-field">
-              <label for="apply-timeframe">Timeframe</label>
-              <input type="text" id="apply-timeframe" name="timeframe" maxlength="160" placeholder="When do you need to deploy?">
+
+            <!-- ── STEP 3: Mission context ──────────────── -->
+            <div class="apply-step" data-step="3">
+              <h2 class="apply-step-title">Where will it serve?</h2>
+              <p class="apply-step-sub">Helps us load the right languages and match equipment to local power and connectivity.</p>
+              <div class="apply-grid">
+                <div class="apply-field">
+                  <label for="apply-country">Country of mission <span class="apply-req" aria-hidden="true">*</span></label>
+                  <input type="text" id="apply-country" name="country" maxlength="120" autocomplete="country-name">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-region">Region / village / city</label>
+                  <input type="text" id="apply-region" name="region" maxlength="160">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-languages">Language(s) spoken by the community</label>
+                  <input type="text" id="apply-languages" name="languages" maxlength="400" placeholder="e.g. Swahili, Kikuyu, English">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-power">Internet &amp; power access</label>
+                  <select id="apply-power" name="power_internet_access">
+                    <option value="">Choose…</option>
+                    <option value="none">None — fully offline, limited power</option>
+                    <option value="limited">Limited — occasional power or signal</option>
+                    <option value="reliable">Reliable power and/or internet</option>
+                  </select>
+                </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-literacy">Literacy context</label>
+                  <textarea id="apply-literacy" name="literacy_context" rows="2" maxlength="1000" placeholder="A rough sense is fine — e.g. most adults read the trade language, but prefer audio and film."></textarea>
+                </div>
+              </div>
+              <p class="apply-err" id="err-3">Please tell us the country of your mission.</p>
             </div>
-            <div class="apply-field apply-field-full">
-              <label for="apply-message">Anything else</label>
-              <textarea id="apply-message" name="message" rows="4" maxlength="2000" placeholder="Partnerships, references, shipping notes, or questions."></textarea>
+
+            <!-- ── STEP 4: About you ────────────────────── -->
+            <div class="apply-step" data-step="4">
+              <h2 class="apply-step-title">About you and your ministry</h2>
+              <p class="apply-step-sub">A reference and a link help us verify quickly and get equipment moving sooner. Everything you share stays private to our review team.</p>
+              <div class="apply-grid">
+                <div class="apply-field">
+                  <label for="apply-name">Full name <span class="apply-req" aria-hidden="true">*</span></label>
+                  <input type="text" id="apply-name" name="name" autocomplete="name" maxlength="160">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-email">Email <span class="apply-req" aria-hidden="true">*</span></label>
+                  <input type="email" id="apply-email" name="email" autocomplete="email" maxlength="255">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-phone-code">Phone country code</label>
+                  <input type="tel" id="apply-phone-code" name="phone_country_code" autocomplete="tel-country-code" maxlength="12" placeholder="+1">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-phone">Phone number</label>
+                  <input type="tel" id="apply-phone" name="phone" autocomplete="tel-national" maxlength="60" placeholder="Optional">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-org">Organization / ministry name</label>
+                  <input type="text" id="apply-org" name="organization" maxlength="200">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-role">Your role</label>
+                  <input type="text" id="apply-role" name="role" maxlength="120" placeholder="Missionary, pastor, field partner…">
+                </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-website-real">Ministry website or social media link</label>
+                  <input type="url" id="apply-website-real" name="org_website" maxlength="400" placeholder="https://…">
+                </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-sending">Sending church / organization</label>
+                  <input type="text" id="apply-sending" name="sending_org" maxlength="300">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-ref-name">Reference contact — name</label>
+                  <input type="text" id="apply-ref-name" name="reference_name" maxlength="160" placeholder="Someone who knows your work">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-ref-contact">Reference — email or phone</label>
+                  <input type="text" id="apply-ref-contact" name="reference_contact" maxlength="255">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-referral">How did you hear about us?</label>
+                  <select id="apply-referral" name="referral_source">
+                    <option value="">Choose…</option>
+                    <option value="existing_partner">Existing partner</option>
+                    <option value="church_network">Church network</option>
+                    <option value="conference">Conference</option>
+                    <option value="search">Search</option>
+                    <option value="social_media">Social media</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="apply-field">
+                  <label for="apply-years">Years in the mission field</label>
+                  <input type="text" id="apply-years" name="years_in_field" maxlength="60" placeholder="e.g. 6">
+                </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-current-reach">Roughly how many people does your ministry reach today?</label>
+                  <input type="text" id="apply-current-reach" name="current_reach" maxlength="200" placeholder="Before this equipment — an estimate is fine">
+                </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-doc">Optional: field photo, ministry ID, or letter of recommendation</label>
+                  <input type="file" id="apply-doc" accept="image/png,image/jpeg,image/webp,application/pdf">
+                  <p class="apply-file-note">Image or PDF, up to 2&nbsp;MB. Optional — never required, especially where carrying ministry documents is unsafe.</p>
+                </div>
+              </div>
+              <p class="apply-err" id="err-4">Please fill in your name and a valid email.</p>
+            </div>
+
+            <!-- ── STEP 5: Logistics & funding ──────────── -->
+            <div class="apply-step" data-step="5">
+              <h2 class="apply-step-title">Receiving the equipment</h2>
+              <p class="apply-step-sub">Getting kits through customs and the last mile is usually the hardest part — tell us your plan and we'll work with it.</p>
+              <fieldset style="border:0;margin:0 0 16px;padding:0">
+                <legend class="apply-legend" style="margin-bottom:8px">Your receiving plan <span class="apply-req" aria-hidden="true">*</span></legend>
+                <div class="opt-list">
+                  <label class="opt-row"><input type="radio" name="receiving_plan" value="cover_import_costs"> I will cover import costs (shipping, customs, duties, local delivery)</label>
+                  <label class="opt-row"><input type="radio" name="receiving_plan" value="transport_partner"> I have a trusted transportation partner</label>
+                  <label class="opt-row"><input type="radio" name="receiving_plan" value="approved_retailer"> I have access to an approved retailer locally</label>
+                  <label class="opt-row"><input type="radio" name="receiving_plan" value="alternative_plan"> I have an alternative receiving plan</label>
+                  <label class="opt-row"><input type="radio" name="receiving_plan" value="need_help"> I need help with shipping and logistics</label>
+                </div>
+              </fieldset>
+              <div class="apply-grid">
+                <div class="apply-field apply-field-full" id="plan-details-field" hidden>
+                  <label for="apply-plan-details" id="plan-details-label">Tell us more</label>
+                  <textarea id="apply-plan-details" name="receiving_plan_details" rows="2" maxlength="1000"></textarea>
+                </div>
+                <div class="apply-field">
+                  <label for="apply-funding">Funding requested / budget</label>
+                  <input type="text" id="apply-funding" name="funding_needed" maxlength="200" placeholder="Optional — an estimate is fine">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-timeframe">Timeframe</label>
+                  <input type="text" id="apply-timeframe" name="timeframe" maxlength="160" placeholder="When do you need to deploy?">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-contact-method">Preferred contact method</label>
+                  <select id="apply-contact-method" name="preferred_contact_method">
+                    <option value="">Choose…</option>
+                    <option value="email">Email</option>
+                    <option value="phone">Phone call</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="sms">Text / SMS</option>
+                  </select>
+                </div>
+                <div class="apply-field">
+                  <label for="apply-timezone">Your time zone</label>
+                  <input type="text" id="apply-timezone" name="contact_timezone" maxlength="120" placeholder="e.g. GMT+3 / East Africa Time">
+                </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-message">Anything else</label>
+                  <textarea id="apply-message" name="message" rows="3" maxlength="2000" placeholder="Partnerships, references, shipping notes, or questions."></textarea>
+                </div>
+              </div>
+              <p class="apply-err" id="err-5">Please choose a receiving plan.</p>
             </div>
 
             <div class="apply-actions">
-              <button type="submit" class="pdf-button" id="apply-submit-btn">Submit application</button>
+              <button type="button" class="apply-back" id="apply-back-btn" hidden>&larr; Back</button>
+              <button type="button" class="pdf-button" id="apply-next-btn">Continue &rarr;</button>
+              <button type="submit" class="pdf-button" id="apply-submit-btn" hidden>Submit application</button>
               <p class="apply-status" id="apply-status" role="status" aria-live="polite"></p>
             </div>
           </form>
@@ -179,10 +424,15 @@
     (function(){
       var loadingEl = document.getElementById('apply-loading');
       var closedEl = document.getElementById('apply-closed');
+      var doneEl = document.getElementById('apply-done');
       var cardEl = document.getElementById('apply-card');
       var form = document.getElementById('apply-form');
       var statusEl = document.getElementById('apply-status');
-      var btn = document.getElementById('apply-submit-btn');
+      var backBtn = document.getElementById('apply-back-btn');
+      var nextBtn = document.getElementById('apply-next-btn');
+      var submitBtn = document.getElementById('apply-submit-btn');
+      var TOTAL_STEPS = 5;
+      var step = 1;
 
       // Ask the server whether applications are currently open.
       fetch('/api/track?type=setting&key=applications_open', { cache: 'no-store' })
@@ -200,39 +450,151 @@
         });
 
       if(!form) return;
-      form.addEventListener('submit', function(e){
-        e.preventDefault();
-        var name = document.getElementById('apply-name').value.trim();
-        var email = document.getElementById('apply-email').value.trim();
-        var country = document.getElementById('apply-country').value.trim();
-        if(!name || !email || !country){
-          statusEl.textContent = 'Please fill in your name, email, and country.';
+
+      function radioValue(name){
+        var el = form.querySelector('input[name="' + name + '"]:checked');
+        return el ? el.value : '';
+      }
+      function val(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function showErr(n, show){ var el = document.getElementById('err-' + n); if(el) el.style.display = show ? 'block' : 'none'; }
+
+      // ── Step navigation ──────────────────────────────
+      function renderStep(){
+        document.querySelectorAll('.apply-step').forEach(function(s){
+          s.classList.toggle('is-active', Number(s.dataset.step) === step);
+        });
+        document.getElementById('apply-progress-label').textContent = 'Step ' + step + ' of ' + TOTAL_STEPS;
+        document.getElementById('apply-progress-fill').style.width = (step / TOTAL_STEPS * 100) + '%';
+        backBtn.hidden = step === 1;
+        nextBtn.hidden = step === TOTAL_STEPS;
+        submitBtn.hidden = step !== TOTAL_STEPS;
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function validateStep(n){
+        if(n === 1) return !!radioValue('kit_tier');
+        if(n === 2) return !!(val('apply-reach') && val('apply-audience') && val('apply-frequency'));
+        if(n === 3) return !!val('apply-country');
+        if(n === 4) return !!(val('apply-name') && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('apply-email')));
+        if(n === 5) return !!radioValue('receiving_plan');
+        return true;
+      }
+
+      nextBtn.addEventListener('click', function(){
+        if(!validateStep(step)){ showErr(step, true); return; }
+        showErr(step, false);
+        step = Math.min(TOTAL_STEPS, step + 1);
+        renderStep();
+      });
+      backBtn.addEventListener('click', function(){
+        step = Math.max(1, step - 1);
+        renderStep();
+      });
+
+      // ── Tier-aware reach placeholder ─────────────────
+      var REACH_PLACEHOLDERS = {
+        1: 'Who is the person or household this card will serve, and how will you follow up with them?',
+        2: 'Which small group will share this hub — how many phones, and how often do you meet?',
+        3: 'Describe the gathering this server will host — how many people, where, and how often?',
+        4: 'Describe the showings you plan — where will crowds gather, how many people, how often?',
+        5: 'Describe the region and the network of villages this signal would serve — how many gathering points, roughly how many people?'
+      };
+      form.querySelectorAll('input[name="kit_tier"]').forEach(function(r){
+        r.addEventListener('change', function(){
+          document.getElementById('apply-reach').placeholder = REACH_PLACEHOLDERS[r.value] || REACH_PLACEHOLDERS[3];
+        });
+      });
+
+      // ── Conditional fields ───────────────────────────
+      form.querySelectorAll('input[name="gathering_infra"]').forEach(function(r){
+        r.addEventListener('change', function(){
+          document.getElementById('gathering-desc-field').hidden = radioValue('gathering_infra') !== 'yes';
+        });
+      });
+
+      var PLAN_LABELS = {
+        transport_partner: 'Describe the transportation arrangement',
+        approved_retailer: 'Which retailer, and in which country?',
+        alternative_plan: 'Describe your receiving plan',
+        need_help: 'What shipping or logistics challenges do you expect?'
+      };
+      form.querySelectorAll('input[name="receiving_plan"]').forEach(function(r){
+        r.addEventListener('change', function(){
+          var plan = radioValue('receiving_plan');
+          var field = document.getElementById('plan-details-field');
+          if(PLAN_LABELS[plan]){
+            field.hidden = false;
+            document.getElementById('plan-details-label').textContent = PLAN_LABELS[plan];
+          } else {
+            field.hidden = true;
+          }
+        });
+      });
+
+      // ── Optional supporting document (≤ 2 MB → data URL) ──
+      var docDataUrl = null, docName = null;
+      document.getElementById('apply-doc').addEventListener('change', function(e){
+        var file = e.target.files && e.target.files[0];
+        docDataUrl = null; docName = null;
+        if(!file) return;
+        if(file.size > 2 * 1024 * 1024){
+          statusEl.textContent = 'That file is over 2 MB — please choose a smaller file or skip the upload.';
           statusEl.className = 'apply-status is-error';
+          e.target.value = '';
           return;
         }
-        var equipment = Array.prototype.slice.call(
-          document.querySelectorAll('input[name="equipment"]:checked')
-        ).map(function(el){ return el.value; });
+        var reader = new FileReader();
+        reader.onload = function(){ docDataUrl = reader.result; docName = file.name; statusEl.textContent = ''; statusEl.className = 'apply-status'; };
+        reader.readAsDataURL(file);
+      });
 
-        btn.disabled = true;
-        btn.textContent = 'Submitting…';
+      // ── Submit ───────────────────────────────────────
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        for(var n = 1; n <= TOTAL_STEPS; n++){
+          if(!validateStep(n)){ step = n; renderStep(); showErr(n, true); return; }
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting…';
         statusEl.textContent = '';
         statusEl.className = 'apply-status';
 
         var payload = {
-          name: name,
-          email: email,
-          phone_country_code: document.getElementById('apply-phone-code').value.trim(),
-          phone: document.getElementById('apply-phone').value.trim(),
-          organization: document.getElementById('apply-org').value.trim(),
-          role: document.getElementById('apply-role').value.trim(),
-          country: country,
-          region: document.getElementById('apply-region').value.trim(),
-          mission_context: document.getElementById('apply-context').value.trim(),
-          equipment_needed: equipment,
-          funding_needed: document.getElementById('apply-funding').value.trim(),
-          timeframe: document.getElementById('apply-timeframe').value.trim(),
-          message: document.getElementById('apply-message').value.trim()
+          kit_tier: Number(radioValue('kit_tier')),
+          reach_justification: val('apply-reach'),
+          audience_type: val('apply-audience'),
+          frequency_of_use: val('apply-frequency'),
+          has_gathering_infrastructure: radioValue('gathering_infra') === '' ? null : radioValue('gathering_infra') === 'yes',
+          gathering_infrastructure_desc: val('apply-gathering-desc'),
+          country: val('apply-country'),
+          region: val('apply-region'),
+          languages: val('apply-languages'),
+          literacy_context: val('apply-literacy'),
+          power_internet_access: val('apply-power'),
+          name: val('apply-name'),
+          email: val('apply-email'),
+          phone_country_code: val('apply-phone-code'),
+          phone: val('apply-phone'),
+          organization: val('apply-org'),
+          role: val('apply-role'),
+          org_website: val('apply-website-real'),
+          sending_org: val('apply-sending'),
+          reference_name: val('apply-ref-name'),
+          reference_contact: val('apply-ref-contact'),
+          referral_source: val('apply-referral'),
+          years_in_field: val('apply-years'),
+          current_reach: val('apply-current-reach'),
+          supporting_document: docDataUrl,
+          supporting_document_name: docName,
+          receiving_plan: radioValue('receiving_plan'),
+          receiving_plan_details: val('apply-plan-details'),
+          funding_needed: val('apply-funding'),
+          timeframe: val('apply-timeframe'),
+          preferred_contact_method: val('apply-contact-method'),
+          contact_timezone: val('apply-timezone'),
+          message: val('apply-message'),
+          website: document.getElementById('apply-website').value
         };
         if(window.VSITracking && window.VSITracking.enrich) payload = window.VSITracking.enrich(payload);
 
@@ -243,18 +605,20 @@
         })
           .then(function(r){ return r.json().then(function(data){ return { ok: r.ok, data: data }; }); })
           .then(function(result){
-            if(!result.ok || !result.data || !result.data.ok) throw new Error('failed');
-            statusEl.textContent = 'Thank you — your application has been received. Our team will review it and reply by email.';
-            statusEl.className = 'apply-status is-success';
-            form.reset();
+            if(!result.ok || !result.data || !result.data.ok) throw new Error(result.data && result.data.error || 'failed');
+            cardEl.hidden = true;
+            doneEl.hidden = false;
+            doneEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
           })
-          .catch(function(){
-            statusEl.textContent = 'Something went wrong submitting your application. Please try again, or email villageserverinitiative@gmail.com directly.';
+          .catch(function(err){
+            statusEl.textContent = (err && err.message && err.message !== 'failed')
+              ? err.message
+              : 'Something went wrong submitting your application. Please try again, or email villageserverinitiative@gmail.com directly.';
             statusEl.className = 'apply-status is-error';
           })
           .then(function(){
-            btn.disabled = false;
-            btn.textContent = 'Submit application';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit application';
           });
       });
     })();
