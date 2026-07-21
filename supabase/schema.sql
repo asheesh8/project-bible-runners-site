@@ -480,6 +480,27 @@ insert into public.deployments (name, country, power_supply, lnb, satellite_find
 select 'Sam Sikapizye', 'Zambia', 'Solar Suitcase', 'LO 10751', 'GT Media V8 Finder 2', 'Aurzen Eazze D1', '[{"label":"2nd Workshop","date":"2026-07-14"}]'::jsonb
 where not exists (select 1 from public.deployments where name = 'Sam Sikapizye');
 
+-- ── Site assistant leads ────────────────────────────────────────────
+-- The public chat assistant (api/assistant.js) captures interested
+-- missionaries/field partners here when they don't complete the full
+-- application. Private: service-role writes and admin reads only.
+create table if not exists public.assistant_leads (
+  id uuid primary key default gen_random_uuid(),
+  visitor_id text,
+  site_host text,
+  name text,
+  email text,
+  country text,
+  interest text,
+  summary text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists assistant_leads_created_idx on public.assistant_leads (created_at desc);
+
+alter table public.assistant_leads enable row level security;
+revoke all on public.assistant_leads from anon, authenticated;
+
 -- Confirm all expected tables exist after running the migration.
 select table_name
 from information_schema.tables
@@ -487,6 +508,7 @@ where table_schema = 'public'
   and table_name in (
     'campaigns', 'posts', 'photos', 'affiliates',
     'page_visits', 'link_clicks', 'donation_interests', 'availability_requests',
-    'contact_messages', 'equipment_applications', 'site_settings', 'deployments'
+    'contact_messages', 'equipment_applications', 'site_settings', 'deployments',
+    'assistant_leads'
   )
 order by table_name;
