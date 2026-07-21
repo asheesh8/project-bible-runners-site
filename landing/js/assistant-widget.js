@@ -54,7 +54,7 @@
     '<div class="vsi-asst-body" data-body></div>' +
     '<form class="vsi-asst-foot" data-form>' +
     '<div class="vsi-asst-hp"><label>Website<input type="text" tabindex="-1" autocomplete="off" data-hp></label></div>' +
-    '<textarea data-input rows="1" placeholder="Ask about kits, sharing, applying…" maxlength="2000"></textarea>' +
+    '<textarea data-input rows="1" placeholder="Ask about kits, sharing, applying…" maxlength="500"></textarea>' +
     '<button type="submit" data-send>Send</button></form>';
 
   document.body.appendChild(launch);
@@ -138,6 +138,9 @@
   panel.querySelector('[data-close]').addEventListener('click', closePanel);
 
   input.addEventListener('input', function () {
+    input.value = input.value
+      .replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}]/gu, '')
+      .replace(/[\u200D\uFE0F\u20E3\u0000-\u001F\u007F]/g, ' ');
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 96) + 'px';
   });
@@ -171,11 +174,19 @@
         var reply = (data && data.reply) || "Sorry, I couldn't reach the assistant. Please try the contact form.";
         addBubble('bot', reply);
         messages.push({ role: 'assistant', content: reply });
+        if (data && data.limited) {
+          input.disabled = true;
+          sendBtn.disabled = true;
+          input.placeholder = 'Chat limit reached';
+        }
       })
       .catch(function () {
         typing.remove();
         addBubble('bot', "Sorry, something went wrong. Please try again, or use the contact form and the team will help you.");
       })
-      .then(function () { busy = false; sendBtn.disabled = false; input.focus(); });
+      .then(function () {
+        busy = false;
+        if (!input.disabled) { sendBtn.disabled = false; input.focus(); }
+      });
   });
 })();

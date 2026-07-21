@@ -11,11 +11,22 @@
 // Public:
 //   POST /api/assistant  { messages:[{role,content}], visitor_id, site_host, website }
 //     → { reply: "…", lead_captured: bool }
+import crypto from 'node:crypto';
 import { KNOWLEDGE_BASE } from './_lib/knowledge-base.js';
 import { PERSONA } from './_lib/assistant-persona.js';
 
 const MODEL = 'claude-haiku-4-5';
 const ROBOT_RE = /bot|crawler|spider|crawl|slurp|facebookexternalhit|headlesschrome|phantomjs|lighthouse|semrush|ahrefs|bytespider|python-requests|httpclient|curl|wget/i;
+
+// ── Guardrails (safe to tune) ───────────────────────────────────────
+const MAX_MSG_CHARS = 500;        // hard cap on a single user message
+const MAX_HISTORY = 8;            // messages of context sent to the model
+const MAX_REPLY_CHARS = 500;      // hard cap on the reply shown to a visitor
+const MAX_OUTPUT_TOKENS = 200;    // bounds model spend before the character cap
+const WINDOW_HOURS = 6;           // rolling window for the per-user limits
+const PER_VISITOR_LIMIT = 10;     // messages per window, per browser/device
+const PER_IP_LIMIT = 30;          // shared-network abuse backstop
+const GLOBAL_DAILY_LIMIT = 1000;  // absolute messages across everyone / 24h
 
 const TOOLS = [{
   name: 'capture_lead',
@@ -34,6 +45,58 @@ const TOOLS = [{
 }];
 
 function trim(v, max = 2000) { return String(v || '').trim().slice(0, max); }
+
+// Clean a user message: strip emojis and control characters (so the model
+// can't be nudged off-course by junk), collapse whitespace, and hard-cap length.
+function cleanUserText(v) {
+  return String(v || '')
+    .replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}]/gu, '')
+    .replace(/[\u200D\uFE0F\u20E3\u0000-\u001F\u007F]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, MAX_MSG_CHARS);
+}
+
+function cleanReplyText(v) {
+  return cleanUserText(v).slice(0, MAX_REPLY_CHARS);
+}
+
+export { cleanUserText, cleanReplyText };
+
+// A stable, privacy-preserving key for the visitor's IP (hashed, never stored raw).
+function ipKeyFrom(req) {
+  const raw = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+    || String(req.headers['x-real-ip'] || '').trim();
+  if (!raw) return null;
+  return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 24);
+}
+
+// The database function checks and records all three limits atomically. This
+// fails closed: if quota storage is unavailable, no paid model call is made.
+async function checkAndRecordUsage(meta) {
+  const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+  if (!SUPABASE_URL || !KEY) return { allowed: false, unavailable: true };
+  const h = { apikey: KEY, Authorization: `Bearer ${KEY}` };
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_assistant_quota`, {
+      method: 'POST',
+      headers: { ...h, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        p_visitor_key: meta.visitor_key || null,
+        p_ip_key: meta.ip_key || null,
+        p_window_hours: WINDOW_HOURS,
+        p_visitor_limit: PER_VISITOR_LIMIT,
+        p_ip_limit: PER_IP_LIMIT,
+        p_global_limit: GLOBAL_DAILY_LIMIT,
+      }),
+    });
+    if (!r.ok) return { allowed: false, unavailable: true };
+    return { allowed: (await r.json()) === true };
+  } catch (e) {
+    return { allowed: false, unavailable: true };
+  }
+}
 
 async function anthropic(apiKey, body) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -107,8 +170,8 @@ export default async function handler(req, res) {
   const incoming = Array.isArray(b.messages) ? b.messages : [];
   const messages = incoming
     .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
-    .slice(-12) // cap history
-    .map((m) => ({ role: m.role, content: trim(m.content, 2000) }))
+    .slice(-MAX_HISTORY) // cap history sent to the model
+    .map((m) => ({ role: m.role, content: m.role === 'user' ? cleanUserText(m.content) : trim(m.content, 1500) }))
     .filter((m) => m.content);
   if (!messages.length || messages[messages.length - 1].role !== 'user') {
     return res.status(400).json({ error: 'A user message is required.' });
@@ -118,6 +181,20 @@ export default async function handler(req, res) {
     visitor_id: String(b.visitor_id || '').replace(/[^\w:.-]/g, '').slice(0, 120),
     site_host: String(b.site_host || '').toLowerCase().replace(/^www\./, '').slice(0, 255),
   };
+  meta.visitor_key = meta.visitor_id || null;
+  meta.ip_key = ipKeyFrom(req);
+
+  // Rate limit BEFORE spending anything on the model. A blocked request never
+  // reaches Claude, so abuse costs essentially nothing.
+  const usage = await checkAndRecordUsage(meta);
+  if (!usage.allowed) {
+    return res.status(200).json({
+      reply: usage.unavailable
+        ? 'The assistant is temporarily unavailable. Please use the contact form and our team will help you directly.'
+        : "You've reached the chat limit for now. Please try again later, or use the contact form for help.",
+      limited: true,
+    });
+  }
 
   const system = [
     { type: 'text', text: PERSONA },
@@ -126,7 +203,7 @@ export default async function handler(req, res) {
 
   try {
     let leadCaptured = false;
-    let response = await anthropic(apiKey, { model: MODEL, max_tokens: 1024, system, tools: TOOLS, messages });
+    let response = await anthropic(apiKey, { model: MODEL, max_tokens: MAX_OUTPUT_TOKENS, system, tools: TOOLS, messages });
 
     // Handle at most one round of lead capture, then get the final reply.
     if (response.stop_reason === 'tool_use') {
@@ -139,12 +216,12 @@ export default async function handler(req, res) {
         toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: leadCaptured ? 'Saved. The team will follow up.' : 'Noted.' });
       }
       response = await anthropic(apiKey, {
-        model: MODEL, max_tokens: 1024, system, tools: TOOLS,
+        model: MODEL, max_tokens: MAX_OUTPUT_TOKENS, system, tools: TOOLS,
         messages: [...messages, { role: 'assistant', content: response.content }, { role: 'user', content: toolResults }],
       });
     }
 
-    const reply = (response.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('\n').trim()
+    const reply = cleanReplyText((response.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('\n'))
       || "I'm sorry — I didn't catch that. Could you rephrase?";
     return res.status(200).json({ reply, lead_captured: leadCaptured });
   } catch (e) {

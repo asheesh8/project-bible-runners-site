@@ -501,6 +501,64 @@ create index if not exists assistant_leads_created_idx on public.assistant_leads
 alter table public.assistant_leads enable row level security;
 revoke all on public.assistant_leads from anon, authenticated;
 
+-- ── Assistant rate-limit ledger ─────────────────────────────────────
+-- One row per accepted chat message. The assistant endpoint counts recent
+-- rows to enforce per-device, per-IP, and global daily limits so the chatbot
+-- can't be abused into a large API bill. No message content is stored —
+-- only a device key, a hashed IP, and a timestamp.
+create table if not exists public.assistant_usage (
+  id uuid primary key default gen_random_uuid(),
+  visitor_key text,
+  ip_key text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists assistant_usage_created_idx on public.assistant_usage (created_at desc);
+create index if not exists assistant_usage_visitor_idx on public.assistant_usage (visitor_key, created_at desc);
+create index if not exists assistant_usage_ip_idx on public.assistant_usage (ip_key, created_at desc);
+
+alter table public.assistant_usage enable row level security;
+revoke all on public.assistant_usage from anon, authenticated;
+
+-- Serialize quota checks so parallel scripted requests cannot race past the
+-- limits. Only the server-side service role may execute this function.
+create or replace function public.consume_assistant_quota(
+  p_visitor_key text,
+  p_ip_key text,
+  p_window_hours integer default 6,
+  p_visitor_limit integer default 10,
+  p_ip_limit integer default 30,
+  p_global_limit integer default 1000
+) returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  cutoff_window timestamptz := now() - make_interval(hours => p_window_hours);
+  cutoff_day timestamptz := now() - interval '24 hours';
+begin
+  -- A single global lock keeps visitor, IP, and daily checks atomic together.
+  perform pg_advisory_xact_lock(84657821);
+
+  if (select count(*) from public.assistant_usage where created_at >= cutoff_day) >= p_global_limit
+    or (p_visitor_key is not null and
+      (select count(*) from public.assistant_usage where visitor_key = p_visitor_key and created_at >= cutoff_window) >= p_visitor_limit)
+    or (p_ip_key is not null and
+      (select count(*) from public.assistant_usage where ip_key = p_ip_key and created_at >= cutoff_window) >= p_ip_limit)
+  then
+    return false;
+  end if;
+
+  insert into public.assistant_usage (visitor_key, ip_key)
+  values (p_visitor_key, p_ip_key);
+  return true;
+end;
+$$;
+
+revoke all on function public.consume_assistant_quota(text, text, integer, integer, integer, integer) from public, anon, authenticated;
+grant execute on function public.consume_assistant_quota(text, text, integer, integer, integer, integer) to service_role;
+
 -- Confirm all expected tables exist after running the migration.
 select table_name
 from information_schema.tables
@@ -509,6 +567,6 @@ where table_schema = 'public'
     'campaigns', 'posts', 'photos', 'affiliates',
     'page_visits', 'link_clicks', 'donation_interests', 'availability_requests',
     'contact_messages', 'equipment_applications', 'site_settings', 'deployments',
-    'assistant_leads'
+    'assistant_leads', 'assistant_usage'
   )
 order by table_name;
