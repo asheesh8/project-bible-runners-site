@@ -3,11 +3,14 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { cleanReplyText, cleanUserText } from '../api/assistant.js';
 
-test('assistant text guardrails remove emoji and cap messages at 500 characters', () => {
+test('assistant text guardrails remove emoji and cap text cleanly', () => {
   assert.equal(cleanUserText('Hello \u{1F44B}\u{1F3FD} world'), 'Hello world');
   assert.equal(cleanUserText('one\u0000\ntwo'), 'one two');
   assert.equal(cleanUserText('x'.repeat(700)).length, 500);
-  assert.equal(cleanReplyText(`Answer \u{1F680} ${'y'.repeat(700)}`).length, 500);
+  const reply = cleanReplyText('A complete useful sentence. '.repeat(60));
+  assert.ok(reply.length <= 800);
+  assert.match(reply, /[.!?]$/);
+  assert.doesNotMatch(reply, /senten\.$/);
   assert.doesNotMatch(cleanReplyText('No emoji \u{1F680}'), /\p{Extended_Pictographic}/u);
 });
 
@@ -18,7 +21,8 @@ test('assistant quota limits and atomic database function remain wired in', () =
 
   assert.match(api, /PER_VISITOR_LIMIT = 10/);
   assert.match(api, /WINDOW_HOURS = 6/);
-  assert.match(api, /MAX_OUTPUT_TOKENS = 200/);
+  assert.match(api, /MAX_REPLY_CHARS = 800/);
+  assert.match(api, /MAX_OUTPUT_TOKENS = 300/);
   assert.match(api, /rpc\/consume_assistant_quota/);
   assert.match(api, /consumeMemoryQuota/);
   assert.match(schema, /pg_advisory_xact_lock/);

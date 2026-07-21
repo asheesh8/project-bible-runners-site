@@ -21,8 +21,8 @@ const ROBOT_RE = /bot|crawler|spider|crawl|slurp|facebookexternalhit|headlesschr
 // ── Guardrails (safe to tune) ───────────────────────────────────────
 const MAX_MSG_CHARS = 500;        // hard cap on a single user message
 const MAX_HISTORY = 8;            // messages of context sent to the model
-const MAX_REPLY_CHARS = 500;      // hard cap on the reply shown to a visitor
-const MAX_OUTPUT_TOKENS = 200;    // bounds model spend before the character cap
+const MAX_REPLY_CHARS = 800;      // room for a useful answer without a wall of text
+const MAX_OUTPUT_TOKENS = 300;    // bounds model spend before the character cap
 const WINDOW_HOURS = 6;           // rolling window for the per-user limits
 const PER_VISITOR_LIMIT = 10;     // messages per window, per browser/device
 const PER_IP_LIMIT = 30;          // shared-network abuse backstop
@@ -63,7 +63,23 @@ function cleanUserText(v) {
 }
 
 function cleanReplyText(v) {
-  return cleanUserText(v).slice(0, MAX_REPLY_CHARS);
+  const text = String(v || '')
+    .replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}]/gu, '')
+    .replace(/[\u200D\uFE0F\u20E3\u0000-\u001F\u007F]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (text.length <= MAX_REPLY_CHARS) return text;
+
+  const clipped = text.slice(0, MAX_REPLY_CHARS + 1);
+  const sentenceEnd = Math.max(
+    clipped.lastIndexOf('. '),
+    clipped.lastIndexOf('! '),
+    clipped.lastIndexOf('? '),
+  );
+  if (sentenceEnd >= Math.floor(MAX_REPLY_CHARS * 0.55)) return clipped.slice(0, sentenceEnd + 1);
+
+  const wordEnd = clipped.slice(0, MAX_REPLY_CHARS - 1).lastIndexOf(' ');
+  return `${clipped.slice(0, wordEnd > 0 ? wordEnd : MAX_REPLY_CHARS - 1).trimEnd()}.`;
 }
 
 export { cleanUserText, cleanReplyText };
