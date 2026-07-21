@@ -6,13 +6,20 @@
 
   var API = '/api/assistant';
   var CHAT_KEY = 'vsi_assistant_chat_v1';
+  var INACTIVE_CLOSE_MS = 10 * 60 * 1000;
+  var ARCHIVE_AFTER_MS = 30 * 60 * 1000;
   var savedChat = null;
   try { savedChat = JSON.parse(localStorage.getItem(CHAT_KEY) || 'null'); } catch (e) { savedChat = null; }
-  if (!savedChat || !Array.isArray(savedChat.messages) || Date.now() - Number(savedChat.updatedAt || 0) > 7 * 86400000) savedChat = null;
+  var savedActivityAt = savedChat && Number(savedChat.lastActivityAt || savedChat.updatedAt || 0);
+  if (!savedChat || !Array.isArray(savedChat.messages) || Date.now() - savedActivityAt >= ARCHIVE_AFTER_MS) savedChat = null;
+  else if (Date.now() - savedActivityAt >= INACTIVE_CLOSE_MS) savedChat.open = false;
   var sessionId = (savedChat && savedChat.sessionId) || ('chat_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 12));
   var chatEmail = (savedChat && savedChat.email) || '';
   var messages = (savedChat && savedChat.messages) || []; // {role, content}
+  var lastActivityAt = (savedChat && Number(savedChat.lastActivityAt || savedChat.updatedAt)) || Date.now();
   var busy = false;
+  var closeTimer = null;
+  var archiveTimer = null;
   var LIMIT_KEY = 'vsi_assistant_usage';
   var LIMIT_COUNT = 10;
   var LIMIT_WINDOW_MS = 6 * 60 * 60 * 1000;
@@ -35,9 +42,49 @@
       localStorage.setItem(CHAT_KEY, JSON.stringify({
         sessionId: sessionId, email: chatEmail, messages: messages.slice(-20),
         open: isOpen === undefined ? panel.classList.contains('open') : !!isOpen,
+        lastActivityAt: lastActivityAt,
         updatedAt: Date.now(),
       }));
     } catch (e) { /* best effort */ }
+  }
+
+  function newSessionId() {
+    return 'chat_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 12);
+  }
+
+  function scheduleLifecycle() {
+    clearTimeout(closeTimer);
+    clearTimeout(archiveTimer);
+    var elapsed = Date.now() - lastActivityAt;
+    closeTimer = setTimeout(function () {
+      if (panel.classList.contains('open')) closePanel();
+    }, Math.max(0, INACTIVE_CLOSE_MS - elapsed));
+    archiveTimer = setTimeout(archiveLocalChat, Math.max(0, ARCHIVE_AFTER_MS - elapsed));
+  }
+
+  function markChatActivity() {
+    lastActivityAt = Date.now();
+    saveChat(true);
+    scheduleLifecycle();
+  }
+
+  function archiveLocalChat() {
+    clearTimeout(closeTimer);
+    clearTimeout(archiveTimer);
+    try { localStorage.removeItem(CHAT_KEY); } catch (e) { /* best effort */ }
+    messages = [];
+    chatEmail = '';
+    sessionId = newSessionId();
+    lastActivityAt = Date.now();
+    opened = false;
+    body.querySelectorAll('.vsi-asst-msg').forEach(function (el) { el.remove(); });
+    emailInput.value = '';
+    emailForm.style.display = '';
+    form.style.display = 'none';
+    input.disabled = false;
+    sendBtn.disabled = false;
+    input.placeholder = 'Ask about kits, sharing, applying…';
+    closePanel(true);
   }
 
   // ── Styles ─────────────────────────────────────────────
@@ -182,7 +229,11 @@
     if (chatEmail) beginChat();
     setTimeout(function () { (chatEmail ? input : emailInput).focus(); }, 50);
   }
-  function closePanel() { panel.classList.remove('open'); launch.style.display = ''; saveChat(false); }
+  function closePanel(skipSave) {
+    panel.classList.remove('open');
+    launch.style.display = '';
+    if (!skipSave) saveChat(false);
+  }
 
   form.style.display = 'none';
   emailInput.value = chatEmail;
@@ -192,7 +243,7 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) { emailError.style.display = 'block'; return; }
     chatEmail = value.slice(0, 255);
     emailError.style.display = 'none';
-    saveChat(true);
+    markChatActivity();
     beginChat();
     input.focus();
   });
@@ -226,7 +277,7 @@
 
     addBubble('user', text);
     messages.push({ role: 'user', content: text });
-    saveChat(true);
+    markChatActivity();
     input.value = '';
     input.style.height = 'auto';
 
@@ -246,7 +297,7 @@
         if (!(data && data.ignored)) recordLocalUsage();
         addBubble('bot', reply);
         messages.push({ role: 'assistant', content: reply });
-        saveChat(true);
+        markChatActivity();
         if (data && data.limited) {
           input.disabled = true;
           sendBtn.disabled = true;
@@ -264,4 +315,5 @@
   });
 
   if (savedChat && savedChat.open) openPanel();
+  scheduleLifecycle();
 })();

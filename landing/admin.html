@@ -1719,11 +1719,12 @@ function loadAssistantChats(){
       }
       list.innerHTML = rows.map(function(row){
         var msgs = Array.isArray(row.messages) ? row.messages : [];
+        var archived = Date.now() - new Date(row.updated_at).getTime() >= 30 * 60 * 1000;
         var transcript = msgs.map(function(m){
           return '<div style="margin:7px 0;padding:8px 10px;border-radius:8px;background:'+(m.role==='assistant'?'#f0f6fc':'#eef8f0')+'"><strong>'+(m.role==='assistant'?'Assistant':'Visitor')+':</strong> '+esc(m.content||'')+'</div>';
         }).join('');
         return '<details class="res-section collapsible-section" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:0 14px">'+
-          '<summary style="padding:14px 0"><strong>'+esc(row.email)+'</strong> · '+fmtDate(row.updated_at)+' · '+msgs.length+' messages <span class="section-caret">▾</span></summary>'+
+          '<summary style="padding:14px 0"><strong>'+esc(row.email)+'</strong> · '+fmtDate(row.updated_at)+' · '+msgs.length+' messages · <span class="td-badge '+(archived?'draft':'active')+'">'+(archived?'Archived':'Active')+'</span> <span class="section-caret">▾</span></summary>'+
           '<div style="padding-bottom:14px">'+transcript+
           '<div style="display:flex;align-items:center;gap:10px;margin-top:12px"><button class="btn-save" type="button" onclick="sendAssistantChat(\''+row.id+'\',this)">'+(row.emailed_at?'Send again':'Send chat by email')+'</button>'+
           (row.emailed_at?'<span style="font-size:12px;color:var(--muted)">Last sent '+esc(new Date(row.emailed_at).toLocaleString())+'</span>':'')+'</div></div></details>';

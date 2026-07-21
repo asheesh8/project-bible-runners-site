@@ -48,6 +48,9 @@ test('assistant quota limits and atomic database function remain wired in', () =
   assert.match(widget, /LIMIT_COUNT = 10/);
   assert.match(widget, /LIMIT_WINDOW_MS = 6 \* 60 \* 60 \* 1000/);
   assert.match(widget, /CHAT_KEY = 'vsi_assistant_chat_v1'/);
+  assert.match(widget, /INACTIVE_CLOSE_MS = 10 \* 60 \* 1000/);
+  assert.match(widget, /ARCHIVE_AFTER_MS = 30 \* 60 \* 1000/);
+  assert.match(widget, /function archiveLocalChat/);
   assert.match(widget, /data-email-form/);
   assert.match(widget, /session_id: sessionId/);
   assert.match(schema, /create table if not exists public\.assistant_transcripts/);
