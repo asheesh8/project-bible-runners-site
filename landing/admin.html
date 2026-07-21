@@ -530,6 +530,10 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           Deployments
         </div>
+        <div class="nav-item" data-tab="assistant-chats">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Assistant Chats
+        </div>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-label">Analytics</div>
@@ -698,6 +702,15 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
             <div>No testimonies yet. Add one above.</div>
           </div>
         </div>
+      </div>
+
+      <!-- ── ASSISTANT CHATS ─────────────────────── -->
+      <div class="tab-view" id="tab-assistant-chats">
+        <div class="page-header">
+          <div><h2 class="page-title">Assistant Chats</h2><p style="margin:5px 0 0;color:var(--muted);font-size:.9rem">Review saved conversations and send a copy only when the visitor needs one.</p></div>
+          <button class="btn-new" type="button" onclick="loadAssistantChats()">Refresh</button>
+        </div>
+        <div id="assistant-chats-list"><div class="empty-state"><div>Loading chats…</div></div></div>
       </div>
 
       <!-- ── TRAFFIC ──────────────────────────────── -->
@@ -1686,9 +1699,50 @@ function loadTab(tab){
   else if(tab === 'traffic') startTrafficPoll();
   else if(tab === 'applications') loadApplications();
   else if(tab === 'deployments') loadDeployments();
+  else if(tab === 'assistant-chats') loadAssistantChats();
   else if(tab === 'pamphlets') initPamphlets();
   else if(tab === 'pageeditor') initPageEditor();
   // 'resources' and 'internal' are static — nothing to load
+}
+
+// ════════════════════════════════════════════════════════
+// ASSISTANT CHAT TRANSCRIPTS
+// ════════════════════════════════════════════════════════
+function loadAssistantChats(){
+  var list = document.getElementById('assistant-chats-list');
+  list.innerHTML = '<div class="empty-state"><div>Loading chats…</div></div>';
+  fetch('/api/assistant-transcripts', {cache:'no-store',headers:{'Authorization':'Bearer '+AUTH_TOKEN}})
+    .then(checkAuth).then(function(r){return r.json();}).then(function(rows){
+      if(!Array.isArray(rows) || !rows.length){
+        list.innerHTML = '<div class="empty-state"><div>No assistant chats yet. If chat has been used, apply the assistant_transcripts Supabase migration.</div></div>';
+        return;
+      }
+      list.innerHTML = rows.map(function(row){
+        var msgs = Array.isArray(row.messages) ? row.messages : [];
+        var transcript = msgs.map(function(m){
+          return '<div style="margin:7px 0;padding:8px 10px;border-radius:8px;background:'+(m.role==='assistant'?'#f0f6fc':'#eef8f0')+'"><strong>'+(m.role==='assistant'?'Assistant':'Visitor')+':</strong> '+esc(m.content||'')+'</div>';
+        }).join('');
+        return '<details class="res-section collapsible-section" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:0 14px">'+
+          '<summary style="padding:14px 0"><strong>'+esc(row.email)+'</strong> · '+fmtDate(row.updated_at)+' · '+msgs.length+' messages <span class="section-caret">▾</span></summary>'+
+          '<div style="padding-bottom:14px">'+transcript+
+          '<div style="display:flex;align-items:center;gap:10px;margin-top:12px"><button class="btn-save" type="button" onclick="sendAssistantChat(\''+row.id+'\',this)">'+(row.emailed_at?'Send again':'Send chat by email')+'</button>'+
+          (row.emailed_at?'<span style="font-size:12px;color:var(--muted)">Last sent '+esc(new Date(row.emailed_at).toLocaleString())+'</span>':'')+'</div></div></details>';
+      }).join('');
+    }).catch(function(){ list.innerHTML='<div class="empty-state"><div>Could not load assistant chats.</div></div>'; });
+}
+
+function sendAssistantChat(id, button){
+  if(!confirm('Send this conversation to the visitor email shown above?')) return;
+  button.disabled = true;
+  button.textContent = 'Sending…';
+  fetch('/api/assistant-transcripts?action=send&id='+encodeURIComponent(id), {
+    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+AUTH_TOKEN}
+  }).then(checkAuth).then(function(r){return r.json().then(function(data){return {ok:r.ok,data:data};});})
+    .then(function(result){
+      if(!result.ok) throw new Error(result.data.error||'Send failed');
+      showStatus('Chat copy sent to the visitor.','ok');
+      loadAssistantChats();
+    }).catch(function(err){ button.disabled=false; button.textContent='Try sending again'; showStatus(err.message||'Could not send chat email.','warn'); });
 }
 
 // ════════════════════════════════════════════════════════

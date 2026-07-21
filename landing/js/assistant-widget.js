@@ -5,7 +5,13 @@
   window.__vsiAssistantLoaded = true;
 
   var API = '/api/assistant';
-  var messages = []; // {role, content} history sent to the API
+  var CHAT_KEY = 'vsi_assistant_chat_v1';
+  var savedChat = null;
+  try { savedChat = JSON.parse(localStorage.getItem(CHAT_KEY) || 'null'); } catch (e) { savedChat = null; }
+  if (!savedChat || !Array.isArray(savedChat.messages) || Date.now() - Number(savedChat.updatedAt || 0) > 7 * 86400000) savedChat = null;
+  var sessionId = (savedChat && savedChat.sessionId) || ('chat_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 12));
+  var chatEmail = (savedChat && savedChat.email) || '';
+  var messages = (savedChat && savedChat.messages) || []; // {role, content}
   var busy = false;
   var LIMIT_KEY = 'vsi_assistant_usage';
   var LIMIT_COUNT = 10;
@@ -22,6 +28,16 @@
     var usage = recentLocalUsage();
     usage.push(Date.now());
     try { localStorage.setItem(LIMIT_KEY, JSON.stringify(usage)); } catch (e) { /* best effort */ }
+  }
+
+  function saveChat(isOpen) {
+    try {
+      localStorage.setItem(CHAT_KEY, JSON.stringify({
+        sessionId: sessionId, email: chatEmail, messages: messages.slice(-20),
+        open: isOpen === undefined ? panel.classList.contains('open') : !!isOpen,
+        updatedAt: Date.now(),
+      }));
+    } catch (e) { /* best effort */ }
   }
 
   // ── Styles ─────────────────────────────────────────────
@@ -44,6 +60,13 @@
     '.vsi-asst-msg li{margin:2px 0}',
     '.vsi-asst-msg code{background:rgba(31,87,149,.09);padding:1px 5px;border-radius:5px;font-size:.86em}',
     '.vsi-asst-msg a{word-break:break-word}',
+    '.vsi-asst-email{margin:auto 0;background:#fff;border:1px solid var(--line,#d7e3f0);border-radius:14px;padding:14px}',
+    '.vsi-asst-email strong{display:block;margin-bottom:5px;color:var(--ink,#17283c)}',
+    '.vsi-asst-email p{margin:0 0 10px;color:var(--muted,#5d6b7d);font-size:.84rem;line-height:1.4}',
+    '.vsi-asst-email-row{display:flex;gap:7px}',
+    '.vsi-asst-email input{min-width:0;flex:1;border:1.5px solid var(--line,#d7e3f0);border-radius:10px;padding:9px;font:inherit}',
+    '.vsi-asst-email button{border:0;border-radius:10px;background:var(--blue,#1f5795);color:#fff;font-weight:800;padding:0 13px;cursor:pointer}',
+    '.vsi-asst-email-error{display:none;color:#b42318!important;margin:7px 0 0!important}',
     '.vsi-asst-foot{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line,#d7e3f0);background:#fff}',
     '.vsi-asst-foot textarea{flex:1;resize:none;border:1.5px solid var(--line,#d7e3f0);border-radius:12px;padding:9px 12px;font:inherit;font-size:.92rem;max-height:96px;color:var(--ink,#17283c)}',
     '.vsi-asst-foot textarea:focus{outline:0;border-color:var(--blue,#1f5795)}',
@@ -67,7 +90,7 @@
   panel.setAttribute('aria-label', 'VillageServer assistant');
   panel.innerHTML =
     '<div class="vsi-asst-head"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><strong>VillageServer Assistant</strong><button type="button" data-close aria-label="Close">×</button></div>' +
-    '<div class="vsi-asst-body" data-body></div>' +
+    '<div class="vsi-asst-body" data-body><form class="vsi-asst-email" data-email-form><strong>Where should we send your chat?</strong><p>Enter your email to begin. An administrator can send you a copy of this conversation when needed.</p><div class="vsi-asst-email-row"><input type="email" data-email required autocomplete="email" placeholder="you@example.com"><button type="submit">Continue</button></div><p class="vsi-asst-email-error" data-email-error>Please enter a valid email address.</p></form></div>' +
     '<form class="vsi-asst-foot" data-form>' +
     '<div class="vsi-asst-hp"><label>Website<input type="text" tabindex="-1" autocomplete="off" data-hp></label></div>' +
     '<textarea data-input rows="1" placeholder="Ask about kits, sharing, applying…" maxlength="500"></textarea>' +
@@ -81,6 +104,9 @@
   var input = panel.querySelector('[data-input]');
   var sendBtn = panel.querySelector('[data-send]');
   var hp = panel.querySelector('[data-hp]');
+  var emailForm = panel.querySelector('[data-email-form]');
+  var emailInput = panel.querySelector('[data-email]');
+  var emailError = panel.querySelector('[data-email-error]');
 
   function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
@@ -139,16 +165,37 @@
   }
 
   var opened = false;
+  function beginChat() {
+    emailForm.style.display = 'none';
+    form.style.display = 'flex';
+    if (!opened) {
+      opened = true;
+      if (messages.length) messages.forEach(function (m) { addBubble(m.role, m.content); });
+      else addBubble('bot', "Hi! I can help with questions about VillageServer kits, how the library is shared, power and satellite options, and how to apply for equipment. What would you like to know?");
+    }
+  }
+
   function openPanel() {
     panel.classList.add('open');
     launch.style.display = 'none';
-    if (!opened) {
-      opened = true;
-      addBubble('bot', "Hi! I can help with questions about VillageServer kits, how the library is shared, power and satellite options, and how to apply for equipment. What would you like to know?");
-    }
-    setTimeout(function () { input.focus(); }, 50);
+    saveChat(true);
+    if (chatEmail) beginChat();
+    setTimeout(function () { (chatEmail ? input : emailInput).focus(); }, 50);
   }
-  function closePanel() { panel.classList.remove('open'); launch.style.display = ''; }
+  function closePanel() { panel.classList.remove('open'); launch.style.display = ''; saveChat(false); }
+
+  form.style.display = 'none';
+  emailInput.value = chatEmail;
+  emailForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var value = emailInput.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) { emailError.style.display = 'block'; return; }
+    chatEmail = value.slice(0, 255);
+    emailError.style.display = 'none';
+    saveChat(true);
+    beginChat();
+    input.focus();
+  });
 
   launch.addEventListener('click', openPanel);
   panel.querySelector('[data-close]').addEventListener('click', closePanel);
@@ -179,6 +226,7 @@
 
     addBubble('user', text);
     messages.push({ role: 'user', content: text });
+    saveChat(true);
     input.value = '';
     input.style.height = 'auto';
 
@@ -187,7 +235,7 @@
     var typing = addBubble('bot', 'Typing…');
     typing.classList.add('typing');
 
-    var payload = { messages: messages, website: hp.value, site_host: location.host };
+    var payload = { messages: messages, email: chatEmail, session_id: sessionId, website: hp.value, site_host: location.host };
     if (window.VSITracking && window.VSITracking.visitorId) payload.visitor_id = window.VSITracking.visitorId();
 
     fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
@@ -198,6 +246,7 @@
         if (!(data && data.ignored)) recordLocalUsage();
         addBubble('bot', reply);
         messages.push({ role: 'assistant', content: reply });
+        saveChat(true);
         if (data && data.limited) {
           input.disabled = true;
           sendBtn.disabled = true;
@@ -213,4 +262,6 @@
         if (!input.disabled) { sendBtn.disabled = false; input.focus(); }
       });
   });
+
+  if (savedChat && savedChat.open) openPanel();
 })();

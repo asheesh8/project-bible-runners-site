@@ -559,6 +559,25 @@ $$;
 revoke all on function public.consume_assistant_quota(text, text, integer, integer, integer, integer) from public, anon, authenticated;
 grant execute on function public.consume_assistant_quota(text, text, integer, integer, integer, integer) to service_role;
 
+-- ── Assistant transcripts ──────────────────────────────────────────
+-- Visitors provide an email before chatting. The transcript is stored for
+-- admin review and is emailed only when an authenticated admin presses Send.
+create table if not exists public.assistant_transcripts (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null unique,
+  visitor_id text,
+  site_host text,
+  email text not null,
+  messages jsonb not null default '[]'::jsonb,
+  emailed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists assistant_transcripts_updated_idx on public.assistant_transcripts (updated_at desc);
+alter table public.assistant_transcripts enable row level security;
+revoke all on public.assistant_transcripts from anon, authenticated;
+
 -- Confirm all expected tables exist after running the migration.
 select table_name
 from information_schema.tables
@@ -567,6 +586,6 @@ where table_schema = 'public'
     'campaigns', 'posts', 'photos', 'affiliates',
     'page_visits', 'link_clicks', 'donation_interests', 'availability_requests',
     'contact_messages', 'equipment_applications', 'site_settings', 'deployments',
-    'assistant_leads', 'assistant_usage'
+    'assistant_leads', 'assistant_usage', 'assistant_transcripts'
   )
 order by table_name;

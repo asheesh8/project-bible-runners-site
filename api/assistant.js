@@ -50,6 +50,7 @@ const TOOLS = [{
 }];
 
 function trim(v, max = 2000) { return String(v || '').trim().slice(0, max); }
+function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').trim()); }
 
 // Clean a user message: strip emojis and control characters (so the model
 // can't be nudged off-course by junk), collapse whitespace, and hard-cap length.
@@ -186,6 +187,34 @@ async function notifyTeam(lead) {
   } catch (e) { /* best effort */ }
 }
 
+async function storeTranscript({ sessionId, email, messages, meta }) {
+  const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+  if (!SUPABASE_URL || !KEY || !sessionId || !validEmail(email)) return false;
+  const safeMessages = messages.slice(-20).map((m) => ({
+    role: m.role === 'assistant' ? 'assistant' : 'user',
+    content: m.role === 'assistant' ? cleanReplyText(m.content) : cleanUserText(m.content),
+  })).filter((m) => m.content);
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/assistant_transcripts?on_conflict=session_id`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', apikey: KEY, Authorization: `Bearer ${KEY}`,
+        Prefer: 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify({
+        session_id: sessionId,
+        visitor_id: meta.visitor_id || null,
+        site_host: meta.site_host || null,
+        email: String(email).trim().toLowerCase().slice(0, 255),
+        messages: safeMessages,
+        updated_at: new Date().toISOString(),
+      }),
+    });
+    return r.ok;
+  } catch (e) { return false; }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -198,12 +227,21 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(503).json({ error: 'Assistant is not configured yet.' });
 
   const b = req.body || {};
+  const email = String(b.email || '').trim().toLowerCase().slice(0, 255);
+  const sessionId = String(b.session_id || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 100);
+  if (!validEmail(email)) return res.status(400).json({ error: 'A valid email address is required.' });
+  if (!sessionId) return res.status(400).json({ error: 'A chat session is required.' });
 
   // Honeypot + crawler screen: pretend-succeed so bots learn nothing and cost nothing.
   const ua = String(req.headers['user-agent'] || '');
   if (trim(b.website, 200) || ROBOT_RE.test(ua)) return res.status(200).json({ reply: '', ignored: true });
 
   const incoming = Array.isArray(b.messages) ? b.messages : [];
+  const transcriptMessages = incoming
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .slice(-19)
+    .map((m) => ({ role: m.role, content: m.role === 'user' ? cleanUserText(m.content) : cleanReplyText(m.content) }))
+    .filter((m) => m.content);
   const messages = incoming
     .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
     .slice(-MAX_HISTORY) // cap history sent to the model
@@ -257,6 +295,7 @@ export default async function handler(req, res) {
 
     const reply = cleanReplyText((response.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('\n'))
       || "I'm sorry — I didn't catch that. Could you rephrase?";
+    await storeTranscript({ sessionId, email, messages: [...transcriptMessages, { role: 'assistant', content: reply }], meta });
     return res.status(200).json({ reply, lead_captured: leadCaptured });
   } catch (e) {
     return res.status(200).json({ reply: "Sorry — I'm having trouble right now. Please try again, or use the contact form and the team will help you directly." });

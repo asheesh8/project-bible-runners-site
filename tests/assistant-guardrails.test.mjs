@@ -18,6 +18,8 @@ test('assistant quota limits and atomic database function remain wired in', () =
   const api = readFileSync(new URL('../api/assistant.js', import.meta.url), 'utf8');
   const schema = readFileSync(new URL('../supabase/schema.sql', import.meta.url), 'utf8');
   const widget = readFileSync(new URL('../landing/js/assistant-widget.js', import.meta.url), 'utf8');
+  const admin = readFileSync(new URL('../landing/admin.html', import.meta.url), 'utf8');
+  const transcriptApi = readFileSync(new URL('../api/assistant-transcripts.js', import.meta.url), 'utf8');
 
   assert.match(api, /PER_VISITOR_LIMIT = 10/);
   assert.match(api, /WINDOW_HOURS = 6/);
@@ -31,4 +33,14 @@ test('assistant quota limits and atomic database function remain wired in', () =
   assert.match(widget, /data\.limited/);
   assert.match(widget, /LIMIT_COUNT = 10/);
   assert.match(widget, /LIMIT_WINDOW_MS = 6 \* 60 \* 60 \* 1000/);
+  assert.match(widget, /CHAT_KEY = 'vsi_assistant_chat_v1'/);
+  assert.match(widget, /data-email-form/);
+  assert.match(widget, /session_id: sessionId/);
+  assert.match(schema, /create table if not exists public\.assistant_transcripts/);
+  assert.match(schema, /messages jsonb/);
+  assert.match(admin, /data-tab="assistant-chats"/);
+  assert.match(admin, /sendAssistantChat/);
+  assert.match(transcriptApi, /isAuthorizedAdmin/);
+  assert.match(transcriptApi, /action === 'send'/);
+  assert.match(transcriptApi, /to: \[row\.email\]/);
 });
