@@ -12,7 +12,7 @@
 //   POST /api/assistant  { messages:[{role,content}], visitor_id, site_host, website }
 //     → { reply: "…", lead_captured: bool }
 import crypto from 'node:crypto';
-import { KNOWLEDGE_BASE } from './_lib/knowledge-base.js';
+import { CORE_KNOWLEDGE, retrieveKnowledge } from './_lib/knowledge-retriever.js';
 import { PERSONA } from './_lib/assistant-persona.js';
 
 const MODEL = 'claude-haiku-4-5';
@@ -268,10 +268,16 @@ export default async function handler(req, res) {
     });
   }
 
+  const retrievalQuery = messages.filter((m) => m.role === 'user').slice(-2).map((m) => m.content).join(' ');
+  const relevantKnowledge = retrieveKnowledge(retrievalQuery);
   const system = [
     { type: 'text', text: PERSONA },
-    { type: 'text', text: `Below is everything you know about VillageServer, taken from the site itself. Answer only from what's here — but never refer to it as a "knowledge base", a "section", or a "source"; just answer naturally as yourself.\n\n${KNOWLEDGE_BASE}`, cache_control: { type: 'ephemeral' } },
+    { type: 'text', text: `This is your stable core information about VillageServer. Answer only from the information provided, but never refer to it as a knowledge base, section, context, or source.\n\n${CORE_KNOWLEDGE}`, cache_control: { type: 'ephemeral' } },
   ];
+  if (relevantKnowledge) system.push({
+    type: 'text',
+    text: `These are the site pages most relevant to the visitor's current question:\n\n${relevantKnowledge}`,
+  });
 
   try {
     let leadCaptured = false;

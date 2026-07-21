@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { cleanReplyText, cleanUserText } from '../api/assistant.js';
+import { CORE_KNOWLEDGE, retrieveKnowledge } from '../api/_lib/knowledge-retriever.js';
 
 test('assistant text guardrails remove emoji and cap text cleanly', () => {
   assert.equal(cleanUserText('Hello \u{1F44B}\u{1F3FD} world'), 'Hello world');
@@ -12,6 +13,18 @@ test('assistant text guardrails remove emoji and cap text cleanly', () => {
   assert.match(reply, /[.!?]$/);
   assert.doesNotMatch(reply, /senten\.$/);
   assert.doesNotMatch(cleanReplyText('No emoji \u{1F680}'), /\p{Extended_Pictographic}/u);
+});
+
+test('local retrieval sends compact, relevant site context', () => {
+  const satellite = retrieveKnowledge('I need a satellite dish, LNB, receiver, and the PDF link');
+  assert.match(satellite, /Satellite Systems and Content Acquisition/);
+  assert.doesNotMatch(satellite, /Photos and Visuals/);
+  assert.ok(satellite.length < 16000);
+
+  const transfer = retrieveKnowledge('How do I copy a Bible from Android to iPhone?');
+  assert.match(transfer, /Transfer Resources Between Devices|Phone-Based Gospel Distribution/);
+  assert.ok(CORE_KNOWLEDGE.includes('/downloads/villageserver-satellite-systems.pdf'));
+  assert.ok(CORE_KNOWLEDGE.length < 18000);
 });
 
 test('assistant quota limits and atomic database function remain wired in', () => {
@@ -25,6 +38,7 @@ test('assistant quota limits and atomic database function remain wired in', () =
   assert.match(api, /WINDOW_HOURS = 6/);
   assert.match(api, /MAX_REPLY_CHARS = 800/);
   assert.match(api, /MAX_OUTPUT_TOKENS = 300/);
+  assert.match(api, /retrieveKnowledge\(retrievalQuery\)/);
   assert.match(api, /rpc\/consume_assistant_quota/);
   assert.match(api, /consumeMemoryQuota/);
   assert.match(schema, /pg_advisory_xact_lock/);
