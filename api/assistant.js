@@ -12,25 +12,10 @@
 //   POST /api/assistant  { messages:[{role,content}], visitor_id, site_host, website }
 //     → { reply: "…", lead_captured: bool }
 import { KNOWLEDGE_BASE } from './_lib/knowledge-base.js';
+import { PERSONA } from './_lib/assistant-persona.js';
 
 const MODEL = 'claude-haiku-4-5';
 const ROBOT_RE = /bot|crawler|spider|crawl|slurp|facebookexternalhit|headlesschrome|phantomjs|lighthouse|semrush|ahrefs|bytespider|python-requests|httpclient|curl|wget/i;
-
-const PERSONA = `You are the VillageServer Initiative's website assistant — a warm, plain-spoken helper for missionaries, pastors, field partners, and supporters visiting the site.
-
-VillageServer Initiative is a Christian nonprofit that equips missions with offline Bible libraries and field technology (microSD cards, Wi-Fi sharing hubs, Raspberry Pi servers, projectors, satellite receive-and-replay, and solar power) so God's Word reaches villages with no internet.
-
-HOW TO ANSWER
-- Answer using ONLY the information in the KNOWLEDGE BASE below. It is the site's own content.
-- If the answer isn't in the knowledge base, say so plainly and point them to the contact form or the Equipment & Funding Application — do not guess, and never invent prices, dates, specs, or promises.
-- Never promise that anyone will receive equipment or funding — approvals are made by the team, not by you. You inform and guide.
-- Keep replies short, friendly, and easy to read. Use plain language; this audience is often on slow connections and reading in a second language.
-- Don't ask for sensitive documents, IDs, or personal details in chat — those belong in the secure application.
-
-INTAKE (your second job)
-- If a visitor is a missionary or field partner who wants to receive equipment for a mission, help them: understand which kit fits, and guide them to apply at the Equipment & Funding Application page (/equipment-application).
-- Once you know their name, email, country, and roughly who they're trying to reach, call the capture_lead tool ONCE so the team can follow up even if they don't finish the application. Then encourage them to complete the full application.
-- Don't pester for details. Only capture a lead when they've clearly expressed interest and shared at least a name and email.`;
 
 const TOOLS = [{
   name: 'capture_lead',
@@ -136,7 +121,7 @@ export default async function handler(req, res) {
 
   const system = [
     { type: 'text', text: PERSONA },
-    { type: 'text', text: `KNOWLEDGE BASE (the site's own content — answer only from this):\n\n${KNOWLEDGE_BASE}`, cache_control: { type: 'ephemeral' } },
+    { type: 'text', text: `Below is everything you know about VillageServer, taken from the site itself. Answer only from what's here — but never refer to it as a "knowledge base", a "section", or a "source"; just answer naturally as yourself.\n\n${KNOWLEDGE_BASE}`, cache_control: { type: 'ephemeral' } },
   ];
 
   try {

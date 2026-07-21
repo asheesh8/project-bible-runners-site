@@ -24,6 +24,10 @@
     '.vsi-asst-msg.bot{align-self:flex-start;background:#fff;border:1px solid var(--line,#d7e3f0);color:var(--ink,#17283c)}',
     '.vsi-asst-msg.me{align-self:flex-end;background:var(--blue,#1f5795);color:#fff}',
     '.vsi-asst-msg.typing{color:var(--muted,#5d6b7d);font-style:italic}',
+    '.vsi-asst-msg p:last-child,.vsi-asst-msg ul:last-child,.vsi-asst-msg ol:last-child{margin-bottom:0}',
+    '.vsi-asst-msg li{margin:2px 0}',
+    '.vsi-asst-msg code{background:rgba(31,87,149,.09);padding:1px 5px;border-radius:5px;font-size:.86em}',
+    '.vsi-asst-msg a{word-break:break-word}',
     '.vsi-asst-foot{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line,#d7e3f0);background:#fff}',
     '.vsi-asst-foot textarea{flex:1;resize:none;border:1.5px solid var(--line,#d7e3f0);border-radius:12px;padding:9px 12px;font:inherit;font-size:.92rem;max-height:96px;color:var(--ink,#17283c)}',
     '.vsi-asst-foot textarea:focus{outline:0;border-color:var(--blue,#1f5795)}',
@@ -64,15 +68,55 @@
 
   function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
+  // Render a light, safe subset of markdown so replies look clean instead of
+  // showing raw #, **, and - symbols. Always escapes HTML first.
+  function renderMarkdown(text) {
+    var lines = String(text).replace(/\r/g, '').split('\n');
+    var html = '';
+    var listType = null; // 'ul' | 'ol' | null
+
+    function inline(s) {
+      s = esc(s);
+      s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+      s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+      // markdown links [text](url)
+      s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">$1</a>');
+      // bare links: full urls, site paths, and *.pdf/*.html paths not already linked
+      s = s.replace(/(^|[\s(])((?:https?:\/\/[^\s<]+)|(?:\/[A-Za-z0-9_\-./]+\.(?:html|pdf)))/g,
+        function (m, pre, url) { return pre + '<a href="' + url + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">' + url + '</a>'; });
+      return s;
+    }
+    function closeList() { if (listType) { html += '</' + listType + '>'; listType = null; } }
+
+    lines.forEach(function (raw) {
+      var line = raw.replace(/\s+$/, '');
+      if (!line.trim()) { closeList(); return; }
+      // strip stray markdown heading hashes — we don't want big headers in chat
+      line = line.replace(/^\s{0,3}#{1,6}\s+/, '');
+      var ol = line.match(/^\s*\d+[.)]\s+(.*)$/);
+      var ul = line.match(/^\s*[-*•]\s+(.*)$/);
+      if (ol) {
+        if (listType !== 'ol') { closeList(); html += '<ol style="margin:4px 0;padding-left:20px">'; listType = 'ol'; }
+        html += '<li>' + inline(ol[1]) + '</li>';
+      } else if (ul) {
+        if (listType !== 'ul') { closeList(); html += '<ul style="margin:4px 0;padding-left:20px">'; listType = 'ul'; }
+        html += '<li>' + inline(ul[1]) + '</li>';
+      } else {
+        closeList();
+        html += '<p style="margin:0 0 8px">' + inline(line) + '</p>';
+      }
+    });
+    closeList();
+    return html || esc(text);
+  }
+
   function addBubble(role, text) {
     var el = document.createElement('div');
     el.className = 'vsi-asst-msg ' + (role === 'user' ? 'me' : 'bot');
-    // Linkify /equipment-application and bare urls lightly
-    var safe = esc(text).replace(/(https?:\/\/[^\s]+|\/equipment-application)/g, function (m) {
-      var href = m.charAt(0) === '/' ? m : m;
-      return '<a href="' + href + '" style="color:inherit;text-decoration:underline">' + m + '</a>';
-    });
-    el.innerHTML = safe;
+    // User text stays plain; the assistant's replies get light markdown rendering.
+    el.innerHTML = role === 'user' ? esc(text) : renderMarkdown(text);
     body.appendChild(el);
     body.scrollTop = body.scrollHeight;
     return el;

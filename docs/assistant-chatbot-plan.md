@@ -115,6 +115,19 @@ it feels native, and it's self-contained (no external chat SDK).
 
 ---
 
+## Personality — how it sounds, and where to change it
+
+The assistant's voice lives in **`api/_lib/assistant-persona.js`** — a plain,
+readable instruction telling it to sound like a warm, human member of the team
+rather than a document generator: short chat-style replies, everyday language, no
+markdown headings or "the knowledge base says…", one gentle question at a time,
+and an encouraging tone for missionaries. To change how the bot talks, edit the
+text in that file and redeploy — the facts it draws on (the knowledge base) are a
+separate file, so you can adjust personality without touching content.
+
+The chat widget also renders light markdown (bold, lists, links), so any
+formatting comes out clean instead of showing raw `#`/`**` symbols.
+
 ## Guardrails (built in from day one)
 
 - **Grounded only.** Answer from the knowledge base; if it's not there, say so and
