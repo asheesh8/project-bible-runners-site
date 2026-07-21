@@ -142,6 +142,7 @@ it feels native, and it's self-contained (no external chat SDK).
 
 ## Env vars this adds
 
-- `ANTHROPIC_API_KEY` — required; the assistant's brain (Haiku).
+- `VillageServerChatBotAnthropicKey` — required; the assistant's brain (Haiku).
+  (The code also accepts the standard `ANTHROPIC_API_KEY` as a fallback.)
 - `RESEND_API_KEY` — already present; used to notify the team on a captured lead.
 - `SUPABASE_URL` / `SUPABASE_SERVICE_KEY` — already present; stores leads.
