@@ -7,6 +7,22 @@
   var API = '/api/assistant';
   var messages = []; // {role, content} history sent to the API
   var busy = false;
+  var LIMIT_KEY = 'vsi_assistant_usage';
+  var LIMIT_COUNT = 10;
+  var LIMIT_WINDOW_MS = 6 * 60 * 60 * 1000;
+
+  function recentLocalUsage() {
+    try {
+      var cutoff = Date.now() - LIMIT_WINDOW_MS;
+      return JSON.parse(localStorage.getItem(LIMIT_KEY) || '[]').filter(function (at) { return Number(at) >= cutoff; });
+    } catch (e) { return []; }
+  }
+
+  function recordLocalUsage() {
+    var usage = recentLocalUsage();
+    usage.push(Date.now());
+    try { localStorage.setItem(LIMIT_KEY, JSON.stringify(usage)); } catch (e) { /* best effort */ }
+  }
 
   // ── Styles ─────────────────────────────────────────────
   var css = document.createElement('style');
@@ -153,6 +169,13 @@
     if (busy) return;
     var text = input.value.trim();
     if (!text) return;
+    if (recentLocalUsage().length >= LIMIT_COUNT) {
+      addBubble('bot', "You've reached the chat limit for now. Please try again later, or use the contact form for help.");
+      input.disabled = true;
+      sendBtn.disabled = true;
+      input.placeholder = 'Chat limit reached';
+      return;
+    }
 
     addBubble('user', text);
     messages.push({ role: 'user', content: text });
@@ -172,6 +195,7 @@
       .then(function (data) {
         typing.remove();
         var reply = (data && data.reply) || "Sorry, I couldn't reach the assistant. Please try the contact form.";
+        if (!(data && data.ignored)) recordLocalUsage();
         addBubble('bot', reply);
         messages.push({ role: 'assistant', content: reply });
         if (data && data.limited) {

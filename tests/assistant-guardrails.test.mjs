@@ -20,8 +20,11 @@ test('assistant quota limits and atomic database function remain wired in', () =
   assert.match(api, /WINDOW_HOURS = 6/);
   assert.match(api, /MAX_OUTPUT_TOKENS = 200/);
   assert.match(api, /rpc\/consume_assistant_quota/);
+  assert.match(api, /consumeMemoryQuota/);
   assert.match(schema, /pg_advisory_xact_lock/);
   assert.match(schema, /grant execute on function public\.consume_assistant_quota/);
   assert.match(widget, /maxlength="500"/);
   assert.match(widget, /data\.limited/);
+  assert.match(widget, /LIMIT_COUNT = 10/);
+  assert.match(widget, /LIMIT_WINDOW_MS = 6 \* 60 \* 60 \* 1000/);
 });

@@ -28,6 +28,11 @@ const PER_VISITOR_LIMIT = 10;     // messages per window, per browser/device
 const PER_IP_LIMIT = 30;          // shared-network abuse backstop
 const GLOBAL_DAILY_LIMIT = 1000;  // absolute messages across everyone / 24h
 
+// Serverless-instance fallback used only until/when the durable Supabase RPC is
+// unavailable. It is intentionally conservative and still prevents tight loops
+// on a warm instance; the database limiter remains the cross-instance authority.
+const memoryUsage = globalThis.__vsiAssistantUsage || (globalThis.__vsiAssistantUsage = []);
+
 const TOOLS = [{
   name: 'capture_lead',
   description: "Record an interested missionary or field partner so the team can follow up. Only call once you have at least their name and email and they've expressed interest in receiving equipment or partnering.",
@@ -71,12 +76,27 @@ function ipKeyFrom(req) {
   return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 24);
 }
 
-// The database function checks and records all three limits atomically. This
-// fails closed: if quota storage is unavailable, no paid model call is made.
+function consumeMemoryQuota(meta) {
+  const now = Date.now();
+  const windowStart = now - WINDOW_HOURS * 3600 * 1000;
+  const dayStart = now - 24 * 3600 * 1000;
+  while (memoryUsage.length && memoryUsage[0].at < dayStart) memoryUsage.shift();
+  const visitorCount = meta.visitor_key
+    ? memoryUsage.filter((row) => row.at >= windowStart && row.visitor_key === meta.visitor_key).length : 0;
+  const ipCount = meta.ip_key
+    ? memoryUsage.filter((row) => row.at >= windowStart && row.ip_key === meta.ip_key).length : 0;
+  if (memoryUsage.length >= GLOBAL_DAILY_LIMIT || visitorCount >= PER_VISITOR_LIMIT || ipCount >= PER_IP_LIMIT) return false;
+  memoryUsage.push({ at: now, visitor_key: meta.visitor_key, ip_key: meta.ip_key });
+  return true;
+}
+
+// The database function checks and records all three limits atomically. A
+// conservative instance-local fallback keeps chat usable during migration or a
+// brief database outage without leaving a warm function open to request loops.
 async function checkAndRecordUsage(meta) {
   const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
-  if (!SUPABASE_URL || !KEY) return { allowed: false, unavailable: true };
+  if (!SUPABASE_URL || !KEY) return { allowed: consumeMemoryQuota(meta), fallback: true };
   const h = { apikey: KEY, Authorization: `Bearer ${KEY}` };
   try {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_assistant_quota`, {
@@ -91,10 +111,10 @@ async function checkAndRecordUsage(meta) {
         p_global_limit: GLOBAL_DAILY_LIMIT,
       }),
     });
-    if (!r.ok) return { allowed: false, unavailable: true };
+    if (!r.ok) return { allowed: consumeMemoryQuota(meta), fallback: true };
     return { allowed: (await r.json()) === true };
   } catch (e) {
-    return { allowed: false, unavailable: true };
+    return { allowed: consumeMemoryQuota(meta), fallback: true };
   }
 }
 
@@ -189,9 +209,7 @@ export default async function handler(req, res) {
   const usage = await checkAndRecordUsage(meta);
   if (!usage.allowed) {
     return res.status(200).json({
-      reply: usage.unavailable
-        ? 'The assistant is temporarily unavailable. Please use the contact form and our team will help you directly.'
-        : "You've reached the chat limit for now. Please try again later, or use the contact form for help.",
+      reply: "You've reached the chat limit for now. Please try again later, or use the contact form for help.",
       limited: true,
     });
   }
