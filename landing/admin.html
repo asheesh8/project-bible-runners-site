@@ -526,6 +526,10 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
           Applications
         </div>
+        <div class="nav-item" data-tab="laura-agent">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2"/><path d="M9 13h.01M15 13h.01"/><path d="M10 17h4"/></svg>
+          Laura Agent
+        </div>
         <div class="nav-item" data-tab="deployments">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           Deployments
@@ -1047,6 +1051,26 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
             <div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h18v18H3z"/></svg><div>No campaigns yet. Click "New campaign" above.</div></div>
           </div>
         </div>
+      </div>
+
+      <!-- ── LAURA AGENT ─────────────────────────────── -->
+      <div class="tab-view" id="tab-laura-agent">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Laura Agent</h2>
+            <p style="margin:5px 0 0;color:var(--muted);font-size:.9rem">Receptionist queue for application follow-up, Larry digests, Gmail replies, and deployment filing.</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-new" type="button" onclick="loadLauraAgent()">Refresh</button>
+            <button class="btn-save" type="button" onclick="lauraEnsureRecent(this)">Create missing threads</button>
+            <button class="btn-save" type="button" onclick="lauraSendDigest(this)">Send Larry digest</button>
+            <button class="btn-save" type="button" onclick="lauraPollGmail(this)">Poll Gmail</button>
+          </div>
+        </div>
+        <div id="laura-health" class="res-section" style="padding:14px 18px">
+          <div style="color:#57606a">Checking Laura configuration...</div>
+        </div>
+        <div id="laura-agent-list"><div class="empty-state"><div>Loading Laura queue...</div></div></div>
       </div>
 
       <!-- ── DEPLOYMENTS (mirrors Eric's Excel log) ── -->
@@ -1698,6 +1722,7 @@ function loadTab(tab){
   else if(tab === 'testimonies') loadTestimonies();
   else if(tab === 'traffic') startTrafficPoll();
   else if(tab === 'applications') loadApplications();
+  else if(tab === 'laura-agent') loadLauraAgent();
   else if(tab === 'deployments') loadDeployments();
   else if(tab === 'assistant-chats') loadAssistantChats();
   else if(tab === 'pamphlets') initPamphlets();
@@ -1744,6 +1769,224 @@ function sendAssistantChat(id, button){
       showStatus('Chat copy sent to the visitor.','ok');
       loadAssistantChats();
     }).catch(function(err){ button.disabled=false; button.textContent='Try sending again'; showStatus(err.message||'Could not send chat email.','warn'); });
+}
+
+// ════════════════════════════════════════════════════════
+// LAURA INTAKE RECEPTIONIST AGENT
+// ════════════════════════════════════════════════════════
+var _lauraCache = {threads:[], messages:[], filing_items:[]};
+
+function fmtDateTime(d){
+  if(!d) return '—';
+  return new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+function lauraApi(method, action, body){
+  var url = '/api/intake-agent';
+  if(action) url += '?action=' + encodeURIComponent(action);
+  var opts = {method:method,cache:'no-store',headers:{'Authorization':'Bearer '+AUTH_TOKEN}};
+  if(body){ opts.headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
+  return fetch(url,opts).then(checkAuth).then(function(r){ return r.json().then(function(data){ return {ok:r.ok,data:data}; }); })
+    .then(function(result){ if(!result.ok) throw new Error((result.data && result.data.error) || 'Laura request failed'); return result.data; });
+}
+
+function lauraSetButton(button, busyText){
+  if(!button) return function(){};
+  var old = button.textContent;
+  button.disabled = true;
+  button.textContent = busyText || 'Working...';
+  return function(text){ button.disabled = false; button.textContent = text || old; };
+}
+
+function lauraHealthBadge(label, on){
+  return '<span style="display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:.74rem;font-weight:800;background:'+(on?'#dafbe1':'#ffebe9')+';color:'+(on?'#1a7f37':'#cf222e')+'">'+esc(label)+': '+(on?'on':'off')+'</span>';
+}
+
+function renderLauraHealth(h){
+  var el = document.getElementById('laura-health');
+  if(!el) return;
+  if(!h){
+    el.innerHTML = '<div style="color:#cf222e;font-weight:700">Could not check Laura configuration.</div>';
+    return;
+  }
+  el.innerHTML =
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:9px">'+
+    lauraHealthBadge('Supabase', h.supabase_configured)+
+    lauraHealthBadge('Anthropic', h.anthropic_configured)+
+    lauraHealthBadge('Resend', h.resend_configured)+
+    lauraHealthBadge('Gmail OAuth', h.gmail_oauth_configured)+
+    lauraHealthBadge('Cal.com', h.cal_booking_configured)+
+    '</div>'+
+    '<div style="font-size:.86rem;color:#57606a;display:flex;gap:14px;flex-wrap:wrap">'+
+    '<span><strong>Email provider:</strong> '+esc(h.email_provider||'resend')+'</span>'+
+    '<span><strong>Laura:</strong> '+esc(h.agent_email||'')+'</span>'+
+    '<span><strong>Larry:</strong> '+esc(h.larry_email||'')+'</span>'+
+    '<button type="button" onclick="lauraGmailAuth(this)" style="border:1px solid #d0d7de;background:#fff;border-radius:7px;padding:5px 9px;font-weight:800;cursor:pointer">Get Gmail auth link</button>'+
+    '</div>';
+}
+
+function lauraMessagesFor(threadId){
+  return (_lauraCache.messages||[]).filter(function(m){ return m.thread_id === threadId; });
+}
+
+function lauraTasksFor(threadId){
+  return (_lauraCache.filing_items||[]).filter(function(t){ return t.thread_id === threadId; });
+}
+
+function latestLauraDraft(threadId){
+  return lauraMessagesFor(threadId).filter(function(m){ return m.status === 'draft' && m.direction === 'outbound'; })
+    .sort(function(a,b){ return new Date(b.created_at) - new Date(a.created_at); })[0];
+}
+
+function lauraStateBadge(t){
+  var state = t.state || 'new';
+  var colors = {
+    waiting_on_larry:['#fff8c5','#9a6700'],
+    waiting_on_customer:['#ddf4ff','#0969da'],
+    filed:['#dafbe1','#1a7f37'],
+    escalated:['#ffebe9','#cf222e'],
+    follow_up_photos:['#f0e7ff','#8250df']
+  }[state] || ['#eaeef2','#57606a'];
+  return badge(state.replace(/_/g,' '), colors[0], colors[1], 'Laura thread state');
+}
+
+function renderLauraThread(t){
+  var msgs = lauraMessagesFor(t.id);
+  var tasks = lauraTasksFor(t.id);
+  var draft = latestLauraDraft(t.id);
+  var recent = msgs.slice(-5).map(function(m){
+    return '<div style="padding:8px 10px;border-radius:8px;background:'+(m.direction==='outbound'?'#f0f6fc':m.role==='larry'?'#fff8c5':'#eef8f0')+';margin-top:7px">'+
+      '<div style="display:flex;gap:8px;justify-content:space-between;align-items:center"><strong style="font-size:.82rem">'+esc((m.role||'message').toUpperCase())+'</strong><span style="font-size:.72rem;color:#57606a">'+esc(m.status||'')+' · '+fmtDateTime(m.created_at)+'</span></div>'+
+      (m.subject?'<div style="font-size:.78rem;color:#57606a;margin-top:3px">'+esc(m.subject)+'</div>':'')+
+      '<div style="font-size:.86rem;margin-top:4px;white-space:pre-wrap">'+esc((m.body||'').slice(0,900))+'</div>'+
+    '</div>';
+  }).join('');
+  var missing = Array.isArray(t.missing_fields) ? t.missing_fields.join(', ') : '';
+  return '<details class="res-section collapsible-section" style="background:#fff;border:1px solid #d0d7de;border-radius:10px;padding:0 14px;margin-bottom:12px" open>'+
+    '<summary style="padding:14px 0;cursor:pointer">'+
+      '<span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+        '<strong>'+esc(t.applicant_name||'Applicant')+'</strong>'+
+        '<span style="font-size:.82rem;color:#57606a">'+esc(t.applicant_email||'')+'</span>'+
+        badge('VS-'+(t.thread_token||''),'#f6f8fa','#24292f','Reply token')+
+        lauraStateBadge(t)+
+        '<span style="font-size:.78rem;color:#57606a">updated '+fmtDateTime(t.updated_at)+'</span>'+
+        '<span class="section-caret">▾</span>'+
+      '</span>'+
+    '</summary>'+
+    '<div style="padding-bottom:14px">'+
+      '<div style="font-size:.9rem;color:#24292f;margin-bottom:8px"><strong>Summary:</strong> '+esc(t.summary||'No summary yet.')+'</div>'+
+      (missing?'<div style="font-size:.86rem;color:#57606a;margin-bottom:8px"><strong>Missing:</strong> '+esc(missing)+'</div>':'')+
+      (tasks.length?'<div style="font-size:.86rem;color:#57606a;margin-bottom:8px"><strong>Filing:</strong> '+tasks.map(function(task){return esc(task.title)+' ('+esc(task.state)+')';}).join('; ')+'</div>':'')+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">'+
+        '<button class="btn-save" type="button" onclick="lauraRunThread(\''+t.id+'\',this)">Run Laura</button>'+
+        (draft?'<button class="btn-save" type="button" onclick="lauraApproveSend(\''+draft.id+'\',this)">Approve/send latest draft</button>':'')+
+        '<button class="btn-save" type="button" onclick="lauraFileDeployment(\''+t.id+'\',this)">File deployment</button>'+
+      '</div>'+
+      (draft?'<div style="border:1px solid #d0d7de;border-radius:8px;padding:10px;margin:10px 0;background:#f6f8fa"><strong>Latest draft to '+esc((draft.to_email||[]).join(', '))+'</strong><div style="font-size:.82rem;color:#57606a;margin-top:4px">'+esc(draft.subject||'')+'</div><pre style="white-space:pre-wrap;font-family:inherit;font-size:.86rem;margin:8px 0 0">'+esc(draft.body||'')+'</pre></div>':'')+
+      (recent || '<div class="empty-state" style="padding:16px"><div>No Laura messages yet.</div></div>')+
+    '</div></details>';
+}
+
+function renderLauraList(){
+  var list = document.getElementById('laura-agent-list');
+  var threads = (_lauraCache.threads||[]).slice().sort(function(a,b){ return new Date(b.updated_at) - new Date(a.updated_at); });
+  if(!threads.length){
+    list.innerHTML = '<div class="empty-state"><div>No Laura threads yet. Click "Create missing threads" or wait for the next application.</div></div>';
+    return;
+  }
+  list.innerHTML = threads.map(renderLauraThread).join('');
+}
+
+function loadLauraAgent(){
+  var list = document.getElementById('laura-agent-list');
+  if(list) list.innerHTML = '<div class="empty-state"><div>Loading Laura queue...</div></div>';
+  Promise.all([
+    lauraApi('GET','health'),
+    fetch('/api/intake-agent?include_messages=1',{cache:'no-store',headers:{'Authorization':'Bearer '+AUTH_TOKEN}}).then(checkAuth).then(function(r){return r.json();})
+  ]).then(function(results){
+    renderLauraHealth(results[0]);
+    _lauraCache = results[1] || {threads:[],messages:[],filing_items:[]};
+    renderLauraList();
+  }).catch(function(err){
+    renderLauraHealth(null);
+    if(list) list.innerHTML = '<div class="empty-state"><div>'+esc(err.message||'Could not load Laura queue.')+'</div></div>';
+  });
+}
+
+function lauraEnsureRecent(button){
+  var done = lauraSetButton(button,'Creating...');
+  lauraApi('POST','ensure-recent',{limit:40}).then(function(){
+    showStatus('Laura threads created for recent applications.','ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Could not create Laura threads.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraRunThread(threadId, button){
+  var done = lauraSetButton(button,'Running...');
+  lauraApi('POST','run-thread',{thread_id:threadId}).then(function(){
+    showStatus('Laura drafted the next step.','ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Laura could not run.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraRunApplication(appId, button){
+  var done = lauraSetButton(button,'Running Laura...');
+  lauraApi('POST','run-thread',{application_id:appId}).then(function(){
+    showStatus('Laura drafted the next step for this application.','ok');
+  }).catch(function(err){ showStatus(err.message||'Laura could not run.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraApproveSend(messageId, button){
+  if(!confirm('Send this Laura draft now?')) return;
+  var done = lauraSetButton(button,'Sending...');
+  lauraApi('POST','approve-send',{message_id:messageId}).then(function(){
+    showStatus('Laura draft sent.','ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Could not send Laura draft.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraSendDigest(button){
+  var done = lauraSetButton(button,'Sending...');
+  lauraApi('POST','send-digest',{force:true}).then(function(data){
+    showStatus(data.sent ? 'Larry digest sent.' : (data.reason || 'No digest needed.'),'ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Could not send digest.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraPollGmail(button){
+  var done = lauraSetButton(button,'Polling...');
+  lauraApi('POST','poll-gmail',{limit:10,auto_run:true}).then(function(data){
+    showStatus(data.configured ? ('Gmail poll complete: '+data.processed+' processed.') : data.message,'ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Could not poll Gmail.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraFileDeployment(threadId, button){
+  if(!confirm('Create a deployment record from this application?')) return;
+  var done = lauraSetButton(button,'Filing...');
+  lauraApi('POST','file-deployment',{thread_id:threadId}).then(function(){
+    showStatus('Deployment record filed.','ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Could not file deployment.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraGmailAuth(button){
+  var done = lauraSetButton(button,'Preparing...');
+  fetch('/api/intake-gmail-oauth?action=auth-url',{cache:'no-store',headers:{'Authorization':'Bearer '+AUTH_TOKEN}})
+    .then(checkAuth).then(function(r){ return r.json().then(function(data){ return {ok:r.ok,data:data}; }); })
+    .then(function(result){
+      if(!result.ok) throw new Error(result.data.error || 'Could not create auth link');
+      window.open(result.data.auth_url,'_blank','noopener');
+      showStatus('Opened Gmail authorization link.','ok');
+    }).catch(function(err){ showStatus(err.message||'Could not create Gmail auth link.','warn'); })
+    .then(function(){ done(); });
 }
 
 // ════════════════════════════════════════════════════════
@@ -2416,6 +2659,7 @@ function renderApplicationCard(a){
     + '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">'
     + '<select onchange="setAppStatus(\'' + a.id + '\', this.value)" style="padding:7px 10px;border:1.5px solid #d0d7de;border-radius:7px;font-size:.82rem;font-weight:700;background:#fff;cursor:pointer">' + statusOptions + '</select>'
     + '<button onclick="saveAppNotes(\'' + a.id + '\')" style="padding:7px 16px;background:#0969da;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Save Notes</button>'
+    + '<button onclick="lauraRunApplication(\'' + a.id + '\', this)" style="padding:7px 16px;background:#1f5795;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Run Laura</button>'
     + '<button onclick="approveAndDeploy(\'' + a.id + '\')" style="padding:7px 16px;background:#8250df;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Approve → Deployment</button>'
     + '<button onclick="buildCampaignFromApp(\'' + a.id + '\')" style="padding:7px 16px;background:#1a7f37;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Build Campaign →</button>'
     + '</div></div></div>';

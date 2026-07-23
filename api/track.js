@@ -15,6 +15,7 @@
 //   PATCH  /api/track?type=deployments&id=…    partial deployment record
 //   DELETE /api/track?type=applications|deployments&id=…
 import { isAuthorizedAdmin } from './_lib/admin-token.js';
+import { ensureThreadForApplication, runLauraAgent } from './_lib/laura-agent.js';
 
 const ROBOT_USER_AGENT_RE = /bot|crawler|spider|crawl|slurp|bingpreview|facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|google-inspectiontool|googleother|adsbot|mediapartners-google|apis-google|feedfetcher|monitor|uptime|pingdom|headlesschrome|phantomjs|lighthouse|pagespeed|semrush|ahrefs|mj12bot|dotbot|petalbot|bytespider|yandex|baiduspider|duckduckbot|archive\.org|wget|curl|python-requests|httpclient/i;
 
@@ -172,7 +173,8 @@ async function sendApplicationEmails({ app, triage }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return false;
   const from = process.env.CONTACT_FROM_EMAIL || 'VillageServer Initiative <onboarding@resend.dev>';
-  const teamEmail = process.env.NOTIFY_EMAIL || 'villageserverinitiative@gmail.com';
+  const teamEmail = process.env.NOTIFY_EMAIL || process.env.LARRY_EMAIL || 'villageserverinitiative@gmail.com';
+  const agentEmail = process.env.AGENT_EMAIL || teamEmail;
   const tierLabel = app.kit_tier ? `Tier ${app.kit_tier} — ${KIT_TIERS[app.kit_tier] || ''}` : 'No tier selected';
   const teamBody = [
     `New equipment & funding application`,
@@ -210,7 +212,7 @@ async function sendApplicationEmails({ app, triage }) {
   }).then((r) => r.ok).catch(() => false);
   const results = await Promise.all([
     send({ from, to: [teamEmail], reply_to: app.email, subject: `New application — ${app.name} (${app.country}) — ${triage.triage_confidence} confidence`, text: teamBody }),
-    send({ from, to: [app.email], reply_to: teamEmail, subject: 'We received your VillageServer application', text: applicantBody }),
+    send({ from, to: [app.email], reply_to: agentEmail, subject: 'We received your VillageServer application', text: applicantBody }),
   ]);
   return results[0] || results[1];
 }
@@ -594,10 +596,29 @@ export default async function handler(req, res) {
       utm_source: payload.utm_source, utm_medium: payload.utm_medium, utm_campaign: payload.utm_campaign,
     };
     const r = await fetchWithFallback([
-      { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=minimal' }, body: JSON.stringify(payload) } },
-      { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=minimal' }, body: JSON.stringify(legacyPayload) } },
+      { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(payload) } },
+      { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(legacyPayload) } },
     ]);
-    if (r.ok) await sendApplicationEmails({ app: payload, triage });
+    if (r.ok) {
+      const savedRows = await r.json().catch(() => []);
+      const savedApp = Array.isArray(savedRows) && savedRows[0] ? savedRows[0] : payload;
+      await sendApplicationEmails({ app: payload, triage });
+      if (savedApp && savedApp.id) {
+        try {
+          await ensureThreadForApplication(savedApp.id, savedApp);
+          if (process.env.LAURA_DRAFT_ON_SUBMIT !== 'false') {
+            await runLauraAgent({
+              applicationId: savedApp.id,
+              autoSend: process.env.LAURA_AUTO_SEND_ON_SUBMIT === 'true',
+              reason: 'application_submit',
+            });
+          }
+        } catch (e) {
+          // Intake should never fail just because the optional agent tables or
+          // external AI/email services are not configured yet.
+        }
+      }
+    }
     return res.status(r.ok ? 200 : 502).json({ ok: r.ok });
   }
 

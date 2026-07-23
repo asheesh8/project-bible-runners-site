@@ -578,6 +578,122 @@ create index if not exists assistant_transcripts_updated_idx on public.assistant
 alter table public.assistant_transcripts enable row level security;
 revoke all on public.assistant_transcripts from anon, authenticated;
 
+-- ── Laura intake receptionist agent ────────────────────────────────
+-- Laura is the backend receptionist for form applications. The application row
+-- remains the source of truth; these tables hold the conversation, Larry
+-- decisions, filing tasks, and digest history around that row.
+create table if not exists public.intake_threads (
+  id uuid primary key default gen_random_uuid(),
+  application_id text not null unique,
+  thread_token text unique not null,
+  applicant_name text,
+  applicant_email text,
+  state text not null default 'new',
+  owner text not null default 'laura',
+  summary text,
+  missing_fields jsonb not null default '[]'::jsonb,
+  next_follow_up_at timestamptz,
+  digest_pending boolean not null default true,
+  digest_last_sent_at timestamptz,
+  gmail_thread_id text,
+  last_agent_run_at timestamptz,
+  last_customer_message_at timestamptz,
+  last_larry_message_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.intake_messages (
+  id uuid primary key default gen_random_uuid(),
+  thread_id uuid references public.intake_threads(id) on delete cascade,
+  role text not null,                       -- applicant | agent | larry | admin | filing | system
+  channel text not null default 'email',    -- email | gmail | resend | admin | cron | note
+  direction text not null default 'internal', -- inbound | outbound | internal
+  action_type text,
+  subject text,
+  body text,
+  from_email text,
+  to_email jsonb not null default '[]'::jsonb,
+  status text not null default 'draft',     -- draft | approved | sent | received | processed | failed | note
+  provider text,
+  provider_message_id text,
+  gmail_message_id text unique,
+  metadata jsonb not null default '{}'::jsonb,
+  sent_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.agent_filing_items (
+  id uuid primary key default gen_random_uuid(),
+  thread_id uuid references public.intake_threads(id) on delete cascade,
+  application_id text,
+  item_type text not null default 'follow_up', -- deployment | campaign | shipping | photo_request | follow_up | note
+  state text not null default 'pending',       -- pending | done | skipped
+  title text not null,
+  detail text,
+  due_at timestamptz,
+  completed_at timestamptz,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.agent_digests (
+  id uuid primary key default gen_random_uuid(),
+  digest_key text unique not null,
+  sent_to text not null,
+  thread_ids jsonb not null default '[]'::jsonb,
+  subject text,
+  body text,
+  status text not null default 'draft',
+  provider text,
+  provider_message_id text,
+  sent_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists intake_threads_created_idx on public.intake_threads (created_at desc);
+create index if not exists intake_threads_state_idx on public.intake_threads (state, updated_at desc);
+create index if not exists intake_threads_digest_idx on public.intake_threads (digest_pending, updated_at desc);
+create index if not exists intake_threads_applicant_email_idx on public.intake_threads (applicant_email);
+create index if not exists intake_messages_thread_idx on public.intake_messages (thread_id, created_at);
+create index if not exists intake_messages_status_idx on public.intake_messages (status, created_at desc);
+create index if not exists intake_messages_gmail_idx on public.intake_messages (gmail_message_id);
+create index if not exists agent_filing_items_state_idx on public.agent_filing_items (state, due_at nulls last, created_at desc);
+create index if not exists agent_filing_items_thread_idx on public.agent_filing_items (thread_id, created_at desc);
+create index if not exists agent_digests_created_idx on public.agent_digests (created_at desc);
+
+drop trigger if exists intake_threads_set_updated_at on public.intake_threads;
+create trigger intake_threads_set_updated_at before update on public.intake_threads
+for each row execute function public.set_updated_at();
+
+drop trigger if exists agent_filing_items_set_updated_at on public.agent_filing_items;
+create trigger agent_filing_items_set_updated_at before update on public.agent_filing_items
+for each row execute function public.set_updated_at();
+
+alter table public.intake_threads enable row level security;
+alter table public.intake_messages enable row level security;
+alter table public.agent_filing_items enable row level security;
+alter table public.agent_digests enable row level security;
+revoke all on public.intake_threads from anon, authenticated;
+revoke all on public.intake_messages from anon, authenticated;
+revoke all on public.agent_filing_items from anon, authenticated;
+revoke all on public.agent_digests from anon, authenticated;
+
+-- Agent behavior toggles. Values are read server-side via service role; keep
+-- secrets such as API keys and OAuth refresh tokens in Vercel env vars, not here.
+insert into public.site_settings (key, value)
+select 'laura_agent_enabled', 'true'::jsonb
+where not exists (select 1 from public.site_settings where key = 'laura_agent_enabled');
+
+insert into public.site_settings (key, value)
+select 'laura_auto_send_missing_info', 'false'::jsonb
+where not exists (select 1 from public.site_settings where key = 'laura_auto_send_missing_info');
+
+insert into public.site_settings (key, value)
+select 'larry_cal_booking_url', '""'::jsonb
+where not exists (select 1 from public.site_settings where key = 'larry_cal_booking_url');
+
 -- Confirm all expected tables exist after running the migration.
 select table_name
 from information_schema.tables
@@ -586,6 +702,7 @@ where table_schema = 'public'
     'campaigns', 'posts', 'photos', 'affiliates',
     'page_visits', 'link_clicks', 'donation_interests', 'availability_requests',
     'contact_messages', 'equipment_applications', 'site_settings', 'deployments',
-    'assistant_leads', 'assistant_usage', 'assistant_transcripts'
+    'assistant_leads', 'assistant_usage', 'assistant_transcripts',
+    'intake_threads', 'intake_messages', 'agent_filing_items', 'agent_digests'
   )
 order by table_name;

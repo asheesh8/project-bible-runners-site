@@ -16,6 +16,8 @@ _research/
 
 # --- Local dev & scratch ---
 *.log
+*.env
+.env*
 _*.txt
 _*.png
 .venv/

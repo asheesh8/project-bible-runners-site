@@ -56,6 +56,14 @@ The post-approval fulfillment log — mirrors Eric's original Excel sheet.
 - Fields: `name`, `date`, `contact_information`, `country`, `region_village`, all the resource columns (`raspberry_pi_5`, `power_supply`, `satellite_dish`, `lnb`, `receiver`, `satellite_finder`, `coax_cable`, `usb_a_to_c`, `usb_a_to_micro_b`, `projector`, `speakers`, `language_card`, `usb_adapter`, `newq_device`, `charger_100w_20_port`, `bibles`, `monetary_support`, `online_support`, `power_charger_for_raspberry`), `in_person_support` (jsonb workshop list), `highlights`, `follow_up_needed`, `additional_notes`.
 - CSV export writes the columns in the exact spreadsheet order.
 
+### Laura Agent  (`data-tab="laura-agent"`)
+Backend receptionist console for application follow-up and Larry handoff.
+- API: `GET/POST /api/intake-agent`, plus cron endpoints `intake-gmail-poll` and `intake-digest`
+- Tables: **`intake_threads`**, **`intake_messages`**, **`agent_filing_items`**, **`agent_digests`**
+- Fed by: new `equipment_applications` rows; recent rows can also be backfilled with **Create missing threads**
+- Buttons: Run Laura, approve/send latest draft, poll Gmail, send Larry digest, file deployment
+- Setup: see [laura-agent-setup.md](laura-agent-setup.md)
+
 ### Blog & Updates  (`data-tab="posts"`)
 - API: `GET/POST/PATCH/DELETE /api/content?type=posts`
 - Table: **`posts`** (`title`, `body`, `image_url`, `author`, `published`, `published_at`). Public pages only read `published = true`.

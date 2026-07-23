@@ -4,7 +4,7 @@
 // (api/_lib/knowledge-base.js), and captures interested missionaries as leads.
 //
 // Env vars:
-//   VillageServerChatBotAnthropicKey (or ANTHROPIC_API_KEY) — required; the assistant's brain (Claude Haiku)
+//   VillageServerChatBotAnthropicKey (or ANTHROPIC_API_KEY / ANTROPIC_API_KEY) — required; the assistant's brain (Claude Haiku)
 //   SUPABASE_URL, SUPABASE_SERVICE_KEY — store captured leads
 //   RESEND_API_KEY, CONTACT_FROM_EMAIL, NOTIFY_EMAIL — optional lead notification
 //
@@ -223,7 +223,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const apiKey = process.env.VillageServerChatBotAnthropicKey || process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.VillageServerChatBotAnthropicKey || process.env.ANTHROPIC_API_KEY || process.env.ANTROPIC_API_KEY;
   if (!apiKey) return res.status(503).json({ error: 'Assistant is not configured yet.' });
 
   const b = req.body || {};
