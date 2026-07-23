@@ -48,6 +48,7 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(trackApi, /runLauraAgent/);
   assert.match(trackApi, /LAURA_DRAFT_ON_SUBMIT/);
   assert.match(trackApi, /shipping_address: trimText/);
+  assert.match(trackApi, /payloadWithoutShipping/);
 
   assert.match(admin, /data-tab="laura-agent"/);
   assert.match(admin, /function loadLauraAgent/);

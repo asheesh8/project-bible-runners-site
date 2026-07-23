@@ -588,6 +588,8 @@ export default async function handler(req, res) {
 
     // Legacy fallback keeps intake alive if the schema migration has not
     // been pasted into Supabase yet — original columns only.
+    const payloadWithoutShipping = { ...payload };
+    delete payloadWithoutShipping.shipping_address;
     const legacyPayload = {
       visitor_id: payload.visitor_id, site_host: payload.site_host, name: payload.name,
       email: payload.email, phone_country_code: payload.phone_country_code, phone: payload.phone,
@@ -599,6 +601,7 @@ export default async function handler(req, res) {
     };
     const r = await fetchWithFallback([
       { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(payload) } },
+      { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(payloadWithoutShipping) } },
       { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(legacyPayload) } },
     ]);
     if (r.ok) {
