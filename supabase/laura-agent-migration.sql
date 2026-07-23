@@ -3,6 +3,9 @@
 
 create extension if not exists pgcrypto;
 
+alter table public.equipment_applications
+add column if not exists shipping_address text;
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql

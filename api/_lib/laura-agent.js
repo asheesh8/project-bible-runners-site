@@ -162,6 +162,7 @@ function appSummaryLines(app) {
     `Years in field: ${app.years_in_field || ''}`,
     `Current reach: ${app.current_reach || ''}`,
     `Receiving plan: ${[app.receiving_plan, app.receiving_plan_details].filter(Boolean).join(' - ')}`,
+    `Shipping address / delivery destination: ${app.shipping_address || ''}`,
     `Funding requested: ${app.funding_needed || ''}`,
     `Timeframe: ${app.timeframe || ''}`,
     `Preferred contact: ${[app.preferred_contact_method, app.contact_timezone].filter(Boolean).join(' / ')}`,
@@ -181,6 +182,9 @@ function detectMissingFields(app) {
   if (!app.receiving_plan) missing.push('receiving/shipping plan');
   if (['transport_partner', 'approved_retailer', 'alternative_plan', 'need_help'].includes(String(app.receiving_plan || '')) && !app.receiving_plan_details) {
     missing.push('receiving plan details');
+  }
+  if (['cover_import_costs', 'transport_partner', 'alternative_plan'].includes(String(app.receiving_plan || '')) && !app.shipping_address) {
+    missing.push('shipping address or delivery destination');
   }
   if (!app.preferred_contact_method) missing.push('preferred contact method');
   return missing.slice(0, 6);
@@ -854,6 +858,7 @@ export async function fileDeploymentForThread(threadId) {
       thread.summary ? `Thread summary: ${thread.summary}` : '',
       `Requested kit: ${kitLabel(app)}`,
       app.receiving_plan ? `Receiving plan: ${app.receiving_plan}${app.receiving_plan_details ? ` - ${app.receiving_plan_details}` : ''}` : '',
+      app.shipping_address ? `Shipping address / delivery destination: ${app.shipping_address}` : '',
       app.timeframe ? `Timeframe: ${app.timeframe}` : '',
       app.message ? `Applicant message: ${app.message}` : '',
     ].filter(Boolean).join('\n'),

@@ -363,6 +363,10 @@
                   <label for="apply-plan-details" id="plan-details-label">Tell us more</label>
                   <textarea id="apply-plan-details" name="receiving_plan_details" rows="2" maxlength="1000"></textarea>
                 </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-shipping-address">Shipping address / delivery destination</label>
+                  <textarea id="apply-shipping-address" name="shipping_address" rows="2" maxlength="1000" placeholder="If known, include recipient name, address, city/region, postal code, country, and phone or WhatsApp for delivery."></textarea>
+                </div>
                 <div class="apply-field">
                   <label for="apply-funding">Funding requested / budget</label>
                   <input type="text" id="apply-funding" name="funding_needed" maxlength="200" placeholder="Optional — an estimate is fine">
@@ -589,6 +593,7 @@
           supporting_document_name: docName,
           receiving_plan: radioValue('receiving_plan'),
           receiving_plan_details: val('apply-plan-details'),
+          shipping_address: val('apply-shipping-address'),
           funding_needed: val('apply-funding'),
           timeframe: val('apply-timeframe'),
           preferred_contact_method: val('apply-contact-method'),

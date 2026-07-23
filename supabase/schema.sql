@@ -370,6 +370,7 @@ alter table public.equipment_applications add column if not exists supporting_do
 alter table public.equipment_applications add column if not exists supporting_document_name text;
 alter table public.equipment_applications add column if not exists receiving_plan text check (receiving_plan in ('cover_import_costs','transport_partner','approved_retailer','alternative_plan','need_help'));
 alter table public.equipment_applications add column if not exists receiving_plan_details text;
+alter table public.equipment_applications add column if not exists shipping_address text;
 alter table public.equipment_applications add column if not exists preferred_contact_method text;
 alter table public.equipment_applications add column if not exists contact_timezone text;
 -- Verification flags + triage output (computed server-side on submit)

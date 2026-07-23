@@ -15,6 +15,7 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   const oauthApi = read('../api/intake-gmail-oauth.js');
   const trackApi = read('../api/track.js');
   const admin = read('../landing/admin.html');
+  const applicationForm = read('../landing/equipment-application.html');
   const vercel = read('../vercel.json');
   const docs = read('../docs/laura-agent-setup.md');
 
@@ -23,6 +24,7 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(schema, /create table if not exists public\.agent_filing_items/);
   assert.match(schema, /create table if not exists public\.agent_digests/);
   assert.match(schema, /laura_auto_send_missing_info/);
+  assert.match(schema, /shipping_address text/);
 
   assert.match(core, /runLauraAgent/);
   assert.match(core, /sendLauraDigest/);
@@ -33,6 +35,7 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(core, /RESEND_API_KEY_AGENT/);
   assert.match(core, /GMAIL_REFRESH_TOKEN/);
   assert.match(core, /LARRY_CAL_BOOKING_URL/);
+  assert.match(core, /shipping address or delivery destination/);
 
   assert.match(agentApi, /isAuthorizedAdmin/);
   assert.match(agentApi, /approve-send/);
@@ -44,12 +47,16 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(trackApi, /ensureThreadForApplication/);
   assert.match(trackApi, /runLauraAgent/);
   assert.match(trackApi, /LAURA_DRAFT_ON_SUBMIT/);
+  assert.match(trackApi, /shipping_address: trimText/);
 
   assert.match(admin, /data-tab="laura-agent"/);
   assert.match(admin, /function loadLauraAgent/);
   assert.match(admin, /lauraApproveSend/);
   assert.match(admin, /lauraPollGmail/);
   assert.match(admin, /lauraFileDeployment/);
+  assert.match(admin, /Shipping address/);
+
+  assert.match(applicationForm, /name="shipping_address"/);
 
   assert.match(vercel, /intake-gmail-poll/);
   assert.match(vercel, /intake-digest/);

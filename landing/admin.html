@@ -2644,6 +2644,7 @@ function renderApplicationCard(a){
     + detailRow('Years in field', a.years_in_field)
     + detailRow('Current reach', a.current_reach)
     + detailRow('Receiving plan', PLAN_NAMES[a.receiving_plan] ? (PLAN_NAMES[a.receiving_plan] + (a.receiving_plan_details ? ' — ' + a.receiving_plan_details : '')) : '')
+    + detailRow('Shipping address', a.shipping_address)
     + detailRow('Funding', a.funding_needed)
     + detailRow('Timeframe', a.timeframe)
     + detailRow('Contact via', [a.preferred_contact_method, a.contact_timezone].filter(Boolean).join(' · '))
@@ -2726,7 +2727,7 @@ function downloadCsv(filename, header, rows){
 function exportApplicationsCsv(){
   var rows = Object.keys(_appsCache).map(function(k){ return _appsCache[k]; })
     .sort(function(x, y){ return new Date(y.created_at) - new Date(x.created_at); });
-  var header = ['Submitted', 'Status', 'Name', 'Organization', 'Email', 'Phone', 'Country', 'Region', 'Kit tier', 'Kit', 'Audience', 'Frequency', 'Reach plan', 'Gathering', 'Languages', 'Literacy', 'Power/internet', 'Website', 'Sending org', 'Reference', 'Referral source', 'Years in field', 'Current reach', 'Receiving plan', 'Receiving details', 'Funding requested', 'Timeframe', 'Preferred contact', 'Time zone', 'Confidence', 'Score', 'Fast-track', 'Flags', 'Triage note', 'Mission context', 'Message', 'Admin notes'];
+  var header = ['Submitted', 'Status', 'Name', 'Organization', 'Email', 'Phone', 'Country', 'Region', 'Kit tier', 'Kit', 'Audience', 'Frequency', 'Reach plan', 'Gathering', 'Languages', 'Literacy', 'Power/internet', 'Website', 'Sending org', 'Reference', 'Referral source', 'Years in field', 'Current reach', 'Receiving plan', 'Receiving details', 'Shipping address', 'Funding requested', 'Timeframe', 'Preferred contact', 'Time zone', 'Confidence', 'Score', 'Fast-track', 'Flags', 'Triage note', 'Mission context', 'Message', 'Admin notes'];
   var data = rows.map(function(a){
     return [a.created_at, appStatusOf(a), a.name, a.organization, a.email,
       [a.phone_country_code, a.phone].filter(Boolean).join(' '), a.country, a.region,
@@ -2735,7 +2736,7 @@ function exportApplicationsCsv(){
       a.reach_justification, a.has_gathering_infrastructure == null ? '' : (a.has_gathering_infrastructure ? 'Yes' : 'No'),
       a.languages, a.literacy_context, a.power_internet_access, a.org_website, a.sending_org,
       [a.reference_name, a.reference_contact].filter(Boolean).join(' — '), a.referral_source,
-      a.years_in_field, a.current_reach, PLAN_NAMES[a.receiving_plan] || a.receiving_plan, a.receiving_plan_details,
+      a.years_in_field, a.current_reach, PLAN_NAMES[a.receiving_plan] || a.receiving_plan, a.receiving_plan_details, a.shipping_address,
       a.funding_needed, a.timeframe, a.preferred_contact_method, a.contact_timezone,
       a.triage_confidence, a.triage_score, a.fast_track ? 'Yes' : '', (Array.isArray(a.triage_flags) ? a.triage_flags.join('; ') : ''),
       a.triage_note, a.mission_context, a.message, a.admin_notes || _allAppNotes[a.id] || ''];
