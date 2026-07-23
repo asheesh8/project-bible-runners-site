@@ -41,6 +41,8 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(core, /gmail_client_configured/);
   assert.match(core, /applications:/);
   assert.match(core, /monetary_support: trim\(app\.funding_needed/);
+  assert.match(core, /function encodeMailHeader/);
+  assert.match(core, /Subject: \$\{encodeMailHeader\(subject\)\}/);
 
   assert.match(agentApi, /isAuthorizedAdmin/);
   assert.match(agentApi, /approve-send/);

@@ -590,6 +590,28 @@ function base64Url(input) {
   return Buffer.from(input, 'utf8').toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
+function cleanHeaderValue(value) {
+  return String(value || '').replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function encodeMailHeader(value) {
+  const cleaned = cleanHeaderValue(value);
+  if (!/[^\x20-\x7E]/.test(cleaned)) return cleaned;
+  const chunks = [];
+  let current = '';
+  for (const char of cleaned) {
+    const next = current + char;
+    if (current && Buffer.byteLength(next, 'utf8') > 42) {
+      chunks.push(current);
+      current = char;
+    } else {
+      current = next;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks.map((part) => `=?UTF-8?B?${Buffer.from(part, 'utf8').toString('base64')}?=`).join(' ');
+}
+
 async function gmailAccessToken() {
   const clientId = env('GMAIL_CLIENT_ID');
   const clientSecret = env('GMAIL_CLIENT_SECRET');
@@ -615,10 +637,10 @@ async function sendGmailEmail({ to, subject, text, replyTo }) {
   const token = await gmailAccessToken();
   const recipient = Array.isArray(to) ? to.join(', ') : to;
   const raw = [
-    `From: ${c.agentName} <${c.agentEmail}>`,
-    `To: ${recipient}`,
-    `Reply-To: ${replyTo || c.agentEmail}`,
-    `Subject: ${subject}`,
+    `From: ${encodeMailHeader(c.agentName)} <${cleanHeaderValue(c.agentEmail)}>`,
+    `To: ${cleanHeaderValue(recipient)}`,
+    `Reply-To: ${cleanHeaderValue(replyTo || c.agentEmail)}`,
+    `Subject: ${encodeMailHeader(subject)}`,
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=UTF-8',
     '',
