@@ -68,6 +68,9 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(admin, /Contact file/);
   assert.match(admin, /Mission request/);
   assert.match(admin, /Application notes/);
+  assert.match(admin, /Person files/);
+  assert.match(admin, /What&#39;s next/);
+  assert.match(admin, /Email thread/);
   assert.match(admin, /Current draft waiting for approval/);
   assert.match(admin, /Gmail thread/);
 

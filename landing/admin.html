@@ -455,6 +455,58 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 @media(max-width:1040px){.laura-file-section.third{grid-column:span 6}}
 @media(max-width:900px){.laura-file-section,.laura-file-section.third,.laura-file-section.wide{grid-column:span 12}.laura-thread > summary{grid-template-columns:1fr}.laura-thread-counts,.laura-file-stamps{justify-content:flex-start}}
 @media(max-width:620px){.laura-meta-row{grid-template-columns:1fr;gap:2px}.laura-file-cover{padding:10px}}
+.laura-browser{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;align-items:start}
+.laura-file-list{border:1.5px solid #d0d7de;border-radius:12px;background:#fff;overflow:hidden;position:sticky;top:14px;max-height:calc(100vh - 245px);display:flex;flex-direction:column}
+.laura-list-head{padding:12px 14px;border-bottom:1px solid #d0d7de;background:#f6f8fa;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.laura-list-title{font-size:.82rem;font-weight:900;color:#24292f;text-transform:uppercase;letter-spacing:.06em}
+.laura-list-scroll{overflow:auto}
+.laura-person-file{width:100%;border:0;border-left:4px solid transparent;border-bottom:1px solid #eaeef2;background:#fff;text-align:left;padding:12px 12px 12px 10px;cursor:pointer;color:#24292f}
+.laura-person-file:hover{background:#f6f8fa}
+.laura-person-file.active{background:#f0f6fc;border-left-color:#0969da}
+.laura-person-file:last-child{border-bottom:0}
+.laura-person-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.laura-person-name{font-size:.9rem;font-weight:900;line-height:1.2}
+.laura-person-email{font-size:.75rem;color:#57606a;font-weight:700;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.laura-person-meta{font-size:.74rem;color:#57606a;margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.laura-person-next{font-size:.78rem;color:#24292f;margin-top:8px;line-height:1.35}
+.laura-open-file{border:1.5px solid #d0d7de;border-radius:12px;background:#fff;overflow:hidden;min-width:0}
+.laura-open-head{padding:16px 18px;border-bottom:1px solid #d0d7de;background:#f6f8fa;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.laura-open-title{font-size:1.16rem;font-weight:900;color:#24292f;line-height:1.2}
+.laura-open-sub{font-size:.82rem;color:#57606a;margin-top:5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.laura-open-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.laura-open-body{padding:14px 18px 18px}
+.laura-next-panel{border:1.5px solid #d4a72c;border-radius:10px;background:#fff8c5;padding:13px 14px;margin-bottom:14px}
+.laura-next-panel.ready{border-color:#0969da;background:#f0f6fc}
+.laura-next-panel.done{border-color:#1a7f37;background:#dafbe1}
+.laura-next-eyebrow{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#57606a}
+.laura-next-title{font-size:1rem;font-weight:900;color:#24292f;margin-top:3px}
+.laura-next-detail{font-size:.86rem;color:#24292f;line-height:1.45;margin-top:5px;max-width:900px}
+.laura-next-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.laura-detail-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.laura-detail-card{border:1px solid #d0d7de;border-radius:9px;background:#fff;padding:11px;min-width:0}
+.laura-detail-card h4{margin:0 0 8px;font-size:.74rem;text-transform:uppercase;letter-spacing:.07em;color:#57606a}
+.laura-kv{display:grid;grid-template-columns:118px minmax(0,1fr);gap:8px;padding:5px 0;border-top:1px solid #eaeef2;font-size:.82rem}
+.laura-kv:first-of-type{border-top:0}
+.laura-kv dt{font-weight:900;color:#57606a}
+.laura-kv dd{margin:0;color:#24292f;word-break:break-word}
+.laura-kv dd.empty{color:#8a929b}
+.laura-conversation-shell{border:1px solid #d0d7de;border-radius:10px;overflow:hidden;background:#fff;margin-bottom:14px}
+.laura-conversation-head{padding:11px 13px;background:#f6f8fa;border-bottom:1px solid #d0d7de;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.laura-conversation-title{font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#57606a}
+.laura-conversation{padding:14px;display:flex;flex-direction:column;gap:10px;background:#fbfbfc}
+.laura-email-bubble{border:1px solid #d0d7de;border-radius:10px;background:#fff;padding:10px 11px;max-width:84%;box-shadow:0 1px 0 rgba(27,31,36,.04)}
+.laura-email-bubble.agent{align-self:flex-end;border-color:#b6d7ff;background:#f0f6fc}
+.laura-email-bubble.applicant{align-self:flex-start;border-color:#b7e4c7;background:#f6fff8}
+.laura-email-bubble.larry{align-self:flex-start;border-color:#f0d98c;background:#fffdf0}
+.laura-email-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.laura-email-label{font-size:.82rem;font-weight:900;color:#24292f}
+.laura-email-time{font-size:.72rem;color:#57606a;font-weight:800}
+.laura-email-meta{font-size:.74rem;color:#57606a;line-height:1.45;margin-top:4px;word-break:break-word}
+.laura-email-subject{font-size:.82rem;font-weight:900;color:#24292f;margin-top:7px}
+.laura-email-body{font-size:.86rem;color:#24292f;line-height:1.5;white-space:pre-wrap;margin-top:6px}
+.laura-form-details{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:1120px){.laura-browser{grid-template-columns:290px minmax(0,1fr)}.laura-detail-strip{grid-template-columns:1fr}.laura-form-details{grid-template-columns:1fr}}
+@media(max-width:860px){.laura-browser{grid-template-columns:1fr}.laura-file-list{position:static;max-height:none}.laura-email-bubble{max-width:100%}}
 
 /* Responsive */
 @media(max-width:760px){
@@ -1837,6 +1889,7 @@ function sendAssistantChat(id, button){
 // ════════════════════════════════════════════════════════
 var _lauraCache = {threads:[], messages:[], filing_items:[], applications:[], deployments:[]};
 var _lauraHealth = null;
+var _lauraSelectedThreadId = '';
 
 function fmtDateTime(d){
   if(!d) return '—';
@@ -2246,14 +2299,291 @@ function renderLauraThread(t, index){
     '</div></details>';
 }
 
+function lauraJsArg(value){
+  return String(value || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+function lauraSortedThreads(){
+  return (_lauraCache.threads||[]).slice().sort(function(a,b){ return new Date(b.updated_at) - new Date(a.updated_at); });
+}
+
+function lauraThreadById(id){
+  var rows = _lauraCache.threads || [];
+  for(var i=0;i<rows.length;i++){ if(String(rows[i].id) === String(id)) return rows[i]; }
+  return null;
+}
+
+function lauraOpenThread(threadId){
+  _lauraSelectedThreadId = String(threadId || '');
+  renderLauraList();
+}
+
+function lauraValue(value){
+  if(value == null || value === '') return '—';
+  if(Array.isArray(value)) return value.filter(Boolean).join(', ') || '—';
+  if(value === true) return 'Yes';
+  if(value === false) return 'No';
+  return String(value);
+}
+
+function lauraKv(label, value){
+  var v = lauraValue(value);
+  return '<div class="laura-kv"><dt>'+esc(label)+'</dt><dd class="'+(v === '—' ? 'empty' : '')+'">'+esc(v)+'</dd></div>';
+}
+
+function lauraDetailCard(title, rows){
+  return '<section class="laura-detail-card"><h4>'+esc(title)+'</h4><dl>'+
+    rows.map(function(row){ return lauraKv(row[0], row[1]); }).join('')+
+  '</dl></section>';
+}
+
+function lauraNextInfo(t, stats, draft, decision, deployment){
+  var state = String(t.state || 'new');
+  if(draft){
+    return {
+      tone: 'ready',
+      title: 'Draft waiting for approval',
+      detail: 'Laura has written the next email. Review it, then approve/send when it looks right.'
+    };
+  }
+  if(state === 'escalated' || state === 'waiting_on_larry'){
+    return {
+      tone: '',
+      title: 'Larry decision needed',
+      detail: decision.reasoning || t.summary || 'Laura is waiting for Larry to approve, reject, ask for more information, or give shipping/scheduling instructions.'
+    };
+  }
+  if(state === 'waiting_on_customer'){
+    return {
+      tone: 'ready',
+      title: 'Waiting for customer reply',
+      detail: 'Laura sent the latest follow-up. Poll Gmail after the customer replies, or wait for the automatic poll to attach the response.'
+    };
+  }
+  if(state === 'filed' || deployment){
+    return {
+      tone: 'done',
+      title: 'Deployment file exists',
+      detail: 'This client has a deployment record. Next work is fulfillment updates, tracking/order notes, and rollout photos after delivery.'
+    };
+  }
+  return {
+    tone: 'ready',
+    title: 'Run Laura for the next step',
+    detail: 'This file has no current draft. Run Laura to decide whether to ask the customer, ask Larry, schedule, or file deployment.'
+  };
+}
+
+function renderLauraDraftPreview(t, draft, stats){
+  if(!draft) return '';
+  var from = draft.from_email || ((_lauraHealth && _lauraHealth.agent_email) || 'villageserverassistant@gmail.com');
+  var to = lauraEmails(draft.to_email).join(', ') || t.applicant_email || '';
+  var hidden = Math.max(0, stats.currentDraft - 1) + stats.supersededDraft;
+  return '<div class="laura-draft-box" style="margin-bottom:0">'+
+    '<div class="laura-draft-head">'+
+      '<div>'+
+        '<div class="laura-draft-title">Email draft</div>'+
+        '<div class="laura-draft-meta"><strong>From:</strong> '+esc(from)+'<br><strong>To:</strong> '+esc(to || '—')+'<br><strong>Action:</strong> '+esc(lauraActionName(draft.action_type))+' · '+fmtDateTime(draft.created_at)+(hidden ? '<br>Older drafts hidden: '+hidden : '')+'</div>'+
+      '</div>'+
+      '<button class="btn-save" type="button" onclick="lauraApproveSend(\''+lauraJsArg(draft.id)+'\',this)">Approve/send</button>'+
+    '</div>'+
+    '<div class="laura-draft-subject">'+esc(draft.subject || '(no subject)')+'</div>'+
+    '<pre class="laura-draft-body">'+esc(draft.body || '')+'</pre>'+
+  '</div>';
+}
+
+function renderLauraNextPanel(t, stats, draft, decision, deployment){
+  var next = lauraNextInfo(t, stats, draft, decision, deployment);
+  var missing = Array.isArray(t.missing_fields) ? t.missing_fields : [];
+  return '<section class="laura-next-panel '+esc(next.tone || '')+'">'+
+    '<div class="laura-next-eyebrow">What&#39;s next</div>'+
+    '<div class="laura-next-title">'+esc(next.title)+'</div>'+
+    '<div class="laura-next-detail">'+esc(next.detail)+'</div>'+
+    (missing.length ? '<div class="laura-missing">'+missing.map(function(m){ return '<span>'+esc(m)+'</span>'; }).join('')+'</div>' : '')+
+    '<div class="laura-next-row">'+
+      '<button class="btn-save" type="button" onclick="lauraRunThread(\''+lauraJsArg(t.id)+'\',this)">Run Laura</button>'+
+      (!deployment ? '<button class="btn-save" type="button" onclick="lauraFileDeployment(\''+lauraJsArg(t.id)+'\',this)">File deployment</button>' : '')+
+    '</div>'+
+    renderLauraDraftPreview(t, draft, stats)+
+  '</section>';
+}
+
+function renderLauraPersonFile(t){
+  var msgs = lauraMessagesFor(t.id);
+  var app = lauraAppFor(t);
+  var deployment = lauraDeploymentFor(t);
+  var draft = latestLauraDraft(t.id);
+  var stats = lauraThreadStats(msgs);
+  var decision = lauraLatestDecision(t.id) || {};
+  var active = String(t.id) === String(_lauraSelectedThreadId);
+  var next = lauraNextInfo(t, stats, draft, decision, deployment);
+  var name = t.applicant_name || (app && app.name) || 'Applicant';
+  var email = t.applicant_email || (app && app.email) || 'no email';
+  return '<button type="button" class="laura-person-file '+(active?'active':'')+'" onclick="lauraOpenThread(\''+lauraJsArg(t.id)+'\')" ondblclick="lauraOpenThread(\''+lauraJsArg(t.id)+'\')">'+
+    '<div class="laura-person-top">'+
+      '<div style="min-width:0">'+
+        '<div class="laura-person-name">'+esc(name)+'</div>'+
+        '<div class="laura-person-email">'+esc(email)+'</div>'+
+      '</div>'+
+      lauraStateBadge(t)+
+    '</div>'+
+    '<div class="laura-person-meta">'+
+      '<span>VS-'+esc(t.thread_token || '')+'</span>'+
+      '<span>'+esc(stats.customer)+' replies</span>'+
+      '<span>'+esc(stats.agentSent)+' sent</span>'+
+      (draft ? '<span>draft ready</span>' : '')+
+    '</div>'+
+    '<div class="laura-person-next">'+esc(next.title)+'</div>'+
+  '</button>';
+}
+
+function lauraConversationLabel(m){
+  if(m.role === 'applicant') return 'Customer';
+  if(m.role === 'larry') return 'Larry';
+  if(m.role === 'agent' && m.direction === 'outbound') return 'Laura';
+  if(m.role === 'agent') return 'Laura note';
+  return lauraActionName(m.role);
+}
+
+function renderLauraEmailBubble(m){
+  var cls = m.role === 'applicant' ? 'applicant' : m.role === 'larry' ? 'larry' : m.direction === 'outbound' ? 'agent' : 'internal';
+  var from = m.from_email || (m.role === 'agent' && _lauraHealth ? _lauraHealth.agent_email : '');
+  var to = lauraEmails(m.to_email).join(', ');
+  var body = String(m.body || '').slice(0, 2600);
+  return '<article class="laura-email-bubble '+cls+'">'+
+    '<div class="laura-email-top">'+
+      '<div class="laura-email-label">'+esc(lauraConversationLabel(m))+'</div>'+
+      '<div class="laura-email-time">'+esc(m.status || '')+' · '+fmtDateTime(m.created_at)+'</div>'+
+    '</div>'+
+    '<div class="laura-email-meta">'+
+      (from ? '<strong>From:</strong> '+esc(from)+' ' : '')+
+      (to ? '<strong>To:</strong> '+esc(to)+' ' : '')+
+      (m.channel ? '<strong>Channel:</strong> '+esc(m.channel) : '')+
+    '</div>'+
+    (m.subject ? '<div class="laura-email-subject">'+esc(m.subject)+'</div>' : '')+
+    (body ? '<div class="laura-email-body">'+esc(body)+'</div>' : '')+
+  '</article>';
+}
+
+function renderLauraConversation(t, msgs, draft){
+  var history = msgs.filter(function(m){
+    return !(m.direction === 'outbound' && (m.status === 'draft' || m.status === 'superseded'));
+  });
+  var thread = history.map(renderLauraEmailBubble).join('');
+  return '<section class="laura-conversation-shell">'+
+    '<div class="laura-conversation-head">'+
+      '<div class="laura-conversation-title">Email thread</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        badge(history.length+' messages','#eaeef2','#57606a','Non-draft messages')+
+        (draft ? badge('1 draft','#fff8c5','#7d4e00','Current draft') : '')+
+      '</div>'+
+    '</div>'+
+    '<div class="laura-conversation">'+
+      (thread || '<div class="empty-state" style="padding:16px;background:#fff"><div>No sent emails or replies yet.</div></div>')+
+    '</div>'+
+  '</section>';
+}
+
+function renderLauraOpenFile(t){
+  if(!t){
+    return '<section class="laura-open-file"><div class="empty-state" style="padding:32px"><div>No file selected.</div></div></section>';
+  }
+  var msgs = lauraMessagesFor(t.id);
+  var app = lauraAppFor(t);
+  var deployment = lauraDeploymentFor(t);
+  var draft = latestLauraDraft(t.id);
+  var stats = lauraThreadStats(msgs);
+  var decision = lauraLatestDecision(t.id) || {};
+  var phone = app ? [app.phone_country_code, app.phone].filter(Boolean).join(' ') : '';
+  var clientEmail = t.applicant_email || (app && app.email) || '';
+  var deployStatus = deployment ? 'Filed' : 'Not filed';
+  var triage = app ? [app.triage_confidence, app.triage_score != null ? app.triage_score + '/3' : ''].filter(Boolean).join(' ') : '';
+  return '<section class="laura-open-file">'+
+    '<div class="laura-open-head">'+
+      '<div>'+
+        '<div class="laura-open-title">'+esc(t.applicant_name || (app && app.name) || 'Applicant')+'</div>'+
+        '<div class="laura-open-sub">'+
+          '<span>'+esc(clientEmail || 'no email')+'</span>'+
+          (app && app.country ? '<span>'+esc([app.country, app.region].filter(Boolean).join(' / '))+'</span>' : '')+
+          '<span>VS-'+esc(t.thread_token || '')+'</span>'+
+          lauraStateBadge(t)+
+        '</div>'+
+      '</div>'+
+      '<div class="laura-open-actions">'+
+        badge(stats.customer+' customer replies','#eef8f0','#1a7f37','Customer replies')+
+        badge(stats.agentSent+' Laura sent','#ddf4ff','#0969da','Laura sent emails')+
+        badge(deployStatus,'#f6f8fa','#24292f','Deployment status')+
+      '</div>'+
+    '</div>'+
+    '<div class="laura-open-body">'+
+      renderLauraNextPanel(t, stats, draft, decision, deployment)+
+      '<div class="laura-detail-strip">'+
+        lauraDetailCard('Person', [
+          ['Email', clientEmail],
+          ['Phone', phone],
+          ['Role', app && app.role],
+          ['Organization', app && app.organization],
+          ['Contact method', app ? [app.preferred_contact_method, app.contact_timezone].filter(Boolean).join(' / ') : '']
+        ])+
+        lauraDetailCard('Review', [
+          ['Status', lauraReviewStatusText(app)],
+          ['Triage', triage],
+          ['Reference', app ? [app.reference_name, app.reference_contact].filter(Boolean).join(' / ') : ''],
+          ['Website', app && app.org_website],
+          ['Reason', decision.reasoning || t.summary]
+        ])+
+        lauraDetailCard('Fulfillment', [
+          ['Kit', lauraKitText(app)],
+          ['Shipping', app && app.shipping_address],
+          ['Funding', app && app.funding_needed],
+          ['Receiving plan', lauraPlanText(app)],
+          ['Deployment', deployment ? 'Filed in deployment log' : 'Not filed yet']
+        ])+
+      '</div>'+
+      renderLauraConversation(t, msgs, draft)+
+      '<div class="laura-form-details">'+
+        lauraDetailCard('Application form', [
+          ['Audience', lauraAudienceText(app)],
+          ['Current reach', app && app.current_reach],
+          ['Reach plan', app && app.reach_justification],
+          ['Gathering', app ? (app.has_gathering_infrastructure ? 'Yes' : (app.has_gathering_infrastructure === false ? 'Not yet' : '')) : ''],
+          ['Gathering details', app && app.gathering_infrastructure_desc],
+          ['Languages', app && app.languages],
+          ['Literacy', app && app.literacy_context],
+          ['Power / internet', app && app.power_internet_access],
+          ['Timeframe', app && app.timeframe]
+        ])+
+        lauraDetailCard('Notes and filing', [
+          ['Mission context', app && app.mission_context],
+          ['Applicant message', app && app.message],
+          ['Triage note', app && app.triage_note],
+          ['Filing tasks', lauraTasksFor(t.id).map(function(task){ return (task.title || 'Task') + ' (' + (task.state || 'pending') + ')'; })]
+        ])+
+      '</div>'+
+    '</div>'+
+  '</section>';
+}
+
 function renderLauraList(){
   var list = document.getElementById('laura-agent-list');
-  var threads = (_lauraCache.threads||[]).slice().sort(function(a,b){ return new Date(b.updated_at) - new Date(a.updated_at); });
+  var threads = lauraSortedThreads();
   if(!threads.length){
     list.innerHTML = '<div class="empty-state"><div>No Laura threads yet. Click "Create missing threads" or wait for the next application.</div></div>';
     return;
   }
-  list.innerHTML = threads.map(function(t, index){ return renderLauraThread(t, index); }).join('');
+  if(!_lauraSelectedThreadId || !lauraThreadById(_lauraSelectedThreadId)) _lauraSelectedThreadId = threads[0].id;
+  var selected = lauraThreadById(_lauraSelectedThreadId);
+  list.innerHTML =
+    '<div class="laura-browser">'+
+      '<aside class="laura-file-list">'+
+        '<div class="laura-list-head">'+
+          '<div class="laura-list-title">Person files</div>'+
+          badge(threads.length+' total','#eaeef2','#57606a','Laura files')+
+        '</div>'+
+        '<div class="laura-list-scroll">'+threads.map(renderLauraPersonFile).join('')+'</div>'+
+      '</aside>'+
+      renderLauraOpenFile(selected)+
+    '</div>';
 }
 
 function loadLauraAgent(){
