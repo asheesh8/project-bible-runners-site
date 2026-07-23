@@ -1,0 +1,52 @@
+name: Laura agent automation
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: laura-agent-automation
+  cancel-in-progress: false
+
+jobs:
+  poll-gmail:
+    name: Poll Gmail replies
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call Laura Gmail poll endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ vars.LAURA_SITE_URL }}
+        run: |
+          set -euo pipefail
+          : "${CRON_SECRET:?Set GitHub repository secret CRON_SECRET to match the Vercel CRON_SECRET.}"
+          BASE_URL="${SITE_URL:-https://villageserver.org}"
+          curl --fail --show-error --silent \
+            --request POST \
+            --header "x-cron-secret: ${CRON_SECRET}" \
+            "${BASE_URL%/}/api/intake-gmail-poll"
+
+  larry-digest:
+    name: Send Larry digest
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 */6 * * *'
+    steps:
+      - name: Call Laura digest endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ vars.LAURA_SITE_URL }}
+        run: |
+          set -euo pipefail
+          : "${CRON_SECRET:?Set GitHub repository secret CRON_SECRET to match the Vercel CRON_SECRET.}"
+          BASE_URL="${SITE_URL:-https://villageserver.org}"
+          curl --fail --show-error --silent \
+            --request POST \
+            --header "x-cron-secret: ${CRON_SECRET}" \
+            "${BASE_URL%/}/api/intake-digest"

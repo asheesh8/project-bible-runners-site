@@ -117,8 +117,30 @@ Do this after deploying the code and setting `ADMIN_PASSWORD`,
 
 9. Redeploy or restart the Vercel environment.
 
-After that, `/api/intake-gmail-poll` can read unread Gmail replies every 10
-minutes.
+After that, `/api/intake-gmail-poll` can read unread Gmail replies.
+
+## Recurring automation on Vercel Hobby
+
+Vercel Hobby only allows daily native Cron Jobs, so Laura's 10-minute Gmail
+poll and 6-hour Larry digest run from GitHub Actions instead.
+
+In GitHub, open this repository's `Settings` -> `Secrets and variables` ->
+`Actions` and add:
+
+```text
+CRON_SECRET=same-value-as-the-Vercel-CRON_SECRET
+```
+
+Optional repository variable:
+
+```text
+LAURA_SITE_URL=https://villageserver.org
+```
+
+The workflow at `.github/workflows/laura-agent.yml` calls:
+
+- `POST /api/intake-gmail-poll` every 10 minutes
+- `POST /api/intake-digest` every 6 hours
 
 ## Optional Gmail sending
 

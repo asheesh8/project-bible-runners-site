@@ -17,6 +17,7 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   const admin = read('../landing/admin.html');
   const applicationForm = read('../landing/equipment-application.html');
   const vercel = read('../vercel.json');
+  const lauraWorkflow = read('../.github/workflows/laura-agent.yml');
   const docs = read('../docs/laura-agent-setup.md');
 
   assert.match(schema, /create table if not exists public\.intake_threads/);
@@ -59,12 +60,15 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
 
   assert.match(applicationForm, /name="shipping_address"/);
 
-  assert.match(vercel, /intake-gmail-poll/);
-  assert.match(vercel, /intake-digest/);
+  assert.doesNotMatch(vercel, /"crons"/);
+  assert.match(lauraWorkflow, /intake-gmail-poll/);
+  assert.match(lauraWorkflow, /intake-digest/);
+  assert.match(lauraWorkflow, /secrets\.CRON_SECRET/);
   assert.match(docs, /AGENT_EMAIL=villageserverassistant@gmail\.com/);
   assert.match(docs, /LARRY_EMAIL=larry\.villageserver@gmail\.com/);
   assert.match(docs, /ANTROPIC_API_KEY/);
   assert.match(docs, /RESEND_API_KEY_AGENT/);
+  assert.match(docs, /Vercel Hobby/);
 });
 
 test('production secrets are not committed into Laura files', () => {
