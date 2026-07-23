@@ -482,6 +482,18 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 .laura-next-title{font-size:1rem;font-weight:900;color:#24292f;margin-top:3px}
 .laura-next-detail{font-size:.86rem;color:#24292f;line-height:1.45;margin-top:5px;max-width:900px}
 .laura-next-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.laura-fact-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.laura-fact{border:1px solid #d0d7de;border-radius:8px;background:#fff;padding:9px 10px;min-width:0}
+.laura-fact-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:#57606a;font-weight:900}
+.laura-fact-value{font-size:.84rem;color:#24292f;font-weight:800;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.laura-folder{border:1px solid #d0d7de;border-radius:10px;background:#fff;margin-bottom:9px;overflow:hidden}
+.laura-folder summary{list-style:none;cursor:pointer;padding:12px 13px;background:#f6f8fa;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.laura-folder summary::-webkit-details-marker{display:none}
+.laura-folder-title{font-size:.82rem;font-weight:900;color:#24292f}
+.laura-folder-sub{font-size:.74rem;color:#57606a;font-weight:800;margin-top:2px}
+.laura-folder-caret{font-size:.9rem;color:#57606a;transition:transform .15s}
+.laura-folder[open] .laura-folder-caret{transform:rotate(180deg)}
+.laura-folder-body{padding:12px 13px;border-top:1px solid #d0d7de}
 .laura-detail-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
 .laura-detail-card{border:1px solid #d0d7de;border-radius:9px;background:#fff;padding:11px;min-width:0}
 .laura-detail-card h4{margin:0 0 8px;font-size:.74rem;text-transform:uppercase;letter-spacing:.07em;color:#57606a}
@@ -490,10 +502,10 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 .laura-kv dt{font-weight:900;color:#57606a}
 .laura-kv dd{margin:0;color:#24292f;word-break:break-word}
 .laura-kv dd.empty{color:#8a929b}
-.laura-conversation-shell{border:1px solid #d0d7de;border-radius:10px;overflow:hidden;background:#fff;margin-bottom:14px}
-.laura-conversation-head{padding:11px 13px;background:#f6f8fa;border-bottom:1px solid #d0d7de;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.laura-conversation-shell{background:#fff}
+.laura-conversation-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .laura-conversation-title{font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#57606a}
-.laura-conversation{padding:14px;display:flex;flex-direction:column;gap:10px;background:#fbfbfc}
+.laura-conversation{display:flex;flex-direction:column;gap:10px;background:#fbfbfc}
 .laura-email-bubble{border:1px solid #d0d7de;border-radius:10px;background:#fff;padding:10px 11px;max-width:84%;box-shadow:0 1px 0 rgba(27,31,36,.04)}
 .laura-email-bubble.agent{align-self:flex-end;border-color:#b6d7ff;background:#f0f6fc}
 .laura-email-bubble.applicant{align-self:flex-start;border-color:#b7e4c7;background:#f6fff8}
@@ -505,8 +517,9 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 .laura-email-subject{font-size:.82rem;font-weight:900;color:#24292f;margin-top:7px}
 .laura-email-body{font-size:.86rem;color:#24292f;line-height:1.5;white-space:pre-wrap;margin-top:6px}
 .laura-form-details{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:1120px){.laura-browser{grid-template-columns:290px minmax(0,1fr)}.laura-detail-strip{grid-template-columns:1fr}.laura-form-details{grid-template-columns:1fr}}
+@media(max-width:1120px){.laura-browser{grid-template-columns:290px minmax(0,1fr)}.laura-fact-row{grid-template-columns:repeat(2,minmax(0,1fr))}.laura-detail-strip{grid-template-columns:1fr}.laura-form-details{grid-template-columns:1fr}}
 @media(max-width:860px){.laura-browser{grid-template-columns:1fr}.laura-file-list{position:static;max-height:none}.laura-email-bubble{max-width:100%}}
+@media(max-width:560px){.laura-fact-row{grid-template-columns:1fr}}
 
 /* Responsive */
 @media(max-width:760px){
@@ -2337,6 +2350,21 @@ function lauraDetailCard(title, rows){
   '</dl></section>';
 }
 
+function lauraFact(label, value){
+  var v = lauraValue(value);
+  return '<div class="laura-fact"><div class="laura-fact-label">'+esc(label)+'</div><div class="laura-fact-value" title="'+esc(v)+'">'+esc(v)+'</div></div>';
+}
+
+function lauraFolder(title, sub, body, open){
+  return '<details class="laura-folder"'+(open ? ' open' : '')+'>'+
+    '<summary>'+
+      '<div><div class="laura-folder-title">'+esc(title)+'</div>'+(sub ? '<div class="laura-folder-sub">'+esc(sub)+'</div>' : '')+'</div>'+
+      '<span class="laura-folder-caret">▾</span>'+
+    '</summary>'+
+    '<div class="laura-folder-body">'+body+'</div>'+
+  '</details>';
+}
+
 function lauraNextInfo(t, stats, draft, decision, deployment){
   var state = String(t.state || 'new');
   if(draft){
@@ -2470,18 +2498,9 @@ function renderLauraConversation(t, msgs, draft){
     return !(m.direction === 'outbound' && (m.status === 'draft' || m.status === 'superseded'));
   });
   var thread = history.map(renderLauraEmailBubble).join('');
-  return '<section class="laura-conversation-shell">'+
-    '<div class="laura-conversation-head">'+
-      '<div class="laura-conversation-title">Email thread</div>'+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
-        badge(history.length+' messages','#eaeef2','#57606a','Non-draft messages')+
-        (draft ? badge('1 draft','#fff8c5','#7d4e00','Current draft') : '')+
-      '</div>'+
-    '</div>'+
-    '<div class="laura-conversation">'+
-      (thread || '<div class="empty-state" style="padding:16px;background:#fff"><div>No sent emails or replies yet.</div></div>')+
-    '</div>'+
-  '</section>';
+  return '<div class="laura-conversation">'+
+    (thread || '<div class="empty-state" style="padding:16px;background:#fff"><div>No sent emails or replies yet.</div></div>')+
+  '</div>';
 }
 
 function renderLauraOpenFile(t){
@@ -2498,6 +2517,8 @@ function renderLauraOpenFile(t){
   var clientEmail = t.applicant_email || (app && app.email) || '';
   var deployStatus = deployment ? 'Filed' : 'Not filed';
   var triage = app ? [app.triage_confidence, app.triage_score != null ? app.triage_score + '/3' : ''].filter(Boolean).join(' ') : '';
+  var historyCount = msgs.filter(function(m){ return !(m.direction === 'outbound' && (m.status === 'draft' || m.status === 'superseded')); }).length;
+  var filingTasks = lauraTasksFor(t.id);
   return '<section class="laura-open-file">'+
     '<div class="laura-open-head">'+
       '<div>'+
@@ -2517,49 +2538,73 @@ function renderLauraOpenFile(t){
     '</div>'+
     '<div class="laura-open-body">'+
       renderLauraNextPanel(t, stats, draft, decision, deployment)+
-      '<div class="laura-detail-strip">'+
-        lauraDetailCard('Person', [
-          ['Email', clientEmail],
-          ['Phone', phone],
-          ['Role', app && app.role],
-          ['Organization', app && app.organization],
-          ['Contact method', app ? [app.preferred_contact_method, app.contact_timezone].filter(Boolean).join(' / ') : '']
-        ])+
-        lauraDetailCard('Review', [
-          ['Status', lauraReviewStatusText(app)],
-          ['Triage', triage],
-          ['Reference', app ? [app.reference_name, app.reference_contact].filter(Boolean).join(' / ') : ''],
-          ['Website', app && app.org_website],
-          ['Reason', decision.reasoning || t.summary]
-        ])+
-        lauraDetailCard('Fulfillment', [
-          ['Kit', lauraKitText(app)],
-          ['Shipping', app && app.shipping_address],
-          ['Funding', app && app.funding_needed],
-          ['Receiving plan', lauraPlanText(app)],
-          ['Deployment', deployment ? 'Filed in deployment log' : 'Not filed yet']
-        ])+
+      '<div class="laura-fact-row">'+
+        lauraFact('Email', clientEmail)+
+        lauraFact('Kit', lauraKitText(app))+
+        lauraFact('Shipping', app && app.shipping_address)+
+        lauraFact('Review', [lauraReviewStatusText(app), triage].filter(Boolean).join(' / '))+
       '</div>'+
-      renderLauraConversation(t, msgs, draft)+
-      '<div class="laura-form-details">'+
-        lauraDetailCard('Application form', [
-          ['Audience', lauraAudienceText(app)],
-          ['Current reach', app && app.current_reach],
-          ['Reach plan', app && app.reach_justification],
-          ['Gathering', app ? (app.has_gathering_infrastructure ? 'Yes' : (app.has_gathering_infrastructure === false ? 'Not yet' : '')) : ''],
-          ['Gathering details', app && app.gathering_infrastructure_desc],
-          ['Languages', app && app.languages],
-          ['Literacy', app && app.literacy_context],
-          ['Power / internet', app && app.power_internet_access],
-          ['Timeframe', app && app.timeframe]
-        ])+
-        lauraDetailCard('Notes and filing', [
+      lauraFolder('Email thread', historyCount+' sent/received message'+(historyCount === 1 ? '' : 's')+(draft ? ' + current draft above' : ''), renderLauraConversation(t, msgs, draft), false)+
+      lauraFolder('Application details', 'Mission request, audience, field conditions, and contact information',
+        '<div class="laura-form-details">'+
+          lauraDetailCard('Person', [
+            ['Email', clientEmail],
+            ['Phone', phone],
+            ['Role', app && app.role],
+            ['Organization', app && app.organization],
+            ['Country / region', app ? [app.country, app.region].filter(Boolean).join(' / ') : ''],
+            ['Contact method', app ? [app.preferred_contact_method, app.contact_timezone].filter(Boolean).join(' / ') : '']
+          ])+
+          lauraDetailCard('Mission request', [
+            ['Kit', lauraKitText(app)],
+            ['Audience', lauraAudienceText(app)],
+            ['Current reach', app && app.current_reach],
+            ['Reach plan', app && app.reach_justification],
+            ['Gathering', app ? (app.has_gathering_infrastructure ? 'Yes' : (app.has_gathering_infrastructure === false ? 'Not yet' : '')) : ''],
+            ['Gathering details', app && app.gathering_infrastructure_desc],
+            ['Languages', app && app.languages],
+            ['Literacy', app && app.literacy_context],
+            ['Power / internet', app && app.power_internet_access],
+            ['Timeframe', app && app.timeframe]
+          ])+
+        '</div>', false)+
+      lauraFolder('Review and verification', [lauraReviewStatusText(app), triage].filter(Boolean).join(' / '),
+        '<div class="laura-form-details">'+
+          lauraDetailCard('Verification', [
+            ['Status', lauraReviewStatusText(app)],
+            ['Triage', triage],
+            ['Reference', app ? [app.reference_name, app.reference_contact].filter(Boolean).join(' / ') : ''],
+            ['Website', app && app.org_website],
+            ['Sending org', app && app.sending_org],
+            ['Checks', lauraVerificationText(app)]
+          ])+
+          lauraDetailCard('Laura reasoning', [
+            ['Last decision', decision.next_action ? lauraActionName(decision.next_action) : ''],
+            ['Reason', decision.reasoning || t.summary],
+            ['Missing fields', Array.isArray(t.missing_fields) ? t.missing_fields : []],
+            ['Triage note', app && app.triage_note]
+          ])+
+        '</div>', false)+
+      lauraFolder('Fulfillment and filing', deployment ? 'Deployment filed' : 'Deployment not filed yet',
+        '<div class="laura-form-details">'+
+          lauraDetailCard('Fulfillment', [
+            ['Receiving plan', lauraPlanText(app)],
+            ['Plan notes', app && app.receiving_plan_details],
+            ['Shipping', app && app.shipping_address],
+            ['Funding', app && app.funding_needed],
+            ['Deployment', deployment ? 'Filed in deployment log' : 'Not filed yet'],
+            ['CSV / Excel', deployment ? 'Manual final export from Deployments tab' : 'Wait until deployment is filed']
+          ])+
+          lauraDetailCard('Filing tasks', [
+            ['Pending/done', filingTasks.map(function(task){ return (task.title || 'Task') + ' (' + (task.state || 'pending') + ')'; })]
+          ])+
+        '</div>', false)+
+      lauraFolder('Notes', 'Mission context, applicant message, and internal notes',
+        lauraDetailCard('Application notes', [
           ['Mission context', app && app.mission_context],
           ['Applicant message', app && app.message],
-          ['Triage note', app && app.triage_note],
-          ['Filing tasks', lauraTasksFor(t.id).map(function(task){ return (task.title || 'Task') + ' (' + (task.state || 'pending') + ')'; })]
-        ])+
-      '</div>'+
+          ['Triage note', app && app.triage_note]
+        ]), false)+
     '</div>'+
   '</section>';
 }
