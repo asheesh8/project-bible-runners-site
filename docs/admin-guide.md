@@ -61,7 +61,9 @@ Backend receptionist console for application follow-up and Larry handoff.
 - API: `GET/POST /api/intake-agent`, plus cron endpoints `intake-gmail-poll` and `intake-digest`
 - Tables: **`intake_threads`**, **`intake_messages`**, **`agent_filing_items`**, **`agent_digests`**
 - Fed by: new `equipment_applications` rows; recent rows can also be backfilled with **Create missing threads**
-- Buttons: Run Laura, approve/send latest draft, poll Gmail, send Larry digest, file deployment
+- Layout: one collapsible client cabinet per applicant, with the client email, Laura mailbox, thread token, current reply stage, latest actionable draft, non-draft email history, filing tasks, funding request, shipping destination, and deployment/CSV status.
+- Buttons: Run Laura, approve/send current draft, poll Gmail, send Larry digest, file deployment
+- Draft cleanup: rerunning Laura marks older unsent drafts as `superseded`; only the current draft is shown as actionable.
 - Setup: see [laura-agent-setup.md](laura-agent-setup.md)
 
 ### Blog & Updates  (`data-tab="posts"`)

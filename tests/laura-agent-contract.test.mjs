@@ -37,6 +37,10 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(core, /GMAIL_REFRESH_TOKEN/);
   assert.match(core, /LARRY_CAL_BOOKING_URL/);
   assert.match(core, /shipping address or delivery destination/);
+  assert.match(core, /superseded_at/);
+  assert.match(core, /gmail_client_configured/);
+  assert.match(core, /applications:/);
+  assert.match(core, /monetary_support: trim\(app\.funding_needed/);
 
   assert.match(agentApi, /isAuthorizedAdmin/);
   assert.match(agentApi, /approve-send/);
@@ -44,6 +48,7 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(gmailPollApi, /pollGmailInbox/);
   assert.match(oauthApi, /gmail\.modify/);
   assert.match(oauthApi, /refresh_token/);
+  assert.match(oauthApi, /missing_env/);
 
   assert.match(trackApi, /ensureThreadForApplication/);
   assert.match(trackApi, /runLauraAgent/);
@@ -57,6 +62,9 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(admin, /lauraPollGmail/);
   assert.match(admin, /lauraFileDeployment/);
   assert.match(admin, /Shipping address/);
+  assert.match(admin, /Client cabinet/);
+  assert.match(admin, /Current draft waiting for approval/);
+  assert.match(admin, /Gmail thread/);
 
   assert.match(applicationForm, /name="shipping_address"/);
 
@@ -69,6 +77,8 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(docs, /ANTROPIC_API_KEY/);
   assert.match(docs, /RESEND_API_KEY_AGENT/);
   assert.match(docs, /Vercel Hobby/);
+  assert.match(docs, /GMAIL_REFRESH_TOKEN/);
+  assert.match(docs, /gmail\.modify/);
 });
 
 test('production secrets are not committed into Laura files', () => {

@@ -42,14 +42,23 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
+  const redirectUri = `${baseUrl(req)}/api/intake-gmail-oauth?action=callback`;
+  const action = String(req.query.action || 'auth-url');
   const clientId = env('GMAIL_CLIENT_ID');
   const clientSecret = env('GMAIL_CLIENT_SECRET');
   if (!clientId || !clientSecret) {
+    if (action === 'auth-url') {
+      return res.status(503).json({
+        error: 'Add GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET to Vercel first.',
+        redirect_uri: redirectUri,
+        missing_env: [
+          !clientId ? 'GMAIL_CLIENT_ID' : '',
+          !clientSecret ? 'GMAIL_CLIENT_SECRET' : '',
+        ].filter(Boolean),
+      });
+    }
     return res.status(503).send(htmlPage('Gmail OAuth not configured', '<h1>Gmail OAuth not configured</h1><p>Add <code>GMAIL_CLIENT_ID</code> and <code>GMAIL_CLIENT_SECRET</code> to Vercel first.</p>'));
   }
-
-  const redirectUri = `${baseUrl(req)}/api/intake-gmail-oauth?action=callback`;
-  const action = String(req.query.action || 'auth-url');
 
   if (action === 'auth-url') {
     if (!isAuthorizedAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });

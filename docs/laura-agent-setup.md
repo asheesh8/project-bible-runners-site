@@ -87,17 +87,25 @@ falls back to the existing site-wide `RESEND_API_KEY`.
 
 ## Gmail OAuth setup
 
-Do this after deploying the code and setting `ADMIN_PASSWORD`,
-`GMAIL_CLIENT_ID`, and `GMAIL_CLIENT_SECRET`.
+Do this after deploying the code and setting `ADMIN_PASSWORD`.
 
-1. Create a Google Cloud OAuth app.
-2. Add this redirect URI:
+1. In Google Cloud Console, create or open a project for VillageServer.
+2. Enable the Gmail API for that project.
+3. Configure the OAuth consent screen.
+   - App name: `VillageServer Laura`
+   - User support email: your admin email
+   - Test user while setting up: `villageserverassistant@gmail.com`
+4. Create OAuth credentials:
+   - Type: `OAuth client ID`
+   - Application type: `Web application`
+   - Name: `VillageServer Laura Gmail`
+5. Add this authorized redirect URI:
 
    ```text
-   https://YOUR_DOMAIN/api/intake-gmail-oauth?action=callback
+   https://villageserver.org/api/intake-gmail-oauth?action=callback
    ```
 
-3. Add Vercel env vars:
+6. Add Vercel env vars:
 
    ```text
    GMAIL_CLIENT_ID=...
@@ -105,19 +113,33 @@ Do this after deploying the code and setting `ADMIN_PASSWORD`,
    GMAIL_USER=me
    ```
 
-4. Sign in to the admin panel.
-5. Open the `Laura Agent` tab.
-6. Click `Get Gmail auth link`.
-7. Sign in as `villageserverassistant@gmail.com`.
-8. Copy the returned refresh token into Vercel:
+7. Redeploy Vercel so the OAuth helper can see those env vars.
+8. Sign in to the admin panel.
+9. Open the `Laura Agent` tab.
+10. Click `Get Gmail auth link`.
+11. Sign in as `villageserverassistant@gmail.com`.
+12. Copy the returned refresh token into Vercel:
 
    ```text
    GMAIL_REFRESH_TOKEN=...
    ```
 
-9. Redeploy or restart the Vercel environment.
+13. Redeploy Vercel again.
 
 After that, `/api/intake-gmail-poll` can read unread Gmail replies.
+
+Laura requests these Gmail scopes:
+
+```text
+https://www.googleapis.com/auth/gmail.modify
+https://www.googleapis.com/auth/gmail.send
+```
+
+Google treats Gmail scopes as sensitive/restricted. Since this app is only for
+the Laura mailbox, keep the OAuth app limited to the Laura test user while
+setting up. If the OAuth consent screen is `External` and left in `Testing`,
+Google refresh tokens can expire after 7 days, so move the app out of Testing
+when you want the inbox automation to stay connected.
 
 ## Recurring automation on Vercel Hobby
 

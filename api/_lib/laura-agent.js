@@ -411,6 +411,18 @@ async function latestDraftForThread(threadId) {
   return rows[0] || null;
 }
 
+async function supersedeDraftsForThread(threadId) {
+  if (!threadId) return;
+  const rows = await selectRows(`intake_messages?select=id,metadata&thread_id=eq.${encodeURIComponent(String(threadId))}&status=eq.draft&direction=eq.outbound&order=created_at.desc&limit=20`);
+  await Promise.all(rows.map((row) => patchRows(`intake_messages?id=eq.${encodeURIComponent(row.id)}`, {
+    status: 'superseded',
+    metadata: {
+      ...(row.metadata || {}),
+      superseded_at: new Date().toISOString(),
+    },
+  }).catch(() => null)));
+}
+
 async function createMessage(row) {
   return insertRow('intake_messages', {
     thread_id: row.thread_id || null,
@@ -475,6 +487,7 @@ export async function runLauraAgent({ threadId = '', applicationId = '', autoSen
   const to = audienceToEmail(decision.audience, app);
   const outbound = decision.audience === 'applicant' || decision.audience === 'larry';
   const subject = subjectWithToken(decision.draft_subject || defaultSubjectFor(decision, app, thread), thread);
+  if (outbound) await supersedeDraftsForThread(thread.id);
   const message = await createMessage({
     thread_id: thread.id,
     role: 'agent',
@@ -526,13 +539,18 @@ export async function listLauraThreads({ includeMessages = false, limit = 80 } =
   const threads = await selectRows(`intake_threads?select=*&order=updated_at.desc&limit=${Number(limit) || 80}`);
   if (!includeMessages || !threads.length) return { threads, messages: [], filing_items: [] };
   const threadIds = threads.map((t) => t.id);
+  const applicationIds = new Set(threads.map((t) => String(t.application_id || '')).filter(Boolean));
   const messages = await selectRows(`intake_messages?select=*&order=created_at.asc&limit=500`);
   const filingItems = await selectRows(`agent_filing_items?select=*&order=created_at.desc&limit=300`);
+  const applications = await selectRows('equipment_applications?select=*&order=created_at.desc&limit=300').catch(() => []);
+  const deployments = await selectRows('deployments?select=*&order=created_at.desc&limit=300').catch(() => []);
   const allowed = new Set(threadIds);
   return {
     threads,
     messages: messages.filter((m) => !m.thread_id || allowed.has(m.thread_id)),
     filing_items: filingItems.filter((m) => !m.thread_id || allowed.has(m.thread_id)),
+    applications: applications.filter((app) => applicationIds.has(String(app.id))),
+    deployments: deployments.filter((row) => applicationIds.has(String(row.application_id || ''))),
   };
 }
 
@@ -853,12 +871,15 @@ export async function fileDeploymentForThread(threadId) {
     contact_information: [app.email, phone].filter(Boolean).join(' / ') || null,
     country: trim(app.country, 160) || null,
     region_village: trim(app.region, 240) || null,
+    monetary_support: trim(app.funding_needed, 240) || null,
+    language_card: trim(app.languages, 240) || null,
     additional_notes: [
       `Filed by Laura from application ${app.id}.`,
       thread.summary ? `Thread summary: ${thread.summary}` : '',
       `Requested kit: ${kitLabel(app)}`,
       app.receiving_plan ? `Receiving plan: ${app.receiving_plan}${app.receiving_plan_details ? ` - ${app.receiving_plan_details}` : ''}` : '',
       app.shipping_address ? `Shipping address / delivery destination: ${app.shipping_address}` : '',
+      app.funding_needed ? `Funding requested: ${app.funding_needed}` : '',
       app.timeframe ? `Timeframe: ${app.timeframe}` : '',
       app.message ? `Applicant message: ${app.message}` : '',
     ].filter(Boolean).join('\n'),
@@ -885,11 +906,16 @@ export async function fileDeploymentForThread(threadId) {
 
 export async function intakeHealth() {
   const c = config();
+  const gmailClientConfigured = !!(env('GMAIL_CLIENT_ID') && env('GMAIL_CLIENT_SECRET'));
+  const gmailRefreshConfigured = !!env('GMAIL_REFRESH_TOKEN');
   return {
     supabase_configured: !!(c.supabaseUrl && c.supabaseKey),
     anthropic_configured: !!c.anthropicKey,
     resend_configured: !!c.resendKey,
-    gmail_oauth_configured: !!(env('GMAIL_CLIENT_ID') && env('GMAIL_CLIENT_SECRET') && env('GMAIL_REFRESH_TOKEN')),
+    gmail_client_configured: gmailClientConfigured,
+    gmail_refresh_configured: gmailRefreshConfigured,
+    gmail_oauth_configured: !!(gmailClientConfigured && gmailRefreshConfigured),
+    gmail_user: c.gmailUser,
     email_provider: c.emailProvider,
     agent_email: c.agentEmail,
     larry_email: c.larryEmail,
