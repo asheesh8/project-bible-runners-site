@@ -207,9 +207,15 @@ Recommended first live setting:
 
 ```text
 Draft everything.
+Laura asks applicants to clarify contradictions before Larry review.
 Larry approves sends from the Laura Agent tab.
 Turn on auto-send only after drafts look right.
 ```
+
+Laura should ask the applicant first when the form has applicant-resolvable
+problems: oversized Tier 4/5 requests for an individual or tiny reach,
+mismatched mission/shipping locations, self-references, placeholder names, or
+vague delivery details.
 
 ## CSV / Excel
 

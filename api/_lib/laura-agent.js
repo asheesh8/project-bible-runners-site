@@ -190,12 +190,230 @@ function detectMissingFields(app) {
   return missing.slice(0, 6);
 }
 
+function firstNumber(value) {
+  const match = String(value || '').replace(/,/g, '').match(/\d+/);
+  return match ? Number(match[0]) : null;
+}
+
+function largestNumber(value) {
+  const numbers = String(value || '').replace(/,/g, '').match(/\d+/g);
+  if (!numbers) return null;
+  return numbers.reduce((max, item) => Math.max(max, Number(item)), 0);
+}
+
+function shortQuote(value, fallback = 'not provided') {
+  const text = trim(value, 140);
+  return text ? `"${text}"` : fallback;
+}
+
+function geoTag(value) {
+  const text = String(value || '').toLowerCase();
+  if (!text) return '';
+  if (/\b(canada|ontario|quebec|british columbia|alberta|manitoba|saskatchewan|toronto|vancouver|montreal|ottawa|calgary|edmonton)\b/.test(text)) return 'Canada';
+  if (/\b(united states|usa|u\.s\.a\.|u\.s\.|america|new york|nyc|brooklyn|manhattan|queens|bronx|staten island|vermont|california|texas|florida|georgia|illinois|ohio|pennsylvania|michigan|virginia|north carolina|south carolina|tennessee|washington|oregon|arizona|colorado|new jersey|massachusetts)\b/.test(text)) return 'United States';
+  if (/\b(kenya|nairobi|kisii|mombasa|eldoret|nakuru)\b/.test(text)) return 'Kenya';
+  if (/\b(uganda|kampala|jinja|gulu)\b/.test(text)) return 'Uganda';
+  if (/\b(nigeria|lagos|abuja|ibadan|kano)\b/.test(text)) return 'Nigeria';
+  if (/\b(zambia|lusaka|ndola|kitwe)\b/.test(text)) return 'Zambia';
+  if (/\b(peru|lima|cusco)\b/.test(text)) return 'Peru';
+  return '';
+}
+
+function looksForwardingPlan(value) {
+  return /\b(forward|forwarded|courier|transport partner|friend|contact in|ship there first|carry|hand.?carry|relay|missionary returning|then send|then take)\b/i.test(String(value || ''));
+}
+
+function vagueShippingAddress(value) {
+  const text = String(value || '').trim();
+  if (!text) return false;
+  if (/\b(down ?town|city hall|friend|can find|unknown|tbd|to be determined|later|not sure|none|n\/a)\b/i.test(text)) return true;
+  return text.length < 35 && !/\d/.test(text) && !/\bp\.?o\.?\s*box\b/i.test(text);
+}
+
+function missingRequestFor(field) {
+  const f = String(field || '').toLowerCase();
+  if (f.includes('reference')) return 'An independent reference contact: full name, relationship to your work, and email or phone.';
+  if (f.includes('website') || f.includes('sending')) return 'A ministry website/social link, or the name of the sending church or organization we can verify.';
+  if (f.includes('power')) return 'The power and internet situation at the deployment location.';
+  if (f.includes('language')) return 'The language or languages the community needs loaded on the kit.';
+  if (f.includes('receiving plan details')) return 'Specific receiving-plan details: who receives it, where, and how it gets to the mission field.';
+  if (f.includes('shipping')) return 'A real shipping or delivery destination, or a clear forwarding plan if it should ship somewhere outside the mission country first.';
+  if (f.includes('receiving')) return 'How you expect to receive the equipment and handle customs/local delivery.';
+  if (f.includes('contact')) return 'Your preferred contact method and time zone.';
+  return field;
+}
+
+export function detectApplicantClarificationNeeds(app) {
+  const concerns = [];
+  const tier = Number(app && app.kit_tier) || null;
+  const audience = String(app && app.audience_type || '');
+  const currentReachMax = largestNumber(app && app.current_reach);
+  const reachPlan = trim(app && app.reach_justification, 2000);
+  const appEmail = normalizeEmail(app && app.email);
+  const refEmail = normalizeEmail(app && app.reference_contact);
+  const name = trim(app && app.name, 160);
+  const missionCountry = trim(app && app.country, 160);
+  const missionCountryTag = geoTag(missionCountry);
+  const missionRegionTag = geoTag(app && app.region);
+  const shippingText = [app && app.shipping_address, app && app.receiving_plan_details].filter(Boolean).join(' ');
+  const shippingTag = geoTag(shippingText);
+  const shippingPlanText = [app && app.receiving_plan, app && app.receiving_plan_details, app && app.shipping_address].filter(Boolean).join(' ');
+
+  if (!name || /^full\s*name\*?$/i.test(name) || normalizeEmail(name)) {
+    concerns.push({
+      code: 'placeholder_name',
+      summary: `The applicant name looks like a placeholder: ${shortQuote(name)}.`,
+      request: 'Your real full name and role in the ministry or deployment.',
+    });
+  }
+
+  if (tier >= 4 && (audience === 'individual' || audience === 'small_group')) {
+    concerns.push({
+      code: 'tier_audience_mismatch',
+      summary: `The form requests ${kitLabel(app)}, but the audience is listed as ${shortQuote(audience.replace(/_/g, ' '))}.`,
+      request: 'Confirm the correct kit tier. If you still need Tier 4 or Tier 5, explain the congregation or regional network it will serve, including gathering points and expected people reached.',
+    });
+  }
+
+  if (tier === 5 && audience !== 'regional_network' && !(audience === 'individual' || audience === 'small_group')) {
+    concerns.push({
+      code: 'tier_5_not_regional',
+      summary: `Tier 5 is for regional receive-and-replay deployments, but the audience is not listed as a regional network.`,
+      request: 'Describe the actual regional deployment plan for Tier 5, or tell us which smaller tier fits this request.',
+    });
+  }
+
+  if (tier === 5 && currentReachMax != null && currentReachMax < 100) {
+    concerns.push({
+      code: 'tier_5_low_reach',
+      summary: `The current reach is ${shortQuote(app.current_reach)}, which is far below the normal Tier 5 regional scale.`,
+      request: 'Explain how this grows to a multi-village or 100+ person deployment, or confirm that a smaller kit is the right request.',
+    });
+  } else if (tier >= 4 && currentReachMax != null && currentReachMax < 25) {
+    concerns.push({
+      code: 'large_tier_low_reach',
+      summary: `The current reach is ${shortQuote(app.current_reach)} for a large equipment tier.`,
+      request: 'Clarify the actual group size and why this larger equipment tier is needed now.',
+    });
+  }
+
+  if (tier >= 4 && firstNumber(reachPlan) == null && reachPlan.length < 80) {
+    concerns.push({
+      code: 'large_tier_weak_reach_plan',
+      summary: `The reach plan is too thin for a large kit request: ${shortQuote(reachPlan)}.`,
+      request: 'Add a concrete reach plan: locations, leaders responsible, gathering rhythm, and rough number of people served.',
+    });
+  }
+
+  if (appEmail && refEmail && appEmail === refEmail) {
+    concerns.push({
+      code: 'self_reference',
+      summary: `The reference contact uses the same email as the applicant.`,
+      request: 'Provide an independent reference who knows your ministry, with their email or phone.',
+    });
+  }
+
+  if (/\b(jim\s+crow|test|asdf|fake|sample)\b/i.test(String(app && app.reference_name || ''))) {
+    concerns.push({
+      code: 'reference_needs_verification',
+      summary: `The reference name needs clarification before review: ${shortQuote(app.reference_name)}.`,
+      request: 'Send a verifiable reference: full name, relationship, and email or phone.',
+    });
+  }
+
+  if (missionCountryTag && missionRegionTag && missionCountryTag !== missionRegionTag) {
+    concerns.push({
+      code: 'mission_location_mismatch',
+      summary: `The mission country is ${shortQuote(app.country)}, but the region/city looks like ${missionRegionTag}: ${shortQuote(app.region)}.`,
+      request: 'Confirm the actual mission country, city/region, and where the equipment will be used.',
+    });
+  }
+
+  if (missionCountryTag && shippingTag && missionCountryTag !== shippingTag && !looksForwardingPlan(shippingPlanText)) {
+    concerns.push({
+      code: 'shipping_country_mismatch',
+      summary: `The mission country is ${shortQuote(app.country)}, but the shipping or delivery destination looks like ${shippingTag}: ${shortQuote(app.shipping_address || app.receiving_plan_details)}.`,
+      request: 'Confirm whether the kit should ship to the mission country or to a forwarding contact, and give the recipient name and full delivery plan.',
+    });
+  }
+
+  if (vagueShippingAddress(app && app.shipping_address)) {
+    concerns.push({
+      code: 'vague_shipping',
+      summary: `The shipping destination is not specific enough to act on: ${shortQuote(app.shipping_address)}.`,
+      request: 'Provide a real recipient name plus address/city/country/phone, or say clearly that you need help finding a shipping path.',
+    });
+  }
+
+  const seen = new Set();
+  return concerns.filter((item) => {
+    if (seen.has(item.code)) return false;
+    seen.add(item.code);
+    return true;
+  }).slice(0, 9);
+}
+
+function hasInboundRole(messages, role) {
+  return asArray(messages).some((m) => m.role === role && (m.direction === 'inbound' || m.status === 'received'));
+}
+
+function applicantClarificationDecision(app, thread, messages, concerns = detectApplicantClarificationNeeds(app), missing = detectMissingFields(app)) {
+  const requests = [
+    ...asArray(concerns).map((item) => item.request),
+    ...asArray(missing).map(missingRequestFor),
+  ].map((x) => trim(x, 260)).filter(Boolean);
+  const uniqueRequests = [];
+  const seen = new Set();
+  requests.forEach((request) => {
+    const key = request.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      uniqueRequests.push(request);
+    }
+  });
+  const tier = Number(app && app.kit_tier) || null;
+  const highTierNote = tier >= 4
+    ? [
+      '',
+      `For Tier ${tier} requests, we need a clear congregation or regional deployment plan before Larry reviews it. If this is mainly for an individual or small group, that is okay, but we need to move it into the smaller kit lane instead of treating it like a regional deployment.`,
+    ]
+    : [];
+  return {
+    next_action: 'ask_customer',
+    state: 'waiting_on_customer',
+    audience: 'applicant',
+    missing_fields: uniqueRequests.slice(0, 8),
+    summary: `${app.name || 'Applicant'} needs to clarify applicant-provided discrepancies before Larry review: ${asArray(concerns).map((c0) => c0.code).join(', ') || missing.join(', ')}.`,
+    draft_subject: `Clarification needed for your VillageServer application [VS-${thread.thread_token}]`,
+    draft_body: [
+      `Hi ${app.name || 'there'},`,
+      '',
+      `Thank you for sending the VillageServer application. Before I can move this to Larry for review, I need to clean up a few details that do not line up in the form.`,
+      '',
+      concerns.length ? `What I am seeing:` : `What I still need:`,
+      ...(concerns.length ? concerns.map((item) => `- ${item.summary}`) : missing.map((field) => `- ${missingRequestFor(field)}`)),
+      '',
+      `Please reply with:`,
+      ...uniqueRequests.slice(0, 7).map((request, index) => `${index + 1}. ${request}`),
+      ...highTierNote,
+      '',
+      `Once those details are clear, I can keep your file moving.`,
+      '',
+      `${config().agentName}`,
+      `VillageServer Initiative`,
+    ].join('\n'),
+    reasoning: 'Applicant-resolvable intake discrepancies must be clarified with the applicant before asking Larry for a decision.',
+    auto_send_ok: true,
+  };
+}
+
 function latestMessage(messages, role) {
   return asArray(messages).filter((m) => m.role === role).slice(-1)[0] || null;
 }
 
 function fallbackDecision(app, thread, messages) {
   const missing = detectMissingFields(app);
+  const clarificationNeeds = detectApplicantClarificationNeeds(app);
   const lastLarry = latestMessage(messages, 'larry');
   if (lastLarry) {
     return {
@@ -218,6 +436,9 @@ function fallbackDecision(app, thread, messages) {
       reasoning: 'Fallback draft because Anthropic is not configured or returned invalid JSON.',
       auto_send_ok: false,
     };
+  }
+  if (clarificationNeeds.length && !hasInboundRole(messages, 'applicant')) {
+    return applicantClarificationDecision(app, thread, messages, clarificationNeeds, missing);
   }
   if (missing.length) {
     return {
@@ -281,6 +502,15 @@ function normalizeDecision(decision, app, thread, messages) {
   ]);
   const action = safeActions.has(nextAction) ? nextAction : fallback.next_action;
   const audience = ['applicant', 'larry', 'internal'].includes(String(d.audience || '')) ? String(d.audience) : fallback.audience;
+  const clarificationNeeds = detectApplicantClarificationNeeds(app);
+  const mustAskApplicantFirst = clarificationNeeds.length && !hasInboundRole(messages, 'applicant') && !hasInboundRole(messages, 'larry');
+  if (mustAskApplicantFirst && (audience === 'larry' || action === 'ask_larry' || action === 'escalate')) {
+    const forced = applicantClarificationDecision(app, thread, messages, clarificationNeeds, detectMissingFields(app));
+    return {
+      ...forced,
+      reasoning: `${forced.reasoning} Overrode ${action} because Laura should ask the applicant before Larry when the form details contradict themselves.`,
+    };
+  }
   return {
     next_action: action,
     state: trim(d.state || fallback.state, 80) || fallback.state,
@@ -299,6 +529,7 @@ async function callAnthropicDecision({ app, thread, messages }) {
   const c = config();
   if (!c.anthropicKey) return fallbackDecision(app, thread, messages);
   const missing = detectMissingFields(app);
+  const clarificationNeeds = detectApplicantClarificationNeeds(app);
   const history = asArray(messages).slice(-12).map((m) => ({
     role: m.role,
     status: m.status,
@@ -311,9 +542,11 @@ async function callAnthropicDecision({ app, thread, messages }) {
     `Your job is to keep form-fillout applicants moving toward one of these outcomes: missing-info collected, Larry decision requested, scheduling link sent, deployment filed, shipping/update followed up, rollout photos requested, or closed.`,
     `Never promise equipment, funding, discounts, delivery dates, shipment dates, or approvals unless Larry explicitly said so in the conversation history.`,
     `If Larry has replied with a concrete instruction, draft the customer-facing follow-up that carries out that instruction.`,
+    `Do not ask Larry to judge applicant-created contradictions before the applicant has clarified them. Ask the applicant first when location, shipping, reference, audience, tier, current reach, or identity details do not line up.`,
+    `Tier 4 and Tier 5 requests need a real congregation or regional deployment plan. If a Tier 4/5 request says individual, small group, tiny current reach, vague reach plan, placeholder identity, or mismatched country/shipping, next_action must be ask_customer unless an applicant reply already resolved it.`,
     `If the applicant is missing routine details, ask for only the important missing details in a warm short email.`,
     `If ready for a call and a booking URL is available, send the booking URL. Booking URL: ${c.calBookingUrl || 'not configured'}.`,
-    `Escalate to Larry for complaints, money disputes, safety concerns, unclear shipping promises, custom pricing, or anything sensitive.`,
+    `Escalate to Larry only for complaints, money disputes, safety concerns, custom pricing, final approval/denial, or shipping/scheduling instructions after applicant details are clear.`,
     `Do not use markdown headings. Email copy should be plain, concise, and human.`,
     `Return ONLY valid JSON with this shape: {"next_action":"ask_customer|ask_larry|reply_customer|send_schedule_link|file_deployment|request_rollout_photos|close|escalate","state":"waiting_on_customer|waiting_on_larry|ready_to_schedule|scheduled|ready_to_ship|shipped|follow_up_photos|filed|closed|escalated","audience":"applicant|larry|internal","missing_fields":["..."],"summary":"one internal sentence","draft_subject":"...","draft_body":"...","reasoning":"one internal sentence","auto_send_ok":false,"filing":{"title":"","detail":"","item_type":"deployment|campaign|shipping|photo_request|follow_up|note"}}`,
   ].join('\n');
@@ -323,6 +556,7 @@ async function callAnthropicDecision({ app, thread, messages }) {
     appSummaryLines(app).join('\n'),
     '',
     `Detected missing fields: ${missing.length ? missing.join(', ') : 'none'}`,
+    `Applicant clarification needed before Larry review: ${clarificationNeeds.length ? clarificationNeeds.map((item) => `${item.code}: ${item.summary} Ask: ${item.request}`).join(' | ') : 'none'}`,
     '',
     `Recent conversation:`,
     JSON.stringify(history, null, 2),

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { detectApplicantClarificationNeeds } from '../api/_lib/laura-agent.js';
 
 function read(path) {
   return readFileSync(new URL(path, import.meta.url), 'utf8');
@@ -43,6 +44,10 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(core, /monetary_support: trim\(app\.funding_needed/);
   assert.match(core, /function encodeMailHeader/);
   assert.match(core, /Subject: \$\{encodeMailHeader\(subject\)\}/);
+  assert.match(core, /detectApplicantClarificationNeeds/);
+  assert.match(core, /tier_audience_mismatch/);
+  assert.match(core, /Applicant-resolvable intake discrepancies must be clarified with the applicant before asking Larry/);
+  assert.match(core, /Tier 4 and Tier 5 requests need a real congregation or regional deployment plan/);
 
   assert.match(agentApi, /isAuthorizedAdmin/);
   assert.match(agentApi, /approve-send/);
@@ -101,4 +106,31 @@ test('production secrets are not committed into Laura files', () => {
 
   assert.doesNotMatch(joined, /sk-ant-api/i);
   assert.doesNotMatch(joined, /re_[A-Za-z0-9_]{20,}/);
+});
+
+test('Laura flags contradictory high-tier applications before Larry review', () => {
+  const concerns = detectApplicantClarificationNeeds({
+    name: 'Full Name*',
+    email: 'the_johnsons@surewest.net',
+    country: 'Canada',
+    region: 'New York City',
+    kit_tier: 5,
+    audience_type: 'individual',
+    current_reach: '5-6',
+    reach_justification: 'daily use',
+    shipping_address: 'Down Town City Hall, New York',
+    reference_name: 'Jim Crow',
+    reference_contact: 'jim@example.com',
+  }).map((item) => item.code);
+
+  assert.deepEqual(concerns, [
+    'placeholder_name',
+    'tier_audience_mismatch',
+    'tier_5_low_reach',
+    'large_tier_weak_reach_plan',
+    'reference_needs_verification',
+    'mission_location_mismatch',
+    'shipping_country_mismatch',
+    'vague_shipping',
+  ]);
 });
