@@ -102,7 +102,7 @@ Do this after deploying the code and setting `ADMIN_PASSWORD`.
 5. Add this authorized redirect URI:
 
    ```text
-   https://villageserver.org/api/intake-gmail-oauth?action=callback
+   https://www.villageservers.com/api/intake-gmail-oauth?action=callback
    ```
 
 6. Add Vercel env vars:
@@ -156,7 +156,7 @@ CRON_SECRET=same-value-as-the-Vercel-CRON_SECRET
 Optional repository variable:
 
 ```text
-LAURA_SITE_URL=https://villageserver.org
+LAURA_SITE_URL=https://www.villageservers.com
 ```
 
 The workflow at `.github/workflows/laura-agent.yml` calls:
