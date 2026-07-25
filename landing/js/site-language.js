@@ -97,12 +97,12 @@
   function addStyles() {
     var style = document.createElement('style');
     style.textContent =
-      '.global-language-switch{position:fixed;right:18px;bottom:18px;z-index:1200;display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #d9ddd4;border-radius:999px;background:rgba(251,250,245,.96);box-shadow:0 10px 35px rgba(20,38,28,.18);font:600 12px "DM Sans",sans-serif;color:#18221d;backdrop-filter:blur(10px)}' +
+      '.global-language-switch{position:fixed;left:18px;bottom:18px;z-index:1200;display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #d9ddd4;border-radius:999px;background:rgba(251,250,245,.96);box-shadow:0 10px 35px rgba(20,38,28,.18);font:600 12px "DM Sans",sans-serif;color:#18221d;backdrop-filter:blur(10px)}' +
       '.global-language-switch>span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#123e31;color:#d9df7b;font-size:11px}.global-language-switch label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}' +
       '.global-language-switch select{border:0;background:transparent;color:#18221d;font:600 12px "DM Sans",sans-serif;min-width:112px;outline:none}' +
-      '@media(max-width:520px){.global-language-switch{right:10px;bottom:10px}.global-language-switch select{min-width:94px}.footer{padding-bottom:78px}}' +
-      '#vsi-translating-hint{position:fixed;left:18px;bottom:18px;z-index:1200;padding:9px 14px;border:1px solid #d9ddd4;border-radius:999px;background:rgba(251,250,245,.96);box-shadow:0 10px 35px rgba(20,38,28,.18);font:600 12px "DM Sans",sans-serif;color:#18221d;backdrop-filter:blur(10px)}' +
-      '@media(max-width:520px){#vsi-translating-hint{left:10px;bottom:10px}}';
+      '@media(max-width:520px){.global-language-switch{left:10px;bottom:10px}.global-language-switch select{min-width:94px}.footer{padding-bottom:78px}}' +
+      '#vsi-translating-hint{position:fixed;left:18px;bottom:74px;z-index:1200;padding:9px 14px;border:1px solid #d9ddd4;border-radius:999px;background:rgba(251,250,245,.96);box-shadow:0 10px 35px rgba(20,38,28,.18);font:600 12px "DM Sans",sans-serif;color:#18221d;backdrop-filter:blur(10px)}' +
+      '@media(max-width:520px){#vsi-translating-hint{left:10px;bottom:62px}}';
     document.head.appendChild(style);
   }
 
