@@ -110,6 +110,12 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.doesNotMatch(vercel, /"crons"/);
   assert.match(lauraWorkflow, /intake-gmail-poll/);
   assert.match(lauraWorkflow, /intake-digest/);
+  // GitHub throttles high-frequency schedules into uselessness, so polling must
+  // not depend on one. An external cron owns it.
+  assert.doesNotMatch(lauraWorkflow, /cron: "\*\/10/);
+  assert.match(lauraWorkflow, /cron: "0 \*\/6 \* \* \*"/);
+  assert.match(docs, /cron-job\.org/);
+  assert.match(docs, /x-cron-secret: <CRON_SECRET>/);
   assert.match(lauraWorkflow, /secrets\.CRON_SECRET/);
   assert.match(docs, /AGENT_EMAIL=villageserverassistant@gmail\.com/);
   assert.match(docs, /LARRY_EMAIL=larry\.villageserver@gmail\.com/);

@@ -15,7 +15,7 @@ Form submission
   -> intake_messages draft
   -> admin approval or auto-send setting
   -> Larry digest every 6 hours
-  -> Gmail polling every 10 minutes, once OAuth is configured
+  -> Gmail polling every 5-10 minutes from an external cron
   -> deployments row for CSV export when filed
 ```
 
@@ -143,8 +143,9 @@ when you want the inbox automation to stay connected.
 
 ## Recurring automation on Vercel Hobby
 
-Vercel Hobby only allows daily native Cron Jobs, so Laura's 10-minute Gmail
-poll and 6-hour Larry digest run from GitHub Actions instead.
+Vercel Hobby only allows daily native Cron Jobs, so the 6-hour Larry digest
+runs from GitHub Actions. Gmail polling runs from an external cron — see below
+for why GitHub is the wrong place for it.
 
 In GitHub, open this repository's `Settings` -> `Secrets and variables` ->
 `Actions` and add:
@@ -161,8 +162,28 @@ LAURA_SITE_URL=https://www.villageservers.com
 
 The workflow at `.github/workflows/laura-agent.yml` calls:
 
-- `POST /api/intake-gmail-poll` every 10 minutes
 - `POST /api/intake-digest` every 6 hours
+
+**Gmail polling is deliberately not on GitHub.** `schedule` is best-effort, and
+GitHub drops high-frequency crons hard — a `*/10` was landing every 45 to 160
+minutes in practice, which is useless for answering someone's email. Polling
+runs from an external cron instead:
+
+| | |
+|---|---|
+| Service | [cron-job.org](https://cron-job.org) (free) |
+| URL | `https://www.villageservers.com/api/intake-gmail-poll?limit=3` |
+| Method | POST |
+| Header | `x-cron-secret: <CRON_SECRET>` |
+| Every | 5-10 minutes |
+
+Put the secret in the **header**, never in the query string — query strings end
+up in server logs and the cron service's own job history. `limit=3` keeps each
+run inside the free tier's 30-second timeout, since every matched reply costs a
+model call plus a send.
+
+The poll job stays in the workflow for `workflow_dispatch`, so it can still be
+triggered by hand from the Actions tab.
 
 ## Optional Gmail sending
 

@@ -1,8 +1,14 @@
 name: Laura agent automation
 
+# Gmail polling is NOT here any more. GitHub treats `schedule` as best-effort
+# and drops high-frequency crons hard — a "*/10" was landing every 45-160
+# minutes in practice, which is useless for answering applicant mail. An
+# external cron (cron-job.org) now calls /api/intake-gmail-poll directly.
+#
+# The 6-hourly digest stays: GitHub honours low-frequency schedules fine, and a
+# late digest costs nothing.
 on:
   schedule:
-    - cron: "*/10 * * * *"
     - cron: "0 */6 * * *"
   workflow_dispatch:
 
@@ -15,9 +21,10 @@ concurrency:
 
 jobs:
   poll-gmail:
-    name: Poll Gmail replies
+    name: Poll Gmail replies (manual only)
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Call Laura Gmail poll endpoint
         env:
