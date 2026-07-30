@@ -231,6 +231,11 @@ test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', ()
   assert.match(core, /function applicantRepliedSinceLastSend/);
   assert.match(core, /const answering = applicantRepliedSinceLastSend\(messages\)/);
   assert.match(core, /if \(!answering && hours < c\.cooldownHours\)/);
+  // Answering an applicant must not require Larry to have spoken first.
+  assert.match(core, /action === 'reply_customer' && !hasInboundRole\(messages, 'larry'\) && !answering/);
+  // A contradiction stops blocking the offer once the applicant has answered it.
+  assert.match(core, /function readyForOffer\(app, messages = \[\]\)/);
+  assert.match(core, /!hasInboundRole\(messages, 'applicant'\) && detectApplicantClarificationNeeds/);
   // Laura confirms the card, but Larry posts it — she must not file a
   // deployment for something nobody has actually sent.
   assert.match(core, /function notifyLarryReadyToShip/);

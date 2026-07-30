@@ -558,8 +558,13 @@ function hasOfferedSdCard(messages) {
 // "Comfortable with the person": nothing in the form contradicts itself and
 // nothing important is missing. Language and shipping are deliberately not
 // blocking — the offer itself is what asks for those two.
-function readyForOffer(app) {
-  if (detectApplicantClarificationNeeds(app).length) return false;
+function readyForOffer(app, messages = []) {
+  // Form contradictions block the offer only until the applicant has had a
+  // chance to explain. Once they have written back, the explanation is in the
+  // thread and re-flagging the same discrepancy forever would strand the file —
+  // Achebe's Vermont address forwarded on to Kenya by his brother is a real
+  // arrangement, not an error, and no regex is going to settle that.
+  if (!hasInboundRole(messages, 'applicant') && detectApplicantClarificationNeeds(app).length) return false;
   return detectMissingFields(app).filter((field) => !/language|shipping|receiving/i.test(field)).length === 0;
 }
 
@@ -739,7 +744,7 @@ function fallbackDecision(app, thread, messages) {
   }
 
   // Verified and consistent, but they have not been levelled with yet.
-  if (cardsOnly && !offered && readyForOffer(app)) {
+  if (cardsOnly && !offered && readyForOffer(app, messages)) {
     return sdCardOfferDecision(app, thread);
   }
 
@@ -863,7 +868,7 @@ function normalizeDecision(decision, app, thread, messages) {
         reasoning: `${forced.reasoning} Overrode ${action} because the card details are already complete.`,
       };
     }
-    if (!hasOfferedSdCard(messages) && readyForOffer(app)) {
+    if (!hasOfferedSdCard(messages) && readyForOffer(app, messages)) {
       const forced = sdCardOfferDecision(app, thread);
       return {
         ...forced,
@@ -1245,21 +1250,24 @@ async function autoSendGate({ decision, messages, outbound, audience }) {
   if (audience === 'larry') return { allowed: true, reason: '' };
 
   const action = decision.next_action;
+  const answering = applicantRepliedSinceLastSend(messages);
   const selfSendable = SELF_SEND_ACTIONS.has(action)
     || (level === 'full' && action === 'send_schedule_link');
   if (!selfSendable) return { allowed: false, reason: `${action} always waits for Larry` };
   if (!decision.auto_send_ok) return { allowed: false, reason: 'Laura flagged this one for review' };
 
-  // Carrying out an instruction means there has to be an instruction.
-  if (action === 'reply_customer' && !hasInboundRole(messages, 'larry')) {
-    return { allowed: false, reason: 'no instruction from Larry yet' };
+  // reply_customer covers two things: carrying out an instruction from Larry,
+  // and simply answering someone who wrote in. Either is a reason to speak. A
+  // "reply" with neither behind it is Laura talking to herself, so that is the
+  // only case worth blocking.
+  if (action === 'reply_customer' && !hasInboundRole(messages, 'larry') && !answering) {
+    return { allowed: false, reason: 'nothing to reply to' };
   }
 
   // The cooldown governs *unprompted* contact. Once someone has written back,
   // answering them is the job — refusing to reply for a day because she happened
   // to write that morning is how a receptionist looks broken, not careful. The
   // round cap is what bounds a genuine back-and-forth.
-  const answering = applicantRepliedSinceLastSend(messages);
   const hours = hoursSinceLastApplicantSend(messages);
   if (!answering && hours < c.cooldownHours) {
     return { allowed: false, reason: `cooldown — wrote to them ${Math.round(hours)}h ago, no reply yet` };
