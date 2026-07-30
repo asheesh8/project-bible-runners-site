@@ -1207,6 +1207,7 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
             <button class="btn-new" type="button" onclick="loadLauraAgent()">Refresh</button>
             <button class="btn-save" type="button" onclick="lauraEnsureRecent(this)">Create missing threads</button>
             <button class="btn-save" type="button" onclick="lauraSendDigest(this)">Send Larry digest</button>
+            <button class="btn-save" type="button" onclick="lauraRunAll(this)">Run all waiting</button>
             <button class="btn-save" type="button" onclick="lauraRunFollowUps(this)">Run follow-ups</button>
             <button class="btn-save" type="button" onclick="lauraPollGmail(this)">Poll Gmail</button>
           </div>
@@ -2777,6 +2778,35 @@ function lauraPollGmail(button){
     showStatus(data.configured ? ('Gmail poll complete: '+data.processed+' processed.') : data.message,'ok');
     loadLauraAgent();
   }).catch(function(err){ showStatus(err.message||'Could not poll Gmail.','err'); })
+    .then(function(){ done(); });
+}
+
+// Two steps on purpose: the first click only asks who would be written to, the
+// second actually writes. Nothing here should ever surprise you with the number
+// of missionaries it just emailed.
+function lauraRunAll(button){
+  var done = lauraSetButton(button,'Checking...');
+  lauraApi('POST','run-all',{limit:40,dry_run:true}).then(function(data){
+    var list = data.would_contact || [];
+    var held = data.held || [];
+    if(!list.length){
+      showStatus(held.length
+        ? 'Nobody is due right now. '+held.length+' file(s) are on cooldown or waiting on Larry.'
+        : 'Nobody is waiting on Laura right now.','ok');
+      return null;
+    }
+    var names = list.slice(0,12).map(function(x){ return '  • '+x.name+' <'+x.email+'>  ('+x.last_contact+')'; }).join('\n');
+    var more = list.length > 12 ? '\n  …and '+(list.length-12)+' more' : '';
+    var heldNote = held.length ? '\n\n'+held.length+' will be skipped (cooldown, or waiting on Larry).' : '';
+    if(!confirm('Laura will email '+list.length+' '+(list.length===1?'person':'people')+' now:\n\n'+names+more+heldNote+'\n\nThese are real emails. Send them?')) return null;
+    done('Run all waiting');
+    var again = lauraSetButton(button,'Sending...');
+    return lauraApi('POST','run-all',{limit:40}).then(function(res){
+      showStatus('Sent '+res.sent+' of '+(res.results||[]).length+' — '+
+        (res.results||[]).filter(function(r){ return !r.sent; }).length+' held or drafted.','ok');
+      loadLauraAgent();
+    }).then(function(){ again(); });
+  }).catch(function(err){ showStatus(err.message||'Could not run.','err'); })
     .then(function(){ done(); });
 }
 

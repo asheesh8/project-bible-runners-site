@@ -1252,6 +1252,70 @@ async function autoSendGate({ decision, messages, outbound, audience }) {
   return { allowed: true, reason: '' };
 }
 
+// Work through every file that is genuinely waiting on Laura. Runs one at a
+// time on purpose — this sends real mail to real people, and a burst of
+// parallel calls is both harder to stop and harder to read afterwards.
+//
+// `dryRun` answers "who would this write to?" without calling the model or
+// sending anything, so the count can be confirmed before it happens.
+export async function runAllWaitingThreads({ limit = 40, dryRun = false } = {}) {
+  if (!(await settingBool('laura_agent_enabled', true))) {
+    return { ok: false, skipped: true, reason: 'Laura agent is disabled.' };
+  }
+  const c = config();
+  const threads = await selectRows(
+    `intake_threads?select=*&state=in.(new,waiting_on_customer)`
+    + `&order=created_at.asc&limit=${Number(limit) || 40}`,
+  );
+
+  const eligible = [];
+  const held = [];
+  for (const thread of threads) {
+    const label = {
+      thread_id: thread.id,
+      name: thread.applicant_name || 'Applicant',
+      email: thread.applicant_email || '',
+      token: thread.thread_token,
+    };
+    // Files parked with Larry are his call, not hers.
+    if (String(thread.owner || '') === 'larry') {
+      held.push({ ...label, reason: 'waiting on Larry' });
+      continue;
+    }
+    const messages = await messagesForThread(thread.id);
+    const hours = hoursSinceLastApplicantSend(messages);
+    if (hours < c.cooldownHours) {
+      held.push({ ...label, reason: `emailed ${Math.round(hours)}h ago` });
+      continue;
+    }
+    eligible.push({ ...label, last_contact: hours === Infinity ? 'never contacted' : `${Math.round(hours / 24)}d ago` });
+  }
+
+  if (dryRun) return { ok: true, dry_run: true, would_contact: eligible, held };
+
+  const results = [];
+  for (const item of eligible) {
+    try {
+      const run = await runLauraAgent({ threadId: item.thread_id, reason: 'run_all' });
+      results.push({
+        ...item,
+        action: run.decision && run.decision.next_action,
+        sent: !!run.sent,
+        held: run.held || null,
+      });
+    } catch (e) {
+      results.push({ ...item, error: String((e && e.message) || e) });
+    }
+  }
+  return {
+    ok: true,
+    considered: threads.length,
+    sent: results.filter((r) => r.sent).length,
+    results,
+    held,
+  };
+}
+
 export async function listLauraThreads({ includeMessages = false, limit = 80 } = {}) {
   const threads = await selectRows(`intake_threads?select=*&order=updated_at.desc&limit=${Number(limit) || 80}`);
   if (!includeMessages || !threads.length) return { threads, messages: [], filing_items: [] };

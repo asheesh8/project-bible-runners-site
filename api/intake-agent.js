@@ -7,6 +7,7 @@ import {
   listLauraThreads,
   performLarryAction,
   pollGmailInbox,
+  runAllWaitingThreads,
   runDueFollowUps,
   runLauraAgent,
   sendLauraDigest,
@@ -75,6 +76,13 @@ export default async function handler(req, res) {
 
     if (action === 'poll-gmail') {
       return res.status(200).json(await pollGmailInbox({ limit: Number(b.limit || 10), autoRun: b.auto_run !== false }));
+    }
+
+    if (action === 'run-all') {
+      return res.status(200).json(await runAllWaitingThreads({
+        limit: Number(b.limit || 40),
+        dryRun: b.dry_run === true || req.query.dry_run === 'true',
+      }));
     }
 
     if (action === 'run-followups') {

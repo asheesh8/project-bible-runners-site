@@ -75,6 +75,13 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(schema, /laura_autonomy/);
 
   assert.match(agentApi, /run-followups/);
+  assert.match(agentApi, /run-all/);
+  assert.match(core, /runAllWaitingThreads/);
+  // Bulk sending must be able to answer "who would this write to?" first.
+  assert.match(core, /dry_run: true, would_contact/);
+  assert.match(admin, /function lauraRunAll/);
+  assert.match(admin, /dry_run:true/);
+  assert.match(admin, /These are real emails/);
   assert.match(agentApi, /larry-action/);
   assert.match(digestApi, /runDueFollowUps/);
 
