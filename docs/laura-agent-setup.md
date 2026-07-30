@@ -314,6 +314,12 @@ LAURA_MAX_NUDGES=3             # then hand the file to Larry instead of nagging
 Mail to Larry is exempt from the cooldown — it is a notification, not a promise
 to an applicant, and holding it back would defeat the point.
 
+The cooldown governs **unprompted** contact only. Once an applicant has written
+back, Laura answers straight away — refusing to reply for a day because she
+happened to write that morning is how a receptionist looks broken rather than
+careful. A genuine back-and-forth is bounded by `LAURA_MAX_ASK_ROUNDS` instead.
+Nudges stay fully cooldown-gated, since a nudge is unprompted by definition.
+
 **Laura never chases anyone she cannot hear.** Applicant replies only enter the
 system through Gmail polling, so until `GMAIL_REFRESH_TOKEN` is set, someone who
 answered looks exactly like someone who ignored her. Rather than nag a

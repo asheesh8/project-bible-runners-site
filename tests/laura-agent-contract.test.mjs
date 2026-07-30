@@ -220,6 +220,11 @@ test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', ()
   assert.match(core, /function cardConfirmationDecision/);
   assert.match(core, /confirm_card/);
   assert.match(core, /LAURA_MAX_ASK_ROUNDS/);
+  // Answering someone who wrote back is not unprompted contact, so the
+  // cooldown must not gate it.
+  assert.match(core, /function applicantRepliedSinceLastSend/);
+  assert.match(core, /const answering = applicantRepliedSinceLastSend\(messages\)/);
+  assert.match(core, /if \(!answering && hours < c\.cooldownHours\)/);
   // Laura confirms the card, but Larry posts it — she must not file a
   // deployment for something nobody has actually sent.
   assert.match(core, /function notifyLarryReadyToShip/);

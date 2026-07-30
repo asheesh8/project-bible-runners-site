@@ -674,6 +674,19 @@ function nudgeCount(messages) {
   return sentToApplicant(messages).filter((m) => m.action_type === 'follow_up_nudge').length;
 }
 
+// Is there an unanswered message from the applicant sitting there? Distinct
+// from "not quiet": a brand new file has no outbound and no inbound, and that
+// is nobody replying — it is nobody having spoken yet.
+function applicantRepliedSinceLastSend(messages) {
+  const inbound = asArray(messages)
+    .filter((m) => m.role === 'applicant' && m.direction === 'inbound')
+    .map((m) => new Date(m.created_at).getTime())
+    .filter((t) => Number.isFinite(t));
+  if (!inbound.length) return false;
+  const lastOut = lastApplicantSendAt(messages);
+  return lastOut == null || Math.max(...inbound) > lastOut;
+}
+
 // Has the applicant said anything since Laura's last message? If not, the ball
 // is still in their court and a nudge is the right move.
 function applicantWentQuiet(messages) {
@@ -1242,9 +1255,14 @@ async function autoSendGate({ decision, messages, outbound, audience }) {
     return { allowed: false, reason: 'no instruction from Larry yet' };
   }
 
+  // The cooldown governs *unprompted* contact. Once someone has written back,
+  // answering them is the job — refusing to reply for a day because she happened
+  // to write that morning is how a receptionist looks broken, not careful. The
+  // round cap is what bounds a genuine back-and-forth.
+  const answering = applicantRepliedSinceLastSend(messages);
   const hours = hoursSinceLastApplicantSend(messages);
-  if (hours < c.cooldownHours) {
-    return { allowed: false, reason: `cooldown — wrote to them ${Math.round(hours)}h ago` };
+  if (!answering && hours < c.cooldownHours) {
+    return { allowed: false, reason: `cooldown — wrote to them ${Math.round(hours)}h ago, no reply yet` };
   }
   if (action === 'follow_up_nudge' && nudgeCount(messages) >= c.maxNudges) {
     return { allowed: false, reason: `already nudged ${c.maxNudges} times` };
@@ -1283,12 +1301,17 @@ export async function runAllWaitingThreads({ limit = 40, dryRun = false } = {}) 
       continue;
     }
     const messages = await messagesForThread(thread.id);
+    const answering = applicantRepliedSinceLastSend(messages);
     const hours = hoursSinceLastApplicantSend(messages);
-    if (hours < c.cooldownHours) {
-      held.push({ ...label, reason: `emailed ${Math.round(hours)}h ago` });
+    if (!answering && hours < c.cooldownHours) {
+      held.push({ ...label, reason: `emailed ${Math.round(hours)}h ago, no reply yet` });
       continue;
     }
-    eligible.push({ ...label, last_contact: hours === Infinity ? 'never contacted' : `${Math.round(hours / 24)}d ago` });
+    eligible.push({
+      ...label,
+      last_contact: answering ? 'replied — waiting on us'
+        : hours === Infinity ? 'never contacted' : `${Math.round(hours / 24)}d ago`,
+    });
   }
 
   if (dryRun) return { ok: true, dry_run: true, would_contact: eligible, held };
