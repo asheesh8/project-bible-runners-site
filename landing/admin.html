@@ -2558,15 +2558,24 @@ function renderLauraLarryBar(t, draft){
   var button = function(action, label, cls){
     return '<button type="button" class="'+(cls||'')+'" onclick="lauraLarryAction(\''+arg+'\',\''+action+'\',this)">'+esc(label)+'</button>';
   };
-  return '<div class="laura-larry-bar">'+
-    '<div class="laura-larry-title">Larry’s call</div>'+
-    '<div class="laura-larry-buttons">'+
-      button('approve','Approve & send booking link','go')+
+  // Once the applicant has confirmed a language and an address, the useful
+  // question is "have you posted it yet?", not "do you approve this person?".
+  var shipping = ['ready_to_ship','shipped','filed'].indexOf(String(t.state || '')) > -1;
+  var title = shipping ? 'Ready to post — has it gone out?' : 'Larry’s call';
+  var buttons = shipping
+    ? button('mark-shipped','Yes — I have posted it','go')+
+      button('file-deployment','File deployment only','')+
+      button('more-info','Ask for more info','')+
+      button('schedule-call','Set up a call first','')+
+      button('hold','Hold for now','')
+    : button('approve','Approve — send a card','go')+
       (draft ? button('send-draft','Send Laura’s draft','') : '')+
       button('more-info','Ask for more info','')+
       button('hold','Hold for now','')+
-      button('decline','Decline','stop')+
-    '</div>'+
+      button('decline','Decline','stop');
+  return '<div class="laura-larry-bar">'+
+    '<div class="laura-larry-title">'+esc(title)+'</div>'+
+    '<div class="laura-larry-buttons">'+buttons+'</div>'+
   '</div>';
 }
 
@@ -2799,8 +2808,10 @@ function lauraSetAutonomy(select){
 }
 
 var LAURA_ACTION_CONFIRM = {
-  approve:'Approve this application and email the applicant the booking link?',
+  approve:'Approve this application and tell the applicant a card is coming?',
   'send-draft':'Send the current draft to the applicant now?',
+  'mark-shipped':'Confirm you have actually posted this card? Laura will file the deployment and tell them it is on its way.',
+  'schedule-call':'Send this applicant your booking link?',
   decline:'Mark this application declined? Laura will draft the note but will not send it.'
 };
 

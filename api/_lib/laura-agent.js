@@ -1153,17 +1153,20 @@ export async function runLauraAgent({ threadId = '', applicationId = '', reason 
   let sent = null;
   if (message && gate.allowed) sent = await sendMessageById(message.id);
 
-  // Confirming a card is the end of the conversation: file the deployment so
-  // the details reach the fulfilment log, and stop chasing.
-  let filed = null;
+  // Confirming a card ends Laura's part, not the job — the card still has to be
+  // physically posted, and only Larry can do that. So she stops chasing the
+  // applicant and puts the file in front of him with shipping buttons instead
+  // of filing a deployment for something nobody has sent yet.
+  let handedOver = null;
   if (sent && decision.next_action === 'confirm_card') {
-    filed = await fileDeploymentForThread(thread.id).catch(() => null);
     await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
-      state: 'filed',
-      owner: 'filing',
+      state: 'ready_to_ship',
+      owner: 'larry',
       next_follow_up_at: null,
       digest_pending: true,
+      summary: `${app.name || 'Applicant'} confirmed ${trim(app.languages, 80)} and an address. Ready for you to post a card.`,
     }).catch(() => null);
+    handedOver = await notifyLarryReadyToShip(thread, app).catch(() => null);
   } else if (sent && decision.audience === 'applicant') {
     // Otherwise the ball is with them, so schedule the next nudge.
     await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
@@ -1180,8 +1183,37 @@ export async function runLauraAgent({ threadId = '', applicationId = '', reason 
     sent,
     held: sent ? null : gate.reason,
     learned: extraction.changes,
-    filed: filed && filed.deployment ? filed.deployment.id : null,
+    handed_to_larry: !!handedOver,
   };
+}
+
+// The hand-off at the shipping stage. Larry gets one email that says exactly
+// what to post and where, with buttons that let him answer "posted it" without
+// opening the admin panel.
+async function notifyLarryReadyToShip(thread, app) {
+  const c = config();
+  const fresh = await loadThreadBy({ threadId: thread.id }) || thread;
+  const message = await createMessage({
+    thread_id: thread.id,
+    role: 'agent',
+    channel: 'email',
+    direction: 'outbound',
+    action_type: 'ready_to_ship',
+    subject: subjectWithToken(`Ready to post: ${app.name || 'an applicant'}`, thread),
+    body: [
+      `${app.name || 'An applicant'} has confirmed everything for a card.`,
+      '',
+      `Language: ${trim(app.languages, 200) || 'not given'}`,
+      `Send to: ${trim(app.shipping_address, 400) || 'not given'}`,
+      '',
+      `Nothing is filed yet — when you have actually posted it, use the button below and I will file the deployment and let them know it is on the way.`,
+    ].join('\n'),
+    from_email: c.agentEmail,
+    to_email: [normalizeEmail(c.larryEmail)],
+    status: 'draft',
+    metadata: { reason: 'ready_to_ship' },
+  });
+  return message ? sendMessageById(message.id).catch(() => null) : null;
 }
 
 // The single place that decides whether an email leaves without Larry. Every
@@ -1402,7 +1434,7 @@ function threadCardItem(thread, app, { draft = null, headline = '' } = {}) {
     ],
     flags: asArray(thread && thread.missing_fields).map((x) => String(x)).slice(0, 6),
     draft: draft ? { subject: draft.subject, body: draft.body } : null,
-    buttons: actionButtonsFor(thread && thread.id, { hasDraft: !!draft }),
+    buttons: actionButtonsFor(thread && thread.id, { hasDraft: !!draft, stage }),
     adminUrl: adminFileUrl(thread && thread.id),
   };
 }
@@ -1731,6 +1763,112 @@ export async function performLarryAction(threadId, action) {
       next_follow_up_at: new Date(Date.now() + 7 * 86400000).toISOString(),
     }).catch(() => null);
     return { ok: true, tone: 'neutral', title: 'On hold', message: `${who} is paused. I will bring the file back in a week.` };
+  }
+
+  if (action === 'mark-shipped') {
+    await recordLarryAction(thread, action, 'Larry posted the card.');
+    const filed = await fileDeploymentForThread(thread.id).catch(() => null);
+    await supersedeDraftsForThread(thread.id);
+    const message = await createMessage({
+      thread_id: thread.id,
+      role: 'agent',
+      channel: 'email',
+      direction: 'outbound',
+      action_type: 'shipped',
+      subject: subjectWithToken('Your VillageServer card is on its way', thread),
+      body: [
+        `Hi ${app.name || 'there'},`,
+        '',
+        `Your card has been posted${trim(app.languages, 120) ? `, loaded in ${trim(app.languages, 120)}` : ''}.`,
+        '',
+        `Post can be slow, so please give it time to reach you. When it arrives, reply and let me know — and if you are able to send a photo of it being used, we would love to see it.`,
+        '',
+        `If it has not turned up after a few weeks, tell me and I will look into it.`,
+        '',
+        config().agentName,
+        'VillageServer Initiative',
+      ].join('\n'),
+      from_email: config().agentEmail,
+      to_email: [normalizeEmail(app.email)],
+      status: 'draft',
+      metadata: { reason: 'larry_action', action },
+    });
+    const sent = message ? await sendMessageById(message.id).catch(() => null) : null;
+    await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+      state: 'shipped',
+      owner: 'laura',
+      digest_pending: true,
+      summary: `Card posted to ${who}. Waiting to hear that it arrived.`,
+      next_follow_up_at: null,
+    }).catch(() => null);
+    return {
+      ok: true,
+      tone: 'go',
+      title: 'Filed and confirmed',
+      message: `${who} has been told the card is on its way.`,
+      detail: filed && filed.already_exists
+        ? 'It was already in the deployment log.'
+        : 'I have added it to the deployment log.',
+    };
+  }
+
+  if (action === 'file-deployment') {
+    await recordLarryAction(thread, action, 'Larry filed the deployment record.');
+    const filed = await fileDeploymentForThread(thread.id).catch(() => null);
+    return {
+      ok: true,
+      tone: 'go',
+      title: filed && filed.already_exists ? 'Already filed' : 'Filed',
+      message: `${who} is in the deployment log.`,
+      detail: 'Nothing was emailed to them.',
+    };
+  }
+
+  if (action === 'schedule-call') {
+    const booking = config().calBookingUrl;
+    if (!booking) {
+      return {
+        ok: false,
+        tone: 'neutral',
+        title: 'No booking link set',
+        message: 'There is no scheduling link configured, so I cannot send one.',
+        detail: 'Set LARRY_CAL_BOOKING_URL in Vercel, or reply to them directly.',
+      };
+    }
+    await recordLarryAction(thread, action, 'Larry asked for a call before shipping.');
+    await supersedeDraftsForThread(thread.id);
+    const message = await createMessage({
+      thread_id: thread.id,
+      role: 'agent',
+      channel: 'email',
+      direction: 'outbound',
+      action_type: 'send_schedule_link',
+      subject: subjectWithToken('A quick call about your VillageServer card', thread),
+      body: [
+        `Hi ${app.name || 'there'},`,
+        '',
+        `Before we send anything out, Larry would like a short conversation with you about your work and how the card will be used.`,
+        '',
+        `Pick whatever time suits you here: ${booking}`,
+        '',
+        `If none of those times work, just reply and tell me what does.`,
+        '',
+        config().agentName,
+        'VillageServer Initiative',
+      ].join('\n'),
+      from_email: config().agentEmail,
+      to_email: [normalizeEmail(app.email)],
+      status: 'draft',
+      metadata: { reason: 'larry_action', action },
+    });
+    const sent = message ? await sendMessageById(message.id).catch(() => null) : null;
+    await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+      state: 'ready_to_schedule', owner: 'applicant', digest_pending: true,
+      next_follow_up_at: new Date(Date.now() + config().followUpDays * 86400000).toISOString(),
+    }).catch(() => null);
+    return sent
+      ? { ok: true, tone: 'go', title: 'Booking link sent', message: `${who} has your booking link.` }
+      : { ok: false, tone: 'stop', title: 'Could not send', message: 'The booking link is drafted but did not go out.' };
   }
 
   if (action === 'decline') {

@@ -49,7 +49,33 @@ export const LARRY_ACTIONS = {
     tone: 'stop',
     blurb: 'Marks the application declined and drafts a kind note for you to review before it sends.',
   },
+
+  // Shipping stage. Reached once an applicant has confirmed a language and a
+  // usable address — Laura has done everything she can, and the card still has
+  // to physically leave the building.
+  'mark-shipped': {
+    label: 'Yes — I have posted it',
+    confirm: true,
+    tone: 'go',
+    blurb: 'Files the deployment record and tells the applicant their card is on its way.',
+  },
+  'file-deployment': {
+    label: 'File deployment only',
+    confirm: false,
+    tone: 'neutral',
+    blurb: 'Adds this to the deployment log without emailing the applicant.',
+  },
+  'schedule-call': {
+    label: 'Set up a call first',
+    confirm: true,
+    tone: 'neutral',
+    blurb: 'Sends the applicant your booking link so you can talk before anything ships.',
+  },
 };
+
+// Stages where the useful question is "has this been posted yet?" rather than
+// "do you approve this applicant?".
+const SHIPPING_STAGES = new Set(['ready_to_ship', 'shipped', 'filed']);
 
 export function isKnownAction(action) {
   return Object.prototype.hasOwnProperty.call(LARRY_ACTIONS, String(action || ''));
@@ -159,12 +185,21 @@ export function adminFileUrl(threadId) {
 
 // Every button Larry should see for a thread, already signed. `hasDraft` swaps
 // the generic approve button for "send this exact draft".
-export function actionButtonsFor(threadId, { hasDraft = false, actions = null } = {}) {
-  // When a draft is sitting right above the buttons, sending that exact text is
-  // the natural first move — it is the thing Larry has just read.
-  const names = actions || (hasDraft
-    ? ['send-draft', 'approve', 'more-info', 'hold', 'decline']
-    : ['approve', 'more-info', 'hold', 'decline']);
+export function shippingButtonNames() {
+  return ['mark-shipped', 'file-deployment', 'more-info', 'schedule-call', 'hold'];
+}
+
+export function actionButtonsFor(threadId, { hasDraft = false, actions = null, stage = '' } = {}) {
+  // Once the applicant has confirmed a language and an address, "approve" is a
+  // decision that has already been made. What Larry needs then is a way to say
+  // he has posted it.
+  const names = actions || (SHIPPING_STAGES.has(String(stage))
+    ? shippingButtonNames()
+    // When a draft is sitting right above the buttons, sending that exact text
+    // is the natural first move — it is the thing Larry has just read.
+    : hasDraft
+      ? ['send-draft', 'approve', 'more-info', 'hold', 'decline']
+      : ['approve', 'more-info', 'hold', 'decline']);
   return names.filter(isKnownAction).map((name) => ({
     action: name,
     ...actionMeta(name),

@@ -204,8 +204,28 @@ application arrives
   -> Laura reads their answers back onto the application row   <-- the part that closes the loop
   -> gaps filled? offer the microSD card, ask language + address
   -> they reply with both
-  -> Laura confirms, files the deployment, stops chasing
+  -> Laura confirms to the applicant and stops chasing
+  -> Larry gets one email: what to post, where, and a button saying
+     "Yes — I have posted it"
+  -> he presses it once the card is actually in the post
+  -> deployment filed, applicant told it is on its way
 ```
+
+**Laura never files a deployment for a card nobody has sent.** She takes it as
+far as it can go without hands — but somebody still has to physically put the
+card in an envelope, and only Larry knows when that happened. So the last step
+is his, and the deployment log stays honest about what has actually shipped.
+
+At that stage his buttons change, because "do you approve this applicant?" is a
+question that has already been answered:
+
+| Button | What happens |
+|---|---|
+| Yes — I have posted it | Files the deployment and emails the applicant that the card is on its way |
+| File deployment only | Adds it to the log, emails nobody |
+| Ask for more info | Laura goes back to the applicant |
+| Set up a call first | Sends your booking link (needs `LARRY_CAL_BOOKING_URL`) |
+| Hold for now | Pauses it for a week |
 
 **Reading answers back onto the file is what makes autonomy work.** Applicants
 reply in prose — "my reference is Pastor Mary, mary@example.org" — and every

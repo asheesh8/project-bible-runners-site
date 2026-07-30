@@ -191,6 +191,7 @@ test('Larry’s email renders every file with its own buttons and escapes hostil
 
 test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', () => {
   const core = read('../api/_lib/laura-agent.js');
+  const admin = read('../landing/admin.html');
 
   // The reality check must live in code, not only in the system prompt, so the
   // model cannot promise a kit or funding that does not exist.
@@ -212,6 +213,15 @@ test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', ()
   assert.match(core, /function cardConfirmationDecision/);
   assert.match(core, /confirm_card/);
   assert.match(core, /LAURA_MAX_ASK_ROUNDS/);
+  // Laura confirms the card, but Larry posts it — she must not file a
+  // deployment for something nobody has actually sent.
+  assert.match(core, /function notifyLarryReadyToShip/);
+  assert.match(core, /ready_to_ship/);
+  assert.match(core, /Nothing is filed yet/);
+  assert.match(core, /'mark-shipped'/);
+  assert.doesNotMatch(core, /confirm_card'\) \{\s*filed = await fileDeploymentForThread/);
+  assert.match(admin, /mark-shipped/);
+  assert.match(admin, /Ready to post/);
   // The offer collects exactly what a card needs.
   assert.match(core, /The language or languages your community needs on the card/);
   assert.match(core, /A shipping address, including a recipient name and a phone number/);
