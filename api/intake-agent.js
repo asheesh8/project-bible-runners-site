@@ -5,7 +5,9 @@ import {
   fileDeploymentForThread,
   intakeHealth,
   listLauraThreads,
+  performLarryAction,
   pollGmailInbox,
+  runDueFollowUps,
   runLauraAgent,
   sendLauraDigest,
   sendMessageById,
@@ -73,6 +75,18 @@ export default async function handler(req, res) {
 
     if (action === 'poll-gmail') {
       return res.status(200).json(await pollGmailInbox({ limit: Number(b.limit || 10), autoRun: b.auto_run !== false }));
+    }
+
+    if (action === 'run-followups') {
+      return res.status(200).json(await runDueFollowUps({ limit: Number(b.limit || 25) }));
+    }
+
+    // Same effects as the buttons in Larry's email, driven from the panel.
+    if (action === 'larry-action') {
+      const threadId = cleanId(req.query.thread_id || b.thread_id);
+      const choice = String(req.query.larry_action || b.larry_action || '').trim();
+      if (!threadId) return res.status(400).json({ error: 'thread_id is required' });
+      return res.status(200).json(await performLarryAction(threadId, choice));
     }
 
     if (action === 'file-deployment') {

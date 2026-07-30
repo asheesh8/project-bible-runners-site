@@ -247,6 +247,14 @@ where not exists (
   select 1 from public.site_settings where key = 'larry_cal_booking_url'
 );
 
+-- How much Laura may send without Larry seeing it first:
+-- 'draft_only' | 'staged' | 'full'. See supabase/schema.sql for the full note.
+insert into public.site_settings (key, value)
+select 'laura_autonomy', '"staged"'::jsonb
+where not exists (
+  select 1 from public.site_settings where key = 'laura_autonomy'
+);
+
 select table_name
 from information_schema.tables
 where table_schema = 'public'

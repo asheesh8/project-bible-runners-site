@@ -184,38 +184,115 @@ LARRY_CAL_BOOKING_URL=https://cal.com/...
 
 Laura will include the link when a thread is ready to schedule.
 
-## Conservative automation defaults
+## What Laura is allowed to offer
 
-By default Laura drafts, but does not freely send.
-
-Server env toggles:
-
-```text
-LAURA_DRAFT_ON_SUBMIT=true
-LAURA_AUTO_SEND_ON_SUBMIT=false
-LAURA_AUTO_SEND_AFTER_LARRY=false
-LAURA_AUTO_SEND_SCHEDULING=false
-```
-
-Supabase setting:
+The initiative can only post microSD cards right now, so that is the only thing
+Laura ever offers — whatever tier the form asked for.
 
 ```text
-laura_auto_send_missing_info=false
+LAURA_OFFER_MODE=sd_card_only   # default; set to full_kits when larger tiers return
 ```
 
-Recommended first live setting:
+While this is `sd_card_only`, the shape of every conversation is:
+
+1. Laura gathers the form details and clears up anything that contradicts
+   itself, asking the applicant rather than bothering Larry.
+2. Once the file is complete and consistent — "comfortable with the person" —
+   she does **not** propose a call, a kit, or a review by Larry. She sends the
+   honest scale-down instead: warm about the ministry, plain about the fact that
+   only cards are going out, and asking for exactly two things — **the language
+   they need** and **a shipping address** with a recipient name and phone.
+3. When they reply with those, the file goes to Larry ready to act on.
+
+This is enforced in `normalizeDecision`, not just requested in the prompt: if
+the model returns `ask_larry`, `send_schedule_link` or `file_deployment` on a
+clean file, it is overridden with the card offer and the reason is recorded on
+the thread. The model cannot promise equipment or money that does not exist.
+
+The offer is sent once per thread. Language and shipping are deliberately not
+treated as blocking gaps beforehand, because the offer itself is what asks for
+them.
+
+## How much Laura sends on her own
+
+One setting controls this, and it is the only thing that decides whether an
+email leaves without Larry. Change it from the dropdown at the top of the
+`Laura Agent` tab, or directly as the `laura_autonomy` row in `site_settings`.
+
+| Level | Laura sends by herself | Always waits for Larry |
+|---|---|---|
+| `draft_only` | nothing | everything |
+| `staged` *(default)* | acknowledgments, missing-info and clarification requests, follow-up nudges | approve, decline, funding, scheduling |
+| `full` | the above, plus the scheduling link once a file is clean | approve, decline, funding |
+
+Approvals and declines are never sent by the model in any mode. They happen
+only when Larry presses a button.
+
+`LAURA_AUTONOMY` in the environment overrides the database setting, which is
+the fastest way to stop all outbound mail without opening the admin panel:
 
 ```text
-Draft everything.
-Laura asks applicants to clarify contradictions before Larry review.
-Larry approves sends from the Laura Agent tab.
-Turn on auto-send only after drafts look right.
+LAURA_AUTONOMY=draft_only
 ```
 
-Laura should ask the applicant first when the form has applicant-resolvable
-problems: oversized Tier 4/5 requests for an individual or tiny reach,
-mismatched mission/shipping locations, self-references, placeholder names, or
-vague delivery details.
+### The rails that make this safe
+
+These apply to applicant mail at every level above `draft_only`:
+
+```text
+LAURA_SEND_COOLDOWN_HOURS=24   # at most one email per applicant per window
+LAURA_FOLLOW_UP_DAYS=4         # chase after this much silence
+LAURA_MAX_NUDGES=3             # then hand the file to Larry instead of nagging
+```
+
+Mail to Larry is exempt from the cooldown — it is a notification, not a promise
+to an applicant, and holding it back would defeat the point.
+
+**Laura never chases anyone she cannot hear.** Applicant replies only enter the
+system through Gmail polling, so until `GMAIL_REFRESH_TOKEN` is set, someone who
+answered looks exactly like someone who ignored her. Rather than nag a
+missionary for details they already sent, follow-ups hand the file straight to
+Larry with a summary saying Gmail is not connected and the mailbox needs
+checking by hand. Normal nudging resumes on its own once OAuth is finished — no
+setting to remember to flip back.
+
+Laura asks the applicant first when the form has applicant-resolvable problems:
+oversized Tier 4/5 requests for an individual or tiny reach, mismatched
+mission/shipping locations, self-references, placeholder names, or vague
+delivery details. This is enforced in code, not left to the model.
+
+If Anthropic is unreachable while a reply from Larry is waiting, Laura holds the
+thread as an internal note rather than guessing at his instruction.
+
+## Larry's one-click buttons
+
+Every file in Larry's email carries signed action buttons, so an application can
+move without opening the admin panel:
+
+| Button | What happens |
+|---|---|
+| Approve & send booking link | Marks the application approved and emails the applicant the scheduling link |
+| Send Laura's draft | Sends the drafted reply exactly as written |
+| Ask for more info | Laura writes and sends a follow-up for what is still missing |
+| Hold for now | Pauses the file and brings it back in a week |
+| Decline | Marks it declined and **drafts** a kind note for review — never auto-sent |
+
+Links are HMAC-signed with `LAURA_ACTION_SECRET` (falling back to
+`ADMIN_PASSWORD`), name exactly one file and one action, and expire after 14
+days. Approve, decline and send-draft show a confirmation page first, because
+mail scanners follow links and none of them should be able to approve an
+application. Every action is idempotent — a second click reports what already
+happened instead of repeating it.
+
+Set the public origin so the buttons point at the right place:
+
+```text
+LAURA_SITE_URL=https://www.villageservers.com
+LAURA_ACTION_SECRET=another-long-random-secret
+```
+
+The same five buttons appear on each file in the `Laura Agent` tab, so the panel
+and the inbox never disagree about what is possible.
 
 ## CSV / Excel
 

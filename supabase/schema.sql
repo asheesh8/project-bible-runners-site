@@ -695,6 +695,17 @@ insert into public.site_settings (key, value)
 select 'larry_cal_booking_url', '""'::jsonb
 where not exists (select 1 from public.site_settings where key = 'larry_cal_booking_url');
 
+-- How much Laura may send without Larry seeing it first.
+--   'draft_only' — she writes, he sends. Nothing leaves on its own.
+--   'staged'     — she sends her own info requests and follow-up nudges;
+--                  approvals, declines, funding and scheduling all wait.
+--   'full'       — she also sends the scheduling link once a file is clean.
+-- Approvals and declines are never sent by the model in any mode; they only
+-- happen when Larry presses a button.
+insert into public.site_settings (key, value)
+select 'laura_autonomy', '"staged"'::jsonb
+where not exists (select 1 from public.site_settings where key = 'laura_autonomy');
+
 -- Confirm all expected tables exist after running the migration.
 select table_name
 from information_schema.tables

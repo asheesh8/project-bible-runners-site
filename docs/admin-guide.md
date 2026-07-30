@@ -58,13 +58,16 @@ The post-approval fulfillment log — mirrors Eric's original Excel sheet.
 
 ### Laura Agent  (`data-tab="laura-agent"`)
 Backend receptionist console for application follow-up and Larry handoff.
-- API: `GET/POST /api/intake-agent`, plus cron endpoints `intake-gmail-poll` and `intake-digest`
+- API: `GET/POST /api/intake-agent`, the action endpoint `/api/laura-action`, plus cron endpoints `intake-gmail-poll` and `intake-digest`
 - Tables: **`intake_threads`**, **`intake_messages`**, **`agent_filing_items`**, **`agent_digests`**
 - Fed by: new `equipment_applications` rows; recent rows can also be backfilled with **Create missing threads**
 - Layout: one collapsible client cabinet per applicant, with the client email, Laura mailbox, thread token, current reply stage, latest actionable draft, non-draft email history, filing tasks, funding request, shipping destination, and deployment/CSV status.
-- Buttons: Run Laura, approve/send current draft, poll Gmail, send Larry digest, file deployment
+- Buttons: Run Laura, approve/send current draft, poll Gmail, send Larry digest, run follow-ups, file deployment
+- **Larry's call** — the five decisions (Approve, Send draft, Ask for more info, Hold, Decline) appear both on each file here and as one-click buttons in Larry's email, so the panel and the inbox never disagree.
+- **Autonomy dropdown** — `draft_only` / `staged` / `full`, stored as `laura_autonomy` in `site_settings`. Whether any email leaves without Larry is decided by this plus a 24h per-applicant cooldown and a 3-nudge cap.
 - Draft cleanup: rerunning Laura marks older unsent drafts as `superseded`; only the current draft is shown as actionable.
-- Setup: see [laura-agent-setup.md](laura-agent-setup.md)
+- Follow-ups: threads carry `next_follow_up_at`; due ones are chased by the digest cron or the **Run follow-ups** button, then handed to Larry once the nudge cap is hit.
+- What Laura may offer is capped by `LAURA_OFFER_MODE` (default `sd_card_only`) — see [laura-agent-setup.md](laura-agent-setup.md)
 
 ### Blog & Updates  (`data-tab="posts"`)
 - API: `GET/POST/PATCH/DELETE /api/content?type=posts`

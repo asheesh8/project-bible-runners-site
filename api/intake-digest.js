@@ -1,5 +1,5 @@
 import { isAuthorizedAdmin } from './_lib/admin-token.js';
-import { sendLauraDigest } from './_lib/laura-agent.js';
+import { runDueFollowUps, sendLauraDigest } from './_lib/laura-agent.js';
 
 function isAuthorizedCron(req) {
   const secret = process.env.CRON_SECRET;
@@ -15,7 +15,13 @@ export default async function handler(req, res) {
   if (!isAuthorizedCron(req) && !isAuthorizedAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
   try {
     const force = req.query.force === 'true' || (req.body && req.body.force === true);
-    return res.status(200).json(await sendLauraDigest({ force }));
+    // Chase quiet applicants first so the digest Larry reads reflects the
+    // nudges that just went out, rather than lagging six hours behind them.
+    const followUps = req.query.skip_followups === 'true'
+      ? { skipped: true }
+      : await runDueFollowUps({}).catch((e) => ({ error: String((e && e.message) || e) }));
+    const digest = await sendLauraDigest({ force });
+    return res.status(200).json({ ...digest, follow_ups: followUps });
   } catch (e) {
     return res.status(500).json({ error: String((e && e.message) || e) });
   }

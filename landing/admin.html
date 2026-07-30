@@ -401,6 +401,23 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 .laura-health-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .laura-health-meta{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:.86rem;color:var(--muted)}
 .laura-oauth-note{margin-top:12px;padding:10px 12px;border:1px solid #d0d7de;border-radius:8px;background:#f6f8fa;font-size:.82rem;color:#57606a;line-height:1.45}
+.laura-autonomy-card{margin-top:12px;padding:12px 14px;border:1px solid #d0d7de;border-radius:8px;background:#fff}
+.laura-autonomy-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.laura-autonomy-top select{border:1.5px solid #d0d7de;border-radius:7px;padding:7px 10px;font-family:var(--sans);font-size:.86rem;font-weight:700;background:#fff;cursor:pointer;min-width:260px}
+.laura-autonomy-note{margin-top:9px;font-size:.83rem;color:#57606a;line-height:1.5}
+.laura-autonomy-limits{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.laura-autonomy-limits span{font-size:.76rem;color:#57606a;background:#f6f8fa;border:1px solid #d0d7de;border-radius:999px;padding:4px 10px}
+.laura-larry-bar{margin:12px 0;padding:12px 14px;border:1px solid #d4a72c;border-radius:10px;background:#fff8c5}
+.laura-larry-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#7d4e00;font-weight:900;margin-bottom:9px}
+.laura-larry-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.laura-larry-buttons button{border-radius:8px;padding:8px 13px;font-family:var(--sans);font-size:.84rem;font-weight:800;cursor:pointer;border:1.5px solid #d0d7de;background:#fff;color:#24292f}
+.laura-larry-buttons button:hover:not(:disabled){background:#f6f8fa}
+.laura-larry-buttons button.go{background:#1a7f37;border-color:#1a7f37;color:#fff}
+.laura-larry-buttons button.go:hover:not(:disabled){background:#116329}
+.laura-larry-buttons button.stop{border-color:#ffb3b8;color:#cf222e}
+.laura-larry-buttons button.stop:hover:not(:disabled){background:#ffebe9}
+.laura-larry-buttons button:disabled{opacity:.55;cursor:not-allowed}
+.laura-held{margin-top:8px;font-size:.8rem;color:#7d4e00;font-weight:700}
 .laura-thread{background:#fff;border:1.5px solid #d0d7de;border-radius:12px;margin-bottom:12px;overflow:hidden}
 .laura-thread > summary{list-style:none;cursor:pointer;padding:14px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
 .laura-thread > summary::-webkit-details-marker{display:none}
@@ -1190,6 +1207,7 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
             <button class="btn-new" type="button" onclick="loadLauraAgent()">Refresh</button>
             <button class="btn-save" type="button" onclick="lauraEnsureRecent(this)">Create missing threads</button>
             <button class="btn-save" type="button" onclick="lauraSendDigest(this)">Send Larry digest</button>
+            <button class="btn-save" type="button" onclick="lauraRunFollowUps(this)">Run follow-ups</button>
             <button class="btn-save" type="button" onclick="lauraPollGmail(this)">Poll Gmail</button>
           </div>
         </div>
@@ -1944,6 +1962,16 @@ function renderLauraHealth(h){
     : (h.gmail_client_configured
       ? 'Google client is set. Click the auth link, sign in as Laura, then add the returned refresh token to Vercel.'
       : 'Add GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET in Vercel first, using the redirect URI below.');
+  var level = h.autonomy || 'staged';
+  var autonomyText = {
+    draft_only: 'Laura writes every email and waits. Nothing goes out until you send it.',
+    staged: 'Laura sends her own information requests and follow-up nudges. Approvals, declines, funding and scheduling always wait for Larry.',
+    full: 'Laura also sends the scheduling link once a file is clean. Approvals and declines still only happen when Larry presses a button.'
+  }[level] || '';
+  var option = function(value, label){
+    return '<option value="'+value+'"'+(level === value ? ' selected' : '')+'>'+label+'</option>';
+  };
+
   el.innerHTML =
     '<div class="laura-health-top">'+
     lauraHealthBadge('Supabase', h.supabase_configured)+
@@ -1951,6 +1979,7 @@ function renderLauraHealth(h){
     lauraHealthBadge('Resend', h.resend_configured)+
     lauraHealthBadge('Gmail OAuth', h.gmail_oauth_configured)+
     lauraHealthBadge('Cal.com', h.cal_booking_configured)+
+    lauraHealthBadge('Action links', h.action_links_configured)+
     '</div>'+
     '<div class="laura-health-meta">'+
     '<span><strong>Email provider:</strong> '+esc(h.email_provider||'resend')+'</span>'+
@@ -1958,9 +1987,27 @@ function renderLauraHealth(h){
     '<span><strong>Larry:</strong> '+esc(h.larry_email||'')+'</span>'+
     '<button type="button" onclick="lauraGmailAuth(this)" style="border:1px solid #d0d7de;background:#fff;border-radius:7px;padding:5px 9px;font-weight:800;cursor:pointer">Get Gmail auth link</button>'+
     '</div>'+
+    '<div class="laura-autonomy-card">'+
+      '<div class="laura-autonomy-top">'+
+        '<label for="laura-autonomy" class="laura-panel-title" style="margin:0">How much Laura sends on her own</label>'+
+        '<select id="laura-autonomy" onchange="lauraSetAutonomy(this)">'+
+          option('draft_only','Draft only — I send everything')+
+          option('staged','Staged — Laura handles intake questions')+
+          option('full','Full — Laura also books calls')+
+        '</select>'+
+      '</div>'+
+      '<div class="laura-autonomy-note">'+esc(autonomyText)+'</div>'+
+      '<div class="laura-autonomy-limits">'+
+        '<span>One email per applicant per <strong>'+esc(String(h.cooldown_hours||24))+'h</strong></span>'+
+        '<span>Chases after <strong>'+esc(String(h.follow_up_days||4))+' days</strong> of silence</span>'+
+        '<span>Stops after <strong>'+esc(String(h.max_nudges||3))+'</strong> nudges</span>'+
+      '</div>'+
+    '</div>'+
     '<div class="laura-oauth-note">'+
       '<strong>OAuth:</strong> '+esc(oauthText)+'<br>'+
-      '<strong>Redirect URI:</strong> <code>'+esc(redirectUri)+'</code>'+
+      '<strong>Redirect URI:</strong> <code>'+esc(redirectUri)+'</code><br>'+
+      '<strong>Larry’s buttons link back to:</strong> <code>'+esc(h.site_url||'')+'</code>'+
+      (h.action_links_configured ? '' : '<br><strong style="color:#cf222e">Set LAURA_ACTION_SECRET or ADMIN_PASSWORD in Vercel so the email buttons work.</strong>')+
     '</div>';
 }
 
@@ -2503,6 +2550,26 @@ function renderLauraConversation(t, msgs, draft){
   '</div>';
 }
 
+// The same decisions Larry gets as buttons in his email, available here too so
+// the panel and the inbox never disagree about what is possible.
+function renderLauraLarryBar(t, draft){
+  if(!t) return '';
+  var arg = lauraJsArg(t.id);
+  var button = function(action, label, cls){
+    return '<button type="button" class="'+(cls||'')+'" onclick="lauraLarryAction(\''+arg+'\',\''+action+'\',this)">'+esc(label)+'</button>';
+  };
+  return '<div class="laura-larry-bar">'+
+    '<div class="laura-larry-title">Larry’s call</div>'+
+    '<div class="laura-larry-buttons">'+
+      button('approve','Approve & send booking link','go')+
+      (draft ? button('send-draft','Send Laura’s draft','') : '')+
+      button('more-info','Ask for more info','')+
+      button('hold','Hold for now','')+
+      button('decline','Decline','stop')+
+    '</div>'+
+  '</div>';
+}
+
 function renderLauraOpenFile(t){
   if(!t){
     return '<section class="laura-open-file"><div class="empty-state" style="padding:32px"><div>No file selected.</div></div></section>';
@@ -2537,6 +2604,7 @@ function renderLauraOpenFile(t){
       '</div>'+
     '</div>'+
     '<div class="laura-open-body">'+
+      renderLauraLarryBar(t, draft)+
       renderLauraNextPanel(t, stats, draft, decision, deployment)+
       '<div class="laura-fact-row">'+
         lauraFact('Email', clientEmail)+
@@ -2658,8 +2726,10 @@ function lauraEnsureRecent(button){
 
 function lauraRunThread(threadId, button){
   var done = lauraSetButton(button,'Running...');
-  lauraApi('POST','run-thread',{thread_id:threadId}).then(function(){
-    showStatus('Laura drafted the next step.','ok');
+  lauraApi('POST','run-thread',{thread_id:threadId}).then(function(data){
+    showStatus(data && data.sent
+      ? 'Laura wrote and sent the next email.'
+      : 'Laura drafted the next step.'+(data && data.held ? ' Held: '+data.held+'.' : ''),'ok');
     loadLauraAgent();
   }).catch(function(err){ showStatus(err.message||'Laura could not run.','err'); })
     .then(function(){ done(); });
@@ -2698,6 +2768,50 @@ function lauraPollGmail(button){
     showStatus(data.configured ? ('Gmail poll complete: '+data.processed+' processed.') : data.message,'ok');
     loadLauraAgent();
   }).catch(function(err){ showStatus(err.message||'Could not poll Gmail.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraRunFollowUps(button){
+  var done = lauraSetButton(button,'Checking...');
+  lauraApi('POST','run-followups',{limit:25}).then(function(data){
+    var results = data.results || [];
+    showStatus(results.length
+      ? (data.due+' due: '+results.map(function(r){ return r.outcome || r.error; }).join('; '))
+      : 'No follow-ups are due right now.','ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Could not run follow-ups.','err'); })
+    .then(function(){ done(); });
+}
+
+function lauraSetAutonomy(select){
+  var value = select.value;
+  select.disabled = true;
+  fetch('/api/track?type=setting',{
+    method:'POST',cache:'no-store',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+AUTH_TOKEN},
+    body:JSON.stringify({key:'laura_autonomy',value:value})
+  }).then(checkAuth).then(function(r){
+    if(!r.ok) throw new Error('Could not save that setting.');
+    showStatus('Laura autonomy set to '+value.replace('_',' ')+'.','ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Could not save that setting.','err'); })
+    .then(function(){ select.disabled = false; });
+}
+
+var LAURA_ACTION_CONFIRM = {
+  approve:'Approve this application and email the applicant the booking link?',
+  'send-draft':'Send the current draft to the applicant now?',
+  decline:'Mark this application declined? Laura will draft the note but will not send it.'
+};
+
+function lauraLarryAction(threadId, action, button){
+  var ask = LAURA_ACTION_CONFIRM[action];
+  if(ask && !confirm(ask)) return;
+  var done = lauraSetButton(button,'Working...');
+  lauraApi('POST','larry-action',{thread_id:threadId,larry_action:action}).then(function(data){
+    showStatus([data.title, data.message, data.detail].filter(Boolean).join(' — '), data.tone === 'stop' && !data.ok ? 'err' : 'ok');
+    loadLauraAgent();
+  }).catch(function(err){ showStatus(err.message||'Could not do that.','err'); })
     .then(function(){ done(); });
 }
 

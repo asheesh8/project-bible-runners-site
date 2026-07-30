@@ -612,9 +612,10 @@ export default async function handler(req, res) {
         try {
           await ensureThreadForApplication(savedApp.id, savedApp);
           if (process.env.LAURA_DRAFT_ON_SUBMIT !== 'false') {
+            // Whether the acknowledgment actually sends is decided by the
+            // autonomy level and cooldown inside the agent, not here.
             await runLauraAgent({
               applicationId: savedApp.id,
-              autoSend: process.env.LAURA_AUTO_SEND_ON_SUBMIT === 'true',
               reason: 'application_submit',
             });
           }

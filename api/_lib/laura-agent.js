@@ -1,7 +1,42 @@
 import crypto from 'node:crypto';
+import {
+  renderApplicantEmail,
+  renderDigestEmail,
+  renderLarryActionEmail,
+} from './laura-email.js';
+import { actionButtonsFor, adminFileUrl, isKnownAction, siteBaseUrl } from './laura-links.js';
 
 const DEFAULT_MODEL = 'claude-haiku-4-5';
 const THREAD_TOKEN_BYTES = 4;
+
+// Autonomy rails. Laura may send her own low-risk mail, but only inside these
+// limits — one applicant email per cooldown window, and a hard cap on how many
+// times she will chase someone before handing the file to Larry.
+const DEFAULT_COOLDOWN_HOURS = 24;
+const DEFAULT_FOLLOW_UP_DAYS = 4;
+const DEFAULT_MAX_NUDGES = 3;
+
+// Actions Laura is trusted to send without Larry seeing them first. Everything
+// absent from this set drafts and waits, no matter what the model decides.
+// `offer_sd_card` belongs here because it only ever scales expectations *down* —
+// the dangerous direction is promising more, and this promises less.
+const SELF_SEND_ACTIONS = new Set(['ask_customer', 'reply_customer', 'follow_up_nudge', 'offer_sd_card']);
+
+// What the initiative can actually put in the post today. While this is
+// 'sd_card_only', no thread is ever handed to Larry as a kit or funding
+// decision — once a file is complete, Laura levels with the applicant, offers
+// the microSD card in their language, and collects the two things a card
+// needs: language and a shipping address. Set LAURA_OFFER_MODE=full_kits when
+// larger tiers are genuinely available again.
+// Can Laura actually hear a reply? Inbound only exists when Gmail polling is
+// wired up; without it, intake_messages never gains an applicant row.
+function inboundConfigured() {
+  return !!(env('GMAIL_CLIENT_ID') && env('GMAIL_CLIENT_SECRET') && env('GMAIL_REFRESH_TOKEN'));
+}
+
+function offerMode() {
+  return env('LAURA_OFFER_MODE', 'sd_card_only').toLowerCase() === 'full_kits' ? 'full_kits' : 'sd_card_only';
+}
 
 function env(name, fallback = '') {
   return String(process.env[name] || fallback || '').trim();
@@ -37,7 +72,20 @@ function config() {
     calBookingUrl: env('LARRY_CAL_BOOKING_URL', process.env.CAL_BOOKING_URL),
     emailProvider: env('EMAIL_PROVIDER', 'resend').toLowerCase(),
     gmailUser: env('GMAIL_USER', 'me'),
+    cooldownHours: Number(env('LAURA_SEND_COOLDOWN_HOURS', String(DEFAULT_COOLDOWN_HOURS))) || DEFAULT_COOLDOWN_HOURS,
+    followUpDays: Number(env('LAURA_FOLLOW_UP_DAYS', String(DEFAULT_FOLLOW_UP_DAYS))) || DEFAULT_FOLLOW_UP_DAYS,
+    maxNudges: Number(env('LAURA_MAX_NUDGES', String(DEFAULT_MAX_NUDGES))) || DEFAULT_MAX_NUDGES,
   };
+}
+
+// 'staged'     — Laura sends her own info-gathering mail and nudges; anything
+//                that approves, declines, prices or schedules waits for Larry.
+// 'draft_only' — Laura writes, Larry sends. Nothing leaves on its own.
+// 'full'       — Laura also sends scheduling links once a thread is clean.
+async function autonomyLevel() {
+  const fromEnv = env('LAURA_AUTONOMY').toLowerCase();
+  const level = fromEnv || String(await getSetting('laura_autonomy', 'staged') || 'staged').replace(/"/g, '');
+  return ['staged', 'draft_only', 'full'].includes(level) ? level : 'staged';
 }
 
 function requireSupabase() {
@@ -411,29 +459,133 @@ function latestMessage(messages, role) {
   return asArray(messages).filter((m) => m.role === role).slice(-1)[0] || null;
 }
 
+function hasOfferedSdCard(messages) {
+  return asArray(messages).some((m) => m.action_type === 'offer_sd_card' && m.status === 'sent');
+}
+
+// "Comfortable with the person": nothing in the form contradicts itself and
+// nothing important is missing. Language and shipping are deliberately not
+// blocking — the offer itself is what asks for those two.
+function readyForOffer(app) {
+  if (detectApplicantClarificationNeeds(app).length) return false;
+  return detectMissingFields(app).filter((field) => !/language|shipping|receiving/i.test(field)).length === 0;
+}
+
+// Written to be read aloud, not assembled: "a Raspberry Pi VillageServer",
+// never "raspberry pi villageserver".
+function kitNoun(app) {
+  return {
+    1: 'a microSD card',
+    2: 'a Wi-Fi sharing hub',
+    3: 'a Raspberry Pi VillageServer',
+    4: 'a projector and audio kit',
+    5: 'a satellite receive-and-replay kit',
+  }[Number(app && app.kit_tier)] || 'the equipment you asked about';
+}
+
+// The honest scale-down. Warm about the ministry, straight about what we can
+// actually post today, and it asks for exactly the two things a card needs.
+function sdCardOfferDecision(app, thread) {
+  const c = config();
+  const askedForMore = Number(app && app.kit_tier) > 1;
+  const askedForFunding = !!trim(app && app.funding_needed, 200);
+  const place = trim(app && app.country, 120);
+  const reach = trim(app && app.current_reach, 60);
+
+  return {
+    next_action: 'offer_sd_card',
+    state: 'waiting_on_customer',
+    audience: 'applicant',
+    missing_fields: ['languages needed', 'shipping address'],
+    summary: `${app.name || 'Applicant'} is verified and complete. Offered the microSD card and asked for language + shipping address.`,
+    draft_subject: `About your VillageServer request`,
+    draft_body: [
+      `Hi ${app.name || 'there'},`,
+      '',
+      `Thank you for walking me through your work${place ? ` in ${place}` : ''}. What you are doing to bring God's Word to the people around you${reach ? `, reaching around ${reach} of them,` : ''} is exactly the kind of outreach we want to help go further.`,
+      '',
+      `I want to be straight with you about where we are right now, because I would rather tell you plainly than leave you waiting.`,
+      '',
+      (askedForMore || askedForFunding)
+        ? `We are not able to send ${askedForMore ? kitNoun(app) : 'equipment'}${askedForFunding ? ' or funding' : ''} at this stage.`
+        : `Our supply is limited at this stage.`,
+      '',
+      `What we are sending out today is microSD cards loaded with the offline library in the language your community actually reads and hears — Scripture, audio Bible, gospel films and teaching material. The card works on an ordinary phone with no internet at all, and it can be copied on to other phones once it reaches you.`,
+      '',
+      `If that would help the people you are reaching, just reply with two things:`,
+      `1. The language or languages your community needs on the card.`,
+      `2. A shipping address, including a recipient name and a phone number.`,
+      '',
+      `Once I have those, I will be in touch about getting a card out to you. And as more equipment becomes available, your file stays with us — this is not a no, it is a not yet for the larger kits.`,
+      '',
+      c.agentName,
+      'VillageServer Initiative',
+    ].filter((line) => line !== null).join('\n'),
+    reasoning: 'File is complete and verified; scaled the request down to what the initiative can actually post today.',
+    auto_send_ok: true,
+  };
+}
+
+function sentToApplicant(messages) {
+  return asArray(messages)
+    .filter((m) => m.direction === 'outbound' && m.status === 'sent' && m.role === 'agent')
+    .filter((m) => !asArray(m.to_email).map(normalizeEmail).includes(normalizeEmail(config().larryEmail)));
+}
+
+// When Laura last wrote to this applicant, so she cannot chase them twice in a
+// day no matter how many times the agent is triggered.
+function lastApplicantSendAt(messages) {
+  const times = sentToApplicant(messages)
+    .map((m) => new Date(m.sent_at || m.created_at).getTime())
+    .filter((t) => Number.isFinite(t));
+  return times.length ? Math.max(...times) : null;
+}
+
+function hoursSinceLastApplicantSend(messages) {
+  const at = lastApplicantSendAt(messages);
+  return at == null ? Infinity : (Date.now() - at) / 3600000;
+}
+
+function nudgeCount(messages) {
+  return sentToApplicant(messages).filter((m) => m.action_type === 'follow_up_nudge').length;
+}
+
+// Has the applicant said anything since Laura's last message? If not, the ball
+// is still in their court and a nudge is the right move.
+function applicantWentQuiet(messages) {
+  const lastOut = lastApplicantSendAt(messages);
+  if (lastOut == null) return false;
+  const lastIn = asArray(messages)
+    .filter((m) => m.role === 'applicant' && m.direction === 'inbound')
+    .map((m) => new Date(m.created_at).getTime())
+    .filter((t) => Number.isFinite(t));
+  return !lastIn.length || Math.max(...lastIn) < lastOut;
+}
+
 function fallbackDecision(app, thread, messages) {
   const missing = detectMissingFields(app);
   const clarificationNeeds = detectApplicantClarificationNeeds(app);
   const lastLarry = latestMessage(messages, 'larry');
   if (lastLarry) {
+    // Larry gave an instruction and the model is unavailable to read it. Guessing
+    // at what he wanted and mailing that guess to a missionary is the worst
+    // failure mode here, so hold everything and flag it for a human instead.
     return {
-      next_action: 'reply_customer',
-      state: 'waiting_on_customer',
-      audience: 'applicant',
+      next_action: 'escalate',
+      state: 'waiting_on_larry',
+      audience: 'internal',
       missing_fields: missing,
-      summary: `Larry replied. Laura should continue the applicant conversation for ${app.name || 'this applicant'}.`,
-      draft_subject: `VillageServer application update [VS-${thread.thread_token}]`,
+      summary: `Larry replied on ${app.name || 'this applicant'} but Laura could not read the instruction.`,
+      draft_subject: `Unread instruction from Larry [VS-${thread.thread_token}]`,
       draft_body: [
-        `Hi ${app.name || 'there'},`,
+        `Larry replied on this thread, but Laura could not interpret the instruction.`,
         '',
-        `Thanks for your patience. I checked with Larry and wanted to follow up on your VillageServer application.`,
+        `What he wrote:`,
+        trim(lastLarry.body, 1200) || '(empty message)',
         '',
-        `Could you reply with any final details, photos, shipping notes, or timing concerns that would help us prepare the next step?`,
-        '',
-        `${config().agentName}`,
-        `VillageServer Initiative`,
+        `Open the file and reply to the applicant by hand, or rerun Laura once the model is reachable.`,
       ].join('\n'),
-      reasoning: 'Fallback draft because Anthropic is not configured or returned invalid JSON.',
+      reasoning: 'Held because Anthropic is unavailable and Larry\'s instruction cannot be carried out blind.',
       auto_send_ok: false,
     };
   }
@@ -464,6 +616,12 @@ function fallbackDecision(app, thread, messages) {
       reasoning: 'Missing operational details.',
       auto_send_ok: true,
     };
+  }
+  // While only cards are going out, a complete file does not go to Larry as a
+  // kit decision — Laura levels with the applicant first and collects what a
+  // card actually needs. Larry sees it once they have replied.
+  if (offerMode() === 'sd_card_only' && !hasOfferedSdCard(messages) && readyForOffer(app)) {
+    return sdCardOfferDecision(app, thread);
   }
   return {
     next_action: 'ask_larry',
@@ -499,6 +657,7 @@ function normalizeDecision(decision, app, thread, messages) {
   const safeActions = new Set([
     'ask_customer', 'ask_larry', 'reply_customer', 'send_schedule_link',
     'file_deployment', 'request_rollout_photos', 'close', 'escalate',
+    'offer_sd_card', 'follow_up_nudge',
   ]);
   const action = safeActions.has(nextAction) ? nextAction : fallback.next_action;
   const audience = ['applicant', 'larry', 'internal'].includes(String(d.audience || '')) ? String(d.audience) : fallback.audience;
@@ -509,6 +668,19 @@ function normalizeDecision(decision, app, thread, messages) {
     return {
       ...forced,
       reasoning: `${forced.reasoning} Overrode ${action} because Laura should ask the applicant before Larry when the form details contradict themselves.`,
+    };
+  }
+
+  // The model does not get to promise a kit, a call or funding while only cards
+  // are going out. On a clean file the honest scale-down replaces whatever it
+  // proposed, in exactly the same way clarifications override a premature
+  // hand-off to Larry.
+  const overpromising = ['ask_larry', 'send_schedule_link', 'file_deployment'].includes(action);
+  if (offerMode() === 'sd_card_only' && overpromising && !hasOfferedSdCard(messages) && readyForOffer(app)) {
+    const forced = sdCardOfferDecision(app, thread);
+    return {
+      ...forced,
+      reasoning: `${forced.reasoning} Overrode ${action} because only microSD cards are going out right now.`,
     };
   }
   return {
@@ -545,10 +717,17 @@ async function callAnthropicDecision({ app, thread, messages }) {
     `Do not ask Larry to judge applicant-created contradictions before the applicant has clarified them. Ask the applicant first when location, shipping, reference, audience, tier, current reach, or identity details do not line up.`,
     `Tier 4 and Tier 5 requests need a real congregation or regional deployment plan. If a Tier 4/5 request says individual, small group, tiny current reach, vague reach plan, placeholder identity, or mismatched country/shipping, next_action must be ask_customer unless an applicant reply already resolved it.`,
     `If the applicant is missing routine details, ask for only the important missing details in a warm short email.`,
-    `If ready for a call and a booking URL is available, send the booking URL. Booking URL: ${c.calBookingUrl || 'not configured'}.`,
+    ...(offerMode() === 'sd_card_only' ? [
+      `WHAT IS ACTUALLY AVAILABLE RIGHT NOW: microSD cards loaded with the offline library, in the applicant's language. Nothing else. No Raspberry Pi servers, no projectors, no satellite kits, no funding, regardless of what tier they asked for.`,
+      `So your goal for every applicant is: get the form details complete and consistent, and once you are satisfied the person and their ministry are real, use next_action "offer_sd_card". That message thanks them warmly, tells them plainly that only cards are going out for now, and asks for exactly two things: the language they need and a shipping address with a recipient name and phone.`,
+      `Do not propose a call, a booking link, a deployment or a review by Larry as the next step for a clean file — the card offer comes first. Larry sees the file after they reply with their language and address.`,
+      `Never suggest that a larger kit or funding is coming, is likely, or is being considered. You may say their file stays with us for when more equipment is available.`,
+    ] : [
+      `If ready for a call and a booking URL is available, send the booking URL. Booking URL: ${c.calBookingUrl || 'not configured'}.`,
+    ]),
     `Escalate to Larry only for complaints, money disputes, safety concerns, custom pricing, final approval/denial, or shipping/scheduling instructions after applicant details are clear.`,
     `Do not use markdown headings. Email copy should be plain, concise, and human.`,
-    `Return ONLY valid JSON with this shape: {"next_action":"ask_customer|ask_larry|reply_customer|send_schedule_link|file_deployment|request_rollout_photos|close|escalate","state":"waiting_on_customer|waiting_on_larry|ready_to_schedule|scheduled|ready_to_ship|shipped|follow_up_photos|filed|closed|escalated","audience":"applicant|larry|internal","missing_fields":["..."],"summary":"one internal sentence","draft_subject":"...","draft_body":"...","reasoning":"one internal sentence","auto_send_ok":false,"filing":{"title":"","detail":"","item_type":"deployment|campaign|shipping|photo_request|follow_up|note"}}`,
+    `Return ONLY valid JSON with this shape: {"next_action":"ask_customer|offer_sd_card|ask_larry|reply_customer|send_schedule_link|file_deployment|request_rollout_photos|close|escalate","state":"waiting_on_customer|waiting_on_larry|ready_to_schedule|scheduled|ready_to_ship|shipped|follow_up_photos|filed|closed|escalated","audience":"applicant|larry|internal","missing_fields":["..."],"summary":"one internal sentence","draft_subject":"...","draft_body":"...","reasoning":"one internal sentence","auto_send_ok":false,"filing":{"title":"","detail":"","item_type":"deployment|campaign|shipping|photo_request|follow_up|note"}}`,
   ].join('\n');
   const user = [
     `Thread token: VS-${thread.thread_token}`,
@@ -681,6 +860,8 @@ function defaultSubjectFor(decision, app, thread) {
   const token = `[VS-${thread.thread_token}]`;
   if (decision.next_action === 'ask_larry') return `Laura review needed: ${app.name || 'new applicant'} ${token}`;
   if (decision.next_action === 'send_schedule_link') return `Schedule a VillageServer call ${token}`;
+  if (decision.next_action === 'offer_sd_card') return `About your VillageServer request ${token}`;
+  if (decision.next_action === 'follow_up_nudge') return `Checking in on your VillageServer application ${token}`;
   if (decision.next_action === 'request_rollout_photos') return `VillageServer rollout photos ${token}`;
   return `Your VillageServer application ${token}`;
 }
@@ -698,7 +879,9 @@ function audienceToEmail(audience, app) {
   return '';
 }
 
-export async function runLauraAgent({ threadId = '', applicationId = '', autoSend = false, reason = 'manual' } = {}) {
+// Whether anything actually leaves is decided by autoSendGate() alone — one
+// place, one answer, so no caller can accidentally widen what Laura may send.
+export async function runLauraAgent({ threadId = '', applicationId = '', reason = 'manual' } = {}) {
   if (!(await settingBool('laura_agent_enabled', true))) {
     return { ok: false, skipped: true, reason: 'Laura agent is disabled.' };
   }
@@ -759,14 +942,62 @@ export async function runLauraAgent({ threadId = '', applicationId = '', autoSen
       metadata: { source_message_id: message && message.id, decision_action: decision.next_action },
     }).catch(() => null);
   }
+  const gate = await autoSendGate({ decision, messages, outbound, audience: decision.audience });
   let sent = null;
-  const autoMissingInfo = await settingBool('laura_auto_send_missing_info', false);
-  const allowAutoSend = outbound && autoSend && decision.auto_send_ok &&
-    ((decision.next_action === 'ask_customer' && autoMissingInfo) ||
-      (decision.next_action === 'reply_customer' && env('LAURA_AUTO_SEND_AFTER_LARRY') === 'true') ||
-      (decision.next_action === 'send_schedule_link' && env('LAURA_AUTO_SEND_SCHEDULING') === 'true'));
-  if (message && allowAutoSend) sent = await sendMessageById(message.id);
-  return { ok: true, thread_id: thread.id, application_id: app.id, decision, message, sent };
+  if (message && gate.allowed) sent = await sendMessageById(message.id);
+
+  // Schedule the next nudge whenever Laura has just written to the applicant.
+  if (sent && decision.audience === 'applicant') {
+    await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+      next_follow_up_at: new Date(Date.now() + config().followUpDays * 86400000).toISOString(),
+    }).catch(() => null);
+  }
+
+  return {
+    ok: true,
+    thread_id: thread.id,
+    application_id: app.id,
+    decision,
+    message,
+    sent,
+    held: sent ? null : gate.reason,
+  };
+}
+
+// The single place that decides whether an email leaves without Larry. Every
+// condition must pass: the autonomy level allows this action, the model agreed,
+// the applicant has not been written to inside the cooldown, and Laura has not
+// already chased them more times than the cap allows.
+async function autoSendGate({ decision, messages, outbound, audience }) {
+  if (!outbound) return { allowed: false, reason: 'internal note' };
+  const c = config();
+  const level = await autonomyLevel();
+  if (level === 'draft_only') return { allowed: false, reason: 'autonomy is draft-only' };
+
+  // Mail to Larry is a notification, not a decision. It carries no promise to
+  // the applicant, so it is neither rate limited nor held for approval — that
+  // is the whole point of getting a file in front of him.
+  if (audience === 'larry') return { allowed: true, reason: '' };
+
+  const action = decision.next_action;
+  const selfSendable = SELF_SEND_ACTIONS.has(action)
+    || (level === 'full' && action === 'send_schedule_link');
+  if (!selfSendable) return { allowed: false, reason: `${action} always waits for Larry` };
+  if (!decision.auto_send_ok) return { allowed: false, reason: 'Laura flagged this one for review' };
+
+  // Carrying out an instruction means there has to be an instruction.
+  if (action === 'reply_customer' && !hasInboundRole(messages, 'larry')) {
+    return { allowed: false, reason: 'no instruction from Larry yet' };
+  }
+
+  const hours = hoursSinceLastApplicantSend(messages);
+  if (hours < c.cooldownHours) {
+    return { allowed: false, reason: `cooldown — wrote to them ${Math.round(hours)}h ago` };
+  }
+  if (action === 'follow_up_nudge' && nudgeCount(messages) >= c.maxNudges) {
+    return { allowed: false, reason: `already nudged ${c.maxNudges} times` };
+  }
+  return { allowed: true, reason: '' };
 }
 
 export async function listLauraThreads({ includeMessages = false, limit = 80 } = {}) {
@@ -801,7 +1032,7 @@ export async function ensureThreadsForRecentApplications({ limit = 30 } = {}) {
   return made;
 }
 
-async function sendResendEmail({ to, subject, text, replyTo }) {
+async function sendResendEmail({ to, subject, text, html, replyTo }) {
   const c = config();
   if (!c.resendKey) throw new Error('RESEND_API_KEY_AGENT or RESEND_API_KEY is not configured.');
   const response = await fetch('https://api.resend.com/emails', {
@@ -813,6 +1044,7 @@ async function sendResendEmail({ to, subject, text, replyTo }) {
       reply_to: replyTo || c.agentEmail,
       subject,
       text,
+      ...(html ? { html } : {}),
     }),
   });
   const body = await response.json().catch(() => ({}));
@@ -866,20 +1098,37 @@ async function gmailAccessToken() {
   return body.access_token;
 }
 
-async function sendGmailEmail({ to, subject, text, replyTo }) {
+async function sendGmailEmail({ to, subject, text, html, replyTo }) {
   const c = config();
   const token = await gmailAccessToken();
   const recipient = Array.isArray(to) ? to.join(', ') : to;
-  const raw = [
+  const headers = [
     `From: ${encodeMailHeader(c.agentName)} <${cleanHeaderValue(c.agentEmail)}>`,
     `To: ${cleanHeaderValue(recipient)}`,
     `Reply-To: ${cleanHeaderValue(replyTo || c.agentEmail)}`,
     `Subject: ${encodeMailHeader(subject)}`,
     'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    '',
-    text,
-  ].join('\r\n');
+  ];
+  // multipart/alternative so clients that refuse HTML still get the letter.
+  const boundary = `vs_${crypto.randomBytes(12).toString('hex')}`;
+  const raw = html
+    ? [
+      ...headers,
+      `Content-Type: multipart/alternative; boundary="${boundary}"`,
+      '',
+      `--${boundary}`,
+      'Content-Type: text/plain; charset=UTF-8',
+      '',
+      text,
+      '',
+      `--${boundary}`,
+      'Content-Type: text/html; charset=UTF-8',
+      '',
+      html,
+      '',
+      `--${boundary}--`,
+    ].join('\r\n')
+    : [...headers, 'Content-Type: text/plain; charset=UTF-8', '', text].join('\r\n');
   const response = await fetch(`https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(c.gmailUser)}/messages/send`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -890,10 +1139,78 @@ async function sendGmailEmail({ to, subject, text, replyTo }) {
   return { provider: 'gmail', provider_message_id: body.id || null, gmail_thread_id: body.threadId || null };
 }
 
-async function sendEmail({ to, subject, text, replyTo }) {
+async function sendEmail({ to, subject, text, html, replyTo }) {
   const c = config();
-  if (c.emailProvider === 'gmail') return sendGmailEmail({ to, subject, text, replyTo });
-  return sendResendEmail({ to, subject, text, replyTo });
+  if (c.emailProvider === 'gmail') return sendGmailEmail({ to, subject, text, html, replyTo });
+  return sendResendEmail({ to, subject, text, html, replyTo });
+}
+
+// Internal state names are for the panel, not for Larry's inbox.
+const STAGE_LABELS = {
+  new: 'Just arrived',
+  waiting_on_larry: 'Waiting on you',
+  waiting_on_customer: 'Waiting on the applicant',
+  ready_to_schedule: 'Ready to book a call',
+  scheduled: 'Call booked',
+  ready_to_ship: 'Ready to ship',
+  shipped: 'Shipped',
+  follow_up_photos: 'Waiting on rollout photos',
+  filed: 'Filed as a deployment',
+  closed: 'Closed',
+  escalated: 'Needs a closer look',
+};
+
+// The facts Larry needs to decide, shaped for the email templates.
+function threadCardItem(thread, app, { draft = null, headline = '' } = {}) {
+  const phone = app ? [app.phone_country_code, app.phone].filter(Boolean).join(' ') : '';
+  const stage = thread && thread.state;
+  return {
+    applicantName: (thread && thread.applicant_name) || (app && app.name) || 'Applicant',
+    applicantEmail: (thread && thread.applicant_email) || (app && app.email) || '',
+    threadToken: thread && thread.thread_token,
+    headline: headline || (thread && thread.summary) || '',
+    facts: [
+      ['Requested', app ? kitLabel(app) : ''],
+      ['Where', app ? [app.region, app.country].filter(Boolean).join(', ') : ''],
+      ['Organization', app && app.organization],
+      ['Role', app && app.role],
+      ['Reach', app && app.current_reach],
+      ['Languages', app && app.languages],
+      ['Funding asked', app && app.funding_needed],
+      ['Phone', phone],
+      ['Stage', STAGE_LABELS[stage] || stage],
+    ],
+    flags: asArray(thread && thread.missing_fields).map((x) => String(x)).slice(0, 6),
+    draft: draft ? { subject: draft.subject, body: draft.body } : null,
+    buttons: actionButtonsFor(thread && thread.id, { hasDraft: !!draft }),
+    adminUrl: adminFileUrl(thread && thread.id),
+  };
+}
+
+// Larry's mail is a decision card; the applicant's is a plain letter.
+async function renderOutbound(message, recipients) {
+  const c = config();
+  const toLarry = recipients.some((address) => address === normalizeEmail(c.larryEmail));
+  if (!toLarry) {
+    const thread = message.thread_id ? await loadThreadBy({ threadId: message.thread_id }) : null;
+    return renderApplicantEmail({
+      agentName: c.agentName,
+      text: message.body,
+      threadToken: thread && thread.thread_token,
+    });
+  }
+  const thread = message.thread_id ? await loadThreadBy({ threadId: message.thread_id }) : null;
+  if (!thread) return { html: '', text: message.body };
+  const app = await loadApplication(thread.application_id).catch(() => null);
+  const draft = await latestDraftForThread(thread.id).catch(() => null);
+  const applicantDraft = draft && draft.id !== message.id
+    && asArray(draft.to_email).map(normalizeEmail).includes(normalizeEmail(app && app.email))
+    ? draft : null;
+  return renderLarryActionEmail({
+    agentName: c.agentName,
+    intro: trim(message.body, 900),
+    item: threadCardItem(thread, app, { draft: applicantDraft }),
+  });
 }
 
 export async function sendMessageById(messageId) {
@@ -904,7 +1221,14 @@ export async function sendMessageById(messageId) {
   if (message.direction !== 'outbound') throw new Error('Only outbound drafts can be sent.');
   const to = asArray(message.to_email).map(normalizeEmail).filter(Boolean);
   if (!to.length) throw new Error('Draft has no recipient.');
-  const sent = await sendEmail({ to, subject: message.subject, text: message.body, replyTo: config().agentEmail });
+  const rendered = await renderOutbound(message, to).catch(() => ({ html: '', text: message.body }));
+  const sent = await sendEmail({
+    to,
+    subject: message.subject,
+    text: rendered.text || message.body,
+    html: rendered.html || '',
+    replyTo: config().agentEmail,
+  });
   const patched = await patchRows(`intake_messages?id=eq.${encodeURIComponent(message.id)}`, {
     status: 'sent',
     provider: sent.provider,
@@ -941,30 +1265,36 @@ export async function sendLauraDigest({ force = false } = {}) {
     if (!taskByThread.has(task.thread_id)) taskByThread.set(task.thread_id, []);
     taskByThread.get(task.thread_id).push(task);
   });
-  const body = [
-    `Larry,`,
-    '',
-    `Laura intake digest: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })}`,
-    '',
-    `Reply with the VS token when you want me to act. Example: "VS-AB12CD34 approve and send scheduling link" or "VS-AB12CD34 shipped UPS tracking 1Z..."`,
-    '',
-    ...threads.flatMap((t, index) => {
-      const recent = (byThread.get(t.id) || []).slice(0, 2).reverse();
-      const tasks = taskByThread.get(t.id) || [];
-      return [
-        `${index + 1}. ${t.applicant_name || 'Applicant'} <${t.applicant_email || 'no email'}> - VS-${t.thread_token}`,
-        `State: ${t.state} / owner: ${t.owner}`,
-        `Summary: ${t.summary || 'No summary yet.'}`,
-        `Missing: ${asArray(t.missing_fields).join(', ') || 'none'}`,
-        tasks.length ? `Filing/tasks: ${tasks.map((task) => task.title).join('; ')}` : '',
-        recent.length ? `Recent: ${recent.map((m) => `${m.role}: ${trim(m.body, 180).replace(/\s+/g, ' ')}`).join(' | ')}` : '',
-        '',
-      ].filter(Boolean);
-    }),
-    `${c.agentName}`,
-  ].join('\n');
-  const subject = `Laura digest - ${threads.length} active intake ${threads.length === 1 ? 'thread' : 'threads'}`;
-  const sent = await sendEmail({ to: c.larryEmail, subject, text: body, replyTo: c.agentEmail });
+  const appIds = new Set(threads.map((t) => String(t.application_id || '')).filter(Boolean));
+  const applications = await selectRows('equipment_applications?select=*&order=created_at.desc&limit=300').catch(() => []);
+  const appById = new Map(applications.filter((a) => appIds.has(String(a.id))).map((a) => [String(a.id), a]));
+
+  const stamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+  const items = threads.map((t) => {
+    const threadMessages = (byThread.get(t.id) || []);
+    const draft = threadMessages.find((m) => m.status === 'draft' && m.direction === 'outbound'
+      && !asArray(m.to_email).map(normalizeEmail).includes(normalizeEmail(c.larryEmail)));
+    const tasks = taskByThread.get(t.id) || [];
+    const item = threadCardItem(t, appById.get(String(t.application_id)) || null, { draft: draft || null });
+    if (tasks.length) item.facts.push(['Filing', tasks.map((task) => task.title).join('; ')]);
+    return item;
+  });
+
+  const rendered = renderDigestEmail({
+    agentName: c.agentName,
+    stamp,
+    items,
+    adminUrl: `${siteBaseUrl()}/admin.html`,
+  });
+  const body = rendered.text;
+  const subject = `${threads.length} VillageServer ${threads.length === 1 ? 'file needs' : 'files need'} you`;
+  const sent = await sendEmail({
+    to: c.larryEmail,
+    subject,
+    text: body,
+    html: rendered.html,
+    replyTo: c.agentEmail,
+  });
   const digest = await insertRow('agent_digests', {
     digest_key: crypto.randomUUID(),
     sent_to: c.larryEmail,
@@ -981,6 +1311,374 @@ export async function sendLauraDigest({ force = false } = {}) {
     digest_last_sent_at: new Date().toISOString(),
   }).catch(() => null)));
   return { ok: true, sent: true, digest, count: threads.length };
+}
+
+// ── Larry's one-click actions ───────────────────────────────────────────
+//
+// Each button in Larry's email lands here. Every action is idempotent: the
+// second click on the same link reports what already happened instead of doing
+// it twice, which matters because mail clients and link scanners retry.
+
+const DOUBLE_CLICK_WINDOW_MS = 5 * 60 * 1000;
+
+async function recentLarryAction(threadId, action) {
+  const rows = await selectRows(
+    `intake_messages?select=id,created_at&thread_id=eq.${encodeURIComponent(threadId)}`
+    + `&action_type=eq.larry_${encodeURIComponent(action)}&order=created_at.desc&limit=1`,
+  ).catch(() => []);
+  if (!rows.length) return null;
+  const at = new Date(rows[0].created_at).getTime();
+  return Number.isFinite(at) && Date.now() - at < DOUBLE_CLICK_WINDOW_MS ? rows[0] : null;
+}
+
+async function recordLarryAction(thread, action, note) {
+  return createMessage({
+    thread_id: thread.id,
+    role: 'larry',
+    channel: 'web',
+    direction: 'inbound',
+    action_type: `larry_${action}`,
+    subject: `Larry chose: ${action}`,
+    body: note,
+    from_email: config().larryEmail,
+    to_email: [config().agentEmail],
+    status: 'received',
+    metadata: { source: 'action_link', action },
+  }).catch(() => null);
+}
+
+async function setApplicationStatus(applicationId, status) {
+  return patchRows(`equipment_applications?id=eq.${encodeURIComponent(String(applicationId))}`, {
+    status,
+    status_updated_at: new Date().toISOString(),
+  }).catch(() => null);
+}
+
+function approvalEmailBody(app) {
+  const c = config();
+  const booking = c.calBookingUrl;
+  const needsAddress = !trim(app && app.shipping_address, 200);
+  const needsLanguage = !trim(app && app.languages, 200);
+
+  // Approving today means a card is going out — never a larger kit or funding,
+  // whatever tier the form asked for.
+  if (offerMode() === 'sd_card_only') {
+    return [
+      `Hi ${app.name || 'there'},`,
+      '',
+      `Good news — Larry has reviewed your application and we would like to get a microSD card out to you, loaded with the offline library in your language.`,
+      '',
+      ...(needsLanguage || needsAddress ? [
+        `To get it moving I still need:`,
+        ...(needsLanguage ? [`- The language or languages your community needs on the card.`] : []),
+        ...(needsAddress ? [`- A shipping address, with a recipient name and a phone number.`] : []),
+        '',
+      ] : [
+        `We have your language and shipping details on file, and I will be in touch as soon as the card is on its way.`,
+        '',
+      ]),
+      `Thank you for your patience, and for the work you are doing.`,
+      '',
+      c.agentName,
+      'VillageServer Initiative',
+    ].join('\n');
+  }
+
+  return [
+    `Hi ${app.name || 'there'},`,
+    '',
+    `Good news — Larry has reviewed your VillageServer application and would like to move ahead with a conversation about your request for ${kitLabel(app).toLowerCase()}.`,
+    '',
+    booking
+      ? `Please pick a time that works for you here: ${booking}`
+      : `Larry will reach out shortly to set up a time to talk.`,
+    '',
+    `Before we talk, it helps to have a rough idea of your timing and how the equipment would reach you. If anything has changed since you applied, just reply and let me know.`,
+    '',
+    `We are glad you reached out.`,
+    '',
+    c.agentName,
+    'VillageServer Initiative',
+  ].join('\n');
+}
+
+function declineEmailBody(app) {
+  const c = config();
+  return [
+    `Hi ${app.name || 'there'},`,
+    '',
+    `Thank you for taking the time to apply to the VillageServer Initiative, and for the work you are doing.`,
+    '',
+    `After review, we are not able to place a kit with you at this time. This is not a judgment of your ministry — our supply is limited and we have to weigh each request against how many people a kit can reach right now.`,
+    '',
+    `You are welcome to apply again as your work grows, and the printable field guides on our site are free to use in the meantime.`,
+    '',
+    `Thank you again, and God bless the work you are doing.`,
+    '',
+    c.agentName,
+    'VillageServer Initiative',
+  ].join('\n');
+}
+
+export async function performLarryAction(threadId, action) {
+  if (!isKnownAction(action)) throw new Error('Unknown action.');
+  const thread = await loadThreadBy({ threadId });
+  if (!thread) return { ok: false, tone: 'stop', title: 'File not found', message: 'That intake file no longer exists.' };
+  const app = await loadApplication(thread.application_id);
+  if (!app) return { ok: false, tone: 'stop', title: 'Application not found', message: 'The application behind this file has been removed.' };
+
+  const who = thread.applicant_name || app.name || 'this applicant';
+  const repeat = await recentLarryAction(thread.id, action);
+  if (repeat) {
+    return { ok: true, repeat: true, tone: 'neutral', title: 'Already done', message: `That was already applied to ${who} a moment ago. Nothing changed.` };
+  }
+
+  if (action === 'approve') {
+    if (String(app.status || '') === 'approved') {
+      return { ok: true, repeat: true, tone: 'go', title: 'Already approved', message: `${who} is already approved.` };
+    }
+    await recordLarryAction(thread, action, 'Larry approved this application from the intake email.');
+    await setApplicationStatus(app.id, 'approved');
+    await supersedeDraftsForThread(thread.id);
+    const subject = subjectWithToken(`Your VillageServer application`, thread);
+    const message = await createMessage({
+      thread_id: thread.id,
+      role: 'agent',
+      channel: 'email',
+      direction: 'outbound',
+      action_type: 'send_schedule_link',
+      subject,
+      body: approvalEmailBody(app),
+      from_email: config().agentEmail,
+      to_email: [normalizeEmail(app.email)],
+      status: 'draft',
+      metadata: { reason: 'larry_action', action },
+    });
+    let sent = null;
+    try {
+      sent = message ? await sendMessageById(message.id) : null;
+    } catch (e) {
+      sent = null;
+    }
+    await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+      state: sent ? 'ready_to_schedule' : 'waiting_on_larry',
+      owner: 'laura',
+      summary: `Larry approved. ${sent ? 'Scheduling note sent to the applicant.' : 'Scheduling note drafted but could not send.'}`,
+      digest_pending: true,
+      next_follow_up_at: new Date(Date.now() + config().followUpDays * 86400000).toISOString(),
+    }).catch(() => null);
+    const emailedWhat = offerMode() === 'sd_card_only'
+      ? ' to say a card in their language is coming'
+      : (config().calBookingUrl ? ' the booking link' : '');
+    return sent
+      ? { ok: true, tone: 'go', title: 'Approved', message: `${who} is approved and I have emailed them${emailedWhat}.`, detail: 'You will see their reply in the usual place.' }
+      : { ok: true, tone: 'neutral', title: 'Approved — email held', message: `${who} is marked approved, but the email could not go out.`, detail: 'The note is saved as a draft in the admin panel; send it from there.' };
+  }
+
+  if (action === 'send-draft') {
+    const draft = await latestDraftForThread(thread.id);
+    if (!draft) return { ok: true, tone: 'neutral', title: 'Nothing to send', message: `There is no draft waiting on ${who} right now.` };
+    await recordLarryAction(thread, action, 'Larry approved sending the pending draft.');
+    const sent = await sendMessageById(draft.id);
+    return sent && sent.already_sent
+      ? { ok: true, repeat: true, tone: 'neutral', title: 'Already sent', message: 'That draft had already gone out.' }
+      : { ok: true, tone: 'go', title: 'Sent', message: `The draft is on its way to ${who}.` };
+  }
+
+  if (action === 'more-info') {
+    await recordLarryAction(thread, action, 'Larry asked Laura to go back to the applicant for more information.');
+    await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+      state: 'waiting_on_customer', owner: 'laura', digest_pending: true,
+    }).catch(() => null);
+    const run = await runLauraAgent({ threadId: thread.id, reason: 'larry_action' }).catch(() => null);
+    const wentOut = run && run.sent;
+    return {
+      ok: true,
+      tone: 'go',
+      title: wentOut ? 'Asked them' : 'Drafted',
+      message: wentOut
+        ? `I have written to ${who} asking for what is still missing.`
+        : `I have drafted the follow-up to ${who}.`,
+      detail: wentOut ? '' : `Held back: ${(run && run.held) || 'waiting for approval in the admin panel'}.`,
+    };
+  }
+
+  if (action === 'hold') {
+    await recordLarryAction(thread, action, 'Larry put this file on hold.');
+    await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+      owner: 'larry',
+      digest_pending: false,
+      next_follow_up_at: new Date(Date.now() + 7 * 86400000).toISOString(),
+    }).catch(() => null);
+    return { ok: true, tone: 'neutral', title: 'On hold', message: `${who} is paused. I will bring the file back in a week.` };
+  }
+
+  if (action === 'decline') {
+    if (String(app.status || '') === 'declined') {
+      return { ok: true, repeat: true, tone: 'neutral', title: 'Already declined', message: `${who} was already declined.` };
+    }
+    await recordLarryAction(thread, action, 'Larry declined this application from the intake email.');
+    await setApplicationStatus(app.id, 'declined');
+    await supersedeDraftsForThread(thread.id);
+    // A decline is never auto-sent. The wording matters too much to send it
+    // from a button press without anyone reading it first.
+    await createMessage({
+      thread_id: thread.id,
+      role: 'agent',
+      channel: 'email',
+      direction: 'outbound',
+      action_type: 'close',
+      subject: subjectWithToken('Your VillageServer application', thread),
+      body: declineEmailBody(app),
+      from_email: config().agentEmail,
+      to_email: [normalizeEmail(app.email)],
+      status: 'draft',
+      metadata: { reason: 'larry_action', action },
+    }).catch(() => null);
+    await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+      state: 'closed', owner: 'larry', digest_pending: true, next_follow_up_at: null,
+      summary: 'Larry declined. A note to the applicant is drafted and waiting for review.',
+    }).catch(() => null);
+    return {
+      ok: true,
+      tone: 'stop',
+      title: 'Declined',
+      message: `${who} is marked declined.`,
+      detail: 'I have drafted a kind note to them but have not sent it — read it over in the admin panel first.',
+    };
+  }
+
+  throw new Error('Unhandled action.');
+}
+
+// ── Follow-ups ──────────────────────────────────────────────────────────
+//
+// A receptionist who never chases is half a receptionist. Threads carry a
+// next_follow_up_at; this runs the ones that are due, nudges the applicant a
+// bounded number of times, then hands the file to Larry rather than nagging.
+
+function nudgeDecision(app, thread, attempt) {
+  const c = config();
+  const missing = detectMissingFields(app);
+  return {
+    next_action: 'follow_up_nudge',
+    state: 'waiting_on_customer',
+    audience: 'applicant',
+    missing_fields: missing,
+    summary: `Follow-up ${attempt} sent to ${app.name || 'applicant'} with no reply yet.`,
+    draft_subject: `Checking in on your VillageServer application`,
+    draft_body: [
+      `Hi ${app.name || 'there'},`,
+      '',
+      attempt === 1
+        ? `I wanted to check in on your VillageServer application — I have not heard back yet and want to make sure my last note reached you.`
+        : `Just one more note about your VillageServer application. I still have it open and would rather keep it moving than let it lapse.`,
+      '',
+      ...(missing.length ? ['If it helps, here is what I am still waiting on:', ...missing.map((field) => `- ${missingRequestFor(field)}`), ''] : []),
+      `If now is not the right time, simply reply and tell me — I will set the file aside and you can come back to it whenever you are ready.`,
+      '',
+      c.agentName,
+      'VillageServer Initiative',
+    ].join('\n'),
+    reasoning: `Scheduled follow-up ${attempt} after no applicant reply.`,
+    auto_send_ok: true,
+  };
+}
+
+export async function runDueFollowUps({ limit = 25 } = {}) {
+  if (!(await settingBool('laura_agent_enabled', true))) {
+    return { ok: false, skipped: true, reason: 'Laura agent is disabled.' };
+  }
+  const c = config();
+  const nowIso = new Date().toISOString();
+  const due = await selectRows(
+    `intake_threads?select=*&next_follow_up_at=lte.${encodeURIComponent(nowIso)}`
+    + `&state=in.(waiting_on_customer,new)&order=next_follow_up_at.asc&limit=${Number(limit) || 25}`,
+  ).catch(() => []);
+
+  const results = [];
+  for (const thread of due) {
+    try {
+      const app = await loadApplication(thread.application_id);
+      if (!app) {
+        await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, { next_follow_up_at: null });
+        continue;
+      }
+      const messages = await messagesForThread(thread.id);
+
+      // Silence only means silence if Laura can hear. With no inbound channel
+      // an applicant who answered looks identical to one who never replied, and
+      // chasing them for details they already sent is the worst thing she can
+      // do. Hand the file to Larry and say plainly why.
+      if (!inboundConfigured()) {
+        await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+          state: 'waiting_on_larry',
+          owner: 'larry',
+          next_follow_up_at: null,
+          digest_pending: true,
+          summary: `${app.name || 'Applicant'} has not replied as far as I can tell — but Gmail is not connected, so I cannot see replies. Check the ${c.agentEmail} inbox by hand.`,
+        }).catch(() => null);
+        results.push({ thread_id: thread.id, outcome: 'handed to Larry — no inbound channel to hear replies' });
+        continue;
+      }
+
+      // They replied since the nudge was scheduled — nothing to chase.
+      if (!applicantWentQuiet(messages)) {
+        await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, { next_follow_up_at: null });
+        results.push({ thread_id: thread.id, outcome: 'applicant already replied' });
+        continue;
+      }
+
+      const attempts = nudgeCount(messages);
+      if (attempts >= c.maxNudges) {
+        // Out of nudges. Stop chasing and put it in front of Larry instead.
+        await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+          state: 'waiting_on_larry',
+          owner: 'larry',
+          next_follow_up_at: null,
+          digest_pending: true,
+          summary: `${app.name || 'Applicant'} has not replied after ${attempts} follow-ups. Needs your call on whether to close the file.`,
+        }).catch(() => null);
+        results.push({ thread_id: thread.id, outcome: 'handed to Larry after max nudges' });
+        continue;
+      }
+
+      const decision = nudgeDecision(app, thread, attempts + 1);
+      const message = await createMessage({
+        thread_id: thread.id,
+        role: 'agent',
+        channel: 'email',
+        direction: 'outbound',
+        action_type: 'follow_up_nudge',
+        subject: subjectWithToken(decision.draft_subject, thread),
+        body: decision.draft_body,
+        from_email: c.agentEmail,
+        to_email: [normalizeEmail(app.email)],
+        status: 'draft',
+        metadata: { decision, reason: 'follow_up', attempt: attempts + 1 },
+      });
+
+      const gate = await autoSendGate({ decision, messages, outbound: true, audience: 'applicant' });
+      let sent = null;
+      if (message && gate.allowed) sent = await sendMessageById(message.id).catch(() => null);
+
+      await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+        summary: decision.summary,
+        digest_pending: true,
+        last_agent_run_at: new Date().toISOString(),
+        // Re-arm on success; on a hold, look again after the cooldown clears.
+        next_follow_up_at: new Date(Date.now() + (sent ? c.followUpDays : 1) * 86400000).toISOString(),
+      }).catch(() => null);
+
+      results.push({
+        thread_id: thread.id,
+        outcome: sent ? `nudge ${attempts + 1} sent` : `nudge ${attempts + 1} drafted (${gate.reason})`,
+      });
+    } catch (e) {
+      results.push({ thread_id: thread.id, error: String((e && e.message) || e) });
+    }
+  }
+  return { ok: true, due: due.length, results };
 }
 
 function extractThreadToken(subject, body) {
@@ -1005,6 +1703,31 @@ function findGmailPart(payload, mimeType) {
   return null;
 }
 
+// Mail clients quote the entire prior thread under the new reply. Left alone,
+// every round-trip re-imports the whole conversation into the row and then into
+// the prompt, and Laura starts reading her own old questions as if they were
+// new. Keep only what the person actually typed this time.
+const QUOTE_MARKERS = [
+  /^\s*On .{0,120}\b(wrote|schrieb|a écrit)\s*:\s*$/im,
+  /^\s*-{2,}\s*Original Message\s*-{2,}\s*$/im,
+  /^\s*_{5,}\s*$/m,
+  /^\s*From:\s.+\bSent:\s/ims,
+  /^\s*>{1,}\s?.*$/m,
+  /^\s*Sent from my \w+/im,
+];
+
+export function stripQuotedReply(body) {
+  const text = String(body || '').replace(/\r\n/g, '\n');
+  let cut = text.length;
+  for (const marker of QUOTE_MARKERS) {
+    const found = text.search(marker);
+    if (found > -1 && found < cut) cut = found;
+  }
+  const kept = text.slice(0, cut).trim();
+  // If stripping ate the whole message the markers misfired — keep the original.
+  return kept.length >= 2 ? kept : text.trim();
+}
+
 function parseGmailPayload(message) {
   const headers = asArray(message.payload?.headers);
   const header = (name) => headers.find((h) => String(h.name || '').toLowerCase() === name.toLowerCase())?.value || '';
@@ -1018,7 +1741,7 @@ function parseGmailPayload(message) {
     gmail_thread_id: message.threadId,
     from_email: normalizeEmail(header('From')),
     subject: trim(header('Subject'), 240),
-    body: trim(body || message.snippet || '', 8000),
+    body: trim(stripQuotedReply(body) || message.snippet || '', 8000),
     message_id_header: header('Message-ID'),
   };
 }
@@ -1092,15 +1815,21 @@ export async function pollGmailInbox({ limit = 10, autoRun = true } = {}) {
     });
     if (thread) {
       await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
-        owner: fromLarry ? 'laura' : 'laura',
+        // Either way the ball is back with Laura: she carries out Larry's
+        // instruction, or she processes the applicant's reply.
+        owner: 'laura',
         digest_pending: true,
+        // An inbound message answers any pending chase.
+        next_follow_up_at: null,
         gmail_thread_id: parsed.gmail_thread_id || thread.gmail_thread_id || null,
         last_customer_message_at: fromLarry ? thread.last_customer_message_at : new Date().toISOString(),
         last_larry_message_at: fromLarry ? new Date().toISOString() : thread.last_larry_message_at,
       });
       if (autoRun) {
-        const autoSend = fromLarry ? env('LAURA_AUTO_SEND_AFTER_LARRY') === 'true' : await settingBool('laura_auto_send_missing_info', false);
-        await runLauraAgent({ threadId: thread.id, autoSend, reason: fromLarry ? 'larry_reply' : 'customer_reply' }).catch((e) => ({ error: e.message }));
+        await runLauraAgent({
+          threadId: thread.id,
+          reason: fromLarry ? 'larry_reply' : 'customer_reply',
+        }).catch((e) => ({ error: e.message }));
       }
     }
     await gmailRequest(`messages/${encodeURIComponent(item.id)}/modify`, {
@@ -1165,6 +1894,12 @@ export async function intakeHealth() {
   const gmailClientConfigured = !!(env('GMAIL_CLIENT_ID') && env('GMAIL_CLIENT_SECRET'));
   const gmailRefreshConfigured = !!env('GMAIL_REFRESH_TOKEN');
   return {
+    autonomy: await autonomyLevel(),
+    action_links_configured: !!(env('LAURA_ACTION_SECRET') || env('ADMIN_PASSWORD')),
+    site_url: siteBaseUrl(),
+    cooldown_hours: c.cooldownHours,
+    follow_up_days: c.followUpDays,
+    max_nudges: c.maxNudges,
     supabase_configured: !!(c.supabaseUrl && c.supabaseKey),
     anthropic_configured: !!c.anthropicKey,
     resend_configured: !!c.resendKey,

@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { detectApplicantClarificationNeeds } from '../api/_lib/laura-agent.js';
+import { detectApplicantClarificationNeeds, stripQuotedReply } from '../api/_lib/laura-agent.js';
+import {
+  LARRY_ACTIONS, actionButtonsFor, isKnownAction, signActionToken, verifyActionToken,
+} from '../api/_lib/laura-links.js';
+import { escapeHtml, renderActionPage, renderDigestEmail } from '../api/_lib/laura-email.js';
 
 function read(path) {
   return readFileSync(new URL(path, import.meta.url), 'utf8');
@@ -63,8 +67,23 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(trackApi, /shipping_address: trimText/);
   assert.match(trackApi, /payloadWithoutShipping/);
 
+  assert.match(core, /autoSendGate/);
+  assert.match(core, /runDueFollowUps/);
+  assert.match(core, /performLarryAction/);
+  assert.match(core, /LAURA_SEND_COOLDOWN_HOURS/);
+  assert.match(core, /next_follow_up_at/);
+  assert.match(schema, /laura_autonomy/);
+
+  assert.match(agentApi, /run-followups/);
+  assert.match(agentApi, /larry-action/);
+  assert.match(digestApi, /runDueFollowUps/);
+
   assert.match(admin, /data-tab="laura-agent"/);
   assert.match(admin, /function loadLauraAgent/);
+  assert.match(admin, /function lauraLarryAction/);
+  assert.match(admin, /function lauraSetAutonomy/);
+  assert.match(admin, /function lauraRunFollowUps/);
+  assert.match(admin, /Larry&rsquo;s call|Larry’s call/);
   assert.match(admin, /lauraApproveSend/);
   assert.match(admin, /lauraPollGmail/);
   assert.match(admin, /lauraFileDeployment/);
@@ -94,13 +113,125 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(docs, /gmail\.modify/);
 });
 
+test('action links only ever authorise one thread and one action', () => {
+  process.env.LAURA_ACTION_SECRET = 'contract-test-secret';
+  const threadId = '11111111-2222-3333-4444-555555555555';
+
+  const token = signActionToken(threadId, 'approve');
+  const good = verifyActionToken(token);
+  assert.equal(good.ok, true);
+  assert.equal(good.thread_id, threadId);
+  assert.equal(good.action, 'approve');
+
+  // Editing the action inside the payload must not verify.
+  const raw = Buffer.from(token, 'base64url').toString('utf8');
+  const swapped = Buffer.from(raw.replace('.approve.', '.decline.'), 'utf8').toString('base64url');
+  assert.equal(verifyActionToken(swapped).ok, false);
+
+  assert.equal(verifyActionToken('garbage').ok, false);
+  assert.equal(verifyActionToken('').ok, false);
+  assert.equal(verifyActionToken(signActionToken(threadId, 'approve', { ttlDays: -1 })).reason, 'expired');
+
+  process.env.LAURA_ACTION_SECRET = 'a-completely-different-secret';
+  assert.equal(verifyActionToken(token).reason, 'bad_signature');
+  delete process.env.LAURA_ACTION_SECRET;
+
+  assert.equal(isKnownAction('approve'), true);
+  assert.equal(isKnownAction('drop-table'), false);
+  // Approving, declining and sending a draft must never fire from a bare GET,
+  // because mail scanners follow links.
+  assert.equal(LARRY_ACTIONS.approve.confirm, true);
+  assert.equal(LARRY_ACTIONS.decline.confirm, true);
+  assert.equal(LARRY_ACTIONS['send-draft'].confirm, true);
+});
+
+test('Larry’s email renders every file with its own buttons and escapes hostile input', () => {
+  process.env.LAURA_ACTION_SECRET = 'contract-test-secret';
+  const threadId = '11111111-2222-3333-4444-555555555555';
+  const item = {
+    applicantName: '<script>alert(1)</script>',
+    applicantEmail: 'grace@example.org',
+    threadToken: 'A1B2C3D4',
+    headline: 'Ready for your call.',
+    facts: [['Requested', 'Tier 3'], ['Blank', '']],
+    flags: ['power and internet access'],
+    buttons: actionButtonsFor(threadId, { hasDraft: false }),
+    adminUrl: 'https://www.villageservers.com/admin.html',
+  };
+  const digest = renderDigestEmail({ agentName: 'Laura', items: [item], stamp: 'now' });
+
+  assert.match(digest.html, /laura-action\?token=/);
+  assert.doesNotMatch(digest.html, /<script>/);
+  assert.match(digest.html, /&lt;script&gt;/);
+  assert.doesNotMatch(digest.html, />Blank</); // empty facts are dropped
+  assert.equal((digest.html.match(/<table/g) || []).length, (digest.html.match(/<\/table>/g) || []).length);
+
+  // The approve button has to describe what pressing it will actually do, so
+  // its wording follows what the initiative can currently send.
+  assert.match(digest.text, /Approve — send a card: https/);
+  assert.doesNotMatch(digest.text, /booking link/);
+
+  process.env.LAURA_OFFER_MODE = 'full_kits';
+  const withKits = renderDigestEmail({
+    agentName: 'Laura',
+    items: [{ ...item, buttons: actionButtonsFor(threadId, { hasDraft: false }) }],
+  });
+  assert.match(withKits.text, /Approve & send booking link: https/);
+  delete process.env.LAURA_OFFER_MODE;
+
+  const page = renderActionPage({
+    title: 'Approve', message: 'Confirm?', tone: 'go',
+    confirm: { url: '/api/laura-action?token=x', label: 'Yes' },
+  });
+  assert.match(page, /method="POST"/);
+  assert.match(page, /Nothing has happened yet/);
+  assert.equal(escapeHtml('<a href="x">&</a>'), '&lt;a href=&quot;x&quot;&gt;&amp;&lt;/a&gt;');
+  delete process.env.LAURA_ACTION_SECRET;
+});
+
+test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', () => {
+  const core = read('../api/_lib/laura-agent.js');
+
+  // The reality check must live in code, not only in the system prompt, so the
+  // model cannot promise a kit or funding that does not exist.
+  assert.match(core, /LAURA_OFFER_MODE/);
+  assert.match(core, /sd_card_only/);
+  assert.match(core, /function sdCardOfferDecision/);
+  assert.match(core, /offer_sd_card/);
+  assert.match(core, /Overrode \$\{action\} because only microSD cards are going out right now/);
+  // ask_larry / send_schedule_link / file_deployment are all pre-empted.
+  assert.match(core, /const overpromising = \['ask_larry', 'send_schedule_link', 'file_deployment'\]/);
+  // The offer collects exactly what a card needs.
+  assert.match(core, /The language or languages your community needs on the card/);
+  assert.match(core, /A shipping address, including a recipient name and a phone number/);
+  // And it is honest without being a rejection.
+  assert.match(core, /this is not a no, it is a not yet for the larger kits/);
+  assert.match(core, /Never suggest that a larger kit or funding is coming/);
+});
+
+test('quoted history is trimmed off inbound replies', () => {
+  const stripped = stripQuotedReply([
+    'Yes, my reference is Pastor Mary.',
+    '',
+    'On Tue, Jul 28, 2026 at 4:02 PM Laura <laura@example.com> wrote:',
+    '> Could you send an independent reference?',
+  ].join('\n'));
+  assert.equal(stripped, 'Yes, my reference is Pastor Mary.');
+  assert.equal(stripQuotedReply('A plain reply.'), 'A plain reply.');
+  // If the markers match everything, keep the original rather than store nothing.
+  assert.ok(stripQuotedReply('> entirely quoted').length > 0);
+});
+
 test('production secrets are not committed into Laura files', () => {
   const joined = [
     read('../api/_lib/laura-agent.js'),
+    read('../api/_lib/laura-links.js'),
+    read('../api/_lib/laura-email.js'),
     read('../api/intake-agent.js'),
     read('../api/intake-digest.js'),
     read('../api/intake-gmail-poll.js'),
     read('../api/intake-gmail-oauth.js'),
+    read('../api/laura-action.js'),
     read('../docs/laura-agent-setup.md'),
   ].join('\n');
 
