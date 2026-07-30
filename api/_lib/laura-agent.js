@@ -20,7 +20,44 @@ const DEFAULT_MAX_NUDGES = 3;
 // absent from this set drafts and waits, no matter what the model decides.
 // `offer_sd_card` belongs here because it only ever scales expectations *down* —
 // the dangerous direction is promising more, and this promises less.
-const SELF_SEND_ACTIONS = new Set(['ask_customer', 'reply_customer', 'follow_up_nudge', 'offer_sd_card']);
+const SELF_SEND_ACTIONS = new Set([
+  'ask_customer', 'reply_customer', 'follow_up_nudge', 'offer_sd_card', 'confirm_card',
+]);
+
+// How many times Laura will go back to an applicant who keeps replying without
+// answering, before she stops and lets Larry look at it. Without this an
+// autonomous loop can ping-pong indefinitely.
+const DEFAULT_MAX_ASK_ROUNDS = 3;
+
+// Columns Laura may fill in from an emailed reply. Identity, status, triage and
+// admin fields are deliberately absent: she is transcribing what an applicant
+// told her, not re-deciding who they are or how the office rated them.
+const EXTRACTABLE_FIELDS = {
+  phone: 'text',
+  phone_country_code: 'text',
+  organization: 'text',
+  role: 'text',
+  country: 'text',
+  region: 'text',
+  languages: 'text',
+  literacy_context: 'text',
+  power_internet_access: 'text',
+  org_website: 'text',
+  sending_org: 'text',
+  reference_name: 'text',
+  reference_contact: 'text',
+  years_in_field: 'text',
+  current_reach: 'text',
+  reach_justification: 'text',
+  gathering_infrastructure_desc: 'text',
+  receiving_plan_details: 'text',
+  shipping_address: 'text',
+  timeframe: 'text',
+  preferred_contact_method: 'text',
+  contact_timezone: 'text',
+  mission_context: 'text',
+  kit_tier: 'int',
+};
 
 // What the initiative can actually put in the post today. While this is
 // 'sd_card_only', no thread is ever handed to Larry as a kit or funding
@@ -75,7 +112,51 @@ function config() {
     cooldownHours: Number(env('LAURA_SEND_COOLDOWN_HOURS', String(DEFAULT_COOLDOWN_HOURS))) || DEFAULT_COOLDOWN_HOURS,
     followUpDays: Number(env('LAURA_FOLLOW_UP_DAYS', String(DEFAULT_FOLLOW_UP_DAYS))) || DEFAULT_FOLLOW_UP_DAYS,
     maxNudges: Number(env('LAURA_MAX_NUDGES', String(DEFAULT_MAX_NUDGES))) || DEFAULT_MAX_NUDGES,
+    maxAskRounds: Number(env('LAURA_MAX_ASK_ROUNDS', String(DEFAULT_MAX_ASK_ROUNDS))) || DEFAULT_MAX_ASK_ROUNDS,
   };
+}
+
+// Applicants answer in prose — "my reference is Pastor Mary, mary@example.org".
+// Without writing that back to the application row, every later check keeps
+// reading the original blank form and Laura asks the same question forever.
+// This is what makes the loop actually close.
+function sanitizeExtracted(extracted) {
+  if (!extracted || typeof extracted !== 'object') return {};
+  const clean = {};
+  for (const [key, raw] of Object.entries(extracted)) {
+    const kind = EXTRACTABLE_FIELDS[key];
+    if (!kind) continue;
+    if (raw == null) continue;
+    if (kind === 'int') {
+      const n = Number(String(raw).match(/\d+/)?.[0]);
+      if (Number.isFinite(n) && n >= 1 && n <= 5) clean[key] = n;
+      continue;
+    }
+    const text = trim(raw, 2000);
+    // Guard against the model echoing its own placeholder back at us.
+    if (!text || /^(unknown|n\/?a|none|not provided|tbd|null)$/i.test(text)) continue;
+    clean[key] = text;
+  }
+  return clean;
+}
+
+// Only writes values that actually change something, and reports what moved so
+// the edit is visible in the thread rather than happening invisibly.
+async function applyExtracted(app, extracted) {
+  const clean = sanitizeExtracted(extracted);
+  const changes = {};
+  for (const [key, value] of Object.entries(clean)) {
+    const current = app[key];
+    const currentText = current == null ? '' : String(current).trim();
+    if (currentText === String(value).trim()) continue;
+    changes[key] = { from: currentText || null, to: value };
+  }
+  if (!Object.keys(changes).length) return { applied: {}, changes: {} };
+
+  const patch = Object.fromEntries(Object.entries(changes).map(([key, diff]) => [key, diff.to]));
+  await patchRows(`equipment_applications?id=eq.${encodeURIComponent(String(app.id))}`, patch);
+  Object.assign(app, patch); // so the rest of this run sees the updated file
+  return { applied: patch, changes };
 }
 
 // 'staged'     — Laura sends her own info-gathering mail and nudges; anything
@@ -459,6 +540,17 @@ function latestMessage(messages, role) {
   return asArray(messages).filter((m) => m.role === role).slice(-1)[0] || null;
 }
 
+function sentActionCount(messages, actionType) {
+  return asArray(messages).filter((m) => m.action_type === actionType && m.status === 'sent').length;
+}
+
+// A card needs exactly two things. Once both are on the file, there is nothing
+// left to ask and the thread can close itself out.
+function hasCardDetails(app) {
+  return !!(trim(app && app.languages, 200) && trim(app && app.shipping_address, 400)
+    && !vagueShippingAddress(app && app.shipping_address));
+}
+
 function hasOfferedSdCard(messages) {
   return asArray(messages).some((m) => m.action_type === 'offer_sd_card' && m.status === 'sent');
 }
@@ -481,6 +573,38 @@ function kitNoun(app) {
     4: 'a projector and audio kit',
     5: 'a satellite receive-and-replay kit',
   }[Number(app && app.kit_tier)] || 'the equipment you asked about';
+}
+
+// The close. They gave a language and a real address, so the file is done —
+// tell them plainly, promise nothing about dates, and hand the details to the
+// deployment log. No reason for anyone to press a button for this.
+function cardConfirmationDecision(app, thread) {
+  const c = config();
+  return {
+    next_action: 'confirm_card',
+    state: 'ready_to_ship',
+    audience: 'applicant',
+    missing_fields: [],
+    summary: `${app.name || 'Applicant'} confirmed ${trim(app.languages, 120)} and a shipping address. Card details filed for sending.`,
+    draft_subject: `Your VillageServer card`,
+    draft_body: [
+      `Hi ${app.name || 'there'},`,
+      '',
+      `That is everything I needed — thank you.`,
+      '',
+      `I have your card down for ${trim(app.languages, 160)}, going to:`,
+      trim(app.shipping_address, 400),
+      '',
+      `It is on our list to send. I cannot give you a firm date, and I would rather say that than guess at one — but if anything changes on your end, especially the address, just reply here and I will update it.`,
+      '',
+      `Thank you for your patience, and for the work you are doing.`,
+      '',
+      c.agentName,
+      'VillageServer Initiative',
+    ].join('\n'),
+    reasoning: 'Language and a usable shipping address are both on file, so the card details are complete.',
+    auto_send_ok: true,
+  };
 }
 
 // The honest scale-down. Warm about the ministry, straight about what we can
@@ -592,6 +716,46 @@ function fallbackDecision(app, thread, messages) {
   if (clarificationNeeds.length && !hasInboundRole(messages, 'applicant')) {
     return applicantClarificationDecision(app, thread, messages, clarificationNeeds, missing);
   }
+
+  const cardsOnly = offerMode() === 'sd_card_only';
+  const offered = hasOfferedSdCard(messages);
+
+  // Everything a card needs is on file — close it out.
+  if (cardsOnly && offered && hasCardDetails(app)) {
+    return cardConfirmationDecision(app, thread);
+  }
+
+  // Verified and consistent, but they have not been levelled with yet.
+  if (cardsOnly && !offered && readyForOffer(app)) {
+    return sdCardOfferDecision(app, thread);
+  }
+
+  // She has asked and asked and the gaps are still there. Stop looping.
+  if (missing.length && sentActionCount(messages, 'ask_customer') >= config().maxAskRounds) {
+    return {
+      next_action: 'ask_larry',
+      state: 'waiting_on_larry',
+      audience: 'larry',
+      missing_fields: missing,
+      summary: `${app.name || 'Applicant'} has replied but still has not given: ${missing.join(', ')}. I have asked ${config().maxAskRounds} times.`,
+      draft_subject: `Stuck on ${app.name || 'an applicant'}`,
+      draft_body: [
+        `Larry,`,
+        '',
+        `I have gone back to this applicant ${config().maxAskRounds} times and these are still outstanding:`,
+        ...missing.map((field) => `- ${field}`),
+        '',
+        `They are replying, so they are not ignoring us — I just cannot get these details out of them. Your call on whether to keep going or let it rest.`,
+        '',
+        appSummaryLines(app).filter((line) => !line.endsWith(': ')).join('\n'),
+        '',
+        config().agentName,
+      ].join('\n'),
+      reasoning: `Hit the ${config().maxAskRounds}-round asking limit with gaps remaining.`,
+      auto_send_ok: false,
+    };
+  }
+
   if (missing.length) {
     return {
       next_action: 'ask_customer',
@@ -616,12 +780,6 @@ function fallbackDecision(app, thread, messages) {
       reasoning: 'Missing operational details.',
       auto_send_ok: true,
     };
-  }
-  // While only cards are going out, a complete file does not go to Larry as a
-  // kit decision — Laura levels with the applicant first and collects what a
-  // card actually needs. Larry sees it once they have replied.
-  if (offerMode() === 'sd_card_only' && !hasOfferedSdCard(messages) && readyForOffer(app)) {
-    return sdCardOfferDecision(app, thread);
   }
   return {
     next_action: 'ask_larry',
@@ -657,7 +815,7 @@ function normalizeDecision(decision, app, thread, messages) {
   const safeActions = new Set([
     'ask_customer', 'ask_larry', 'reply_customer', 'send_schedule_link',
     'file_deployment', 'request_rollout_photos', 'close', 'escalate',
-    'offer_sd_card', 'follow_up_nudge',
+    'offer_sd_card', 'confirm_card', 'follow_up_nudge',
   ]);
   const action = safeActions.has(nextAction) ? nextAction : fallback.next_action;
   const audience = ['applicant', 'larry', 'internal'].includes(String(d.audience || '')) ? String(d.audience) : fallback.audience;
@@ -667,6 +825,7 @@ function normalizeDecision(decision, app, thread, messages) {
     const forced = applicantClarificationDecision(app, thread, messages, clarificationNeeds, detectMissingFields(app));
     return {
       ...forced,
+      auto_send_ok: forced.auto_send_ok && d.auto_send_ok !== false,
       reasoning: `${forced.reasoning} Overrode ${action} because Laura should ask the applicant before Larry when the form details contradict themselves.`,
     };
   }
@@ -675,13 +834,30 @@ function normalizeDecision(decision, app, thread, messages) {
   // are going out. On a clean file the honest scale-down replaces whatever it
   // proposed, in exactly the same way clarifications override a premature
   // hand-off to Larry.
-  const overpromising = ['ask_larry', 'send_schedule_link', 'file_deployment'].includes(action);
-  if (offerMode() === 'sd_card_only' && overpromising && !hasOfferedSdCard(messages) && readyForOffer(app)) {
-    const forced = sdCardOfferDecision(app, thread);
-    return {
-      ...forced,
-      reasoning: `${forced.reasoning} Overrode ${action} because only microSD cards are going out right now.`,
-    };
+  // `ask_customer` and `reply_customer` are in here too: once a reply has been
+  // transcribed onto the file, the model's plan to ask for something is often
+  // out of date, and asking for what they already sent is exactly the failure
+  // that makes an autonomous agent look broken.
+  const supersedable = [
+    'ask_larry', 'send_schedule_link', 'file_deployment', 'ask_customer', 'reply_customer',
+  ].includes(action);
+  if (offerMode() === 'sd_card_only' && supersedable) {
+    if (hasOfferedSdCard(messages) && hasCardDetails(app)) {
+      const forced = cardConfirmationDecision(app, thread);
+      return {
+        ...forced,
+        auto_send_ok: forced.auto_send_ok && d.auto_send_ok !== false,
+        reasoning: `${forced.reasoning} Overrode ${action} because the card details are already complete.`,
+      };
+    }
+    if (!hasOfferedSdCard(messages) && readyForOffer(app)) {
+      const forced = sdCardOfferDecision(app, thread);
+      return {
+        ...forced,
+        auto_send_ok: forced.auto_send_ok && d.auto_send_ok !== false,
+        reasoning: `${forced.reasoning} Overrode ${action} because only microSD cards are going out right now.`,
+      };
+    }
   }
   return {
     next_action: action,
@@ -720,14 +896,16 @@ async function callAnthropicDecision({ app, thread, messages }) {
     ...(offerMode() === 'sd_card_only' ? [
       `WHAT IS ACTUALLY AVAILABLE RIGHT NOW: microSD cards loaded with the offline library, in the applicant's language. Nothing else. No Raspberry Pi servers, no projectors, no satellite kits, no funding, regardless of what tier they asked for.`,
       `So your goal for every applicant is: get the form details complete and consistent, and once you are satisfied the person and their ministry are real, use next_action "offer_sd_card". That message thanks them warmly, tells them plainly that only cards are going out for now, and asks for exactly two things: the language they need and a shipping address with a recipient name and phone.`,
-      `Do not propose a call, a booking link, a deployment or a review by Larry as the next step for a clean file — the card offer comes first. Larry sees the file after they reply with their language and address.`,
+      `Do not propose a call, a booking link, a deployment or a review by Larry as the next step for a clean file — the card offer comes first.`,
+      `Once they have replied with a language and a real shipping address, use next_action "confirm_card": thank them, repeat the language and address back so they can correct it, and say the card is on the list to send. Never give or imply a shipping date.`,
       `Never suggest that a larger kit or funding is coming, is likely, or is being considered. You may say their file stays with us for when more equipment is available.`,
     ] : [
       `If ready for a call and a booking URL is available, send the booking URL. Booking URL: ${c.calBookingUrl || 'not configured'}.`,
     ]),
     `Escalate to Larry only for complaints, money disputes, safety concerns, custom pricing, final approval/denial, or shipping/scheduling instructions after applicant details are clear.`,
     `Do not use markdown headings. Email copy should be plain, concise, and human.`,
-    `Return ONLY valid JSON with this shape: {"next_action":"ask_customer|offer_sd_card|ask_larry|reply_customer|send_schedule_link|file_deployment|request_rollout_photos|close|escalate","state":"waiting_on_customer|waiting_on_larry|ready_to_schedule|scheduled|ready_to_ship|shipped|follow_up_photos|filed|closed|escalated","audience":"applicant|larry|internal","missing_fields":["..."],"summary":"one internal sentence","draft_subject":"...","draft_body":"...","reasoning":"one internal sentence","auto_send_ok":false,"filing":{"title":"","detail":"","item_type":"deployment|campaign|shipping|photo_request|follow_up|note"}}`,
+    `EXTRACTION — do this on every run where the applicant has replied. Read their replies and put any concrete detail they gave you into the "extracted" object, using these keys: ${Object.keys(EXTRACTABLE_FIELDS).join(', ')}. If they wrote "we speak Bemba and English" then extracted.languages is "Bemba, English"; if they gave an address, that is extracted.shipping_address. Only include a key when they actually told you it — never guess, never restate what is already on the form, and omit the key entirely if you are unsure. This is how their answers reach the file; without it you will keep asking for things they already sent.`,
+    `Return ONLY valid JSON with this shape: {"next_action":"ask_customer|offer_sd_card|confirm_card|ask_larry|reply_customer|send_schedule_link|file_deployment|request_rollout_photos|close|escalate","state":"waiting_on_customer|waiting_on_larry|ready_to_schedule|scheduled|ready_to_ship|shipped|follow_up_photos|filed|closed|escalated","audience":"applicant|larry|internal","missing_fields":["..."],"summary":"one internal sentence","draft_subject":"...","draft_body":"...","reasoning":"one internal sentence","auto_send_ok":false,"extracted":{},"filing":{"title":"","detail":"","item_type":"deployment|campaign|shipping|photo_request|follow_up|note"}}`,
   ].join('\n');
   const user = [
     `Thread token: VS-${thread.thread_token}`,
@@ -900,6 +1078,17 @@ export async function runLauraAgent({ threadId = '', applicationId = '', reason 
     rawDecision = fallbackDecision(app, thread, messages);
     rawDecision.reasoning = `${rawDecision.reasoning} Anthropic failed: ${String((e && e.message) || e).slice(0, 180)}`;
   }
+  // Transcribe anything the applicant answered into the file BEFORE deciding
+  // what to do, so the decision is made against what we now know rather than
+  // the blank form they first submitted.
+  // applyExtracted mutates `app` in place, so normalizeDecision below re-runs
+  // readyForOffer / hasCardDetails against what we now know. No second model
+  // call needed — the deterministic rules do the re-deciding.
+  let extraction = { applied: {}, changes: {} };
+  if (rawDecision && rawDecision.extracted) {
+    extraction = await applyExtracted(app, rawDecision.extracted).catch(() => ({ applied: {}, changes: {} }));
+  }
+
   const decision = normalizeDecision(rawDecision, app, thread, messages);
   const to = audienceToEmail(decision.audience, app);
   const outbound = decision.audience === 'applicant' || decision.audience === 'larry';
@@ -921,8 +1110,26 @@ export async function runLauraAgent({ threadId = '', applicationId = '', reason 
       reason,
       reasoning: decision.reasoning,
       model: config().anthropicKey ? config().model : 'fallback',
+      extracted: extraction.changes,
     },
   });
+
+  // Anything Laura learned from a reply gets its own visible entry, so a field
+  // never changes on an application without a record of where it came from.
+  if (Object.keys(extraction.changes).length) {
+    await insertRow('agent_filing_items', {
+      thread_id: thread.id,
+      application_id: String(app.id),
+      item_type: 'note',
+      state: 'done',
+      title: `Updated from their reply: ${Object.keys(extraction.changes).join(', ')}`,
+      detail: Object.entries(extraction.changes)
+        .map(([field, diff]) => `${field}: ${diff.from || '(blank)'} -> ${diff.to}`)
+        .join('\n'),
+      completed_at: new Date().toISOString(),
+      metadata: { source_message_id: message && message.id },
+    }).catch(() => null);
+  }
   await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
     state: decision.state,
     owner: decision.audience === 'larry' ? 'larry' : decision.audience === 'applicant' ? 'applicant' : 'laura',
@@ -946,8 +1153,19 @@ export async function runLauraAgent({ threadId = '', applicationId = '', reason 
   let sent = null;
   if (message && gate.allowed) sent = await sendMessageById(message.id);
 
-  // Schedule the next nudge whenever Laura has just written to the applicant.
-  if (sent && decision.audience === 'applicant') {
+  // Confirming a card is the end of the conversation: file the deployment so
+  // the details reach the fulfilment log, and stop chasing.
+  let filed = null;
+  if (sent && decision.next_action === 'confirm_card') {
+    filed = await fileDeploymentForThread(thread.id).catch(() => null);
+    await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
+      state: 'filed',
+      owner: 'filing',
+      next_follow_up_at: null,
+      digest_pending: true,
+    }).catch(() => null);
+  } else if (sent && decision.audience === 'applicant') {
+    // Otherwise the ball is with them, so schedule the next nudge.
     await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
       next_follow_up_at: new Date(Date.now() + config().followUpDays * 86400000).toISOString(),
     }).catch(() => null);
@@ -961,6 +1179,8 @@ export async function runLauraAgent({ threadId = '', applicationId = '', reason 
     message,
     sent,
     held: sent ? null : gate.reason,
+    learned: extraction.changes,
+    filed: filed && filed.deployment ? filed.deployment.id : null,
   };
 }
 

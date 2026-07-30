@@ -1965,8 +1965,8 @@ function renderLauraHealth(h){
   var level = h.autonomy || 'staged';
   var autonomyText = {
     draft_only: 'Laura writes every email and waits. Nothing goes out until you send it.',
-    staged: 'Laura sends her own information requests and follow-up nudges. Approvals, declines, funding and scheduling always wait for Larry.',
-    full: 'Laura also sends the scheduling link once a file is clean. Approvals and declines still only happen when Larry presses a button.'
+    staged: 'Laura runs the whole card conversation herself: asks for what is missing, reads the answers back onto the file, offers the microSD card, then confirms the language and address and files the deployment. She only comes to you for declines, funding, anything she cannot get an answer to, and anything that needs escalating.',
+    full: 'Everything in Staged, plus she sends the scheduling link once a file is clean. Declines still only happen when you press a button.'
   }[level] || '';
   var option = function(value, label){
     return '<option value="'+value+'"'+(level === value ? ' selected' : '')+'>'+label+'</option>';

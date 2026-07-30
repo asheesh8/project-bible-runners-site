@@ -193,6 +193,52 @@ Laura ever offers — whatever tier the form asked for.
 LAURA_OFFER_MODE=sd_card_only   # default; set to full_kits when larger tiers return
 ```
 
+### The loop, end to end
+
+Laura runs this herself. Larry is not a step in it.
+
+```
+application arrives
+  -> Laura asks for what is missing (or clarifies contradictions)
+  -> applicant replies
+  -> Laura reads their answers back onto the application row   <-- the part that closes the loop
+  -> gaps filled? offer the microSD card, ask language + address
+  -> they reply with both
+  -> Laura confirms, files the deployment, stops chasing
+```
+
+**Reading answers back onto the file is what makes autonomy work.** Applicants
+reply in prose — "my reference is Pastor Mary, mary@example.org" — and every
+later check reads the *application row*, not the email. Without transcription
+Laura would re-ask the same question forever, so each run extracts what they
+told her and writes it to the row before deciding anything.
+
+Only the columns in `EXTRACTABLE_FIELDS` can be written this way. Identity,
+`status`, `triage_*` and admin fields are deliberately excluded — she is
+transcribing what an applicant said, not re-deciding who they are or how the
+office rated them. Every write is recorded as an `agent_filing_items` note
+showing the before and after, so a field never changes invisibly.
+
+Two brakes stop the loop spinning:
+
+```text
+LAURA_MAX_ASK_ROUNDS=3   # then hand to Larry rather than keep asking
+LAURA_MAX_NUDGES=3       # then hand to Larry rather than keep chasing
+```
+
+The first is for someone who replies but never answers; the second is for
+someone who goes quiet. Either way the file reaches a human instead of looping.
+
+A card is only confirmed when there is a language *and* a shipping address that
+survives the vague-address check — "downtown, can find me" does not close a
+file.
+
+### What Laura still will not do
+
+Decline anyone, promise funding, promise a shipping date, or send anything the
+model flagged for review. A deterministic override can replace *what* she says,
+but never the judgement that a particular message should not go out unread.
+
 While this is `sd_card_only`, the shape of every conversation is:
 
 1. Laura gathers the form details and clears up anything that contradicts

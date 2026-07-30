@@ -200,7 +200,18 @@ test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', ()
   assert.match(core, /offer_sd_card/);
   assert.match(core, /Overrode \$\{action\} because only microSD cards are going out right now/);
   // ask_larry / send_schedule_link / file_deployment are all pre-empted.
-  assert.match(core, /const overpromising = \['ask_larry', 'send_schedule_link', 'file_deployment'\]/);
+  assert.match(core, /const supersedable = \[/);
+  assert.match(core, /'ask_larry', 'send_schedule_link', 'file_deployment', 'ask_customer', 'reply_customer',/);
+  // A deterministic override may replace what Laura says, never the judgement
+  // that this particular message should not go out unread.
+  assert.match(core, /auto_send_ok: forced\.auto_send_ok && d\.auto_send_ok !== false/);
+  // The loop has to close: replies write back to the file, and a confirmed
+  // card files itself.
+  assert.match(core, /function applyExtracted/);
+  assert.match(core, /EXTRACTABLE_FIELDS/);
+  assert.match(core, /function cardConfirmationDecision/);
+  assert.match(core, /confirm_card/);
+  assert.match(core, /LAURA_MAX_ASK_ROUNDS/);
   // The offer collects exactly what a card needs.
   assert.match(core, /The language or languages your community needs on the card/);
   assert.match(core, /A shipping address, including a recipient name and a phone number/);
