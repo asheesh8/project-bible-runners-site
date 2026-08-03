@@ -36,17 +36,21 @@ export function escapeHtml(value) {
 }
 
 // Turn Laura's plain-text draft into paragraphs, keeping "- " lines as a list.
+// A numbered block becomes an <ol> so "1." and "2." survive — stripping the
+// prefix into a bulleted list loses the ordering Laura wrote them in.
 function textToHtml(text) {
   const blocks = String(text || '').replace(/\r\n/g, '\n').split(/\n{2,}/);
   return blocks.map((block) => {
     const lines = block.split('\n').filter((line) => line.trim());
     if (!lines.length) return '';
-    const isList = lines.every((line) => /^\s*(?:[-*]|\d+\.)\s+/.test(line));
+    const numbered = lines.every((line) => /^\s*\d+\.\s+/.test(line));
+    const isList = numbered || lines.every((line) => /^\s*[-*]\s+/.test(line));
     if (isList) {
+      const tag = numbered ? 'ol' : 'ul';
       const items = lines
         .map((line) => `<li style="margin:0 0 6px">${escapeHtml(line.replace(/^\s*(?:[-*]|\d+\.)\s+/, ''))}</li>`)
         .join('');
-      return `<ul style="margin:0 0 16px;padding-left:20px;color:${PALETTE.text}">${items}</ul>`;
+      return `<${tag} style="margin:0 0 16px;padding-left:20px;color:${PALETTE.text}">${items}</${tag}>`;
     }
     return `<p style="margin:0 0 16px;line-height:1.55;color:${PALETTE.text}">${lines.map(escapeHtml).join('<br>')}</p>`;
   }).join('');
@@ -155,6 +159,28 @@ function flagList(flags) {
 </td></tr></table>`;
 }
 
+// The panel Larry actually copies onto an envelope. It gets its own block, at
+// the top of the card and bigger than everything else, because when a file is
+// ready to post the address *is* the message — everything else on the card is
+// context for a decision that has already been made.
+//
+// Monospace and pre-wrap on purpose: the applicant typed these line breaks, and
+// reflowing someone's address into a paragraph is how a parcel goes astray.
+function addressBlock(shipTo) {
+  if (!shipTo || !shipTo.address) return '';
+  const rows = (shipTo.rows || []).filter((row) => row && row[1]).map(([label, value]) => `<tr>
+  <td style="padding:3px 10px 3px 0;font-size:12px;font-weight:700;color:${PALETTE.muted};white-space:nowrap;vertical-align:top">${escapeHtml(label)}</td>
+  <td style="padding:3px 0;font-size:13px;color:${PALETTE.text};line-height:1.5">${escapeHtml(value)}</td>
+</tr>`).join('');
+
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px">
+<tr><td style="background:#ffffff;border:2px solid ${PALETTE.text};border-radius:10px;padding:16px 18px">
+  <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:${PALETTE.muted};margin-bottom:10px">${escapeHtml(shipTo.label || 'Post to')}</div>
+  <div style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;line-height:1.65;color:${PALETTE.text};white-space:pre-wrap;word-break:break-word">${escapeHtml(shipTo.address)}</div>
+  ${rows ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;border-top:1px solid ${PALETTE.border};padding-top:4px">${rows}</table>` : ''}
+</td></tr></table>`;
+}
+
 function draftPreview(draft) {
   if (!draft || !draft.body) return '';
   const preview = String(draft.body).trim();
@@ -172,6 +198,7 @@ export function renderThreadCardHtml(item) {
   const {
     applicantName = 'Applicant', applicantEmail = '', threadToken = '',
     headline = '', facts = [], flags = [], draft = null, buttons = [], adminUrl = '',
+    shipTo = null,
   } = item || {};
 
   return `
@@ -180,6 +207,7 @@ export function renderThreadCardHtml(item) {
   ${escapeHtml(applicantEmail)}${threadToken ? ` &nbsp;·&nbsp; <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">VS-${escapeHtml(threadToken)}</span>` : ''}
 </div>
 ${headline ? `<p style="margin:14px 0 0;font-size:15px;line-height:1.55;color:${PALETTE.text}">${escapeHtml(headline)}</p>` : ''}
+${addressBlock(shipTo)}
 ${factTable(facts)}
 ${flagList(flags)}
 ${draftPreview(draft)}
@@ -190,10 +218,23 @@ ${adminUrl ? `<div style="margin-top:14px;text-align:center">
 }
 
 function threadCardText(item) {
-  const { applicantName, applicantEmail, threadToken, headline, facts = [], flags = [], buttons = [], adminUrl } = item || {};
+  const {
+    applicantName, applicantEmail, threadToken, headline,
+    facts = [], flags = [], buttons = [], adminUrl, shipTo = null,
+  } = item || {};
+
+  // Indented and set apart from the facts, so it stays legible in the clients
+  // that show plain text only — the address has to survive there too.
+  const address = shipTo && shipTo.address ? [
+    `  ${(shipTo.label || 'Post to').toUpperCase()}`,
+    ...String(shipTo.address).split('\n').map((line) => `    ${line}`),
+    ...(shipTo.rows || []).filter((row) => row && row[1]).map(([label, value]) => `    ${label}: ${value}`),
+  ] : [];
+
   return [
     `${applicantName || 'Applicant'} <${applicantEmail || 'no email'}> — VS-${threadToken || ''}`,
     headline || '',
+    ...address,
     ...facts.filter((row) => row && row[1]).map(([label, value]) => `  ${label}: ${value}`),
     flags.length ? `  Still open: ${flags.join('; ')}` : '',
     '',
@@ -208,7 +249,10 @@ export function renderLarryActionEmail({ agentName = 'Laura', intro = '', item =
     `<tr><td style="padding:0 4px 14px">
       <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:${PALETTE.muted}">${escapeHtml(agentName)} · needs your call</div>
     </td></tr>`,
-    card(`${intro ? `<p style="margin:0 0 18px;font-size:15px;line-height:1.55;color:${PALETTE.muted}">${escapeHtml(intro)}</p>` : ''}${renderThreadCardHtml(item)}`),
+    // textToHtml, not a single escaped <p>: Laura's intros carry line breaks and
+    // numbered steps, and collapsing them into one paragraph runs an address and
+    // an instruction together on the same line.
+    card(`${intro ? `<div style="font-size:15px;color:${PALETTE.muted}">${textToHtml(intro)}</div>` : ''}${renderThreadCardHtml(item)}`),
     footer(agentName),
   ].join('');
 
@@ -251,11 +295,30 @@ export function renderDigestEmail({ agentName = 'Laura', stamp = '', items = [],
 
 // ── The page Larry lands on after clicking a button ─────────────────────
 
+// Larry types here rather than in the email itself — Gmail, Outlook and Apple
+// Mail all strip <form> out of a message body, so a box in the email would look
+// fine and silently do nothing. The button in the email opens this page instead.
+function inputFields(inputs) {
+  if (!inputs || !inputs.length) return '';
+  return inputs.map((field) => `
+<label style="display:block;margin-top:22px;text-align:left">
+  <span style="display:block;font-size:14px;font-weight:700;color:${PALETTE.text};margin-bottom:7px">${escapeHtml(field.label)}${field.required ? '' : ' <span style="font-weight:400;color:' + PALETTE.faint + '">(optional)</span>'}</span>
+  <input type="${escapeHtml(field.type || 'text')}" name="${escapeHtml(field.name)}"
+    ${field.required ? 'required' : ''}
+    placeholder="${escapeHtml(field.placeholder || '')}"
+    autocomplete="off" autocapitalize="off" spellcheck="false"
+    style="width:100%;box-sizing:border-box;padding:13px 14px;font-size:16px;font-family:${FONT};color:${PALETTE.text};background:#fff;border:1px solid ${PALETTE.border};border-radius:10px;outline:none">
+  ${field.help ? `<span style="display:block;margin-top:7px;font-size:13px;line-height:1.5;color:${PALETTE.faint}">${escapeHtml(field.help)}</span>` : ''}
+</label>`).join('');
+}
+
 export function renderActionPage({ title, message, detail = '', tone = 'go', confirm = null } = {}) {
   const accent = tone === 'stop' ? PALETTE.stop : tone === 'neutral' ? PALETTE.neutral : PALETTE.go;
+  const fields = confirm ? inputFields(confirm.inputs) : '';
   const form = confirm ? `
-<form method="POST" action="${escapeHtml(confirm.url)}" style="margin-top:26px">
-  <button type="submit" style="width:100%;background:${accent};border:1px solid ${accent};color:#fff;border-radius:10px;padding:15px 18px;font-size:16px;font-weight:700;font-family:${FONT};cursor:pointer">${escapeHtml(confirm.label)}</button>
+<form method="POST" action="${escapeHtml(confirm.url)}" style="margin-top:${fields ? '4px' : '26px'}">
+  ${fields}
+  <button type="submit" style="width:100%;margin-top:${fields ? '24px' : '0'};background:${accent};border:1px solid ${accent};color:#fff;border-radius:10px;padding:15px 18px;font-size:16px;font-weight:700;font-family:${FONT};cursor:pointer">${escapeHtml(confirm.label)}</button>
 </form>
 <p style="margin:14px 0 0;font-size:13px;color:${PALETTE.faint};text-align:center">Nothing has happened yet. Close this page to cancel.</p>` : '';
 

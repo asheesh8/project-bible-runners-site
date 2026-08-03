@@ -44,6 +44,23 @@ const PROBLEMS = {
   },
 };
 
+// The pages that collect a tracking number or a donation link submit as a plain
+// HTML form, so the body arrives urlencoded rather than as JSON. Vercel normally
+// parses both, but a string body must still be handled or Larry's typing is
+// silently dropped and he is told it worked.
+function parseBody(req) {
+  const raw = req && req.body;
+  if (!raw) return {};
+  if (typeof raw === 'object') return raw;
+  try {
+    const text = String(raw);
+    if (text.trim().startsWith('{')) return JSON.parse(text);
+    return Object.fromEntries(new URLSearchParams(text));
+  } catch (e) {
+    return {};
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
     return page(res, 405, renderActionPage({
@@ -51,7 +68,8 @@ export default async function handler(req, res) {
     }));
   }
 
-  const token = String((req.query && req.query.token) || (req.body && req.body.token) || '');
+  const body = parseBody(req);
+  const token = String((req.query && req.query.token) || body.token || '');
   const verified = verifyActionToken(token);
   if (!verified.ok) {
     const problem = PROBLEMS[verified.reason] || PROBLEMS.bad_signature;
@@ -61,22 +79,41 @@ export default async function handler(req, res) {
   const { thread_id: threadId, action } = verified;
   const meta = actionMeta(action);
 
-  // High-stakes actions get an interstitial. The GET changes nothing.
+  // High-stakes actions get an interstitial, and the ones that need Larry to
+  // type something get their fields here. Either way the GET changes nothing.
   if (req.method === 'GET' && meta.confirm) {
+    const asks = meta.inputs && meta.inputs.length;
     return page(res, 200, renderActionPage({
       title: meta.label,
       tone: meta.tone,
       message: meta.blurb,
-      detail: 'Confirm below and I will take it from here.',
+      detail: asks ? '' : 'Confirm below and I will take it from here.',
       confirm: {
         url: `/api/laura-action?token=${encodeURIComponent(token)}`,
-        label: `Yes — ${meta.label.toLowerCase()}`,
+        label: asks ? meta.label : `Yes — ${meta.label.toLowerCase()}`,
+        inputs: meta.inputs || null,
+      },
+    }));
+  }
+
+  // A blank required field means the browser validation was bypassed. Re-offer
+  // the form rather than recording an action with nothing in it.
+  const missingField = (meta.inputs || []).find((field) => field.required && !String(body[field.name] || '').trim());
+  if (missingField) {
+    return page(res, 400, renderActionPage({
+      title: meta.label,
+      tone: 'neutral',
+      message: `I still need the ${missingField.label.toLowerCase()}. Nothing has been saved.`,
+      confirm: {
+        url: `/api/laura-action?token=${encodeURIComponent(token)}`,
+        label: meta.label,
+        inputs: meta.inputs,
       },
     }));
   }
 
   try {
-    const result = await performLarryAction(threadId, action);
+    const result = await performLarryAction(threadId, action, { value: body.value });
     return page(res, 200, renderActionPage({
       title: result.title,
       message: result.message,

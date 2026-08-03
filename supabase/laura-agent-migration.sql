@@ -255,6 +255,14 @@ where not exists (
   select 1 from public.site_settings where key = 'laura_autonomy'
 );
 
+-- Shipping hand-off, and the one post Laura writes per shipped applicant.
+alter table public.deployments add column if not exists tracking_number text;
+alter table public.intake_threads add column if not exists tracking_number text;
+alter table public.posts add column if not exists source_application_id text;
+alter table public.posts add column if not exists auto_created boolean not null default false;
+create unique index if not exists posts_source_application_idx
+  on public.posts (source_application_id) where source_application_id is not null;
+
 select table_name
 from information_schema.tables
 where table_schema = 'public'

@@ -65,6 +65,34 @@ export const LARRY_ACTIONS = {
     tone: 'neutral',
     blurb: 'Adds this to the deployment log without emailing the applicant.',
   },
+
+  // Actions that need Larry to type something. Mail clients strip <form>, so
+  // the button opens a page that carries the fields — one tap, then one box.
+  'add-tracking': {
+    label: 'Add a tracking number',
+    confirm: true,
+    tone: 'go',
+    blurb: 'Saves the tracking number to the deployment record and emails it to the applicant.',
+    inputs: [{
+      name: 'value',
+      label: 'Tracking or order number',
+      placeholder: 'RR123456789KE',
+      help: 'Whatever the post office gave you. It goes to the applicant exactly as typed.',
+      required: true,
+    }],
+  },
+  'skip-tracking': {
+    label: 'No tracking for this one',
+    confirm: false,
+    tone: 'neutral',
+    blurb: 'Some post has no number. This closes the question without emailing anyone.',
+  },
+  'publish-post': {
+    label: 'Publish the write-up',
+    confirm: true,
+    tone: 'go',
+    blurb: 'Puts Laura’s write-up of this deployment live on the site.',
+  },
   'schedule-call': {
     label: 'Set up a call first',
     confirm: true,
@@ -187,6 +215,12 @@ export function adminFileUrl(threadId) {
 // the generic approve button for "send this exact draft".
 export function shippingButtonNames() {
   return ['mark-shipped', 'file-deployment', 'more-info', 'schedule-call', 'hold'];
+}
+
+// Once the card is in the post there is nothing left to approve. The only open
+// questions are the tracking number and whether Laura's write-up goes live.
+export function postedButtonNames() {
+  return ['add-tracking', 'publish-post', 'skip-tracking'];
 }
 
 export function actionButtonsFor(threadId, { hasDraft = false, actions = null, stage = '' } = {}) {

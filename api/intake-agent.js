@@ -12,6 +12,7 @@ import {
   runLauraAgent,
   sendLauraDigest,
   sendMessageById,
+  sweepStalledThreads,
 } from './_lib/laura-agent.js';
 
 function cleanId(value) {
@@ -56,12 +57,10 @@ export default async function handler(req, res) {
       const threadId = cleanId(req.query.thread_id || b.thread_id);
       const applicationId = cleanId(req.query.application_id || b.application_id);
       if (!threadId && !applicationId) return res.status(400).json({ error: 'thread_id or application_id is required' });
-      return res.status(200).json(await runLauraAgent({
-        threadId,
-        applicationId,
-        autoSend: b.auto_send === true || req.query.auto_send === 'true',
-        reason: 'admin',
-      }));
+      // No auto_send override here on purpose: autoSendGate is the only thing
+      // that decides whether mail leaves, so there is one answer rather than
+      // one per caller.
+      return res.status(200).json(await runLauraAgent({ threadId, applicationId, reason: 'admin' }));
     }
 
     if (action === 'approve-send') {
@@ -87,6 +86,13 @@ export default async function handler(req, res) {
 
     if (action === 'run-followups') {
       return res.status(200).json(await runDueFollowUps({ limit: Number(b.limit || 25) }));
+    }
+
+    if (action === 'sweep') {
+      return res.status(200).json(await sweepStalledThreads({
+        limit: Number(b.limit || 15),
+        dryRun: b.dry_run === true || req.query.dry_run === 'true',
+      }));
     }
 
     // Same effects as the buttons in Larry's email, driven from the panel.

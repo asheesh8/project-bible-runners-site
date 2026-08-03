@@ -41,6 +41,11 @@ idempotent and adds:
 - `agent_filing_items`
 - `agent_digests`
 - Laura behavior settings in `site_settings`
+- `deployments.tracking_number` and `intake_threads.tracking_number`
+- `posts.source_application_id` and `posts.auto_created`
+
+**Run it again after pulling the shipping hand-off.** The tracking number and
+write-up columns are new; without them Larry's tracking box saves nothing.
 
 ## Required Vercel env vars
 
@@ -164,6 +169,30 @@ The workflow at `.github/workflows/laura-agent.yml` calls:
 
 - `POST /api/intake-digest` every 6 hours
 
+That endpoint is the whole unattended tick, not just a mailout. In order:
+
+1. **Sweep** — picks up files that lost their next step (below).
+2. **Follow-ups** — runs every chase that has come due.
+3. **Digest** — mails Larry what is waiting on him.
+
+The order matters: the digest he reads reflects the mail that just went out,
+rather than lagging a full cycle behind it.
+
+### Files that lose their next step
+
+Every open file should either have something scheduled or be sitting with a
+human. One with neither has been dropped — the run that created it died before
+it decided anything, or a send failed in a way nothing re-armed. Nothing else in
+the system looks for these, so the sweep does.
+
+It is deliberately narrow: a healthy file always has a follow-up scheduled, so a
+working queue sweeps to nothing. A file is only picked up when it has no next
+step, is not parked with Larry, and Laura has not run on it within
+`LAURA_FOLLOW_UP_DAYS`.
+
+`Find dropped files` in the `Laura Agent` tab does the same thing by hand, and
+shows the list before touching anything.
+
 **Gmail polling is deliberately not on GitHub.** `schedule` is best-effort, and
 GitHub drops high-frequency crons hard — a `*/10` was landing every 45 to 160
 minutes in practice, which is useless for answering someone's email. Polling
@@ -230,6 +259,11 @@ application arrives
      "Yes — I have posted it"
   -> he presses it once the card is actually in the post
   -> deployment filed, applicant told it is on its way
+  -> the deployment is written up as a post, ready for him to publish
+  -> Larry types the tracking number into one box; Laura passes it on
+  -> two weeks later she asks: did it arrive, may we see it, what has it done
+  -> their reply is added to that same write-up in their own words
+  -> answered, or quietly closed after two tries
 ```
 
 **Laura never files a deployment for a card nobody has sent.** She takes it as
@@ -242,11 +276,20 @@ question that has already been answered:
 
 | Button | What happens |
 |---|---|
-| Yes — I have posted it | Files the deployment and emails the applicant that the card is on its way |
+| Yes — I have posted it | Files the deployment, tells the applicant, writes the post, and asks you for the tracking number |
 | File deployment only | Adds it to the log, emails nobody |
 | Ask for more info | Laura goes back to the applicant |
 | Set up a call first | Sends your booking link (needs `LARRY_CAL_BOOKING_URL`) |
 | Hold for now | Pauses it for a week |
+
+Once it is posted, the buttons change again — there is nothing left to approve,
+only the two things Laura cannot supply herself:
+
+| Button | What happens |
+|---|---|
+| Add a tracking number | Opens a page with one box; saves it and emails it to the applicant |
+| Publish the write-up | Puts Laura's write-up of this deployment live on the site |
+| No tracking for this one | Closes the question, emails nobody |
 
 **Reading answers back onto the file is what makes autonomy work.** Applicants
 reply in prose — "my reference is Pastor Mary, mary@example.org" — and every
@@ -269,6 +312,89 @@ LAURA_MAX_NUDGES=3       # then hand to Larry rather than keep chasing
 
 The first is for someone who replies but never answers; the second is for
 someone who goes quiet. Either way the file reaches a human instead of looping.
+
+### After the card is posted
+
+Pressing "Yes — I have posted it" does five things, not one:
+
+1. Files the deployment record.
+2. Tells the applicant their card is on its way.
+3. **Writes the deployment up as a post** from the file (below).
+4. **Emails Larry his own card** asking for the tracking number.
+5. Schedules the arrival check.
+
+```text
+LAURA_ARRIVAL_CHECK_DAYS=14   # post to these places takes weeks, not days
+LAURA_MAX_ARRIVAL_CHECKS=2
+```
+
+The arrival note asks three things and demands none of them: did it reach you,
+may we see a photo, and what have you been able to do with it. It says plainly
+that anything they send may be shared, and that "no" is a complete answer. If it
+never arrived, Laura offers to send another.
+
+When they write back, their reply is appended to the write-up Laura already
+filed for them, under a dated heading and in their own words. That always sets
+the post back to **unpublished** for a read, whatever it was before: those are
+somebody else's words about their own ministry, sometimes naming a village or a
+person, and a human should see them before they go on a public site.
+
+### The tracking number
+
+Larry gets an individual formatted email — the same card as every other file —
+with a button that opens a page holding a single text box. He types the number,
+and Laura passes it straight to the applicant.
+
+**The box cannot live in the email itself.** Gmail, Outlook and Apple Mail all
+strip `<form>` out of a message body, so an input there would look right and
+silently do nothing. One tap gets him to a page that works everywhere, and the
+number is saved to `deployments.tracking_number` so it stays in the CSV export.
+
+"No tracking for this one" closes the question without emailing anybody — plenty
+of post has no number, and the flow must not stall waiting for one that will
+never exist.
+
+### One write-up per shipped applicant
+
+Every applicant who is approved and actually gets something sent gets a post,
+written from their file when the card goes in the post. All the material is
+already there — who they are, where they serve, what language, how many people —
+so nothing is retyped.
+
+This is **not a fundraiser**. No donation link, no goal, no money. It is the
+account of where a card went and what it is for.
+
+One post per applicant, not one per event: when they write back to the arrival
+check, their own words are appended to that same post under a dated heading
+rather than becoming a second fragment. `source_application_id` has a unique
+index, so a file posted twice finds the write-up that already exists.
+
+**It is filed unpublished by default**, and that is a deliberate default rather
+than a limitation. The post names a real person, their church, and the town they
+work in. For some fields that is not information to put on a public site without
+someone looking at it first. Larry gets a one-tap "Publish the write-up" button
+in the same email that asks for the tracking number.
+
+If every applicant you serve is somewhere it is safe to name, make it fully
+hands-free:
+
+```text
+LAURA_AUTO_PUBLISH_POSTS=true
+```
+
+That covers what Laura wrote. It never covers what the applicant wrote — a
+reply appended to a post always sets it back to unpublished for a read, because
+Laura composing a summary from a form and a missionary describing their own work
+are not the same thing.
+
+A card nobody acknowledges is **closed, not escalated**. There is no decision
+left for Larry to make about a card that is already in the post, so after two
+unanswered checks the file closes itself and the deployment record stands.
+
+Once a card is confirmed or posted, the card rules switch off for that file.
+They exist to stop Laura promising equipment that does not exist, and re-running
+them on a finished file is how "thank you, it arrived" gets answered with the
+confirmation letter for a second time.
 
 A card is only confirmed when there is a language *and* a shipping address that
 survives the vague-address check — "downtown, can find me" does not close a
@@ -334,6 +460,14 @@ LAURA_MAX_NUDGES=3             # then hand the file to Larry instead of nagging
 
 Mail to Larry is exempt from the cooldown — it is a notification, not a promise
 to an applicant, and holding it back would defeat the point.
+
+**A held draft never leaves the file claiming it is waiting on the applicant.**
+There are two kinds of hold and they mean opposite things. A *policy* hold —
+draft-only mode, an action that always waits, or something Laura flagged for
+review — needs a person to release it, so the file goes to Larry. A *timing*
+hold, such as the cooldown or a provider outage, just means not yet, so the file
+stays where it is and comes back on its own. Getting this wrong is how a file
+goes quiet with a letter still sitting in the drawer.
 
 The cooldown governs **unprompted** contact only. Once an applicant has written
 back, Laura answers straight away — refusing to reply for a day because she

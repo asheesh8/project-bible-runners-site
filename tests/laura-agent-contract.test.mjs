@@ -1,11 +1,16 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { detectApplicantClarificationNeeds, stripQuotedReply } from '../api/_lib/laura-agent.js';
 import {
-  LARRY_ACTIONS, actionButtonsFor, isKnownAction, signActionToken, verifyActionToken,
+  detectApplicantClarificationNeeds, normalizeDecision, sanitizeExtracted, stripQuotedReply,
+} from '../api/_lib/laura-agent.js';
+import {
+  LARRY_ACTIONS, actionButtonsFor, actionMeta, isKnownAction, postedButtonNames,
+  signActionToken, verifyActionToken,
 } from '../api/_lib/laura-links.js';
-import { escapeHtml, renderActionPage, renderDigestEmail } from '../api/_lib/laura-email.js';
+import {
+  escapeHtml, renderActionPage, renderDigestEmail, renderLarryActionEmail, renderThreadCardHtml,
+} from '../api/_lib/laura-email.js';
 
 function read(path) {
   return readFileSync(new URL(path, import.meta.url), 'utf8');
@@ -31,6 +36,11 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(schema, /create table if not exists public\.agent_digests/);
   assert.match(schema, /laura_auto_send_missing_info/);
   assert.match(schema, /shipping_address text/);
+  // Shipping hand-off and the campaigns Laura drafts from a posted file.
+  assert.match(schema, /alter table public\.deployments add column if not exists tracking_number text/);
+  assert.match(schema, /alter table public\.intake_threads add column if not exists tracking_number text/);
+  assert.match(schema, /alter table public\.posts add column if not exists source_application_id text/);
+  assert.match(schema, /alter table public\.posts add column if not exists auto_created boolean/);
 
   assert.match(core, /runLauraAgent/);
   assert.match(core, /sendLauraDigest/);
@@ -77,6 +87,31 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(agentApi, /run-followups/);
   assert.match(agentApi, /run-all/);
   assert.match(core, /runAllWaitingThreads/);
+
+  // A follow-up clock that nothing reads is the same as no clock. Approve and
+  // schedule-call arm `ready_to_schedule`, Hold arms whatever state the file was
+  // in, and posting a card arms the arrival check — the query has to cover all
+  // of them, not just the two intake states.
+  assert.match(core, /state=in\.\(new,waiting_on_customer,waiting_on_larry,ready_to_schedule,shipped,follow_up_photos\)/);
+  assert.match(core, /hold expired — back in the digest/);
+  assert.match(core, /function bookingNudgeDecision/);
+  // The deployment record promises rollout photos, so something must ask.
+  assert.match(core, /function arrivalCheckDecision/);
+  assert.match(core, /LAURA_ARRIVAL_CHECK_DAYS/);
+  assert.match(core, /next_follow_up_at: daysFromNow\(config\(\)\.arrivalCheckDays\)/);
+  assert.match(core, /closed after arrival checks went unanswered/);
+  // Nothing else looks for a file whose first run died before it decided
+  // anything, so the sweep is the only thing standing between that and silence.
+  assert.match(core, /export async function sweepStalledThreads/);
+  assert.match(core, /next_follow_up_at=is\.null/);
+  assert.match(agentApi, /action === 'sweep'/);
+  assert.match(digestApi, /sweepStalledThreads/);
+  assert.match(admin, /function lauraSweep/);
+  assert.match(admin, /Find dropped files/);
+  // A held draft must not leave the thread claiming it is waiting on someone.
+  assert.match(core, /gate\.kind === 'timing'/);
+  assert.match(core, /inbound_configured/);
+  assert.match(admin, /Laura cannot hear replies yet/);
   // Bulk sending must be able to answer "who would this write to?" first.
   assert.match(core, /dry_run: true, would_contact/);
   assert.match(admin, /function lauraRunAll/);
@@ -251,6 +286,217 @@ test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', ()
   // And it is honest without being a rejection.
   assert.match(core, /this is not a no, it is a not yet for the larger kits/);
   assert.match(core, /Never suggest that a larger kit or funding is coming/);
+});
+
+// A file with nothing missing and nothing contradictory: the state in which
+// Laura is "comfortable with the person" and the card offer is the next move.
+function cleanApplication(extra = {}) {
+  return {
+    id: 'app-1',
+    name: 'Grace Achebe',
+    email: 'grace@example.org',
+    kit_tier: 1,
+    audience_type: 'small_group',
+    country: 'Kenya',
+    region: 'Kisii',
+    reference_name: 'Pastor Mary',
+    reference_contact: 'mary@example.org',
+    sending_org: 'Kisii Community Church',
+    power_internet_access: 'Solar, phone data only',
+    preferred_contact_method: 'email',
+    receiving_plan: 'cover_import_costs',
+    ...extra,
+  };
+}
+
+const THREAD = { id: 'thread-1', thread_token: 'A1B2C3D4', state: 'waiting_on_customer' };
+
+function sentMessage(actionType) {
+  return {
+    role: 'agent', direction: 'outbound', status: 'sent', action_type: actionType,
+    to_email: ['grace@example.org'], created_at: '2026-07-01T00:00:00.000Z', sent_at: '2026-07-01T00:00:00.000Z',
+  };
+}
+
+test('a clean file is scaled down to the card offer, whatever the model proposed', () => {
+  const decision = normalizeDecision(
+    { next_action: 'ask_larry', audience: 'larry', auto_send_ok: true },
+    cleanApplication(), THREAD, [],
+  );
+  assert.equal(decision.next_action, 'offer_sd_card');
+  assert.equal(decision.audience, 'applicant');
+  assert.match(decision.reasoning, /only microSD cards are going out/);
+
+  // The override replaces what she says, never the judgement that a particular
+  // message should not go out unread.
+  const flagged = normalizeDecision(
+    { next_action: 'ask_larry', audience: 'larry', auto_send_ok: false },
+    cleanApplication(), THREAD, [],
+  );
+  assert.equal(flagged.next_action, 'offer_sd_card');
+  assert.equal(flagged.auto_send_ok, false);
+});
+
+test('a card that is already confirmed or posted is never re-offered or re-confirmed', () => {
+  const app = cleanApplication({
+    languages: 'Ekegusii, Swahili',
+    shipping_address: 'Pastor Mary Ondieki, PO Box 1420, Kisii 40200, Kenya, +254 700 000000',
+  });
+
+  // Before confirmation, a complete file does close itself out.
+  const closing = normalizeDecision(
+    { next_action: 'reply_customer', audience: 'applicant', auto_send_ok: true },
+    app, THREAD, [sentMessage('offer_sd_card')],
+  );
+  assert.equal(closing.next_action, 'confirm_card');
+
+  // After it, "thank you, it arrived" must not be answered with the
+  // confirmation letter all over again.
+  const afterConfirm = normalizeDecision(
+    { next_action: 'reply_customer', audience: 'applicant', auto_send_ok: true, draft_body: 'You are very welcome.' },
+    app, THREAD, [sentMessage('offer_sd_card'), sentMessage('confirm_card')],
+  );
+  assert.equal(afterConfirm.next_action, 'reply_customer');
+  assert.equal(afterConfirm.draft_body, 'You are very welcome.');
+
+  // And a posted card is settled by its state alone, whatever the history says.
+  const afterShipping = normalizeDecision(
+    { next_action: 'reply_customer', audience: 'applicant', auto_send_ok: true, draft_body: 'Glad it reached you.' },
+    app, { ...THREAD, state: 'shipped' }, [sentMessage('offer_sd_card')],
+  );
+  assert.equal(afterShipping.next_action, 'reply_customer');
+});
+
+test('Laura may transcribe what an applicant said, never who they are or how they were rated', () => {
+  const clean = sanitizeExtracted({
+    languages: 'Bemba, English',
+    shipping_address: 'Box 12, Ndola, Zambia',
+    kit_tier: 'tier 3',
+    // None of these are hers to write.
+    status: 'approved',
+    email: 'attacker@example.com',
+    name: 'Someone Else',
+    triage_score: 3,
+    id: 'other-application',
+    // Nor is a placeholder the model echoed back at her.
+    reference_name: 'unknown',
+  });
+
+  assert.deepEqual(clean, {
+    languages: 'Bemba, English',
+    shipping_address: 'Box 12, Ndola, Zambia',
+    kit_tier: 3,
+  });
+  assert.deepEqual(sanitizeExtracted(null), {});
+});
+
+test('the tracking page collects exactly the fields the endpoint reads back', () => {
+  process.env.LAURA_ACTION_SECRET = 'contract-test-secret';
+  const meta = actionMeta('add-tracking');
+
+  // Mail clients strip <form>, so the box has to live on the page the button
+  // opens. If that page and the endpoint ever disagree on the field name,
+  // Larry's typing is silently dropped and he is still told it worked.
+  const page = renderActionPage({
+    title: meta.label,
+    message: meta.blurb,
+    tone: meta.tone,
+    confirm: { url: '/api/laura-action?token=abc', label: meta.label, inputs: meta.inputs },
+  });
+  assert.match(page, /method="POST"/);
+  assert.match(page, /name="value"/);
+  assert.match(page, /required/);
+  assert.match(page, /Tracking or order number/);
+
+  // Every field any action asks for has to be one the endpoint actually reads.
+  const endpoint = read('../api/laura-action.js');
+  assert.match(endpoint, /value: body\.value/);
+  const asked = Object.values(LARRY_ACTIONS)
+    .flatMap((entry) => entry.inputs || [])
+    .map((field) => field.name);
+  assert.deepEqual([...new Set(asked)].sort(), ['value']);
+
+  // A GET must never carry an action that writes, so both stay behind confirm.
+  assert.equal(LARRY_ACTIONS['add-tracking'].confirm, true);
+  assert.equal(LARRY_ACTIONS['publish-post'].confirm, true);
+  delete process.env.LAURA_ACTION_SECRET;
+});
+
+test('a posted card asks for the two things only Larry can supply', () => {
+  process.env.LAURA_ACTION_SECRET = 'contract-test-secret';
+  const core = read('../api/_lib/laura-agent.js');
+
+  assert.deepEqual(postedButtonNames(), ['add-tracking', 'publish-post', 'skip-tracking']);
+  const buttons = actionButtonsFor('11111111-2222-3333-4444-555555555555', { actions: postedButtonNames() });
+  assert.equal(buttons.length, 3);
+  buttons.forEach((button) => assert.match(button.url, /laura-action\?token=/));
+
+  // Posting a card files the write-up and asks for the number.
+  assert.match(core, /function notifyLarryPosted/);
+  assert.match(core, /export async function ensurePostForThread/);
+  // The address block is built for the posting stages only, and the intro no
+  // longer repeats it — one place to read it from, no chance of disagreement.
+  assert.match(core, /function shipToFor/);
+  assert.match(core, /ADDRESSABLE_STAGES/);
+  assert.match(core, /shipTo: shipToFor\(app, stage, thread\)/);
+  assert.doesNotMatch(core, /`Send to: \$\{trim\(app\.shipping_address/);
+  assert.match(core, /action === 'add-tracking'/);
+  assert.match(core, /action === 'skip-tracking'/);
+  assert.match(core, /action === 'publish-post'/);
+  // The number reaches both the export and the applicant.
+  assert.match(core, /tracking_number: tracking/);
+  assert.match(core, /action_type: 'tracking_number'/);
+  // One write-up per applicant, not a fundraiser: no donation link, no goal.
+  assert.match(core, /function postDraftFrom/);
+  assert.match(core, /auto_created: true/);
+  assert.doesNotMatch(core, /zeffy/i);
+  assert.doesNotMatch(core, /goal_amount/);
+  // It stays unpublished unless the site is explicitly told otherwise, because
+  // it names a real person and where they are.
+  assert.match(core, /LAURA_AUTO_PUBLISH_POSTS/);
+  // Their own reply is folded into that same post, and never auto-published.
+  assert.match(core, /function appendReplyToWriteUp/);
+  assert.match(core, /published: false/);
+  delete process.env.LAURA_ACTION_SECRET;
+});
+
+test('the address Larry posts to keeps the line breaks the applicant typed', () => {
+  const address = 'Pastor Mary Ondieki\nKisii Community Church\nPO Box 1420\nKisii 40200\nKenya';
+  const html = renderThreadCardHtml({
+    applicantName: 'Grace Achebe',
+    headline: 'Ready for you to post a card.',
+    shipTo: { label: 'Post to', address, rows: [['Card language', 'Ekegusii, Swahili']] },
+    facts: [['Where', 'Kisii, Kenya']],
+    buttons: [],
+  });
+
+  // Reflowing someone's address into a paragraph is how a parcel goes astray,
+  // so the block must preserve whitespace rather than collapse it.
+  assert.match(html, /Post to/);
+  assert.match(html, /white-space:pre-wrap/);
+  assert.match(html, /PO Box 1420\nKisii 40200/);
+  assert.match(html, /Card language/);
+
+  // It sits above the facts — when a file is ready to post, the address is the
+  // message and everything else is context.
+  assert.ok(html.indexOf('Post to') < html.indexOf('Where'));
+
+  // A file with no address renders no empty block.
+  assert.doesNotMatch(renderThreadCardHtml({ applicantName: 'Grace', facts: [], buttons: [] }), /Post to/);
+});
+
+test('Larry’s intro keeps its line breaks and numbered steps', () => {
+  // Escaping the intro into one <p> collapsed every newline, which ran an
+  // address and an instruction together on the same line.
+  const email = renderLarryActionEmail({
+    agentName: 'Laura',
+    intro: 'Two things left:\n\n1. The tracking number.\n2. The campaign link.\n\nThat is all.',
+    item: { applicantName: 'Grace Achebe', facts: [], buttons: [] },
+  });
+  assert.match(email.html, /<ol/);
+  assert.match(email.html, /<li[^>]*>The tracking number\.<\/li>/);
+  assert.match(email.html, /<li[^>]*>The campaign link\.<\/li>/);
+  assert.doesNotMatch(email.html, /1\. The tracking number\.\s*2\. The campaign link\./);
 });
 
 test('quoted history is trimmed off inbound replies', () => {

@@ -1209,6 +1209,7 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
             <button class="btn-save" type="button" onclick="lauraSendDigest(this)">Send Larry digest</button>
             <button class="btn-save" type="button" onclick="lauraRunAll(this)">Run all waiting</button>
             <button class="btn-save" type="button" onclick="lauraRunFollowUps(this)">Run follow-ups</button>
+            <button class="btn-save" type="button" onclick="lauraSweep(this)">Find dropped files</button>
             <button class="btn-save" type="button" onclick="lauraPollGmail(this)">Poll Gmail</button>
           </div>
         </div>
@@ -1999,10 +2000,18 @@ function renderLauraHealth(h){
       '</div>'+
       '<div class="laura-autonomy-note">'+esc(autonomyText)+'</div>'+
       '<div class="laura-autonomy-limits">'+
-        '<span>One email per applicant per <strong>'+esc(String(h.cooldown_hours||24))+'h</strong></span>'+
+        '<span>One unprompted email per applicant per <strong>'+esc(String(h.cooldown_hours||24))+'h</strong></span>'+
         '<span>Chases after <strong>'+esc(String(h.follow_up_days||4))+' days</strong> of silence</span>'+
         '<span>Stops after <strong>'+esc(String(h.max_nudges||3))+'</strong> nudges</span>'+
+        '<span>Hands over after <strong>'+esc(String(h.max_ask_rounds||3))+'</strong> rounds of asking</span>'+
+        '<span>Checks a posted card arrived after <strong>'+esc(String(h.arrival_check_days||21))+' days</strong></span>'+
       '</div>'+
+      (h.inbound_configured ? '' :
+        '<div class="laura-autonomy-note" style="color:#9a6700">'+
+        '<strong>Laura cannot hear replies yet.</strong> Until Gmail is connected she still writes, '+
+        'but silence is ambiguous, so files go to you instead of being chased — and a posted card '+
+        'is never checked on. Connect Gmail below to close the loop.'+
+        '</div>')+
     '</div>'+
     '<div class="laura-oauth-note">'+
       '<strong>OAuth:</strong> '+esc(oauthText)+'<br>'+
@@ -2819,6 +2828,30 @@ function lauraRunFollowUps(button){
       : 'No follow-ups are due right now.','ok');
     loadLauraAgent();
   }).catch(function(err){ showStatus(err.message||'Could not run follow-ups.','err'); })
+    .then(function(){ done(); });
+}
+
+// Same two-step shape as "Run all waiting": look first, then act. These are
+// files nothing else is going to pick up, so it is worth seeing the list.
+function lauraSweep(button){
+  var done = lauraSetButton(button,'Looking...');
+  lauraApi('POST','sweep',{limit:15,dry_run:true}).then(function(data){
+    var list = data.stalled || [];
+    if(!list.length){
+      showStatus('Nothing has been dropped — every open file has a next step scheduled.','ok');
+      return null;
+    }
+    var names = list.slice(0,12).map(function(x){ return '  • '+x.name+'  ('+x.reason+')'; }).join('\n');
+    var more = list.length > 12 ? '\n  …and '+(list.length-12)+' more' : '';
+    if(!confirm(list.length+' '+(list.length===1?'file has':'files have')+' no next step:\n\n'+names+more+'\n\nRun Laura on them now? She may email these people.')) return null;
+    done('Find dropped files');
+    var again = lauraSetButton(button,'Running...');
+    return lauraApi('POST','sweep',{limit:15}).then(function(res){
+      var results = res.results || [];
+      showStatus('Picked up '+results.length+' — '+results.filter(function(r){ return r.sent; }).length+' emailed, the rest drafted or held.','ok');
+      loadLauraAgent();
+    }).then(function(){ again(); });
+  }).catch(function(err){ showStatus(err.message||'Could not sweep.','err'); })
     .then(function(){ done(); });
 }
 

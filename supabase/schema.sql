@@ -681,6 +681,25 @@ revoke all on public.intake_messages from anon, authenticated;
 revoke all on public.agent_filing_items from anon, authenticated;
 revoke all on public.agent_digests from anon, authenticated;
 
+-- ── Shipping and write-up hand-off ─────────────────────────────────
+-- Larry types the tracking number into a signed page; Laura stores it in both
+-- places she needs it — on the deployment record for the export, and on the
+-- thread so she can quote it back to the applicant without a join.
+alter table public.deployments add column if not exists tracking_number text;
+alter table public.intake_threads add column if not exists tracking_number text;
+
+-- One post per applicant who is approved and actually gets something shipped.
+-- Laura writes it from the file when the card is posted and adds their own
+-- words to it when they write back, so a deployment ends as a story rather than
+-- a row in a log. `auto_created` marks the ones she wrote, and
+-- `source_application_id` is plain text on purpose: equipment_applications.id is
+-- bigint on older databases and uuid on fresh ones, and this link is never
+-- joined in SQL.
+alter table public.posts add column if not exists source_application_id text;
+alter table public.posts add column if not exists auto_created boolean not null default false;
+create unique index if not exists posts_source_application_idx
+  on public.posts (source_application_id) where source_application_id is not null;
+
 -- Agent behavior toggles. Values are read server-side via service role; keep
 -- secrets such as API keys and OAuth refresh tokens in Vercel env vars, not here.
 insert into public.site_settings (key, value)
