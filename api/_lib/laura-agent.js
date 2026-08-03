@@ -576,6 +576,24 @@ function hasOfferedSdCard(messages) {
   return asArray(messages).some((m) => m.action_type === 'offer_sd_card' && m.status === 'sent');
 }
 
+// Did they actually take up the offer? The offer asks them to reply if a card
+// would help, so silence is not a yes.
+//
+// This matters because plenty of applications already carry a language and an
+// address from the original form. Without this check, hasCardDetails is true
+// the moment the offer goes out, and the next run thanks somebody for details
+// they never sent and books them a card they never asked for.
+function acceptedTheOffer(messages) {
+  const offers = asArray(messages)
+    .filter((m) => m.action_type === 'offer_sd_card' && m.status === 'sent')
+    .map((m) => new Date(m.sent_at || m.created_at).getTime())
+    .filter((t) => Number.isFinite(t));
+  if (!offers.length) return false;
+  const firstOffer = Math.min(...offers);
+  return asArray(messages).some((m) => m.role === 'applicant' && m.direction === 'inbound'
+    && new Date(m.created_at).getTime() > firstOffer);
+}
+
 // "Comfortable with the person": nothing in the form contradicts itself and
 // nothing important is missing. Language and shipping are deliberately not
 // blocking — the offer itself is what asks for those two.
@@ -763,8 +781,8 @@ function fallbackDecision(app, thread, messages) {
   const settled = POST_SHIPPING_STATES.has(String(thread && thread.state || ''))
     || sentActionCount(messages, 'confirm_card') > 0;
 
-  // Everything a card needs is on file — close it out.
-  if (cardsOnly && !settled && offered && hasCardDetails(app)) {
+  // They took up the offer and everything a card needs is on file — close it out.
+  if (cardsOnly && !settled && acceptedTheOffer(messages) && hasCardDetails(app)) {
     return cardConfirmationDecision(app, thread);
   }
 
@@ -915,7 +933,7 @@ export function normalizeDecision(decision, app, thread, messages) {
   const settled = POST_SHIPPING_STATES.has(String(thread && thread.state || ''))
     || sentActionCount(messages, 'confirm_card') > 0;
   if (offerMode() === 'sd_card_only' && supersedable && !settled) {
-    if (hasOfferedSdCard(messages) && hasCardDetails(app)) {
+    if (acceptedTheOffer(messages) && hasCardDetails(app)) {
       const forced = cardConfirmationDecision(app, thread);
       return {
         ...forced,
@@ -1548,7 +1566,11 @@ export async function listLauraThreads({ includeMessages = false, limit = 80 } =
   if (!includeMessages || !threads.length) return { threads, messages: [], filing_items: [] };
   const threadIds = threads.map((t) => t.id);
   const applicationIds = new Set(threads.map((t) => String(t.application_id || '')).filter(Boolean));
-  const messages = await selectRows(`intake_messages?select=*&order=created_at.asc&limit=500`);
+  // Newest first, not oldest. Ascending order meant that once the mailbox
+  // passed 500 messages the panel would keep showing the first 500 ever sent
+  // and quietly stop showing anything recent. The client sorts each thread
+  // back into order before rendering it.
+  const messages = await selectRows(`intake_messages?select=*&order=created_at.desc&limit=1500`);
   const filingItems = await selectRows(`agent_filing_items?select=*&order=created_at.desc&limit=300`);
   const applications = await selectRows('equipment_applications?select=*&order=created_at.desc&limit=300').catch(() => []);
   const deployments = await selectRows('deployments?select=*&order=created_at.desc&limit=300').catch(() => []);

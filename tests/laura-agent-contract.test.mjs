@@ -311,11 +311,15 @@ function cleanApplication(extra = {}) {
 
 const THREAD = { id: 'thread-1', thread_token: 'A1B2C3D4', state: 'waiting_on_customer' };
 
-function sentMessage(actionType) {
+function sentMessage(actionType, at = '2026-07-01T00:00:00.000Z') {
   return {
     role: 'agent', direction: 'outbound', status: 'sent', action_type: actionType,
-    to_email: ['grace@example.org'], created_at: '2026-07-01T00:00:00.000Z', sent_at: '2026-07-01T00:00:00.000Z',
+    to_email: ['grace@example.org'], created_at: at, sent_at: at,
   };
+}
+
+function replyMessage(at = '2026-07-02T00:00:00.000Z') {
+  return { role: 'applicant', direction: 'inbound', status: 'received', body: 'Yes please!', created_at: at };
 }
 
 test('a clean file is scaled down to the card offer, whatever the model proposed', () => {
@@ -343,10 +347,10 @@ test('a card that is already confirmed or posted is never re-offered or re-confi
     shipping_address: 'Pastor Mary Ondieki, PO Box 1420, Kisii 40200, Kenya, +254 700 000000',
   });
 
-  // Before confirmation, a complete file does close itself out.
+  // Once they have taken up the offer, a complete file closes itself out.
   const closing = normalizeDecision(
     { next_action: 'reply_customer', audience: 'applicant', auto_send_ok: true },
-    app, THREAD, [sentMessage('offer_sd_card')],
+    app, THREAD, [sentMessage('offer_sd_card'), replyMessage()],
   );
   assert.equal(closing.next_action, 'confirm_card');
 
@@ -354,7 +358,7 @@ test('a card that is already confirmed or posted is never re-offered or re-confi
   // confirmation letter all over again.
   const afterConfirm = normalizeDecision(
     { next_action: 'reply_customer', audience: 'applicant', auto_send_ok: true, draft_body: 'You are very welcome.' },
-    app, THREAD, [sentMessage('offer_sd_card'), sentMessage('confirm_card')],
+    app, THREAD, [sentMessage('offer_sd_card'), replyMessage(), sentMessage('confirm_card')],
   );
   assert.equal(afterConfirm.next_action, 'reply_customer');
   assert.equal(afterConfirm.draft_body, 'You are very welcome.');
@@ -362,9 +366,42 @@ test('a card that is already confirmed or posted is never re-offered or re-confi
   // And a posted card is settled by its state alone, whatever the history says.
   const afterShipping = normalizeDecision(
     { next_action: 'reply_customer', audience: 'applicant', auto_send_ok: true, draft_body: 'Glad it reached you.' },
-    app, { ...THREAD, state: 'shipped' }, [sentMessage('offer_sd_card')],
+    app, { ...THREAD, state: 'shipped' }, [sentMessage('offer_sd_card'), replyMessage()],
   );
   assert.equal(afterShipping.next_action, 'reply_customer');
+});
+
+test('silence is not an acceptance of the card offer', () => {
+  // Plenty of applications already carry a language and an address from the
+  // original form. Laura must not read her own offer plus the form they filled
+  // in weeks ago as an answer — that thanks somebody for details they never
+  // sent and books them a card they never asked for.
+  const app = cleanApplication({
+    languages: 'Lusoga',
+    shipping_address: 'Kigambo Samuel, +256706260398, Uganda, Jinja district',
+  });
+
+  const noReply = normalizeDecision(
+    { next_action: 'ask_customer', audience: 'applicant', auto_send_ok: true, draft_body: 'Just checking in.' },
+    app, THREAD, [sentMessage('offer_sd_card')],
+  );
+  assert.notEqual(noReply.next_action, 'confirm_card');
+  assert.equal(noReply.draft_body, 'Just checking in.');
+
+  // A reply that lands *before* the offer is not an answer to it either.
+  const staleReply = normalizeDecision(
+    { next_action: 'ask_customer', audience: 'applicant', auto_send_ok: true, draft_body: 'Just checking in.' },
+    app, THREAD,
+    [replyMessage('2026-06-01T00:00:00.000Z'), sentMessage('offer_sd_card', '2026-07-01T00:00:00.000Z')],
+  );
+  assert.notEqual(staleReply.next_action, 'confirm_card');
+
+  // But a reply after it is.
+  const answered = normalizeDecision(
+    { next_action: 'ask_customer', audience: 'applicant', auto_send_ok: true },
+    app, THREAD, [sentMessage('offer_sd_card'), replyMessage()],
+  );
+  assert.equal(answered.next_action, 'confirm_card');
 });
 
 test('Laura may transcribe what an applicant said, never who they are or how they were rated', () => {

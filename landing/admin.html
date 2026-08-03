@@ -1853,7 +1853,9 @@ function showStatus(msg, level){
   setTimeout(function(){ el.style.display = 'none'; }, 5000);
 }
 
-function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
+// `s || ''` swallowed the number zero, so a file with no replies rendered a
+// bare " replies" with the count missing. Only null and undefined are blank.
+function esc(s){ return String(s===null||s===undefined?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
 function fmtDate(d){
   if(!d) return '—';
   // Date-only strings must not shift a day across time zones
