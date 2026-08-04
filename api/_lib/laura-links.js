@@ -93,6 +93,17 @@ export const LARRY_ACTIONS = {
     tone: 'go',
     blurb: 'Puts Laura’s write-up of this deployment live on the site.',
   },
+
+  // Read-only. Opening this changes nothing on the file, which is why it is the
+  // one action safe to reach from a bare GET — a link scanner can follow it all
+  // day and the worst that happens is a page renders.
+  'order-form': {
+    label: 'Order form for Digital Bible Society',
+    confirm: false,
+    view: true,
+    tone: 'neutral',
+    blurb: 'Opens the printable order to send to Digital Bible Society.',
+  },
   'schedule-call': {
     label: 'Set up a call first',
     confirm: true,
@@ -213,8 +224,11 @@ export function adminFileUrl(threadId) {
 
 // Every button Larry should see for a thread, already signed. `hasDraft` swaps
 // the generic approve button for "send this exact draft".
+// The order form leads, because nothing can ship until it has been sent on.
+// No call booking here — a file at this stage is past the point of a chat, and
+// Cal.com is not set up.
 export function shippingButtonNames() {
-  return ['mark-shipped', 'file-deployment', 'more-info', 'schedule-call', 'hold'];
+  return ['order-form', 'mark-shipped', 'file-deployment', 'more-info', 'hold'];
 }
 
 // Once the card is in the post there is nothing left to approve. The only open

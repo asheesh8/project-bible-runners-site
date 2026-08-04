@@ -276,11 +276,41 @@ question that has already been answered:
 
 | Button | What happens |
 |---|---|
+| Order form for Digital Bible Society | Opens the printable order (below). Changes nothing |
 | Yes — I have posted it | Files the deployment, tells the applicant, writes the post, and asks you for the tracking number |
 | File deployment only | Adds it to the log, emails nobody |
 | Ask for more info | Laura goes back to the applicant |
-| Set up a call first | Sends your booking link (needs `LARRY_CAL_BOOKING_URL`) |
 | Hold for now | Pauses it for a week |
+
+There is no call-booking button at this stage — a file that is ready to post is
+past the point of a conversation.
+
+### The order for Digital Bible Society
+
+Nothing physical happens until this leaves Larry's hands, so Laura assembles it
+the moment a file is ready rather than making him copy a name, an address and a
+language out of three places. The button opens a printable page carrying the
+order reference, the supplier, the delivery address as an envelope, the item and
+its language, and the deployment context. Print it or save it as a PDF and send
+it on; there is also a **Copy as text** button for pasting into an email.
+
+```text
+DBS_NAME=Digital Bible Society    # optional, only if the supplier is renamed
+DBS_EMAIL=orders@example.org      # optional, printed on the order
+```
+
+**The amount is deliberately blank.** The system holds no price list, so a figure
+Laura printed would be a guess. The amount and total are editable in the browser
+— type them in before printing.
+
+**It is not an invoice.** Digital Bible Society invoices you; this is the order
+you place with them. It is also the only action reachable from a bare `GET`,
+because opening it changes nothing on the file — which is what makes it safe for
+the link scanners that follow everything in an inbox.
+
+Then the loop closes as normal: DBS ships and gives you a tracking number, you
+enter it with **Add a tracking number**, and Laura sends it straight on to the
+applicant.
 
 Once it is posted, the buttons change again — there is nothing left to approve,
 only the two things Laura cannot supply herself:

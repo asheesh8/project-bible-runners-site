@@ -1544,7 +1544,9 @@ async function notifyLarryReadyToShip(thread, app) {
     body: [
       `${app.name || 'An applicant'} has confirmed everything for a card, and the address to post it to is below.`,
       '',
-      `Nothing is filed yet — when you have actually posted it, use the button below and I will file the deployment, tell them it is on the way, and come back to you for the tracking number.`,
+      `The order form for ${env('DBS_NAME', 'Digital Bible Society')} is ready — open it from the button, fill in the amount, and print or save it as a PDF to send on. Everything on it comes off this file, so there is nothing to retype.`,
+      '',
+      `Nothing is filed yet. Once it has actually gone out, use "Yes — I have posted it" and I will file the deployment, tell them it is on the way, and come back to you for the tracking number to pass on.`,
     ].join('\n'),
     from_email: c.agentEmail,
     to_email: [normalizeEmail(c.larryEmail)],
@@ -2983,6 +2985,75 @@ export async function pollGmailInbox({ limit = 10, autoRun = true } = {}) {
     results.push({ message_id: message && message.id, thread_id: thread && thread.id, matched: !!thread, from: parsed.from_email });
   }
   return { ok: true, configured: true, processed, results };
+}
+
+// ── The order Larry sends to Digital Bible Society ──────────────────────
+//
+// Nothing physical happens until this leaves Larry's hands, so Laura assembles
+// it the moment a file is ready rather than making him copy a name, an address
+// and a language out of three different places.
+//
+// It is read-only and it is not an invoice: Digital Bible Society invoices us,
+// we order from them. The amount is left blank on purpose — the system holds no
+// price list, and printing a number Laura guessed at would be worse than a gap.
+
+export async function buildOrderForm(threadId) {
+  const thread = await loadThreadBy({ threadId });
+  if (!thread) throw new Error('Thread not found.');
+  const app = await loadApplication(thread.application_id);
+  if (!app) throw new Error('Application not found.');
+
+  const c = config();
+  const posted = formatPostalAddress(app.shipping_address);
+  const check = assessShippingAddress(app.shipping_address, { country: app.country });
+  const language = trim(app.languages, 200);
+
+  // The first address line is normally the recipient's own name, and that is the
+  // name that belongs at the top of a label — but only once. Where the parcel is
+  // going to somebody other than the applicant, both matter, so the applicant is
+  // named separately instead of being silently dropped.
+  const applicantName = trim(app.name, 160);
+  const labelName = trim(posted.lines[0], 160) || applicantName || 'Applicant';
+  const addressLines = posted.lines.length
+    ? posted.lines.slice(1)
+    : [trim(app.shipping_address, 400)].filter(Boolean);
+  const sameRecipient = labelName.toLowerCase() === applicantName.toLowerCase();
+
+  return {
+    reference: `VS-${thread.thread_token}`,
+    raisedOn: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+    supplier: {
+      name: env('DBS_NAME', 'Digital Bible Society'),
+      email: env('DBS_EMAIL'),
+    },
+    orderedBy: {
+      name: 'VillageServer Initiative',
+      contact: c.larryEmail,
+    },
+    shipTo: {
+      name: labelName,
+      lines: addressLines,
+      phone: posted.phone || [app.phone_country_code, app.phone].filter(Boolean).join(' '),
+      country: trim(app.country, 120),
+      warning: check.ok ? '' : `Address not verified — needs ${check.say.join('; ')}.`,
+    },
+    items: [{
+      description: 'microSD card, offline library preloaded',
+      language: language || 'NOT SPECIFIED',
+      quantity: 1,
+    }],
+    context: [
+      // Only worth stating when the parcel is addressed to somebody else.
+      ['Applicant', sameRecipient ? '' : applicantName],
+      ['Organization', trim(app.organization, 160)],
+      ['Role', trim(app.role, 120)],
+      ['Region', [app.region, app.country].filter(Boolean).join(', ')],
+      ['People reached', trim(app.current_reach, 80)],
+      ['Originally requested', kitLabel(app)],
+      ['Funding the applicant asked for', trim(app.funding_needed, 200)],
+    ].filter((row) => row[1]),
+    adminUrl: adminFileUrl(thread.id),
+  };
 }
 
 // ── The write-up Laura files for every shipped applicant ────────────────

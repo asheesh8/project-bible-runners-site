@@ -7,10 +7,11 @@ import {
 } from '../api/_lib/laura-agent.js';
 import {
   LARRY_ACTIONS, actionButtonsFor, actionMeta, isKnownAction, postedButtonNames,
-  signActionToken, verifyActionToken,
+  shippingButtonNames, signActionToken, verifyActionToken,
 } from '../api/_lib/laura-links.js';
 import {
-  escapeHtml, renderActionPage, renderDigestEmail, renderLarryActionEmail, renderThreadCardHtml,
+  escapeHtml, renderActionPage, renderDigestEmail, renderLarryActionEmail,
+  renderOrderForm, renderThreadCardHtml,
 } from '../api/_lib/laura-email.js';
 
 function read(path) {
@@ -441,6 +442,47 @@ test('an address that will not ship is queried, not confirmed', () => {
     THREAD, history,
   );
   assert.equal(fixed.next_action, 'confirm_card');
+});
+
+test('the order for Digital Bible Society is read-only and prints clean', () => {
+  process.env.LAURA_ACTION_SECRET = 'contract-test-secret';
+
+  // Nothing ships until this is sent on, so it leads the shipping buttons.
+  // No call booking on a file at this stage — Cal.com is not set up.
+  assert.deepEqual(shippingButtonNames(),
+    ['order-form', 'mark-shipped', 'file-deployment', 'more-info', 'hold']);
+  assert.equal(LARRY_ACTIONS['order-form'].view, true);
+  assert.equal(LARRY_ACTIONS['order-form'].confirm, false);
+
+  // The endpoint must render it before it can reach anything that mutates —
+  // this is the one action a bare GET may perform.
+  const endpoint = read('../api/laura-action.js');
+  assert.match(endpoint, /if \(meta\.view\)/);
+  assert.ok(endpoint.indexOf('if (meta.view)') < endpoint.indexOf('performLarryAction(threadId, action'));
+
+  const html = renderOrderForm({
+    reference: 'VS-A1B2C3D4',
+    raisedOn: '3 August 2026',
+    supplier: { name: 'Digital Bible Society' },
+    orderedBy: { name: 'VillageServer Initiative', contact: 'larry@example.org' },
+    shipTo: { name: 'Pastor Mary Ondieki', lines: ['Nawantale village', 'Kamuli district', 'Uganda'], phone: '+256706260398' },
+    items: [{ description: 'microSD card, offline library preloaded', language: 'Lusoga', quantity: 1 }],
+    context: [['Organization', 'Nawantale Community Church']],
+  });
+
+  assert.match(html, /Order VS-A1B2C3D4/);
+  assert.match(html, /Digital Bible Society/);
+  assert.match(html, /Nawantale village/);
+  assert.match(html, /Lusoga/);
+  assert.match(html, /\+256706260398/);
+  // The recipient is named once, not twice.
+  assert.equal((html.match(/Pastor Mary Ondieki/g) || []).length, 1);
+  // The screen furniture comes off at print time.
+  assert.match(html, /@media print/);
+  assert.match(html, /\.bar,\.hint\{display:none !important\}/);
+  // No price list exists, so no figure is invented — Larry fills it in.
+  assert.match(html, /contenteditable="true"/);
+  assert.doesNotMatch(html, /\$\s?\d/);
 });
 
 test('a comma run becomes an envelope Larry can copy', () => {

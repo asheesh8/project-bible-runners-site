@@ -302,6 +302,147 @@ export function renderDigestEmail({ agentName = 'Laura', stamp = '', items = [],
   };
 }
 
+// ── The order Larry prints and sends to Digital Bible Society ───────────
+//
+// A document, not an email — so it is laid out for A4 and for a browser's
+// "save as PDF", with the screen furniture stripped out at print time.
+//
+// The amount fields are editable in the browser and print whatever Larry typed.
+// There is no price list in the system, so a filled-in figure would be a guess;
+// a blank line he completes is honest and takes two seconds.
+
+export function renderOrderForm(order = {}) {
+  const {
+    reference = '', raisedOn = '', supplier = {}, orderedBy = {},
+    shipTo = {}, items = [], context = [], adminUrl = '',
+  } = order;
+
+  const addressLines = (shipTo.lines || []).map((line) => escapeHtml(line)).join('<br>');
+  const rows = items.map((item) => `<tr>
+    <td style="padding:12px 10px;border-bottom:1px solid ${PALETTE.border}">
+      <strong style="display:block;color:${PALETTE.text}">${escapeHtml(item.description)}</strong>
+      <span style="font-size:13px;color:${PALETTE.muted}">Language: ${escapeHtml(item.language)}</span>
+    </td>
+    <td style="padding:12px 10px;border-bottom:1px solid ${PALETTE.border};text-align:center;font-variant-numeric:tabular-nums">${escapeHtml(item.quantity)}</td>
+    <td style="padding:12px 10px;border-bottom:1px solid ${PALETTE.border};text-align:right">
+      <span class="fill" contenteditable="true" role="textbox" aria-label="Amount for ${escapeHtml(item.description)}">&nbsp;</span>
+    </td>
+  </tr>`).join('');
+
+  const contextRows = context.map(([label, value]) => `<tr>
+    <td style="padding:5px 14px 5px 0;color:${PALETTE.muted};white-space:nowrap;vertical-align:top">${escapeHtml(label)}</td>
+    <td style="padding:5px 0;color:${PALETTE.text}">${escapeHtml(value)}</td>
+  </tr>`).join('');
+
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Order ${escapeHtml(reference)} — ${escapeHtml(supplier.name || 'Digital Bible Society')}</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:${PALETTE.wash};font-family:${FONT};color:${PALETTE.text};line-height:1.55}
+  .sheet{max-width:760px;margin:0 auto;padding:34px 20px 60px}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+  .bar button{border:1px solid ${PALETTE.border};background:#fff;color:${PALETTE.text};
+    border-radius:9px;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer}
+  .bar button.primary{background:${PALETTE.go};border-color:${PALETTE.go};color:#fff}
+  .bar a{align-self:center;font-size:13px;font-weight:700;color:${PALETTE.muted}}
+  .hint{font-size:13px;color:${PALETTE.faint};margin:0 0 20px}
+  .paper{background:#fff;border:1px solid ${PALETTE.border};border-radius:12px;padding:38px 40px}
+  h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+  .sub{font-size:14px;color:${PALETTE.muted};margin:0 0 28px}
+  .grid{display:flex;flex-wrap:wrap;gap:28px;margin-bottom:28px}
+  .grid > div{flex:1 1 200px;min-width:0}
+  .lbl{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+    color:${PALETTE.muted};margin-bottom:7px}
+  .addr{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;line-height:1.6}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:${PALETTE.muted};text-align:left;padding:0 10px 8px;border-bottom:2px solid ${PALETTE.text}}
+  thead th.num{text-align:center} thead th.amt{text-align:right}
+  .fill{display:inline-block;min-width:110px;border-bottom:1px solid ${PALETTE.border};
+    padding:2px 4px;text-align:right;font-variant-numeric:tabular-nums;outline:none}
+  .fill:focus{border-bottom-color:${PALETTE.go};background:${PALETTE.wash}}
+  .total{display:flex;justify-content:flex-end;align-items:baseline;gap:16px;
+    margin-top:18px;padding-top:14px;border-top:2px solid ${PALETTE.text};font-weight:800}
+  .warn{background:${PALETTE.warnBg};border:1px solid ${PALETTE.warnBorder};color:${PALETTE.warn};
+    border-radius:8px;padding:11px 13px;font-size:13px;margin-bottom:20px}
+  .ctx{margin-top:30px;padding-top:20px;border-top:1px solid ${PALETTE.border};font-size:13px}
+  .ctx table{font-size:13px}
+  .sig{margin-top:34px;padding-top:22px;border-top:1px solid ${PALETTE.border};
+    display:flex;gap:32px;flex-wrap:wrap;font-size:13px;color:${PALETTE.muted}}
+  .sig > div{flex:1 1 200px}
+  .sigline{margin-top:26px;border-bottom:1px solid ${PALETTE.text}}
+  @media print{
+    body{background:#fff}
+    .bar,.hint{display:none !important}
+    .sheet{max-width:none;padding:0}
+    .paper{border:0;border-radius:0;padding:0}
+    .fill{border-bottom:1px solid #999}
+    @page{margin:16mm}
+  }
+</style></head>
+<body>
+<div class="sheet">
+  <div class="bar">
+    <button type="button" class="primary" onclick="window.print()">Print or save as PDF</button>
+    <button type="button" onclick="copyOrder(this)">Copy as text</button>
+    ${adminUrl ? `<a href="${escapeHtml(adminUrl)}">Open the full file</a>` : ''}
+  </div>
+  <p class="hint">Fill in the amounts, then print or save as PDF and send it to ${escapeHtml(supplier.name || 'Digital Bible Society')}. Nothing here changes the file.</p>
+
+  <div class="paper" id="order">
+    <h1>Order ${escapeHtml(reference)}</h1>
+    <p class="sub">Raised ${escapeHtml(raisedOn)} &middot; VillageServer Initiative</p>
+
+    ${shipTo.warning ? `<div class="warn"><strong>Check this before sending.</strong> ${escapeHtml(shipTo.warning)}</div>` : ''}
+
+    <div class="grid">
+      <div>
+        <div class="lbl">Supplier</div>
+        <div><strong>${escapeHtml(supplier.name || 'Digital Bible Society')}</strong>${supplier.email ? `<br>${escapeHtml(supplier.email)}` : ''}</div>
+      </div>
+      <div>
+        <div class="lbl">Ordered by</div>
+        <div><strong>${escapeHtml(orderedBy.name || 'VillageServer Initiative')}</strong>${orderedBy.contact ? `<br>${escapeHtml(orderedBy.contact)}` : ''}</div>
+      </div>
+      <div>
+        <div class="lbl">Deliver to</div>
+        <div class="addr"><strong>${escapeHtml(shipTo.name || '')}</strong><br>${addressLines}</div>
+        ${shipTo.phone ? `<div style="margin-top:8px;font-size:13px"><strong>Phone</strong> ${escapeHtml(shipTo.phone)}</div>` : ''}
+      </div>
+    </div>
+
+    <table>
+      <thead><tr>
+        <th>Item</th><th class="num" style="width:70px">Qty</th><th class="amt" style="width:150px">Amount</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="total"><span>Total funded by VillageServer Initiative</span>
+      <span class="fill" contenteditable="true" role="textbox" aria-label="Order total">&nbsp;</span></div>
+
+    ${contextRows ? `<div class="ctx"><div class="lbl">About this deployment</div><table>${contextRows}</table></div>` : ''}
+
+    <div class="sig">
+      <div>Authorised by<div class="sigline"></div></div>
+      <div>Date<div class="sigline"></div></div>
+    </div>
+  </div>
+</div>
+<script>
+function copyOrder(btn){
+  var text = document.getElementById('order').innerText.replace(/\\n{3,}/g,'\\n\\n').trim();
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent; btn.textContent = 'Copied';
+    setTimeout(function(){ btn.textContent = old; }, 1600);
+  });
+}
+</script>
+</body></html>`;
+}
+
 // ── The page Larry lands on after clicking a button ─────────────────────
 
 // Larry types here rather than in the email itself — Gmail, Outlook and Apple

@@ -10,8 +10,8 @@
 // here would defeat the purpose. Tokens name one thread and one action, expire,
 // and are verified with a constant-time comparison.
 import { actionMeta, verifyActionToken } from './_lib/laura-links.js';
-import { renderActionPage } from './_lib/laura-email.js';
-import { performLarryAction } from './_lib/laura-agent.js';
+import { renderActionPage, renderOrderForm } from './_lib/laura-email.js';
+import { buildOrderForm, performLarryAction } from './_lib/laura-agent.js';
 
 function page(res, status, html) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -78,6 +78,21 @@ export default async function handler(req, res) {
 
   const { thread_id: threadId, action } = verified;
   const meta = actionMeta(action);
+
+  // Read-only actions render and stop. Nothing on the file moves, so this is
+  // the one thing a link scanner may safely follow.
+  if (meta.view) {
+    try {
+      return page(res, 200, renderOrderForm(await buildOrderForm(threadId)));
+    } catch (e) {
+      return page(res, 500, renderActionPage({
+        title: 'Could not build the order',
+        tone: 'stop',
+        message: 'I could not put the order form together just now.',
+        detail: String((e && e.message) || e).slice(0, 200),
+      }));
+    }
+  }
 
   // High-stakes actions get an interstitial, and the ones that need Larry to
   // type something get their fields here. Either way the GET changes nothing.
