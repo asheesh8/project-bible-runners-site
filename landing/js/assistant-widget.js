@@ -90,7 +90,7 @@
   // ── Styles ─────────────────────────────────────────────
   var css = document.createElement('style');
   css.textContent = [
-    '.vsi-asst-launch{position:fixed;right:20px;bottom:20px;z-index:9998;display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border:0;border-radius:999px;background:var(--blue,#1f5795);color:#fff;font-family:inherit;font-weight:800;font-size:.95rem;cursor:pointer;box-shadow:0 10px 30px rgba(22,58,107,.28)}',
+    '.vsi-asst-launch{position:fixed;right:20px;bottom:20px;z-index:9998;display:inline-flex;align-items:center;gap:9px;padding:13px 18px;border:0;border-radius:999px;background:var(--blue,#1f5795);color:#fff;font-family:inherit;font-weight:800;font-size:.95rem;cursor:pointer;box-shadow:0 10px 30px rgba(22,58,107,.28);will-change:transform}',
     '.vsi-asst-launch:hover{filter:brightness(1.06)}',
     '.vsi-asst-launch svg{width:20px;height:20px}',
     '.vsi-asst-panel{position:fixed;right:20px;bottom:20px;z-index:9999;width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 40px));display:none;flex-direction:column;background:#fff;border:1px solid var(--line,#d7e3f0);border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(22,58,107,.28);font-family:inherit}',
@@ -233,6 +233,52 @@
     panel.classList.remove('open');
     launch.style.display = '';
     if (!skipSave) saveChat(false);
+    queueLift();
+  }
+
+  // ── Keep the launcher clear of the footer ──────────────
+  // The launcher is pinned to the bottom-right, so scrolling to the end of a
+  // page parks it right on top of the footer credit. Lift it above whatever
+  // part of the footer has scrolled into view instead of covering it. Measured
+  // from live geometry, so it holds at any width and on any page layout.
+  var FOOT_GAP = 14;
+  var credit = document.getElementById('arki-credit');
+  var dock = (credit && credit.closest('footer,.site-footer,.footer')) || credit ||
+    document.querySelector('footer,.site-footer,.footer');
+  var lift = 0;
+  var liftQueued = false;
+
+  function syncLift() {
+    liftQueued = false;
+    if (!dock || panel.classList.contains('open')) return;
+    var rect = dock.getBoundingClientRect();
+    // A footer taller than the viewport can't be cleared whole — clear just the
+    // credit line there, so the button never gets flung off the top.
+    if (credit && rect.height > window.innerHeight * 0.4) rect = credit.getBoundingClientRect();
+    var box = launch.getBoundingClientRect();
+    var restingBottom = box.bottom + lift; // where it sits with no lift applied
+    // Once the anchor has reached the top of the screen there is nothing left to
+    // rise above — stop chasing it and drop back to the resting position.
+    var next = rect.top <= 0 ? 0 : Math.max(0, restingBottom + FOOT_GAP - rect.top);
+    next = Math.min(next, Math.max(0, restingBottom - box.height - 12)); // stay on screen
+    if (Math.abs(next - lift) < 0.5) return;
+    lift = next;
+    launch.style.transform = lift ? 'translateY(-' + Math.round(lift) + 'px)' : '';
+  }
+
+  function queueLift() {
+    if (liftQueued) return;
+    liftQueued = true;
+    requestAnimationFrame(syncLift);
+  }
+
+  if (dock) {
+    window.addEventListener('scroll', queueLift, { passive: true });
+    window.addEventListener('resize', queueLift);
+    window.addEventListener('orientationchange', queueLift);
+    window.addEventListener('load', queueLift);
+    if (window.ResizeObserver) new ResizeObserver(queueLift).observe(dock);
+    queueLift();
   }
 
   form.style.display = 'none';
