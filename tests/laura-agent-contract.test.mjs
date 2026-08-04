@@ -108,6 +108,19 @@ test('Laura receptionist schema, endpoints, and admin console stay wired in', ()
   assert.match(digestApi, /sweepStalledThreads/);
   assert.match(admin, /function lauraSweep/);
   assert.match(admin, /Find dropped files/);
+  // A list you can only scroll stops working somewhere around a hundred files.
+  assert.match(admin, /function lauraFuzzyScore/);
+  assert.match(admin, /function lauraFilteredThreads/);
+  assert.match(admin, /function lauraStateOptions/);
+  assert.match(admin, /id="laura-state-filter"/);
+  assert.match(admin, /id="laura-search"/);
+  assert.match(admin, /needs_you/);
+  // Search repaints the list only — rebuilding the shell on every keystroke
+  // would tear the input out of the DOM and drop the caret mid-word.
+  assert.match(admin, /function lauraRefreshList/);
+  assert.match(admin, /id="laura-list-scroll"/);
+  // esc() must render a zero, or every file with no replies loses its count.
+  assert.match(admin, /String\(s===null\|\|s===undefined\?'':s\)/);
   // A held draft must not leave the thread claiming it is waiting on someone.
   assert.match(core, /gate\.kind === 'timing'/);
   assert.match(core, /inbound_configured/);

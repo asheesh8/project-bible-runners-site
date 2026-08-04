@@ -477,6 +477,16 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
 .laura-list-head{padding:12px 14px;border-bottom:1px solid #d0d7de;background:#f6f8fa;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .laura-list-title{font-size:.82rem;font-weight:900;color:#24292f;text-transform:uppercase;letter-spacing:.06em}
 .laura-list-scroll{overflow:auto}
+.laura-filters{padding:10px 12px;border-bottom:1px solid #d0d7de;background:#fff;display:flex;flex-direction:column;gap:8px}
+.laura-filters input,.laura-filters select{
+  width:100%;padding:7px 10px;border:1.5px solid #d0d7de;border-radius:8px;
+  font-family:var(--sans);font-size:.85rem;background:#fff;color:#24292f;outline:none
+}
+.laura-filters input:focus,.laura-filters select:focus{border-color:#316dca}
+.laura-filter-clear{
+  align-self:flex-start;border:0;background:none;padding:0;cursor:pointer;
+  font-family:var(--sans);font-size:.76rem;font-weight:700;color:#0969da;text-decoration:underline
+}
 .laura-person-file{width:100%;border:0;border-left:4px solid transparent;border-bottom:1px solid #eaeef2;background:#fff;text-align:left;padding:12px 12px 12px 10px;cursor:pointer;color:#24292f}
 .laura-person-file:hover{background:#f6f8fa}
 .laura-person-file.active{background:#f0f6fc;border-left-color:#0969da}
@@ -2379,6 +2389,145 @@ function lauraSortedThreads(){
   return (_lauraCache.threads||[]).slice().sort(function(a,b){ return new Date(b.updated_at) - new Date(a.updated_at); });
 }
 
+// ── Finding one person among a thousand ─────────────────────────────────
+//
+// At 25 files you can scan the list. At 1000 you cannot, and the states are
+// what Larry actually thinks in: who is waiting on me, who has gone quiet,
+// what has shipped.
+
+var _lauraFilter = {state:'all', query:''};
+
+var LAURA_STATE_LABELS = {
+  new:'Just arrived',
+  waiting_on_larry:'Waiting on you',
+  waiting_on_customer:'Waiting on the applicant',
+  ready_to_schedule:'Ready to book a call',
+  scheduled:'Call booked',
+  ready_to_ship:'Ready to post',
+  shipped:'Posted',
+  follow_up_photos:'Waiting on photos',
+  filed:'Filed as a deployment',
+  closed:'Closed',
+  escalated:'Needs a closer look'
+};
+
+// States where the file cannot move until Larry does something. This is the
+// filter he will use most, so it gets to be one click rather than three.
+var LAURA_NEEDS_YOU = ['waiting_on_larry','ready_to_ship','escalated'];
+
+// Typing "grc onditi" should find "Grace Ondieki". Exact substrings win, then
+// in-order subsequences, so a half-remembered name still lands. Returning a
+// score rather than a boolean lets the best match float to the top.
+function lauraFuzzyScore(haystack, needle){
+  var h = String(haystack==null?'':haystack).toLowerCase();
+  var n = String(needle==null?'':needle).toLowerCase().trim();
+  if(!n) return 1;
+  if(!h) return 0;
+  var idx = h.indexOf(n);
+  if(idx === 0) return 1000;
+  if(idx > 0) return 900 - Math.min(idx, 100);
+  var at = 0, firstHit = -1, gaps = 0;
+  for(var i=0;i<n.length;i++){
+    if(n[i] === ' ') continue;
+    var hit = h.indexOf(n[i], at);
+    if(hit === -1) return 0;
+    if(firstHit < 0) firstHit = hit;
+    if(at > 0 && hit > at) gaps += hit - at;
+    at = hit + 1;
+  }
+  return Math.max(1, 500 - gaps - Math.min(firstHit, 50));
+}
+
+function lauraThreadScore(t, query){
+  var app = lauraAppFor(t);
+  return Math.max(
+    lauraFuzzyScore(t.applicant_name || (app && app.name), query),
+    lauraFuzzyScore(t.applicant_email || (app && app.email), query),
+    lauraFuzzyScore('VS-'+(t.thread_token||''), query),
+    lauraFuzzyScore(app && app.organization, query),
+    lauraFuzzyScore(app && app.country, query)
+  );
+}
+
+function lauraMatchesState(t){
+  var want = _lauraFilter.state;
+  if(want === 'all') return true;
+  if(want === 'needs_you') return LAURA_NEEDS_YOU.indexOf(String(t.state)) > -1;
+  return String(t.state) === want;
+}
+
+function lauraFilteredThreads(){
+  var query = String(_lauraFilter.query||'').trim();
+  var rows = lauraSortedThreads().filter(lauraMatchesState);
+  if(!query) return rows;
+  return rows.map(function(t){ return {t:t, score:lauraThreadScore(t, query)}; })
+    .filter(function(x){ return x.score > 0; })
+    .sort(function(a,b){ return b.score - a.score; })
+    .map(function(x){ return x.t; });
+}
+
+// Only offer states that actually have files in them, with counts — an empty
+// option in a dropdown is a dead end you have to back out of.
+function lauraStateOptions(){
+  var all = lauraSortedThreads();
+  var counts = {};
+  all.forEach(function(t){ var s = String(t.state||'new'); counts[s] = (counts[s]||0)+1; });
+  var needsYou = all.filter(function(t){ return LAURA_NEEDS_YOU.indexOf(String(t.state)) > -1; }).length;
+
+  var opts = [{value:'all', label:'All files ('+all.length+')'}];
+  if(needsYou) opts.push({value:'needs_you', label:'Needs you ('+needsYou+')'});
+  Object.keys(LAURA_STATE_LABELS).forEach(function(state){
+    if(counts[state]) opts.push({value:state, label:LAURA_STATE_LABELS[state]+' ('+counts[state]+')'});
+  });
+  // A state Laura invented that is not in the label map still needs a home.
+  Object.keys(counts).forEach(function(state){
+    if(!LAURA_STATE_LABELS[state]) opts.push({value:state, label:state.replace(/_/g,' ')+' ('+counts[state]+')'});
+  });
+  return opts;
+}
+
+// Changing the stage is a deliberate "show me these" — jump to the first one so
+// the open panel matches what is now in the list. Typing is not, so search only
+// repaints the list and leaves whatever is open alone.
+function lauraSetStateFilter(select){
+  _lauraFilter.state = select.value;
+  var visible = lauraFilteredThreads();
+  if(visible.length && !visible.some(function(t){ return String(t.id) === String(_lauraSelectedThreadId); })){
+    _lauraSelectedThreadId = visible[0].id;
+  }
+  renderLauraList();
+}
+
+function lauraSetSearch(input){
+  _lauraFilter.query = input.value;
+  lauraRefreshList();
+}
+
+function lauraClearFilters(){
+  _lauraFilter = {state:'all', query:''};
+  var input = document.getElementById('laura-search');
+  var select = document.getElementById('laura-state-filter');
+  if(input) input.value = '';
+  if(select) select.value = 'all';
+  lauraRefreshList();
+}
+
+// Repaints only the list, never the whole panel — re-rendering the shell on
+// every keystroke would tear the search box out of the DOM mid-word and drop
+// the caret.
+function lauraRefreshList(){
+  var scroll = document.getElementById('laura-list-scroll');
+  var count = document.getElementById('laura-list-count');
+  if(!scroll) return;
+  var rows = lauraFilteredThreads();
+  var total = (_lauraCache.threads||[]).length;
+  if(count) count.textContent = rows.length === total ? total+' total' : rows.length+' of '+total;
+  scroll.innerHTML = rows.length
+    ? rows.map(renderLauraPersonFile).join('')
+    : '<div class="empty-state" style="padding:26px 16px"><div>Nothing matches that.</div>'
+      + '<button type="button" class="laura-filter-clear" style="margin-top:8px" onclick="lauraClearFilters()">Clear the filters</button></div>';
+}
+
 function lauraThreadById(id){
   var rows = _lauraCache.threads || [];
   for(var i=0;i<rows.length;i++){ if(String(rows[i].id) === String(id)) return rows[i]; }
@@ -2707,14 +2856,33 @@ function renderLauraList(){
   }
   if(!_lauraSelectedThreadId || !lauraThreadById(_lauraSelectedThreadId)) _lauraSelectedThreadId = threads[0].id;
   var selected = lauraThreadById(_lauraSelectedThreadId);
+  var visible = lauraFilteredThreads();
+  var options = lauraStateOptions().map(function(o){
+    return '<option value="'+esc(o.value)+'"'+(o.value === _lauraFilter.state ? ' selected' : '')+'>'+esc(o.label)+'</option>';
+  }).join('');
+
   list.innerHTML =
     '<div class="laura-browser">'+
       '<aside class="laura-file-list">'+
         '<div class="laura-list-head">'+
           '<div class="laura-list-title">Person files</div>'+
-          badge(threads.length+' total','#eaeef2','#57606a','Laura files')+
+          '<span id="laura-list-count" title="Laura files" style="display:inline-flex;align-items:center;'+
+            'padding:3px 10px;border-radius:999px;font-weight:800;font-size:.75rem;'+
+            'background:#eaeef2;color:#57606a;white-space:nowrap">'+
+            esc(visible.length === threads.length ? threads.length+' total' : visible.length+' of '+threads.length)+
+          '</span>'+
         '</div>'+
-        '<div class="laura-list-scroll">'+threads.map(renderLauraPersonFile).join('')+'</div>'+
+        '<div class="laura-filters">'+
+          '<select id="laura-state-filter" onchange="lauraSetStateFilter(this)" aria-label="Filter files by stage">'+options+'</select>'+
+          '<input id="laura-search" type="search" placeholder="Search name, email, org, VS-token"'+
+            ' value="'+esc(_lauraFilter.query)+'" oninput="lauraSetSearch(this)" aria-label="Search person files">'+
+        '</div>'+
+        '<div class="laura-list-scroll" id="laura-list-scroll">'+
+          (visible.length
+            ? visible.map(renderLauraPersonFile).join('')
+            : '<div class="empty-state" style="padding:26px 16px"><div>Nothing matches that.</div>'
+              + '<button type="button" class="laura-filter-clear" style="margin-top:8px" onclick="lauraClearFilters()">Clear the filters</button></div>')+
+        '</div>'+
       '</aside>'+
       renderLauraOpenFile(selected)+
     '</div>';
