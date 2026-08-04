@@ -173,9 +173,17 @@ function addressBlock(shipTo) {
   <td style="padding:3px 0;font-size:13px;color:${PALETTE.text};line-height:1.5">${escapeHtml(value)}</td>
 </tr>`).join('');
 
+  // A parcel posted to an address that cannot receive it comes back weeks later,
+  // so if Laura could not verify it, that says so above the label rather than
+  // letting Larry find out from the returned envelope.
+  const warning = shipTo.warning ? `<div style="margin-bottom:12px;background:${PALETTE.warnBg};border:1px solid ${PALETTE.warnBorder};border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.5;color:${PALETTE.warn}">
+    <strong>Check before you post.</strong> ${escapeHtml(shipTo.warning)}
+  </div>` : '';
+
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px">
 <tr><td style="background:#ffffff;border:2px solid ${PALETTE.text};border-radius:10px;padding:16px 18px">
   <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:${PALETTE.muted};margin-bottom:10px">${escapeHtml(shipTo.label || 'Post to')}</div>
+  ${warning}
   <div style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;line-height:1.65;color:${PALETTE.text};white-space:pre-wrap;word-break:break-word">${escapeHtml(shipTo.address)}</div>
   ${rows ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;border-top:1px solid ${PALETTE.border};padding-top:4px">${rows}</table>` : ''}
 </td></tr></table>`;
@@ -227,6 +235,7 @@ function threadCardText(item) {
   // that show plain text only — the address has to survive there too.
   const address = shipTo && shipTo.address ? [
     `  ${(shipTo.label || 'Post to').toUpperCase()}`,
+    ...(shipTo.warning ? [`    ** CHECK BEFORE YOU POST: ${shipTo.warning}`] : []),
     ...String(shipTo.address).split('\n').map((line) => `    ${line}`),
     ...(shipTo.rows || []).filter((row) => row && row[1]).map(([label, value]) => `    ${label}: ${value}`),
   ] : [];

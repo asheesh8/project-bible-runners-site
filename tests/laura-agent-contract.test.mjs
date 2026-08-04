@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
-  detectApplicantClarificationNeeds, normalizeDecision, sanitizeExtracted, stripQuotedReply,
+  assessShippingAddress, detectApplicantClarificationNeeds, formatPostalAddress,
+  normalizeDecision, sanitizeExtracted, stripQuotedReply,
 } from '../api/_lib/laura-agent.js';
 import {
   LARRY_ACTIONS, actionButtonsFor, actionMeta, isKnownAction, postedButtonNames,
@@ -295,7 +296,9 @@ test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', ()
   assert.match(admin, /Ready to post/);
   // The offer collects exactly what a card needs.
   assert.match(core, /The language or languages your community needs on the card/);
-  assert.match(core, /A shipping address, including a recipient name and a phone number/);
+  assert.match(core, /the village or street and any landmark nearby/);
+  // The offer states the two things that will not work before they waste a reply on one.
+  assert.match(core, /A PO box or a private bag will not work, and neither will an airport/);
   // And it is honest without being a rejection.
   assert.match(core, /this is not a no, it is a not yet for the larger kits/);
   assert.match(core, /Never suggest that a larger kit or funding is coming/);
@@ -357,7 +360,7 @@ test('a clean file is scaled down to the card offer, whatever the model proposed
 test('a card that is already confirmed or posted is never re-offered or re-confirmed', () => {
   const app = cleanApplication({
     languages: 'Ekegusii, Swahili',
-    shipping_address: 'Pastor Mary Ondieki, PO Box 1420, Kisii 40200, Kenya, +254 700 000000',
+    shipping_address: 'Pastor Mary Ondieki, Nyanchwa village, Kisii Town, Kisii County, Kenya, +254 700 000000',
   });
 
   // Once they have taken up the offer, a complete file closes itself out.
@@ -382,6 +385,88 @@ test('a card that is already confirmed or posted is never re-offered or re-confi
     app, { ...THREAD, state: 'shipped' }, [sentMessage('offer_sd_card'), replyMessage()],
   );
   assert.equal(afterShipping.next_action, 'reply_customer');
+});
+
+test('a card is never posted to somewhere a courier cannot reach', () => {
+  const undeliverable = [
+    ['Kigambo Samuel, +256706260398, Uganda, Jinja district', 'a country and a district with no place in them'],
+    ['John Doe, P.O. Box 1420, Kisii 40200, Kenya, +254700000000', 'a PO box'],
+    ['Mary Ann, Private Bag 22, Lusaka, Zambia, +260970000000', 'a private bag'],
+    ['Ann, Entebbe International Airport, Uganda, +256700000000', 'an airport'],
+    ['Pastor Mary, Poste Restante, Nairobi, Kenya, +254700000000', 'a poste restante counter'],
+    ['Downtown, can find me', 'a placeholder'],
+    ['Uganda', 'a bare country'],
+  ];
+  undeliverable.forEach(([address, why]) => {
+    const check = assessShippingAddress(address);
+    assert.equal(check.ok, false, `should have rejected ${why}: ${address}`);
+    assert.ok(check.say.length, `must say what is wrong with ${address}`);
+  });
+
+  // Lenient about form, strict about substance. A rural field address with no
+  // street number is a real place a driver can find, and rejecting it would
+  // strand exactly the people this exists for.
+  const deliverable = [
+    'Pastor Mary Ondieki, Nawantale village, Kamuli district, Uganda, +256706260398',
+    'Grace Achebe, Plot 12 Kenyatta Road, Kisii Town, Kisii County, Kenya, +254700123456',
+    'John Mwangi, opposite Full Gospel Church, Nakuru town, Nakuru County, Kenya, +254722000111',
+  ];
+  deliverable.forEach((address) => {
+    assert.equal(assessShippingAddress(address).ok, true, `should have accepted: ${address}`);
+  });
+});
+
+test('an address that will not ship is queried, not confirmed', () => {
+  const app = cleanApplication({
+    languages: 'Lusoga',
+    shipping_address: 'Kigambo Samuel, +256706260398, Uganda, Jinja district',
+  });
+  const history = [sentMessage('offer_sd_card'), replyMessage()];
+
+  const asked = normalizeDecision(
+    { next_action: 'reply_customer', audience: 'applicant', auto_send_ok: true },
+    app, THREAD, history,
+  );
+  assert.equal(asked.next_action, 'ask_customer');
+  assert.match(asked.draft_body, /village or a landmark/);
+  // It quotes what they sent, so they can see what was wrong with it.
+  assert.match(asked.draft_body, /Jinja district/);
+  // And it never implies a street number is required.
+  assert.match(asked.draft_body, /that is completely normal/);
+
+  // Fix the address and the same inputs confirm.
+  const fixed = normalizeDecision(
+    { next_action: 'reply_customer', audience: 'applicant', auto_send_ok: true },
+    { ...app, shipping_address: 'Kigambo Samuel, Nawantale village, Kamuli district, Uganda, +256706260398' },
+    THREAD, history,
+  );
+  assert.equal(fixed.next_action, 'confirm_card');
+});
+
+test('a comma run becomes an envelope Larry can copy', () => {
+  const posted = formatPostalAddress('Pastor Mary Ondieki, Nawantale village, Kamuli district, Uganda, +256706260398');
+  assert.deepEqual(posted.lines, ['Pastor Mary Ondieki', 'Nawantale village', 'Kamuli district', 'Uganda']);
+  assert.equal(posted.phone, '+256706260398');
+
+  // An address already written across lines is left exactly as typed.
+  const multi = formatPostalAddress('Grace Achebe\nPlot 12 Kenyatta Road\nKisii Town\nKenya\n+254700123456');
+  assert.deepEqual(multi.lines, ['Grace Achebe', 'Plot 12 Kenyatta Road', 'Kisii Town', 'Kenya']);
+  assert.equal(multi.phone, '+254700123456');
+
+  // A doubtful address warns on the card rather than coming back as a parcel.
+  const html = renderThreadCardHtml({
+    applicantName: 'Kigambo Samuel',
+    shipTo: {
+      label: 'Post to',
+      address: 'Kigambo Samuel\nUganda\nJinja district',
+      warning: 'Not deliverable as written — needs the town or village.',
+      rows: [['Phone', '+256706260398']],
+    },
+    facts: [],
+    buttons: [],
+  });
+  assert.match(html, /Check before you post/);
+  assert.match(html, /Not deliverable as written/);
 });
 
 test('silence is not an acceptance of the card offer', () => {
@@ -409,10 +494,12 @@ test('silence is not an acceptance of the card offer', () => {
   );
   assert.notEqual(staleReply.next_action, 'confirm_card');
 
-  // But a reply after it is.
+  // But a reply after it is — given an address that can actually be delivered
+  // to. The address check is exercised separately; this is about acceptance.
   const answered = normalizeDecision(
     { next_action: 'ask_customer', audience: 'applicant', auto_send_ok: true },
-    app, THREAD, [sentMessage('offer_sd_card'), replyMessage()],
+    { ...app, shipping_address: 'Kigambo Samuel, Nawantale village, Kamuli district, Uganda, +256706260398' },
+    THREAD, [sentMessage('offer_sd_card'), replyMessage()],
   );
   assert.equal(answered.next_action, 'confirm_card');
 });
@@ -511,7 +598,7 @@ test('a posted card asks for the two things only Larry can supply', () => {
 });
 
 test('the address Larry posts to keeps the line breaks the applicant typed', () => {
-  const address = 'Pastor Mary Ondieki\nKisii Community Church\nPO Box 1420\nKisii 40200\nKenya';
+  const address = 'Pastor Mary Ondieki\nKisii Community Church\nNyanchwa village\nKisii Town\nKenya';
   const html = renderThreadCardHtml({
     applicantName: 'Grace Achebe',
     headline: 'Ready for you to post a card.',
@@ -524,7 +611,7 @@ test('the address Larry posts to keeps the line breaks the applicant typed', () 
   // so the block must preserve whitespace rather than collapse it.
   assert.match(html, /Post to/);
   assert.match(html, /white-space:pre-wrap/);
-  assert.match(html, /PO Box 1420\nKisii 40200/);
+  assert.match(html, /Nyanchwa village\nKisii Town/);
   assert.match(html, /Card language/);
 
   // It sits above the facts — when a file is ready to post, the address is the

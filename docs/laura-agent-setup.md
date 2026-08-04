@@ -396,9 +396,33 @@ They exist to stop Laura promising equipment that does not exist, and re-running
 them on a finished file is how "thank you, it arrived" gets answered with the
 confirmation letter for a second time.
 
-A card is only confirmed when there is a language *and* a shipping address that
-survives the vague-address check — "downtown, can find me" does not close a
-file.
+### The address has to be one a parcel can reach
+
+A card is only confirmed when there is a language *and* an address that passes a
+component check, not a vague-wording check. Rejected outright:
+
+| Rejected | Why |
+|---|---|
+| PO box, private bag, PMB | No courier hands a parcel to one |
+| Airport, freight terminal | Cannot receive a personal parcel |
+| Poste restante, general delivery, GPO | A counter, not a destination |
+| "downtown", "can find me", "TBD" | A placeholder |
+
+Beyond that it requires a recipient name, a phone number, a country, a locality,
+and a physical locator. `Uganda, Jinja district` fails — a country and an
+administrative area with no place in them — and used to pass.
+
+**It is deliberately lenient about form.** Plenty of real field addresses have no
+street number and never will. `Nawantale village, Kamuli district` is somewhere a
+driver can find, and a village or a landmark satisfies the locator exactly as a
+street name does. Rejecting those would strand the people this exists for.
+
+When an applicant accepts the offer but sends an address that will not ship,
+Laura goes back naming the specific gap and quoting what they sent, rather than
+repeating "not specific enough". That is bounded by `LAURA_MAX_ASK_ROUNDS` like
+any other question. If Laura still cannot verify it, Larry's card carries a
+**Check before you post** warning above the address rather than letting him find
+out when the parcel comes back.
 
 ### What Laura still will not do
 

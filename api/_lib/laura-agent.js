@@ -373,11 +373,123 @@ function looksForwardingPlan(value) {
   return /\b(forward|forwarded|courier|transport partner|friend|contact in|ship there first|carry|hand.?carry|relay|missionary returning|then send|then take)\b/i.test(String(value || ''));
 }
 
+// ── Is this an address a parcel can actually reach? ─────────────────────
+//
+// The old check asked only whether the text looked vague, which let through
+// every address that has actually caused trouble: a PO box a courier will not
+// deliver to, an airport, and "Uganda, Jinja district" — a country and an
+// administrative area with no place in them.
+//
+// This assesses components instead, and reports what is missing so Laura can
+// ask for that one thing rather than saying "not specific enough" again.
+//
+// It is deliberately lenient about *form*. Plenty of real field addresses have
+// no street number and never will: "Nawantale village, Kamuli district" is a
+// place a courier can find, and rejecting it would strand exactly the people
+// this initiative exists for. What it insists on is a physical locality, a
+// country, and a phone — the three things last-mile delivery cannot work
+// without.
+
+// Things no courier will hand a parcel to, whatever else is on the label.
+const ADDRESS_BLOCKERS = [
+  { code: 'po_box', test: /\b(p\.?\s*o\.?\s*box|post\s*office\s*box|postbox|post\s*bag|private\s*bag|p\.?\s*m\.?\s*b\.?)\b/i,
+    say: 'a PO box or private bag — couriers will not deliver a parcel to one' },
+  { code: 'airport', test: /\b(airport|airstrip|air\s*field|terminal\s*\d|jkia|freight\s*terminal)\b/i,
+    say: 'an airport or freight terminal, which cannot receive a personal parcel' },
+  { code: 'poste_restante', test: /\b(poste\s*restante|general\s*delivery|c\/o\s*post\s*office|gpo)\b/i,
+    say: 'a poste restante or general-delivery counter rather than a place we can send to' },
+  { code: 'placeholder', test: /\b(down\s?town|city\s*hall|can\s*find|will\s*(send|give|provide)|tbd|to\s*be\s*(determined|advised)|not\s*sure|unknown|n\/?a|same\s*as\s*above|any\s*where|anywhere)\b/i,
+    say: 'a placeholder rather than a real destination' },
+];
+
+const STREET_WORDS = /\b(street|st\.?|road|rd\.?|avenue|ave\.?|lane|ln\.?|close|drive|dr\.?|way|crescent|boulevard|blvd|highway|plot|house|building|block|flat|apartment|apt|suite|estate|court|park|zone|stage|junction)\b/i;
+// Rural field addresses are landmarks, not street numbers. These count.
+const PLACE_WORDS = /\b(village|trading\s*cent(re|er)|market|centre|center|church|mission|school|clinic|hospital|parish|sub\s*-?\s*county|opposite|near|behind|next\s*to|along|off\s*the)\b/i;
+const AREA_WORDS = /\b(district|county|region|province|state|division|ward|town|city|municipality|sub\s*-?\s*county|territory)\b/i;
+const COUNTRY_WORDS = /\b(uganda|kenya|nigeria|zambia|tanzania|rwanda|burundi|malawi|ghana|ethiopia|south\s*sudan|congo|drc|cameroon|zimbabwe|mozambique|india|pakistan|philippines|peru|bolivia|guatemala|honduras|haiti|nepal|myanmar|indonesia|papua|liberia|sierra\s*leone|togo|benin|mali|niger|chad|somalia|madagascar|united\s*states|usa|canada|u\.?k\.?|united\s*kingdom)\b/i;
+const POSTCODE = /\b(\d{4,6}|[A-Z]{1,2}\d{1,2}[A-Z]?\s*\d[A-Z]{2})\b/;
+const PHONE = /(\+?\d[\d\s().-]{6,}\d)/;
+
+function addressSegments(text) {
+  return String(text || '')
+    .split(/[\n,;/]+|\s{3,}/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+export function assessShippingAddress(value, { country = '' } = {}) {
+  const text = trim(value, 600);
+  if (!text) return { ok: false, empty: true, blockers: [], missing: ['everything'], say: [] };
+
+  const blockers = ADDRESS_BLOCKERS.filter((rule) => rule.test.test(text));
+  const segments = addressSegments(text);
+  const phone = PHONE.test(text.replace(/\b\d{4,6}\b/g, ' ')) || /\+\d{6,}/.test(text.replace(/\s/g, ''));
+  const hasCountry = COUNTRY_WORDS.test(text)
+    || (country && new RegExp(`\\b${String(country).replace(/[^a-z\s]/gi, '').trim()}\\b`, 'i').test(text));
+  const hasPhysical = STREET_WORDS.test(text) || PLACE_WORDS.test(text)
+    || /\b(plot|house|no\.?|#)\s*\d+/i.test(text);
+  const hasPostcode = POSTCODE.test(text.replace(PHONE, ' '));
+  const hasArea = AREA_WORDS.test(text);
+
+  // Strip the parts we can identify; whatever is left should still name a place.
+  const placeish = segments.filter((seg) => {
+    if (PHONE.test(seg) && !/[a-z]{3}/i.test(seg)) return false;
+    if (COUNTRY_WORDS.test(seg) && seg.split(/\s+/).length <= 3) return false;
+    return true;
+  });
+  // The first segment is normally the recipient. A name is not a location.
+  const recipientLooking = placeish.length && !/\d/.test(placeish[0])
+    && !STREET_WORDS.test(placeish[0]) && !PLACE_WORDS.test(placeish[0]) && !AREA_WORDS.test(placeish[0]);
+  const locationParts = recipientLooking ? placeish.slice(1) : placeish;
+
+  const missing = [];
+  if (!recipientLooking && !/^[A-Za-z][A-Za-z.'-]+\s+[A-Za-z]/.test(text)) missing.push('recipient');
+  if (!phone) missing.push('phone');
+  if (!hasCountry) missing.push('country');
+  if (!hasPhysical && !hasPostcode) missing.push('street');
+  if (locationParts.length < 2 && !hasPostcode) missing.push('locality');
+
+  const say = [
+    ...blockers.map((rule) => rule.say),
+    ...missing.map((what) => ({
+      recipient: 'the full name of the person who will receive it',
+      phone: 'a phone number the courier can call on delivery',
+      country: 'the country',
+      street: 'the street, plot, village or a landmark near where they are — not just the district',
+      locality: 'the town or village as well as the district',
+      everything: 'a delivery address',
+    }[what])).filter(Boolean),
+  ];
+
+  return {
+    ok: !blockers.length && !missing.length,
+    empty: false,
+    blockers: blockers.map((rule) => rule.code),
+    missing,
+    say,
+    hasArea,
+  };
+}
+
 function vagueShippingAddress(value) {
   const text = String(value || '').trim();
   if (!text) return false;
-  if (/\b(down ?town|city hall|friend|can find|unknown|tbd|to be determined|later|not sure|none|n\/a)\b/i.test(text)) return true;
-  return text.length < 35 && !/\d/.test(text) && !/\bp\.?o\.?\s*box\b/i.test(text);
+  return !assessShippingAddress(text).ok;
+}
+
+// A comma-run is what applicants type; an envelope is what Larry needs. Split
+// it into postal lines, recipient first, phone on its own row at the bottom.
+export function formatPostalAddress(value) {
+  const text = trim(value, 600);
+  if (!text) return { lines: [], phone: '' };
+  if (/\n/.test(text)) {
+    const rows = text.split('\n').map((line) => line.trim()).filter(Boolean);
+    const phoneRow = rows.find((line) => PHONE.test(line) && !/[a-z]{4}/i.test(line.replace(PHONE, '')));
+    return { lines: rows.filter((line) => line !== phoneRow), phone: phoneRow || '' };
+  }
+  const segments = addressSegments(text);
+  const phoneSeg = segments.find((seg) => PHONE.test(seg) && !/[a-z]{4}/i.test(seg.replace(PHONE, '')));
+  return { lines: segments.filter((seg) => seg !== phoneSeg), phone: phoneSeg || '' };
 }
 
 function missingRequestFor(field) {
@@ -487,11 +599,12 @@ export function detectApplicantClarificationNeeds(app) {
     });
   }
 
-  if (vagueShippingAddress(app && app.shipping_address)) {
+  const addressCheck = assessShippingAddress(app && app.shipping_address, { country: app && app.country });
+  if (trim(app && app.shipping_address, 600) && !addressCheck.ok) {
     concerns.push({
       code: 'vague_shipping',
-      summary: `The shipping destination is not specific enough to act on: ${shortQuote(app.shipping_address)}.`,
-      request: 'Provide a real recipient name plus address/city/country/phone, or say clearly that you need help finding a shipping path.',
+      summary: `The delivery address is not one a courier can reach: ${shortQuote(app.shipping_address)}. It gives ${addressCheck.say.join('; ')}.`,
+      request: `A delivery address we can actually post to. I still need ${addressCheck.say.join(', and ')}.`,
     });
   }
 
@@ -651,6 +764,47 @@ function cardConfirmationDecision(app, thread) {
   };
 }
 
+// They said yes and sent an address, but it is not one a parcel can reach.
+// Going quiet here, or confirming anyway, both end with a card posted into
+// nowhere — so Laura goes back naming the exact gap rather than repeating
+// "not specific enough". Bounded by the ask-round cap like any other question.
+function addressFixDecision(app, thread, assessment) {
+  const c = config();
+  const blocked = assessment.blockers.length;
+  return {
+    next_action: 'ask_customer',
+    state: 'waiting_on_customer',
+    audience: 'applicant',
+    missing_fields: ['shipping address'],
+    summary: `${app.name || 'Applicant'} accepted the card but the address cannot be delivered to: ${assessment.blockers.concat(assessment.missing).join(', ')}.`,
+    draft_subject: `One more thing on your delivery address`,
+    draft_body: [
+      `Hi ${app.name || 'there'},`,
+      '',
+      `Thank you — I have your card set aside.`,
+      '',
+      blocked
+        ? `Before I can send it I need a different address. What you sent is ${assessment.say[0]}.`
+        : `Before I can send it I need a little more of the address, so the parcel can actually find you.`,
+      '',
+      `Here is what you gave me:`,
+      trim(app.shipping_address, 400),
+      '',
+      `Could you send it again with:`,
+      ...assessment.say.map((what, index) => `${index + 1}. ${what.charAt(0).toUpperCase()}${what.slice(1)}`),
+      '',
+      `If there is no street address where you are, that is completely normal — a village or a nearby landmark that a delivery driver could ask for works just as well. The phone number matters most of all, because they will ring it when they are close.`,
+      '',
+      `If getting a parcel to you is difficult, tell me that too and we will work out another way.`,
+      '',
+      c.agentName,
+      'VillageServer Initiative',
+    ].join('\n'),
+    reasoning: 'Accepted the offer but the address is not deliverable; asked for the specific missing parts.',
+    auto_send_ok: true,
+  };
+}
+
 // The honest scale-down. Warm about the ministry, straight about what we can
 // actually post today, and it asks for exactly the two things a card needs.
 function sdCardOfferDecision(app, thread) {
@@ -682,7 +836,9 @@ function sdCardOfferDecision(app, thread) {
       '',
       `If that would help the people you are reaching, just reply with two things:`,
       `1. The language or languages your community needs on the card.`,
-      `2. A shipping address, including a recipient name and a phone number.`,
+      `2. A delivery address, written out as: full name of whoever will receive it, the village or street and any landmark nearby, the town, the district or region, the country, and a phone number they can be reached on.`,
+      '',
+      `One thing on the address — it has to be somewhere a person can hand a parcel over. A PO box or a private bag will not work, and neither will an airport. If there is no street name where you are, that is completely normal: a village and a landmark a driver could ask for is exactly right. The phone number matters most, because they ring it when they are close.`,
       '',
       `Once I have those, I will be in touch about getting a card out to you. And as more equipment becomes available, your file stays with us — this is not a no, it is a not yet for the larger kits.`,
       '',
@@ -933,6 +1089,19 @@ export function normalizeDecision(decision, app, thread, messages) {
   const settled = POST_SHIPPING_STATES.has(String(thread && thread.state || ''))
     || sentActionCount(messages, 'confirm_card') > 0;
   if (offerMode() === 'sd_card_only' && supersedable && !settled) {
+    // They took up the offer and sent something, but it will not ship. Ask for
+    // the missing part by name before anything else gets decided.
+    const address = assessShippingAddress(app && app.shipping_address, { country: app && app.country });
+    if (acceptedTheOffer(messages) && trim(app && app.languages, 200)
+      && trim(app && app.shipping_address, 600) && !address.ok
+      && sentActionCount(messages, 'ask_customer') < config().maxAskRounds) {
+      const forced = addressFixDecision(app, thread, address);
+      return {
+        ...forced,
+        auto_send_ok: forced.auto_send_ok && d.auto_send_ok !== false,
+        reasoning: `${forced.reasoning} Overrode ${action} because a card cannot be posted to that address.`,
+      };
+    }
     if (acceptedTheOffer(messages) && hasCardDetails(app)) {
       const forced = cardConfirmationDecision(app, thread);
       return {
@@ -1732,20 +1901,27 @@ const STAGE_LABELS = {
 const ADDRESSABLE_STAGES = new Set(['ready_to_ship', 'shipped', 'follow_up_photos', 'filed']);
 
 function shipToFor(app, stage, thread) {
-  const address = trim(app && app.shipping_address, 600);
-  if (!address || !ADDRESSABLE_STAGES.has(String(stage || ''))) return null;
-  const phone = [app.phone_country_code, app.phone].filter(Boolean).join(' ');
-  // Their address usually already carries a phone number, because that is what
-  // Laura asked for. Only add the one from the form when it is genuinely absent.
-  const digits = (value) => String(value || '').replace(/\D/g, '');
-  const phoneAlreadyThere = phone && digits(address).includes(digits(phone).slice(-7));
+  const raw = trim(app && app.shipping_address, 600);
+  if (!raw || !ADDRESSABLE_STAGES.has(String(stage || ''))) return null;
+
+  // Applicants type one long comma run; Larry needs an envelope. One component
+  // per line, recipient at the top, phone on its own row underneath.
+  const posted = formatPostalAddress(raw);
+  // The number written on the address wins — that is the one the applicant
+  // expects a courier to ring. The form's number is the fallback.
+  const phoneShown = posted.phone || [app.phone_country_code, app.phone].filter(Boolean).join(' ');
+
+  // If it will not ship, say so on the card rather than letting Larry find out
+  // when the parcel comes back.
+  const check = assessShippingAddress(raw, { country: app && app.country });
+
   return {
     label: 'Post to',
-    address,
+    address: posted.lines.join('\n') || raw,
+    warning: check.ok ? '' : `Not deliverable as written — needs ${check.say.join('; ')}.`,
     rows: [
+      ['Phone', phoneShown],
       ['Card language', trim(app.languages, 200) || 'not given'],
-      ['Applicant', trim(app.name, 160)],
-      ['Phone', phoneAlreadyThere ? '' : phone],
       ['Tracking', trim(thread && thread.tracking_number, 120)],
     ],
   };
