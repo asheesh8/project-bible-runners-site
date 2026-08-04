@@ -1,4 +1,5 @@
 import { isAuthorizedAdmin } from './_lib/admin-token.js';
+import { actionUrl } from './_lib/laura-links.js';
 import {
   ensureThreadForApplication,
   ensureThreadsForRecentApplications,
@@ -93,6 +94,14 @@ export default async function handler(req, res) {
         limit: Number(b.limit || 15),
         dryRun: b.dry_run === true || req.query.dry_run === 'true',
       }));
+    }
+
+    // The panel opens the same signed order form the email links to, rather
+    // than a second copy that could drift away from it.
+    if (action === 'order-url') {
+      const threadId = cleanId(req.query.thread_id || b.thread_id);
+      if (!threadId) return res.status(400).json({ error: 'thread_id is required' });
+      return res.status(200).json({ ok: true, url: actionUrl(threadId, 'order-form') });
     }
 
     // Same effects as the buttons in Larry's email, driven from the panel.

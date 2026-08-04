@@ -226,7 +226,11 @@ Leave it as `resend` while testing if you only want Gmail for reading replies.
 
 ## Cal.com
 
-Start without a Cal.com API key. Create Larry's public booking link and set:
+Not in use yet. Nothing in the card workflow needs it, and no booking button
+appears on a file that is ready to post &mdash; by then the conversation is over.
+Wire it up when larger tiers return and a call before shipping makes sense again.
+
+Create Larry's public booking link and set:
 
 ```text
 LARRY_CAL_BOOKING_URL=https://cal.com/...
@@ -552,7 +556,7 @@ move without opening the admin panel:
 
 | Button | What happens |
 |---|---|
-| Approve & send booking link | Marks the application approved and emails the applicant the scheduling link |
+| Approve &mdash; send a card | Marks the application approved and tells the applicant a card in their language is coming |
 | Send Laura's draft | Sends the drafted reply exactly as written |
 | Ask for more info | Laura writes and sends a follow-up for what is still missing |
 | Hold for now | Pauses the file and brings it back in a week |

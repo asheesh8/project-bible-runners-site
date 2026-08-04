@@ -5,7 +5,7 @@ import {
   renderLarryActionEmail,
 } from './laura-email.js';
 import {
-  actionButtonsFor, adminFileUrl, isKnownAction, postedButtonNames, siteBaseUrl,
+  actionButtonsFor, actionMeta, adminFileUrl, isKnownAction, postedButtonNames, siteBaseUrl,
 } from './laura-links.js';
 
 const DEFAULT_MODEL = 'claude-haiku-4-5';
@@ -2207,6 +2207,17 @@ function declineEmailBody(app) {
 // tracking number. Actions without inputs ignore it entirely.
 export async function performLarryAction(threadId, action, { value = '' } = {}) {
   if (!isKnownAction(action)) throw new Error('Unknown action.');
+  // Read-only actions are rendered by the endpoint before they ever get here.
+  // If one arrives anyway, say so plainly rather than falling through to the
+  // unhandled-action throw at the bottom.
+  if (actionMeta(action) && actionMeta(action).view) {
+    return {
+      ok: false,
+      tone: 'neutral',
+      title: 'Nothing to do',
+      message: 'That link only opens a page — there is no action behind it.',
+    };
+  }
   const thread = await loadThreadBy({ threadId });
   if (!thread) return { ok: false, tone: 'stop', title: 'File not found', message: 'That intake file no longer exists.' };
   const app = await loadApplication(thread.application_id);

@@ -460,6 +460,20 @@ test('the order for Digital Bible Society is read-only and prints clean', () => 
   assert.match(endpoint, /if \(meta\.view\)/);
   assert.ok(endpoint.indexOf('if (meta.view)') < endpoint.indexOf('performLarryAction(threadId, action'));
 
+  // The panel and the inbox must never disagree about what is possible, so the
+  // admin offers the order form too — as a link to the same signed page, not a
+  // second copy that could drift away from it.
+  const admin = read('../landing/admin.html');
+  const agentApi = read('../api/intake-agent.js');
+  assert.match(admin, /function lauraOpenOrderForm/);
+  assert.match(admin, /Order form for Digital Bible Society/);
+  assert.match(agentApi, /action === 'order-url'/);
+  // And the panel's shipping bar no longer offers a call it cannot book.
+  const shipBar = admin.slice(admin.indexOf('var buttons = shipping'), admin.indexOf('return \'<div class="laura-larry-bar">'));
+  assert.doesNotMatch(shipBar, /schedule-call/);
+  shippingButtonNames().filter((name) => name !== 'order-form')
+    .forEach((name) => assert.match(shipBar, new RegExp(`'${name}'`), `panel is missing ${name}`));
+
   const html = renderOrderForm({
     reference: 'VS-A1B2C3D4',
     raisedOn: '3 August 2026',
