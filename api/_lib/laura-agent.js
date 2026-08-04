@@ -3,6 +3,7 @@ import {
   renderApplicantEmail,
   renderDigestEmail,
   renderLarryActionEmail,
+  renderWaitingDigestEmail,
 } from './laura-email.js';
 import {
   actionButtonsFor, actionMeta, adminFileUrl, isKnownAction, postedButtonNames, siteBaseUrl,
@@ -2028,13 +2029,41 @@ export async function sendMessageById(messageId) {
   return { sent, message: patched[0] || message };
 }
 
+// Files where nothing moves until Larry does something. Everything else is
+// Laura's to carry, and putting the two in one email is what made the old
+// digest unreadable — six things he had to act on, buried in twenty he did not.
+const NEEDS_LARRY_STATES = new Set(['waiting_on_larry', 'ready_to_ship', 'escalated']);
+
+// How long the applicant has had the ball, in words. Anything past the chase
+// window is worth his eye even though Laura is already on it.
+function waitedLabel(messages, followUpDays) {
+  const hours = hoursSinceLastApplicantSend(messages);
+  if (!Number.isFinite(hours)) return { text: 'not contacted yet', stale: true };
+  const days = Math.floor(hours / 24);
+  if (days < 1) return { text: 'today', stale: false };
+  return { text: `${days} ${days === 1 ? 'day' : 'days'}`, stale: days > followUpDays };
+}
+
+// What this file is actually short of, said the way Larry would say it.
+function waitingForLabel(thread, app) {
+  const missing = asArray(thread.missing_fields).map((x) => String(x)).filter(Boolean);
+  if (missing.length) return missing.slice(0, 4).join(', ');
+  return {
+    new: 'Laura has not run on this one yet',
+    waiting_on_customer: 'a reply',
+    ready_to_schedule: 'them to pick a time',
+    shipped: 'word that the card arrived',
+    follow_up_photos: 'photos and news of what it has done',
+  }[String(thread.state || '')] || 'nothing in particular';
+}
+
 export async function sendLauraDigest({ force = false } = {}) {
   const c = config();
-  const rows = await selectRows('intake_threads?select=*&order=updated_at.desc&limit=80');
-  const activeStates = new Set(['new', 'waiting_on_larry', 'waiting_on_customer', 'ready_to_schedule', 'ready_to_ship', 'follow_up_photos', 'escalated']);
-  const threads = rows.filter((t) => force || t.digest_pending || activeStates.has(t.state)).slice(0, 25);
+  const rows = await selectRows('intake_threads?select=*&order=updated_at.desc&limit=200');
+  const activeStates = new Set(['new', 'waiting_on_larry', 'waiting_on_customer', 'ready_to_schedule', 'ready_to_ship', 'shipped', 'follow_up_photos', 'escalated']);
+  const threads = rows.filter((t) => force || t.digest_pending || activeStates.has(t.state));
   if (!threads.length) return { ok: true, sent: false, reason: 'No active Laura threads.' };
-  const allMessages = await selectRows('intake_messages?select=*&order=created_at.desc&limit=500');
+  const allMessages = await selectRows('intake_messages?select=*&order=created_at.desc&limit=1500');
   const allTasks = await selectRows('agent_filing_items?select=*&state=eq.pending&order=created_at.desc&limit=200').catch(() => []);
   const byThread = new Map();
   allMessages.forEach((m) => {
@@ -2053,47 +2082,121 @@ export async function sendLauraDigest({ force = false } = {}) {
   const appById = new Map(applications.filter((a) => appIds.has(String(a.id))).map((a) => [String(a.id), a]));
 
   const stamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-  const items = threads.map((t) => {
-    const threadMessages = (byThread.get(t.id) || []);
-    const draft = threadMessages.find((m) => m.status === 'draft' && m.direction === 'outbound'
-      && !asArray(m.to_email).map(normalizeEmail).includes(normalizeEmail(c.larryEmail)));
-    const tasks = taskByThread.get(t.id) || [];
-    const item = threadCardItem(t, appById.get(String(t.application_id)) || null, { draft: draft || null });
-    if (tasks.length) item.facts.push(['Filing', tasks.map((task) => task.title).join('; ')]);
-    return item;
-  });
+  const adminUrl = `${siteBaseUrl()}/admin.html`;
 
-  const rendered = renderDigestEmail({
-    agentName: c.agentName,
-    stamp,
-    items,
-    adminUrl: `${siteBaseUrl()}/admin.html`,
-  });
-  const body = rendered.text;
-  const subject = `${threads.length} VillageServer ${threads.length === 1 ? 'file needs' : 'files need'} you`;
-  const sent = await sendEmail({
-    to: c.larryEmail,
-    subject,
-    text: body,
-    html: rendered.html,
-    replyTo: c.agentEmail,
-  });
-  const digest = await insertRow('agent_digests', {
-    digest_key: crypto.randomUUID(),
-    sent_to: c.larryEmail,
-    thread_ids: threads.map((t) => t.id),
-    subject,
-    body,
-    status: 'sent',
-    provider: sent.provider,
-    provider_message_id: sent.provider_message_id,
-    sent_at: new Date().toISOString(),
-  });
-  await Promise.all(threads.map((t) => patchRows(`intake_threads?id=eq.${encodeURIComponent(t.id)}`, {
+  const needsLarry = threads.filter((t) => NEEDS_LARRY_STATES.has(String(t.state || '')));
+  // Longest-ignored first: the queue email is read top-down and abandoned
+  // halfway, so whoever has waited most should never be the part he misses.
+  const waiting = threads
+    .filter((t) => !NEEDS_LARRY_STATES.has(String(t.state || '')))
+    .map((t) => ({ thread: t, hours: hoursSinceLastApplicantSend(byThread.get(t.id) || []) }))
+    .sort((a, b) => (b.hours === Infinity ? 1e9 : b.hours) - (a.hours === Infinity ? 1e9 : a.hours))
+    .map((x) => x.thread);
+
+  const sends = [];
+
+  // ── One: the things only he can do. Full cards, every button. ──────────
+  if (needsLarry.length) {
+    const items = needsLarry.slice(0, 25).map((t) => {
+      const threadMessages = (byThread.get(t.id) || []);
+      const draft = threadMessages.find((m) => m.status === 'draft' && m.direction === 'outbound'
+        && !asArray(m.to_email).map(normalizeEmail).includes(normalizeEmail(c.larryEmail)));
+      const tasks = taskByThread.get(t.id) || [];
+      const item = threadCardItem(t, appById.get(String(t.application_id)) || null, { draft: draft || null });
+      if (tasks.length) item.facts.push(['Filing', tasks.map((task) => task.title).join('; ')]);
+      return item;
+    });
+    const rendered = renderDigestEmail({ agentName: c.agentName, stamp, items, adminUrl });
+    sends.push({
+      kind: 'needs_you',
+      threads: needsLarry,
+      subject: `${needsLarry.length} VillageServer ${needsLarry.length === 1 ? 'file needs' : 'files need'} you`,
+      rendered,
+    });
+  }
+
+  // ── Two: where everything else has got to. No action required. ─────────
+  if (waiting.length) {
+    const shown = waiting.slice(0, 40);
+    const items = shown.map((t) => {
+      const app = appById.get(String(t.application_id)) || null;
+      const waited = waitedLabel(byThread.get(t.id) || [], c.followUpDays);
+      return {
+        name: t.applicant_name || (app && app.name) || 'Applicant',
+        email: t.applicant_email || (app && app.email) || '',
+        token: t.thread_token,
+        waitingFor: waitingForLabel(t, app),
+        waited: waited.text,
+        stale: waited.stale,
+        // One link each, so he can lean on somebody without opening the panel.
+        // Laura still writes and sends it; he only chooses who. Not offered on a
+        // posted card — there is nothing left to ask for, and its chase is the
+        // arrival check already on the clock.
+        nudgeUrl: POST_SHIPPING_STATES.has(String(t.state || ''))
+          ? ''
+          : (actionButtonsFor(t.id, { actions: ['more-info'] })[0] || {}).url || '',
+      };
+    });
+    const rendered = renderWaitingDigestEmail({
+      agentName: c.agentName,
+      stamp,
+      items,
+      adminUrl,
+      overflow: Math.max(0, waiting.length - shown.length),
+    });
+    sends.push({
+      kind: 'queue',
+      threads: waiting,
+      subject: `${waiting.length} in the queue — what Laura is still waiting for`,
+      rendered,
+    });
+  }
+
+  const results = [];
+  for (const send of sends) {
+    try {
+      const sent = await sendEmail({
+        to: c.larryEmail,
+        subject: send.subject,
+        text: send.rendered.text,
+        html: send.rendered.html,
+        replyTo: c.agentEmail,
+      });
+      const digest = await insertRow('agent_digests', {
+        digest_key: crypto.randomUUID(),
+        sent_to: c.larryEmail,
+        thread_ids: send.threads.map((t) => t.id),
+        subject: send.subject,
+        body: send.rendered.text,
+        status: 'sent',
+        provider: sent.provider,
+        provider_message_id: sent.provider_message_id,
+        sent_at: new Date().toISOString(),
+      }).catch(() => null);
+      results.push({ kind: send.kind, count: send.threads.length, digest_id: digest && digest.id });
+    } catch (e) {
+      // One failing send must not swallow the other — they carry different news.
+      results.push({ kind: send.kind, count: send.threads.length, error: String((e && e.message) || e) });
+    }
+  }
+
+  // Only clear the flag on files that actually made it into an email that sent.
+  const delivered = new Set(sends
+    .filter((send) => results.some((r) => r.kind === send.kind && !r.error))
+    .flatMap((send) => send.threads.map((t) => t.id)));
+  await Promise.all([...delivered].map((id) => patchRows(`intake_threads?id=eq.${encodeURIComponent(id)}`, {
     digest_pending: false,
     digest_last_sent_at: new Date().toISOString(),
   }).catch(() => null)));
-  return { ok: true, sent: true, digest, count: threads.length };
+
+  return {
+    ok: true,
+    sent: results.some((r) => !r.error),
+    emails: results,
+    needs_you: needsLarry.length,
+    queue: waiting.length,
+    count: threads.length,
+  };
 }
 
 // ── Larry's one-click actions ───────────────────────────────────────────
@@ -2283,8 +2386,14 @@ export async function performLarryAction(threadId, action, { value = '' } = {}) 
 
   if (action === 'more-info') {
     await recordLarryAction(thread, action, 'Larry asked Laura to go back to the applicant for more information.');
+    // Never drag a posted card back into intake. Its chase is the arrival
+    // check, and resetting the state here would cancel that and start asking
+    // for form details on a file that has already shipped.
+    const posted = POST_SHIPPING_STATES.has(String(thread.state || ''));
     await patchRows(`intake_threads?id=eq.${encodeURIComponent(thread.id)}`, {
-      state: 'waiting_on_customer', owner: 'laura', digest_pending: true,
+      ...(posted ? {} : { state: 'waiting_on_customer' }),
+      owner: 'laura',
+      digest_pending: true,
     }).catch(() => null);
     const run = await runLauraAgent({ threadId: thread.id, reason: 'larry_action' }).catch(() => null);
     const wentOut = run && run.sent;

@@ -11,7 +11,7 @@ import {
 } from '../api/_lib/laura-links.js';
 import {
   escapeHtml, renderActionPage, renderDigestEmail, renderLarryActionEmail,
-  renderOrderForm, renderThreadCardHtml,
+  renderOrderForm, renderThreadCardHtml, renderWaitingDigestEmail,
 } from '../api/_lib/laura-email.js';
 
 function read(path) {
@@ -442,6 +442,45 @@ test('an address that will not ship is queried, not confirmed', () => {
     THREAD, history,
   );
   assert.equal(fixed.next_action, 'confirm_card');
+});
+
+test('the six-hourly digest separates what Larry must do from what Laura is chasing', () => {
+  const core = read('../api/_lib/laura-agent.js');
+
+  // One email of twenty files, six of which needed him, is how the important
+  // ones got missed. Two emails, two jobs.
+  assert.match(core, /const NEEDS_LARRY_STATES = new Set\(\['waiting_on_larry', 'ready_to_ship', 'escalated'\]\)/);
+  assert.match(core, /renderWaitingDigestEmail/);
+  assert.match(core, /kind: 'needs_you'/);
+  assert.match(core, /kind: 'queue'/);
+  // Longest-ignored first: this email gets abandoned halfway, so whoever has
+  // waited most must not be the part he never reaches.
+  assert.match(core, /\.sort\(\(a, b\) => \(b\.hours === Infinity/);
+  // A failed send of one must not swallow the other, and only files that
+  // actually reached an inbox get their pending flag cleared.
+  assert.match(core, /const delivered = new Set\(sends/);
+
+  // Asking for more info must never drag a posted card back into intake --
+  // that would cancel the arrival check and start asking for form details on
+  // something already in the post.
+  assert.match(core, /const posted = POST_SHIPPING_STATES\.has\(String\(thread\.state \|\| ''\)\)/);
+  assert.match(core, /\.\.\.\(posted \? \{\} : \{ state: 'waiting_on_customer' \}\)/);
+
+  const items = [
+    { name: 'Kaisu Enoka', email: 'k@example.org', token: '595209D4', waitingFor: 'reference contact', waited: '11 days', stale: true, nudgeUrl: 'https://example.org/a' },
+    { name: 'Achebe', email: 'a@example.org', token: 'ECDFD902', waitingFor: 'word that the card arrived', waited: 'today', stale: false, nudgeUrl: '' },
+  ];
+  const mail = renderWaitingDigestEmail({ agentName: 'Laura', items, adminUrl: 'https://example.org/admin', overflow: 5 });
+
+  assert.match(mail.html, /2 in the queue/);
+  assert.match(mail.html, /Nothing here needs you/);
+  assert.match(mail.html, /reference contact/);
+  assert.match(mail.html, /11 days/);
+  assert.match(mail.html, /and 5 more/);
+  // The one with somewhere to chase gets a link; the posted one does not.
+  assert.equal((mail.html.match(/Ask them for it now/g) || []).length, 1);
+  assert.match(mail.text, /Nothing here needs you/);
+  assert.match(mail.text, /Waiting on: word that the card arrived/);
 });
 
 test('the order for Digital Bible Society is read-only and prints clean', () => {

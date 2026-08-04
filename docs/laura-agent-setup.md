@@ -173,7 +173,29 @@ That endpoint is the whole unattended tick, not just a mailout. In order:
 
 1. **Sweep** — picks up files that lost their next step (below).
 2. **Follow-ups** — runs every chase that has come due.
-3. **Digest** — mails Larry what is waiting on him.
+3. **Digest** — mails Larry, in two separate emails.
+
+### Two emails, not one
+
+One email carrying every active file is how the handful that needed Larry got
+buried in the twenty that did not. The tick sends two, and skips either one when
+it would be empty:
+
+| Email | Contains | What it looks like |
+|---|---|---|
+| **"3 files need you"** | `waiting_on_larry`, `ready_to_ship`, `escalated` | Full decision cards — address block, draft preview, every button |
+| **"12 in the queue"** | Everything else still open | A compact list: who, what they still owe, how long it has been |
+
+The queue email needs nothing from him. Each row carries what that applicant is
+missing and one **Ask them for it now** link, so he can lean on somebody early
+without opening the panel — Laura still writes and sends it, he only picks who.
+Rows are ordered longest-ignored first, because this is an email people abandon
+halfway, and anyone past `LAURA_FOLLOW_UP_DAYS` is marked. A posted card gets no
+link: there is nothing left to ask for, and its chase is the arrival check
+already on the clock.
+
+If one of the two fails to send, the other still goes, and only the files that
+actually reached an inbox have their pending flag cleared.
 
 The order matters: the digest he reads reflects the mail that just went out,
 rather than lagging a full cycle behind it.

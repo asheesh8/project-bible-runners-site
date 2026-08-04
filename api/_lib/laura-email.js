@@ -302,6 +302,73 @@ export function renderDigestEmail({ agentName = 'Laura', stamp = '', items = [],
   };
 }
 
+// ── The queue Laura is still working ────────────────────────────────────
+//
+// Deliberately not the card treatment. Nothing in this email needs Larry, so it
+// is a status report he can skim in ten seconds: who is waiting, what they still
+// owe, how long it has been. One link each, in case he wants to lean on somebody
+// himself — Laura writes and sends it, he just decides who.
+//
+// Compact on purpose. At a thousand applicants a stack of decision cards is
+// unreadable, and the thing that matters is the shape of the queue.
+
+export function renderWaitingDigestEmail({
+  agentName = 'Laura', stamp = '', items = [], adminUrl = '', overflow = 0,
+} = {}) {
+  const count = items.length;
+  const rows = items.map((item) => {
+    const wait = item.waited
+      ? `<span style="font-size:12px;font-weight:700;color:${item.stale ? PALETTE.warn : PALETTE.faint};white-space:nowrap">${escapeHtml(item.waited)}</span>`
+      : '';
+    return `<tr><td style="padding:13px 0;border-bottom:1px solid ${PALETTE.border}">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+    <td style="font-size:15px;font-weight:700;color:${PALETTE.text};line-height:1.35">${escapeHtml(item.name)}</td>
+    <td align="right" style="vertical-align:top">${wait}</td>
+  </tr></table>
+  <div style="font-size:12px;color:${PALETTE.faint};margin-top:2px">
+    ${escapeHtml(item.email || '')}${item.token ? ` &middot; <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace">VS-${escapeHtml(item.token)}</span>` : ''}
+  </div>
+  <div style="font-size:13.5px;color:${PALETTE.text};line-height:1.5;margin-top:7px">
+    <span style="color:${PALETTE.muted}">Waiting on:</span> ${escapeHtml(item.waitingFor)}
+  </div>
+  ${item.nudgeUrl ? `<div style="margin-top:8px">
+    <a href="${escapeHtml(item.nudgeUrl)}" style="font-size:13px;font-weight:700;color:${PALETTE.neutral};text-decoration:none;border:1px solid ${PALETTE.border};border-radius:7px;padding:6px 12px;display:inline-block">Ask them for it now</a>
+  </div>` : ''}
+</td></tr>`;
+  }).join('');
+
+  const heading = `<tr><td style="padding:0 4px 14px">
+  <div style="font-size:20px;font-weight:800;color:${PALETTE.text}">${count} in the queue</div>
+  <div style="font-size:13px;color:${PALETTE.muted};margin-top:5px">Nothing here needs you &mdash; this is what ${escapeHtml(agentName)} is waiting for${stamp ? ` &middot; ${escapeHtml(stamp)}` : ''}</div>
+</td></tr>`;
+
+  const tail = `<tr><td style="padding:18px 8px 0;text-align:center">
+  ${overflow ? `<div style="font-size:13px;color:${PALETTE.muted};margin-bottom:12px">and ${overflow} more &mdash; the panel has the rest</div>` : ''}
+  ${adminUrl ? `<a href="${escapeHtml(adminUrl)}" style="font-size:13px;font-weight:700;color:${PALETTE.neutral};text-decoration:underline">Open the admin panel</a><br><br>` : ''}
+  <span style="font-size:12px;color:${PALETTE.faint};line-height:1.6">Every one of these is already being chased on a schedule. The links are only there if you want to push one along early.</span>
+</td></tr>`;
+
+  return {
+    html: shell([heading, card(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table>`),
+      tail, footer(agentName)].join(''), { preheader: `${count} waiting, nothing needs you` }),
+    text: [
+      'Larry,',
+      '',
+      `${count} ${count === 1 ? 'file is' : 'files are'} with ${agentName}${stamp ? ` as of ${stamp}` : ''}. Nothing here needs you.`,
+      '',
+      ...items.map((item) => [
+        `${item.name} <${item.email || 'no email'}> — VS-${item.token || ''}${item.waited ? ` — ${item.waited}` : ''}`,
+        `  Waiting on: ${item.waitingFor}`,
+        item.nudgeUrl ? `  Ask them for it now: ${item.nudgeUrl}` : '',
+      ].filter(Boolean).join('\n')),
+      overflow ? `\n…and ${overflow} more in the panel.` : '',
+      adminUrl ? `\n${adminUrl}` : '',
+      '',
+      agentName,
+    ].filter(Boolean).join('\n'),
+  };
+}
+
 // ── The order Larry prints and sends to Digital Bible Society ───────────
 //
 // A document, not an email — so it is laid out for A4 and for a browser's
