@@ -71,6 +71,15 @@ a{color:inherit}
 .link-band-col{display:flex;flex-direction:column}
 .link-band-col a{font-family:"Newsreader",Georgia,serif;text-decoration:none;font-size:clamp(.94rem,1.1vw,1.18rem);font-weight:700;line-height:1.18;color:var(--ink);padding:6px 0;transition:color .12s}
 .link-band-col a:hover,.link-band-col a:focus-visible{color:var(--gold);outline:0}
+/* Actions — an application, a form — as opposed to pages that are only read.
+   Gold is already the hover colour for every link in this list, so an action
+   cannot be marked by colour alone or it would read as permanently hovered.
+   It carries a chip instead: present whether or not anything is hovered, and
+   dark enough on the tint to stay legible (#8a6100 on #fdf5e6 is ~6.5:1,
+   where plain --gold on white would have been about 3:1). */
+.link-band-col a.is-action{align-self:flex-start;margin:5px 0;padding:7px 15px;border:1.5px solid #e3c489;border-radius:999px;background:#fdf5e6;color:#8a6100;box-shadow:0 1px 2px rgba(197,139,36,.13)}
+.link-band-col a.is-action::after{content:"→";margin-left:8px;font-weight:900}
+.link-band-col a.is-action:hover,.link-band-col a.is-action:focus-visible{background:var(--gold);border-color:var(--gold);color:#fff}
 
 /* Donate / support CTA band */
 .donate-band{background:var(--blue-soft);border-top:1.5px solid var(--line);border-bottom:1.5px solid var(--line);padding:clamp(30px,4.5vw,56px) 0}
@@ -157,6 +166,10 @@ a{color:inherit}
 .step-list li{transition:border-color .15s ease}
 .step-list li:hover{border-color:var(--blue);background:#fff}
 .related a:hover,.related a:focus-visible{border-color:var(--blue);background:var(--blue-soft);color:var(--blue-dark);outline:0}
+.related a.is-action{border-color:#e3c489;background:#fdf5e6;color:#8a6100}
+.related a.is-action::after{color:#8a6100}
+.related a.is-action:hover,.related a.is-action:focus-visible{border-color:var(--gold);background:var(--gold);color:#fff}
+.related a.is-action:hover::after,.related a.is-action:focus-visible::after{color:#fff}
 .download-link:hover,.download-link:focus-visible{border-color:var(--blue);background:var(--blue-soft);color:var(--blue-dark);outline:0}
 #arki-credit{display:inline-block;cursor:pointer;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
 #arki-credit:hover{transform:scale(1.18)}

@@ -531,3 +531,36 @@ test('ministry verification scores the evidence and never self-certifies the int
   // And it is never recorded as a lesser file.
   assert.match(exemptTwo.verification_note, /safety-exemption route/);
 });
+
+test('the things a visitor can act on stay highlighted without being hovered', () => {
+  const css = read('landing/css/board.css');
+  const home = read('landing/index.html');
+  const privacy = read('landing/privacy.html');
+
+  // Gold is already the hover colour for directory links, so an action needs a
+  // treatment that survives with nothing hovered — otherwise it just reads as
+  // permanently hovered and loses its meaning.
+  assert.match(css, /\.link-band-col a:hover[^{]*\{color:var\(--gold\)/);
+  assert.match(css, /\.link-band-col a\.is-action\{[^}]*background:#fdf5e6/);
+  assert.match(css, /\.link-band-col a\.is-action::after\{content:"→"/);
+  assert.match(css, /\.related a\.is-action\{[^}]*background:#fdf5e6/);
+
+  // The forms carry it; the pages you only read do not.
+  assert.match(home, /<a class="is-action" href="\.\/equipment-application\.html"/);
+  assert.match(privacy, /<a class="is-action" href="\.\/equipment-application\.html"/);
+  assert.match(privacy, /<a class="is-action" href="\.\/index\.html#contact"/);
+  assert.doesNotMatch(home, /<a class="is-action" href="\.\/mission\.html"/);
+
+  // Chip text must stay legible on its own tint. #8a6100 on #fdf5e6 is ~5.1:1;
+  // plain --gold (#c58b24) on white would have been ~3:1 and failed AA.
+  assert.match(css, /\.link-band-col a\.is-action\{[^}]*color:#8a6100/);
+  assert.doesNotMatch(css, /\.link-band-col a\.is-action\{[^}]*color:var\(--gold\)/);
+
+  // Every page loads the same stylesheet build, or some pages keep the old one.
+  const versions = new Set();
+  for (const page of [...publicPages, 'landing/equipment-application.html', 'landing/kenya-schools.html', 'landing/privacy.html']) {
+    const m = read(page).match(/board\.css\?v=(\d+)/);
+    if (m) versions.add(m[1]);
+  }
+  assert.equal(versions.size, 1, `board.css cache-buster should be one version site-wide, found: ${[...versions].join(', ')}`);
+});
