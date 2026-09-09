@@ -2,5 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "landing",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/kenya-schools",
+      "destination": "/kenya",
+      "permanent": true
+    }
+  ]
 }

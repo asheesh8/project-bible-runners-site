@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>One Card. A Whole School. | VillageServer Initiative</title>
+  <meta name="description" content="Kenyan schools and children's programs serving children aged 6 to 12 can apply for a VillageServer microSD card — the full offline Bible library on any phone, with no internet, no data, and no cost.">
+  <link rel="canonical" href="https://villageserver.org/kenya">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="VillageServer Initiative">
+  <meta property="og:title" content="One Card. A Whole School.">
+  <meta property="og:description" content="The full offline Bible library — Scripture, audio, films and teaching for children aged 6 to 12 — on a single card that works on any phone with no internet. Free to Kenyan schools.">
+  <meta property="og:url" content="https://villageserver.org/kenya">
+  <meta property="og:image" content="https://villageserver.org/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="One Card. A Whole School.">
+  <meta name="twitter:description" content="The full offline Bible library for children aged 6 to 12, on a single card that works on any phone with no internet. Free to Kenyan schools.">
+  <meta name="twitter:image" content="https://villageserver.org/og-image.jpg">
+
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/board.css?v=14">
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       Kenya schools funnel. A campaign landing page rather than a
+       board article, so it carries its own scoped design — but it
+       borrows board.css tokens so it still reads as the same site.
+
+       Almost all of this traffic arrives from a Facebook ad on a
+       phone, so everything below is built mobile-first: one column,
+       thumb-reachable calls to action, and a sticky bar so the
+       button is never more than a glance away.
+       ══════════════════════════════════════════════════════════ */
+    .kf{
+      --deep:#08182e; --navy:#123055;
+      --gold:#e0a233; --gold-lit:#f5c46a; --gold-deep:#8a6100; --gold-wash:#fdf5e6;
+      --cream:#fbf8f1; --sky:#eaf3ff; --line-d:rgba(255,255,255,.13);
+    }
+
+    .kf *{ box-sizing:border-box }
+    .kf-wrap{ width:min(1120px,92vw); margin-inline:auto }
+    .kf-narrow{ width:min(760px,92vw); margin-inline:auto }
+
+    /* ── Scroll progress ─────────────────────────── */
+    .kf-progress{
+      position:fixed; top:0; left:0; height:3px; width:0%; z-index:60;
+      background:linear-gradient(90deg,var(--gold),var(--gold-lit));
+      transition:width .1s linear;
+    }
+
+    /* ── HERO ────────────────────────────────────── */
+    .kf-hero{
+      position:relative; overflow:hidden; isolation:isolate;
+      background:var(--deep); color:#fff;
+      padding:clamp(70px,13vh,130px) 0 clamp(56px,9vh,96px);
+    }
+    /* Slow-drifting colour field. Two blurred blobs, GPU-composited,
+       no JS — cheap enough to leave running on a mid-range phone. */
+    .kf-aurora{ position:absolute; inset:-30%; z-index:-2; filter:blur(70px); opacity:.62 }
+    .kf-aurora i{ position:absolute; display:block; border-radius:50%; animation:kf-drift 22s ease-in-out infinite }
+    .kf-aurora i:nth-child(1){ width:52%; height:52%; left:4%;  top:6%;  background:#1b4f8f }
+    .kf-aurora i:nth-child(2){ width:44%; height:44%; right:6%; top:26%; background:#8a5f16; animation-delay:-7s }
+    .kf-aurora i:nth-child(3){ width:38%; height:38%; left:34%; bottom:2%; background:#123f6d; animation-delay:-14s }
+    @keyframes kf-drift{
+      0%,100%{ transform:translate3d(0,0,0) scale(1) }
+      33%    { transform:translate3d(6%,-5%,0) scale(1.12) }
+      66%    { transform:translate3d(-5%,4%,0) scale(.94) }
+    }
+    /* Faint grid — reads as a map without being a literal one. */
+    .kf-grid-bg{
+      position:absolute; inset:0; z-index:-1; opacity:.16;
+      background-image:linear-gradient(var(--line-d) 1px,transparent 1px),linear-gradient(90deg,var(--line-d) 1px,transparent 1px);
+      background-size:58px 58px;
+      mask-image:radial-gradient(ellipse 75% 60% at 50% 42%,#000 35%,transparent 78%);
+      -webkit-mask-image:radial-gradient(ellipse 75% 60% at 50% 42%,#000 35%,transparent 78%);
+    }
+
+    .kf-hero-grid{ display:grid; grid-template-columns:1fr; gap:clamp(34px,5vw,60px); align-items:center }
+    .kf-flag{
+      display:inline-flex; align-items:center; gap:9px; padding:7px 15px 7px 9px;
+      border:1px solid rgba(224,162,51,.4); border-radius:999px; background:rgba(224,162,51,.11);
+      font-size:.76rem; font-weight:900; letter-spacing:.11em; text-transform:uppercase; color:var(--gold-lit);
+    }
+    .kf-flag b{
+      display:grid; place-items:center; width:21px; height:21px; border-radius:50%;
+      background:var(--gold); color:var(--deep); font-size:.7rem;
+    }
+    .kf-h1{
+      font-family:"Newsreader",Georgia,serif; font-weight:700;
+      font-size:clamp(2.9rem,8.5vw,5.2rem); line-height:.98; letter-spacing:-.032em;
+      margin:20px 0 0; color:#fff; text-wrap:balance;
+    }
+    .kf-h1 em{ font-style:normal; position:relative; white-space:nowrap; color:var(--gold-lit) }
+    /* Hand-drawn underline that sweeps in once the hero settles. */
+    .kf-h1 em::after{
+      content:""; position:absolute; left:0; right:0; bottom:-.07em; height:.1em;
+      background:linear-gradient(90deg,var(--gold),var(--gold-lit));
+      border-radius:99px; transform:scaleX(0); transform-origin:left;
+      animation:kf-sweep .85s cubic-bezier(.22,1,.36,1) .5s forwards;
+    }
+    @keyframes kf-sweep{ to{ transform:scaleX(1) } }
+    .kf-sub{
+      font-size:clamp(1.06rem,2.4vw,1.3rem); line-height:1.55; color:rgba(255,255,255,.8);
+      margin:22px 0 0; max-width:36ch;
+    }
+    .kf-cta-block{ margin-top:32px; display:flex; flex-direction:column; gap:13px; align-items:flex-start }
+    .kf-btn{
+      display:inline-flex; align-items:center; gap:11px;
+      background:linear-gradient(180deg,var(--gold-lit),var(--gold));
+      color:#2a1c05; border:0; border-radius:999px;
+      padding:17px 32px; font:inherit; font-weight:900; font-size:1.06rem;
+      text-decoration:none; cursor:pointer; position:relative; overflow:hidden;
+      box-shadow:0 12px 34px rgba(224,162,51,.34), inset 0 1px 0 rgba(255,255,255,.5);
+      transition:transform .16s cubic-bezier(.22,1,.36,1), box-shadow .16s;
+    }
+    .kf-btn:hover{ transform:translateY(-2px); box-shadow:0 18px 42px rgba(224,162,51,.44), inset 0 1px 0 rgba(255,255,255,.5) }
+    .kf-btn:active{ transform:translateY(0) }
+    .kf-btn .kf-arr{ transition:transform .16s }
+    .kf-btn:hover .kf-arr{ transform:translateX(4px) }
+    /* Light sweeping across the button, drawing the eye without moving it. */
+    .kf-btn::after{
+      content:""; position:absolute; top:0; bottom:0; width:38%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+      transform:skewX(-18deg); animation:kf-shine 4.5s ease-in-out 1.6s infinite;
+    }
+    @keyframes kf-shine{ 0%{left:-45%} 22%,100%{left:125%} }
+    .kf-microcopy{ font-size:.88rem; color:rgba(255,255,255,.62) }
+    .kf-trust{ display:flex; flex-wrap:wrap; gap:8px; margin-top:26px }
+    .kf-chip{
+      display:inline-flex; align-items:center; gap:7px; padding:8px 14px;
+      border:1px solid var(--line-d); border-radius:999px; background:rgba(255,255,255,.05);
+      font-size:.82rem; font-weight:700; color:rgba(255,255,255,.86);
+    }
+    .kf-chip svg{ width:15px; height:15px; flex:0 0 auto; color:var(--gold-lit) }
+
+    /* ── The card, with its library fanning out ──── */
+    .kf-stage{ position:relative; display:grid; place-items:center; min-height:290px }
+    .kf-rings{ position:absolute; inset:0; display:grid; place-items:center; pointer-events:none }
+    .kf-rings span{
+      position:absolute; width:170px; height:170px; border:1.5px solid rgba(224,162,51,.5);
+      border-radius:50%; opacity:0; animation:kf-pulse 4s ease-out infinite;
+    }
+    .kf-rings span:nth-child(2){ animation-delay:1.33s }
+    .kf-rings span:nth-child(3){ animation-delay:2.66s }
+    @keyframes kf-pulse{
+      0%  { transform:scale(.55); opacity:.85 }
+      100%{ transform:scale(2.5); opacity:0 }
+    }
+    .kf-card{
+      position:relative; width:clamp(140px,30vw,176px); aspect-ratio:3/3.7;
+      background:linear-gradient(155deg,#1c4c85,#0d2647 62%);
+      border:1.5px solid rgba(224,162,51,.5); border-radius:14px 14px 16px 16px;
+      box-shadow:0 26px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.16);
+      display:grid; place-items:center; z-index:2;
+      animation:kf-float 6s ease-in-out infinite;
+    }
+    /* The notched corner that makes it read as a microSD card. */
+    .kf-card::before{
+      content:""; position:absolute; top:0; right:0; width:26%; height:17%;
+      background:var(--deep); border-left:1.5px solid rgba(224,162,51,.5);
+      border-bottom:1.5px solid rgba(224,162,51,.5); border-radius:0 14px 0 8px;
+    }
+    /* Contact pins. */
+    .kf-card::after{
+      content:""; position:absolute; bottom:9%; left:12%; right:12%; height:15%;
+      background:repeating-linear-gradient(90deg,rgba(224,162,51,.62) 0 8%,transparent 8% 14%);
+      border-radius:2px;
+    }
+    @keyframes kf-float{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-11px)} }
+    .kf-card-label{
+      font-family:"Newsreader",Georgia,serif; font-size:.92rem; font-weight:700;
+      color:var(--gold-lit); text-align:center; line-height:1.25; padding:0 10px;
+      transform:translateY(-14%);
+    }
+    /* Content chips orbiting the card. Positioned per-item below. */
+    .kf-orbit{ position:absolute; inset:0; pointer-events:none }
+    .kf-orb{
+      position:absolute; display:inline-flex; align-items:center; gap:6px;
+      padding:7px 13px; border-radius:999px; white-space:nowrap;
+      background:rgba(255,255,255,.95); color:#123055;
+      font-size:.78rem; font-weight:800; box-shadow:0 8px 22px rgba(0,0,0,.3);
+      opacity:0; animation:kf-orb-in .55s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @keyframes kf-orb-in{
+      from{ opacity:0; transform:translateY(14px) scale(.85) }
+      to  { opacity:1; transform:none }
+    }
+    .kf-orb:nth-child(1){ top:6%;  left:-4%;  animation-delay:.75s }
+    .kf-orb:nth-child(2){ top:26%; right:-6%; animation-delay:.9s }
+    .kf-orb:nth-child(3){ bottom:24%; left:-8%; animation-delay:1.05s }
+    .kf-orb:nth-child(4){ bottom:4%; right:-2%; animation-delay:1.2s }
+    .kf-orb b{ width:6px; height:6px; border-radius:50%; background:var(--gold) }
+
+    /* ── Reveal-on-scroll ────────────────────────── */
+    .kf-rise{ opacity:0; transform:translateY(26px); transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1) }
+    .kf-rise.is-in{ opacity:1; transform:none }
+
+    /* ── Section furniture ───────────────────────── */
+    .kf-sec{ padding:clamp(58px,9vw,100px) 0 }
+    .kf-sec-cream{ background:var(--cream) }
+    .kf-sec-sky{ background:var(--sky) }
+    .kf-eyebrow{
+      font-size:.75rem; font-weight:900; letter-spacing:.16em; text-transform:uppercase;
+      color:var(--gold-deep); margin:0 0 12px;
+    }
+    .kf-h2{
+      font-family:"Newsreader",Georgia,serif; font-weight:700;
+      font-size:clamp(1.95rem,4.6vw,3.1rem); line-height:1.06; letter-spacing:-.025em;
+      margin:0 0 16px; color:var(--ink); text-wrap:balance;
+    }
+    .kf-lede{ font-size:clamp(1.02rem,2vw,1.15rem); line-height:1.62; color:var(--muted); margin:0; max-width:62ch }
+
+    /* ── Library grid ────────────────────────────── */
+    .kf-lib{ display:grid; grid-template-columns:1fr; gap:14px; margin-top:38px }
+    .kf-lib-card{
+      padding:24px 24px 26px; border:1.5px solid var(--line); border-radius:20px; background:#fff;
+      transition:transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s, border-color .22s;
+    }
+    .kf-lib-card:hover{ transform:translateY(-4px); border-color:var(--blue); box-shadow:0 20px 44px rgba(22,58,107,.13) }
+    .kf-ico{
+      display:grid; place-items:center; width:46px; height:46px; border-radius:14px;
+      background:linear-gradient(160deg,var(--blue),var(--blue-dark)); color:#fff; margin-bottom:15px;
+    }
+    .kf-ico svg{ width:22px; height:22px }
+    .kf-lib-card h3{ font-size:1.1rem; margin:0 0 7px; color:var(--ink) }
+    .kf-lib-card p{ margin:0; color:var(--muted); font-size:.95rem; line-height:1.58 }
+
+    /* ── The multiplier ──────────────────────────── */
+    .kf-mult{ background:var(--deep); color:#fff; padding:clamp(58px,9vw,100px) 0; overflow:hidden }
+    .kf-mult .kf-h2{ color:#fff }
+    .kf-mult .kf-eyebrow{ color:var(--gold-lit) }
+    .kf-count{
+      font-family:"Newsreader",Georgia,serif; font-weight:700; letter-spacing:-.03em; line-height:1;
+      font-size:clamp(4.2rem,15vw,9rem); color:var(--gold-lit);
+      font-variant-numeric:tabular-nums; margin:26px 0 6px;
+    }
+    .kf-count-label{ font-size:1.02rem; color:rgba(255,255,255,.72); margin:0 0 34px }
+    .kf-dots{ display:grid; grid-template-columns:repeat(10,1fr); gap:9px; max-width:430px }
+    .kf-dots i{
+      display:block; aspect-ratio:1; border-radius:50%; background:rgba(255,255,255,.13);
+      transform:scale(.55); transition:background .4s, transform .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .kf-dots i.on{ background:var(--gold-lit); transform:scale(1) }
+    .kf-mult-note{ margin:30px 0 0; color:rgba(255,255,255,.72); font-size:1rem; line-height:1.6; max-width:44ch }
+
+    /* ── Honest supply split ─────────────────────── */
+    .kf-split{ display:grid; grid-template-columns:1fr; gap:16px; margin-top:34px }
+    .kf-panel{ padding:28px; border-radius:22px; border:1.5px solid var(--line); background:#fff }
+    .kf-panel.give{ border-color:var(--blue); background:var(--blue-soft); box-shadow:0 14px 40px rgba(31,87,149,.11) }
+    .kf-panel h3{
+      font-size:.76rem; font-weight:900; letter-spacing:.13em; text-transform:uppercase;
+      margin:0 0 16px; color:var(--blue-dark);
+    }
+    .kf-panel.yours h3{ color:var(--muted) }
+    .kf-panel ul{ list-style:none; margin:0; padding:0; display:grid; gap:11px }
+    .kf-panel li{ display:grid; grid-template-columns:20px 1fr; gap:11px; align-items:start; font-size:.98rem; line-height:1.5 }
+    .kf-panel li svg{ width:20px; height:20px; margin-top:1px }
+    .kf-panel.give li svg{ color:var(--blue) }
+    .kf-panel.yours li{ color:var(--muted) }
+    .kf-panel.yours li svg{ color:#9fb0c2 }
+    .kf-honest{
+      margin:22px 0 0; padding:18px 22px; border-left:4px solid var(--gold);
+      background:var(--gold-wash); border-radius:0 14px 14px 0; color:var(--ink);
+      font-size:1rem; line-height:1.62;
+    }
+
+    /* ── Fit checklist ───────────────────────────── */
+    .kf-fit{ display:grid; gap:11px; margin-top:32px }
+    .kf-fit li{
+      list-style:none; display:grid; grid-template-columns:26px 1fr; gap:13px; align-items:start;
+      padding:16px 20px; border:1.5px solid var(--line); border-radius:16px; background:#fff; font-size:1rem; line-height:1.55;
+    }
+    .kf-fit li svg{ width:26px; height:26px; color:var(--blue) }
+    .kf-fit b{ display:block; margin-bottom:2px }
+    .kf-fit span{ color:var(--muted); font-size:.94rem }
+
+    /* ── Steps timeline ──────────────────────────── */
+    .kf-steps{ position:relative; margin-top:40px; padding-left:0; list-style:none }
+    .kf-steps::before{
+      content:""; position:absolute; left:21px; top:14px; bottom:14px; width:2px;
+      background:linear-gradient(180deg,var(--gold),rgba(224,162,51,.15));
+      transform:scaleY(0); transform-origin:top; transition:transform 1.1s ease .15s;
+    }
+    .kf-steps.is-in::before{ transform:scaleY(1) }
+    .kf-steps li{ position:relative; display:grid; grid-template-columns:44px 1fr; gap:18px; padding-bottom:30px }
+    .kf-steps li:last-child{ padding-bottom:0 }
+    .kf-step-n{
+      position:relative; z-index:2; display:grid; place-items:center; width:44px; height:44px;
+      border-radius:50%; background:var(--deep); color:var(--gold-lit);
+      font-weight:900; font-size:1.02rem; border:2px solid var(--gold);
+    }
+    .kf-steps h3{ font-size:1.14rem; margin:9px 0 5px; color:var(--ink) }
+    .kf-steps p{ margin:0; color:var(--muted); line-height:1.6; font-size:.98rem }
+
+    /* ── FAQ ─────────────────────────────────────── */
+    .kf-faq{ margin-top:34px; display:grid; gap:11px }
+    .kf-faq details{
+      border:1.5px solid var(--line); border-radius:16px; background:#fff; overflow:hidden;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    .kf-faq details[open]{ border-color:var(--blue); box-shadow:0 12px 32px rgba(22,58,107,.09) }
+    .kf-faq summary{
+      cursor:pointer; list-style:none; padding:19px 56px 19px 22px; position:relative;
+      font-weight:800; font-size:1.02rem; color:var(--ink);
+    }
+    .kf-faq summary::-webkit-details-marker{ display:none }
+    .kf-faq summary::after{
+      content:""; position:absolute; right:22px; top:50%; width:11px; height:11px;
+      border-right:2.5px solid var(--blue); border-bottom:2.5px solid var(--blue);
+      transform:translateY(-70%) rotate(45deg); transition:transform .22s;
+    }
+    .kf-faq details[open] summary::after{ transform:translateY(-30%) rotate(-135deg) }
+    .kf-faq .kf-ans{ padding:0 22px 21px; color:var(--muted); line-height:1.65; font-size:.98rem }
+
+    /* ── Closing ─────────────────────────────────── */
+    .kf-close{ position:relative; overflow:hidden; background:var(--deep); color:#fff; padding:clamp(66px,10vw,112px) 0; text-align:center }
+    .kf-close .kf-h2{ color:#fff }
+    .kf-close p{ color:rgba(255,255,255,.78); font-size:1.08rem; line-height:1.6; margin:0 auto 32px; max-width:50ch }
+
+    /* ── Sticky bar ──────────────────────────────── */
+    /* Most of this traffic is a thumb on a phone, so the button follows. */
+    .kf-sticky{
+      position:fixed; left:0; right:0; bottom:0; z-index:55;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+      padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+      background:rgba(8,24,46,.93); backdrop-filter:blur(14px) saturate(150%);
+      -webkit-backdrop-filter:blur(14px) saturate(150%);
+      border-top:1px solid var(--line-d);
+      transform:translateY(110%); transition:transform .32s cubic-bezier(.22,1,.36,1);
+    }
+    .kf-sticky.is-up{ transform:translateY(0) }
+    .kf-sticky-text{ color:#fff; font-size:.9rem; font-weight:800; line-height:1.25 }
+    .kf-sticky-text span{ display:block; font-weight:500; font-size:.78rem; color:rgba(255,255,255,.6) }
+    .kf-sticky .kf-btn{ padding:13px 22px; font-size:.95rem; flex:0 0 auto; box-shadow:0 6px 20px rgba(224,162,51,.34) }
+    .kf-sticky .kf-btn::after{ animation:none }
+    /* The language switch and the assistant launcher already live in the
+       bottom corners of every page, and both sit far above this bar on
+       z-index (1200 and 9998). Fighting that would only bury the button, so
+       while the bar is up they move up with it. */
+    @media (max-width:959px){
+      .global-language-switch,.vsi-asst-launch{ transition:bottom .32s cubic-bezier(.22,1,.36,1) }
+      body.kf-bar-up .global-language-switch,
+      body.kf-bar-up .vsi-asst-launch{ bottom:calc(var(--kf-bar-h,76px) + 14px) }
+      /* and the last of the page stays reachable above the bar */
+      body.kf-bar-up .kf-close{ padding-bottom:calc(clamp(66px,10vw,112px) + var(--kf-bar-h,76px)) }
+    }
+
+    /* On a narrow phone the negative offsets push the chips under the hero's
+       overflow clip and they arrive with their ends sliced off. Pull them
+       inside the stage and shrink them a little. */
+    @media (max-width:520px){
+      .kf-orb{ font-size:.72rem; padding:6px 11px }
+      .kf-orb:nth-child(1),.kf-orb:nth-child(3){ left:0 }
+      .kf-orb:nth-child(2),.kf-orb:nth-child(4){ right:0 }
+    }
+
+    /* ── Wider viewports ─────────────────────────── */
+    @media (min-width:700px){
+      .kf-lib{ grid-template-columns:repeat(2,1fr) }
+      .kf-split{ grid-template-columns:1fr 1fr }
+      .kf-dots{ gap:11px }
+    }
+    @media (min-width:960px){
+      .kf-hero-grid{ grid-template-columns:1.12fr .88fr }
+      .kf-lib{ grid-template-columns:repeat(4,1fr) }
+      .kf-stage{ min-height:400px }
+      .kf-sticky{ display:none }   /* desktop keeps the in-page buttons */
+    }
+
+    /* ── Motion off ──────────────────────────────── */
+    @media (prefers-reduced-motion:reduce){
+      .kf *,.kf *::before,.kf *::after{
+        animation-duration:.001ms !important; animation-iteration-count:1 !important;
+        transition-duration:.001ms !important;
+      }
+      .kf-rise{ opacity:1; transform:none }
+      .kf-orb{ opacity:1; transform:none; animation:none }
+      .kf-steps::before{ transform:scaleY(1) }
+      .kf-h1 em::after{ transform:scaleX(1) }
+    }
+  </style>
+</head>
+<body class="kf">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="kf-progress" id="kf-progress" aria-hidden="true"></div>
+
+  <header class="board-top">
+    <div class="wrap">
+      <a class="board-brand" href="./index.html"><img src="./img/villageserver-initiative-logo.webp" alt="VillageServer Initiative"><span>VillageServer Initiative</span></a>
+      <a class="board-back" href="./index.html#directory">Back to directory</a>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ══ HERO ══════════════════════════════════════════════ -->
+    <section class="kf-hero" id="kf-hero">
+      <div class="kf-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="kf-grid-bg" aria-hidden="true"></div>
+      <div class="kf-wrap kf-hero-grid">
+        <div>
+          <p class="kf-flag"><b>&#10003;</b> Free for Kenyan schools</p>
+          <h1 class="kf-h1">One card.<br>A whole <em>school</em>.</h1>
+          <p class="kf-sub">The entire Bible library — Scripture, audio, gospel films and children's teaching — on a single microSD card that works on any phone. No internet. No data bundle. No cost, ever.</p>
+
+          <div class="kf-cta-block">
+            <a class="kf-btn" href="./equipment-application.html?funnel=kenya_schools">
+              Apply for your card <span class="kf-arr" aria-hidden="true">&rarr;</span>
+            </a>
+            <p class="kf-microcopy">Takes about 15 minutes · No payment details, ever</p>
+          </div>
+
+          <div class="kf-trust">
+            <span class="kf-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M2 2l20 20M5 12.5a11 11 0 0 1 4-2.6M8.5 16a6 6 0 0 1 2-1.3M12 20h.01"/></svg>
+              Works with no internet
+            </span>
+            <span class="kf-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3v18M8 7h8M6 12h12M8 17h8"/></svg>
+              Swahili &amp; English
+            </span>
+            <span class="kf-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+              Ages 6&ndash;12
+            </span>
+          </div>
+        </div>
+
+        <div class="kf-stage" aria-hidden="true">
+          <div class="kf-rings"><span></span><span></span><span></span></div>
+          <div class="kf-card"><span class="kf-card-label">The whole<br>library</span></div>
+          <div class="kf-orbit">
+            <span class="kf-orb"><b></b> Full Bible</span>
+            <span class="kf-orb"><b></b> Audio Scripture</span>
+            <span class="kf-orb"><b></b> Gospel films</span>
+            <span class="kf-orb"><b></b> Children's lessons</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ WHAT IS ON THE CARD ═══════════════════════════════ -->
+    <section class="kf-sec">
+      <div class="kf-wrap">
+        <div class="kf-rise">
+          <p class="kf-eyebrow">What the card holds</p>
+          <h2 class="kf-h2">Everything a class needs, already on it</h2>
+          <p class="kf-lede">Nothing to download, nothing to set up. Put the card in a phone and the whole library opens — the same on the first day as on a day the power has been out since morning.</p>
+        </div>
+        <div class="kf-lib">
+          <article class="kf-lib-card kf-rise">
+            <div class="kf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h7a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4zM20 4h-7a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h7z"/></svg></div>
+            <h3>Scripture they can read</h3>
+            <p>Swahili and English, plus other Kenyan languages where a translation exists.</p>
+          </article>
+          <article class="kf-lib-card kf-rise">
+            <div class="kf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10v4h4l5 4V6L7 10zM16.5 8.5a5 5 0 0 1 0 7M19.5 5.5a9 9 0 0 1 0 13"/></svg></div>
+            <h3>Audio Bible</h3>
+            <p>For the children still learning to read — and for the ones who never will.</p>
+          </article>
+          <article class="kf-lib-card kf-rise">
+            <div class="kf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="M10 9l5 3-5 3z"/></svg></div>
+            <h3>Gospel films</h3>
+            <p>Made for a young audience, not adult teaching handed down to children.</p>
+          </article>
+          <article class="kf-lib-card kf-rise">
+            <div class="kf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 9L12 4 2 9l10 5 10-5zM6 11.5V17c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/></svg></div>
+            <h3>Lessons for teaching</h3>
+            <p>Structured children's material a teacher can take straight into a class.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ THE MULTIPLIER ════════════════════════════════════ -->
+    <section class="kf-mult" id="kf-mult">
+      <div class="kf-wrap">
+        <div class="kf-rise">
+          <p class="kf-eyebrow">Why one card is enough</p>
+          <h2 class="kf-h2">It copies.</h2>
+          <p class="kf-count" id="kf-count" aria-hidden="true">0</p>
+          <p class="kf-count-label" id="kf-count-label">children reached from a single card in one teacher's hand</p>
+        </div>
+        <div class="kf-dots kf-rise" id="kf-dots" role="img" aria-label="A grid representing thirty children reached from one card"></div>
+        <p class="kf-mult-note kf-rise">The library copies from one phone to another with no internet at all. One card in a staff room becomes every teacher's phone by the end of the week — and the children go on hearing it long after the lesson ends.</p>
+      </div>
+    </section>
+
+    <!-- ══ HONEST SUPPLY ═════════════════════════════════════ -->
+    <section class="kf-sec kf-sec-cream">
+      <div class="kf-wrap">
+        <div class="kf-rise">
+          <p class="kf-eyebrow">Before you spend time on this</p>
+          <h2 class="kf-h2">What we send, and what your school already has</h2>
+          <p class="kf-lede">We would rather be plain with you now than have you plan around something that is not coming.</p>
+        </div>
+        <div class="kf-split">
+          <div class="kf-panel give kf-rise">
+            <h3>What we send you</h3>
+            <ul>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>A microSD card carrying the full offline library, loaded for your pupils' languages</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>An SD card adapter, so the card fits a phone, a reader, or a computer</span></li>
+            </ul>
+          </div>
+          <div class="kf-panel yours kf-rise">
+            <h3>What the school provides</h3>
+            <ul>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>A phone, tablet, or computer to read the card — one teacher's phone is enough to begin</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>A television or projector, if you want to show films to a whole class or assembly</span></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>Speakers, power, and anything else a larger showing needs</span></li>
+            </ul>
+          </div>
+        </div>
+        <p class="kf-honest kf-rise">We are not able to send equipment or funding at this stage. The card is genuinely where this starts — schools that begin with one teacher's phone and add a screen later are the ordinary path, not the exception.</p>
+      </div>
+    </section>
+
+    <!-- ══ WHO IT IS FOR ═════════════════════════════════════ -->
+    <section class="kf-sec">
+      <div class="kf-narrow">
+        <div class="kf-rise">
+          <p class="kf-eyebrow">Who we are looking for</p>
+          <h2 class="kf-h2">Is this your school?</h2>
+        </div>
+        <ul class="kf-fit">
+          <li class="kf-rise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+            <div><b>Children aged 6 to 12 are in your care regularly</b><span>Week after week — a school, a children's church programme, an orphanage, or a community learning centre.</span></div>
+          </li>
+          <li class="kf-rise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+            <div><b>You are in Kenya</b><span>This funnel is for Kenyan schools. Elsewhere in the world, apply through our main application instead.</span></div>
+          </li>
+          <li class="kf-rise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+            <div><b>A named person applies</b><span>A head teacher, programme coordinator, pastor, or school director — someone answerable for the children. Not a general enquiry address.</span></div>
+          </li>
+          <li class="kf-rise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+            <div><b>Registration is not required</b><span>A children's programme run out of a church is as welcome as a registered academy. We do need to know who you are and who vouches for you.</span></div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══ HOW IT WORKS ══════════════════════════════════════ -->
+    <section class="kf-sec kf-sec-sky">
+      <div class="kf-narrow">
+        <div class="kf-rise">
+          <p class="kf-eyebrow">After you apply</p>
+          <h2 class="kf-h2">You will hear from Laura</h2>
+          <p class="kf-lede">She handles every application personally. She is our receptionist, and she is the person you will deal with from here.</p>
+        </div>
+        <ol class="kf-steps" id="kf-steps">
+          <li>
+            <span class="kf-step-n">1</span>
+            <div><h3>She reads your application</h3><p>Usually within a few days. If something is missing or does not quite add up, she writes and asks — she will not leave your file sitting in silence.</p></div>
+          </li>
+          <li>
+            <span class="kf-step-n">2</span>
+            <div><h3>She verifies your ministry</h3><p>A referee, your identification, your school or pastoral credentials, and photographs of your work. If sending documents would put you or your community at risk, say so on the form — you will verify through two referees and your conversation instead.</p></div>
+          </li>
+          <li>
+            <span class="kf-step-n">3</span>
+            <div><h3>You speak with her</h3><p>Twenty minutes or so about your school and your pupils, by WhatsApp, phone, or video, at a time that suits you. Everyone we send to speaks with Laura first. There is nothing to prepare.</p></div>
+          </li>
+          <li>
+            <span class="kf-step-n">4</span>
+            <div><h3>Your card is posted</h3><p>Loaded for your pupils' languages and sent to the address you gave her. She will not promise a date she cannot keep, and she will tell you plainly where things stand.</p></div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ══ FAQ ═══════════════════════════════════════════════ -->
+    <section class="kf-sec">
+      <div class="kf-narrow">
+        <div class="kf-rise">
+          <p class="kf-eyebrow">Before you ask</p>
+          <h2 class="kf-h2">Questions we get</h2>
+        </div>
+        <div class="kf-faq">
+          <details class="kf-rise"><summary>Does it really cost nothing?</summary><div class="kf-ans">Nothing. The card and the adapter are given, not sold. There is no subscription, nothing to renew, and we will never ask you for payment details.</div></details>
+          <details class="kf-rise"><summary>Can we copy the card?</summary><div class="kf-ans">Yes, and we hope you do. Once it reaches you the library copies onto other phones with no internet — that is how one card reaches a whole staff room instead of one teacher.</div></details>
+          <details class="kf-rise"><summary>Our school has no internet at all.</summary><div class="kf-ans">That is exactly what this is for. Nothing on the card needs a connection — not to open it, not to read it, not to play the films.</div></details>
+          <details class="kf-rise"><summary>What if we have no projector or television?</summary><div class="kf-ans">You do not need one. A single phone is enough to begin, and most schools start exactly there. A screen makes assemblies easier later, but it is never a requirement.</div></details>
+          <details class="kf-rise"><summary>Why do you need my identification?</summary><div class="kf-ans">Because these cards go to children, and we verify every ministry we send to. If sharing documents would be unsafe where you are, tick the box on the form — two referees and your conversation with Laura take their place, and nobody will ask you for papers again.</div></details>
+          <details class="kf-rise"><summary>How long does it take?</summary><div class="kf-ans">The application takes about fifteen minutes. After that it depends on how quickly we can verify your ministry and find a time to talk. Laura will keep you told rather than leaving you guessing.</div></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ CLOSE ═════════════════════════════════════════════ -->
+    <section class="kf-close">
+      <div class="kf-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="kf-narrow kf-rise">
+        <h2 class="kf-h2">Your pupils could have the whole Bible by next term</h2>
+        <p>One card, one phone, and a class that can hear the Word in the language they actually speak. Tell us about your school and we will take it from there.</p>
+        <a class="kf-btn" href="./equipment-application.html?funnel=kenya_schools">
+          Start your application <span class="kf-arr" aria-hidden="true">&rarr;</span>
+        </a>
+        <p class="kf-microcopy" style="margin-top:16px">Questions first? Write to <a href="mailto:villageserverinitiative@gmail.com" style="color:var(--gold-lit)">villageserverinitiative@gmail.com</a></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Thumb-height CTA for the phone traffic the ad sends. -->
+  <div class="kf-sticky" id="kf-sticky">
+    <div class="kf-sticky-text">Free for Kenyan schools<span>About 15 minutes</span></div>
+    <a class="kf-btn" href="./equipment-application.html?funnel=kenya_schools">Apply <span class="kf-arr" aria-hidden="true">&rarr;</span></a>
+  </div>
+
+  <footer class="footer"><div class="wrap">© 2026 VillageServer Initiative · <a href="./index.html#directory">Directory</a> · <a href="./pamphlets.html">Pamphlets</a> · <a href="./privacy.html">Privacy</a> · <span id="arki-credit" title="ArkiTech Solutions">Built by ArkiTech Solutions</span></div></footer>
+
+  <script src="./js/site-language.js?v=8"></script>
+  <script src="./js/site-tracking.js?v=1"></script>
+  <script>
+  (function(){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ── Scroll progress ───────────────────────────────────
+    var bar = document.getElementById('kf-progress');
+    var ticking = false;
+    function onScroll(){
+      if(ticking) return;
+      ticking = true;
+      requestAnimationFrame(function(){
+        var max = document.documentElement.scrollHeight - window.innerHeight;
+        if(bar) bar.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+
+        // The sticky bar earns its place only after the hero button has gone by.
+        var sticky = document.getElementById('kf-sticky');
+        if(sticky){
+          var up = window.scrollY > window.innerHeight * 0.75;
+          sticky.classList.toggle('is-up', up);
+          // Measured rather than assumed — the label wraps on narrow phones.
+          if(up) document.documentElement.style.setProperty('--kf-bar-h', sticky.offsetHeight + 'px');
+          document.body.classList.toggle('kf-bar-up', up);
+        }
+        ticking = false;
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive:true });
+    onScroll();
+
+    // ── Reveal on scroll ──────────────────────────────────
+    var rises = document.querySelectorAll('.kf-rise');
+    if(reduce || !('IntersectionObserver' in window)){
+      rises.forEach(function(el){ el.classList.add('is-in'); });
+    } else {
+      // Stagger siblings so a grid arrives as a wave rather than a slab.
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(!entry.isIntersecting) return;
+          var el = entry.target;
+          var sibs = Array.prototype.slice.call(el.parentNode.children).filter(function(n){
+            return n.classList && n.classList.contains('kf-rise');
+          });
+          el.style.transitionDelay = Math.min(sibs.indexOf(el), 5) * 70 + 'ms';
+          el.classList.add('is-in');
+          io.unobserve(el);
+        });
+      }, { threshold:0.12, rootMargin:'0px 0px -8% 0px' });
+      rises.forEach(function(el){ io.observe(el); });
+    }
+
+    // ── The multiplier: 30 dots and a count that runs up ──
+    var DOTS = 30;
+    var dotWrap = document.getElementById('kf-dots');
+    var countEl = document.getElementById('kf-count');
+    if(dotWrap){
+      for(var i = 0; i < DOTS; i++) dotWrap.appendChild(document.createElement('i'));
+    }
+    var dots = dotWrap ? dotWrap.querySelectorAll('i') : [];
+
+    function runMultiplier(){
+      if(reduce){
+        dots.forEach(function(d){ d.classList.add('on'); });
+        if(countEl) countEl.textContent = DOTS;
+        return;
+      }
+      dots.forEach(function(d, idx){ setTimeout(function(){ d.classList.add('on'); }, idx * 55); });
+      var start = null, dur = DOTS * 55;
+      function step(ts){
+        if(start === null) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        // Ease out, so it lands on the number rather than snapping to it.
+        if(countEl) countEl.textContent = Math.round((1 - Math.pow(1 - p, 3)) * DOTS);
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    var mult = document.getElementById('kf-mult');
+    if(mult && 'IntersectionObserver' in window){
+      var mio = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if(e.isIntersecting){ runMultiplier(); mio.disconnect(); } });
+      }, { threshold:0.3 });
+      mio.observe(mult);
+    } else {
+      runMultiplier();
+    }
+
+    // ── Timeline line draws itself ────────────────────────
+    var steps = document.getElementById('kf-steps');
+    if(steps){
+      if(reduce || !('IntersectionObserver' in window)){ steps.classList.add('is-in'); }
+      else {
+        var sio = new IntersectionObserver(function(entries){
+          entries.forEach(function(e){ if(e.isIntersecting){ steps.classList.add('is-in'); sio.disconnect(); } });
+        }, { threshold:0.2 });
+        sio.observe(steps);
+      }
+    }
+  })();
+  </script>
+  <script src="./js/page-content.js?v=1"></script>
+  <script src="./js/donate.js?v=1"></script>
+  <script src="./js/assistant-widget.js?v=5" defer></script>
+</body>
+</html>

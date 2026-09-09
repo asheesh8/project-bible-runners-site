@@ -403,7 +403,7 @@ test('old campaign page redirects back into the new directory instead of staying
 test('the site says plainly that only a card and an adapter are sent', () => {
   const apply = read('landing/equipment-application.html');
   const home = read('landing/index.html');
-  const kenya = read('landing/kenya-schools.html');
+  const kenya = read('landing/kenya.html');
 
   // Every page that could set an expectation states what actually arrives.
   for (const [name, html] of [['application', apply], ['homepage', home], ['kenya funnel', kenya]]) {
@@ -453,22 +453,22 @@ test('the application collects proof of ministry, with a route for people who ca
 });
 
 test('the Kenya schools funnel is its own page and tags the applications it sends', () => {
-  const kenya = read('landing/kenya-schools.html');
+  const kenya = read('landing/kenya.html');
   const apply = read('landing/equipment-application.html');
   const track = read('api/track.js');
   const sitemap = read('landing/sitemap.xml');
 
-  assert.ok(existsSync(join(root, 'landing/kenya-schools.html')));
+  assert.ok(existsSync(join(root, 'landing/kenya.html')));
   // Its calls to action carry the funnel tag, or the campaign cannot be counted.
   assert.match(kenya, /equipment-application\.html\?funnel=kenya_schools/);
-  assert.equal([...kenya.matchAll(/funnel=kenya_schools/g)].length, 2, 'both CTAs should tag the funnel');
+  assert.equal([...kenya.matchAll(/funnel=kenya_schools/g)].length, 3, 'hero, sticky and closing CTAs should all tag the funnel');
   assert.match(apply, /q === 'kenya_schools' \? 'kenya_schools' : 'general'/);
   assert.match(track, /oneOf\(b\.funnel, \['general', 'kenya_schools'\]\)/);
 
   // The audience Larry named, and the handoff to Laura.
   assert.match(kenya, /6 to 12/);
   assert.match(kenya, /Laura/);
-  assert.match(sitemap, /villageserver\.org\/kenya-schools/);
+  assert.match(sitemap, /villageserver\.org\/kenya/);
 });
 
 test('the admin panel can see the evidence and open the interview gate', () => {
@@ -558,7 +558,7 @@ test('the things a visitor can act on stay highlighted without being hovered', (
 
   // Every page loads the same stylesheet build, or some pages keep the old one.
   const versions = new Set();
-  for (const page of [...publicPages, 'landing/equipment-application.html', 'landing/kenya-schools.html', 'landing/privacy.html']) {
+  for (const page of [...publicPages, 'landing/equipment-application.html', 'landing/kenya.html', 'landing/privacy.html']) {
     const m = read(page).match(/board\.css\?v=(\d+)/);
     if (m) versions.add(m[1]);
   }

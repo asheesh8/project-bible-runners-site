@@ -7,7 +7,7 @@ An informational field guide for a portable, offline digital library that brings
 - Guides visitors through the initiative, honest kit availability, component setup, and the system flow.
 - States plainly on every page that reaches an applicant that what is sent is a microSD card and an SD card adapter, and that all other hardware is obtained locally.
 - Verifies every applicant before a card is offered — referrals, photo ID, pastoral licensing, ministry photos, and an interview with Laura — with a documents-free route for applicants who cannot safely send them.
-- Runs a separate Kenya schools funnel (`kenya-schools.html`) whose applications are tagged for the campaign.
+- Runs a separate Kenya schools campaign funnel at `/kenya`, whose applications are tagged `kenya_schools` so the campaign can be measured on its own.
 - Moves initiative/rollout and access/share material onto focused resource pages.
 - Walks through Wi-Fi, Android microSD, iPhone/iPad card reader, and computer/USB access.
 - Uses an interactive component widget that opens focused setup guides.

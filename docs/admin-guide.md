@@ -112,7 +112,7 @@ Static help content baked into `admin.html` (WireGuard setup Q&A, etc.). No data
 | Form | Page | Endpoint | Table | Also emails? |
 |---|---|---|---|---|
 | Card application | `equipment-application.html` | `POST /api/track?type=application` | `equipment_applications` | Team + applicant (if `RESEND_API_KEY` set) |
-| Kenya schools funnel | `kenya-schools.html` | links to the application with `?funnel=kenya_schools` | `equipment_applications.funnel` | as above |
+| Kenya schools funnel | `/kenya` (`kenya.html`) | links to the application with `?funnel=kenya_schools` | `equipment_applications.funnel` | as above |
 | Contact | `index.html` | `POST /api/track?type=contact` | `contact_messages` | Team (if `RESEND_API_KEY` set) |
 
 Everything else in the panel is admin-authored content or read-only analytics.
