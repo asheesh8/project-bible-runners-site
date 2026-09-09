@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
-  assessShippingAddress, detectApplicantClarificationNeeds, formatPostalAddress,
-  normalizeDecision, sanitizeExtracted, stripQuotedReply,
+  assessShippingAddress, detectApplicantClarificationNeeds, detectVerificationGaps,
+  formatPostalAddress, normalizeDecision, sanitizeExtracted, stripQuotedReply,
 } from '../api/_lib/laura-agent.js';
 import {
   LARRY_ACTIONS, actionButtonsFor, actionMeta, isKnownAction, postedButtonNames,
@@ -305,8 +305,9 @@ test('only microSD cards are offered while LAURA_OFFER_MODE is sd_card_only', ()
   assert.match(core, /Never suggest that a larger kit or funding is coming/);
 });
 
-// A file with nothing missing and nothing contradictory: the state in which
-// Laura is "comfortable with the person" and the card offer is the next move.
+// A file with nothing missing and nothing contradictory, whose ministry has
+// been verified and whose interview has happened: the state in which Laura is
+// "comfortable with the person" and the card offer is the next move.
 function cleanApplication(extra = {}) {
   return {
     id: 'app-1',
@@ -322,6 +323,14 @@ function cleanApplication(extra = {}) {
     power_internet_access: 'Solar, phone data only',
     preferred_contact_method: 'email',
     receiving_plan: 'cover_import_costs',
+    // Proof of ministry, complete, with the interview behind her.
+    ministry_verification_mode: 'documents',
+    id_document: 'data:image/jpeg;base64,AAA',
+    license_document: 'data:image/jpeg;base64,BBB',
+    ministry_photos: [{ name: 'service.jpg', data: 'data:image/jpeg;base64,CCC' }],
+    interview_consent: true,
+    interview_status: 'completed',
+    interview_completed_at: '2026-07-01T00:00:00.000Z',
     ...extra,
   };
 }
@@ -356,6 +365,117 @@ test('a clean file is scaled down to the card offer, whatever the model proposed
   );
   assert.equal(flagged.next_action, 'offer_sd_card');
   assert.equal(flagged.auto_send_ok, false);
+});
+
+test('proof of ministry is chased before anything is offered', () => {
+  // Everything operational is on file, but none of the ministry evidence is.
+  const unverified = cleanApplication({
+    id_document: null,
+    license_document: null,
+    ministry_photos: [],
+    interview_status: 'required',
+    interview_completed_at: null,
+  });
+
+  const gaps = detectVerificationGaps(unverified);
+  assert.equal(gaps.length, 3);
+  assert.match(gaps.join(' '), /government-issued photo ID/);
+  assert.match(gaps.join(' '), /pastoral licensing/);
+  assert.match(gaps.join(' '), /photograph or two of your ministry/);
+
+  const decision = normalizeDecision(
+    { next_action: 'ask_larry', audience: 'larry', auto_send_ok: true },
+    unverified, THREAD, [],
+  );
+  assert.equal(decision.next_action, 'ask_customer');
+  assert.equal(decision.audience, 'applicant');
+  assert.match(decision.reasoning, /not verified yet/);
+  // The letter names what is missing rather than gesturing at it.
+  assert.match(decision.draft_body, /government-issued photo ID/);
+});
+
+test('the safety exemption swaps documents for a second referee, never for nothing', () => {
+  const exempt = cleanApplication({
+    ministry_verification_mode: 'safety_exempt',
+    id_document: null,
+    license_document: null,
+    ministry_photos: [],
+    safety_exempt_reason: 'Registering a church here draws attention we cannot afford.',
+    interview_status: 'required',
+    interview_completed_at: null,
+  });
+
+  // One referee is not enough on this route.
+  const gaps = detectVerificationGaps(exempt);
+  assert.equal(gaps.length, 1);
+  assert.match(gaps[0], /Two people who know your ministry/);
+  // And she never asks an exempt applicant for papers.
+  assert.doesNotMatch(gaps.join(' '), /photo ID|licensing/i);
+
+  const withBoth = detectVerificationGaps({
+    ...exempt, reference2_name: 'Bishop Otieno', reference2_contact: 'otieno@example.org',
+  });
+  assert.deepEqual(withBoth, []);
+
+  // The letter to an exempt applicant does not re-ask for documents.
+  const decision = normalizeDecision(
+    { next_action: 'ask_larry', audience: 'larry', auto_send_ok: true },
+    exempt, THREAD, [],
+  );
+  assert.match(decision.draft_body, /would not be safe/);
+  assert.doesNotMatch(decision.draft_body, /Photographs are completely fine/);
+});
+
+test('no card is offered to anyone nobody has interviewed', () => {
+  // Verified on paper, but the conversation has not happened.
+  const notYetInterviewed = cleanApplication({
+    interview_status: 'required',
+    interview_completed_at: null,
+  });
+
+  assert.deepEqual(detectVerificationGaps(notYetInterviewed), []);
+  const decision = normalizeDecision(
+    { next_action: 'offer_sd_card', audience: 'applicant', auto_send_ok: true },
+    notYetInterviewed, THREAD, [],
+  );
+  assert.equal(decision.next_action, 'send_schedule_link');
+  assert.match(decision.reasoning, /no one has interviewed/);
+
+  // Once a human marks the interview done, the offer is free to go.
+  const interviewed = cleanApplication();
+  assert.equal(
+    normalizeDecision({ next_action: 'ask_larry', audience: 'larry', auto_send_ok: true }, interviewed, THREAD, []).next_action,
+    'offer_sd_card',
+  );
+
+  // And she does not invite the same person twice.
+  const alreadyInvited = normalizeDecision(
+    { next_action: 'ask_larry', audience: 'larry', auto_send_ok: true },
+    notYetInterviewed, THREAD, [sentMessage('send_schedule_link')],
+  );
+  assert.notEqual(alreadyInvited.next_action, 'send_schedule_link');
+});
+
+test('applications filed before the requirement existed are not chased for documents', () => {
+  // A legacy row carries no verification mode at all. Demanding a passport
+  // from someone who applied under the old rules is not the intent.
+  const legacy = cleanApplication({
+    ministry_verification_mode: null,
+    id_document: null,
+    license_document: null,
+    ministry_photos: [],
+    interview_consent: null,
+    interview_status: null,
+    interview_completed_at: null,
+  });
+
+  assert.deepEqual(detectVerificationGaps(legacy), []);
+  // The interview still applies to them — that gate is about the person.
+  const decision = normalizeDecision(
+    { next_action: 'offer_sd_card', audience: 'applicant', auto_send_ok: true },
+    legacy, THREAD, [],
+  );
+  assert.equal(decision.next_action, 'send_schedule_link');
 });
 
 test('a card that is already confirmed or posted is never re-offered or re-confirmed', () => {

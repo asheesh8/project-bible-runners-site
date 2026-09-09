@@ -118,6 +118,89 @@ function websiteDomainOf(url) {
   }
 }
 
+// Uploaded evidence arrives as a data URL. Anything that is not an image or a
+// PDF, or is over the cap, is dropped rather than rejected — a bad upload must
+// never cost an applicant the whole application they just spent ten minutes on.
+const DATA_URL_RE = /^data:(image\/(png|jpeg|webp|gif)|application\/pdf);base64,[a-zA-Z0-9+/=]+$/;
+
+function cleanDataUrl(value, maxLen = 2200000) {
+  return (typeof value === 'string' && DATA_URL_RE.test(value) && value.length <= maxLen) ? value : null;
+}
+
+// At most 3 ministry photos, each within the cap, names trimmed.
+function cleanPhotoArray(value, maxItems = 3) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, maxItems).map((item) => {
+    const data = cleanDataUrl(item && item.data);
+    if (!data) return null;
+    return { name: trimText(item && item.name, 200) || 'photo', data };
+  }).filter(Boolean);
+}
+
+// ── Proof of ministry ────────────────────────────────────────────────
+// Larry's rule: nobody is reviewed until we know the ministry is real. Five
+// signals count — referrals, a government photo ID, pastoral licensing or
+// authorization, ministry/service photos, and an interview with Laura.
+//
+// The exemption exists because the requirement cannot be absolute. In parts of
+// the field, carrying ordination papers or photographing a service is what gets
+// a pastor arrested. Those applicants verify through people instead of paper:
+// two independent referees and a live interview, which is a higher bar of
+// human contact, not a waiver. What we never do is quietly downgrade them —
+// the file says which route they took and why.
+export function computeVerification(app) {
+  const mode = app.ministry_verification_mode === 'safety_exempt' ? 'safety_exempt' : 'documents';
+  const exempt = mode === 'safety_exempt';
+
+  const referees = [
+    !!(app.reference_name && app.reference_contact),
+    !!(app.reference2_name && app.reference2_contact),
+  ].filter(Boolean).length;
+  const hasId = !!app.id_document;
+  const hasLicense = !!(app.license_document || (app.ministry_license_body && app.ministry_license_ref));
+  const photoCount = Array.isArray(app.ministry_photos) ? app.ministry_photos.length : 0;
+  const interviewAgreed = app.interview_consent === true;
+
+  // The exemption path trades documents for people, so it needs both referees.
+  const refereesEnough = exempt ? referees >= 2 : referees >= 1;
+
+  const score = [refereesEnough, exempt || hasId, exempt || hasLicense, exempt || photoCount > 0, interviewAgreed]
+    .filter(Boolean).length;
+
+  const gaps = [];
+  if (!refereesEnough) gaps.push(exempt ? 'two independent referees' : 'a reference contact');
+  if (!exempt && !hasId) gaps.push('government-issued photo ID');
+  if (!exempt && !hasLicense) gaps.push('pastoral licensing or authorization');
+  if (!exempt && !photoCount) gaps.push('ministry or service photos');
+  if (!interviewAgreed) gaps.push('agreement to an interview with Laura');
+
+  // The interview is always required — it is the one check no document
+  // replaces — so a complete file is "interview_required", never "verified".
+  // Only a human marking the interview done moves it on.
+  const complete = gaps.length === 0;
+  const status = !complete ? 'pending_review' : 'interview_required';
+
+  const note = [
+    `Ministry verification ${score}/5 via the ${exempt ? 'safety-exemption' : 'document'} route.`,
+    exempt
+      ? `Applicant states documents cannot be sent safely: ${String(app.safety_exempt_reason || 'no reason given').slice(0, 240)}`
+      : `Supplied: ${[hasId && 'photo ID', hasLicense && 'licensing', photoCount && `${photoCount} ministry photo${photoCount > 1 ? 's' : ''}`].filter(Boolean).join(', ') || 'nothing yet'}.`,
+    `Referees on file: ${referees}.`,
+    complete
+      ? 'File is complete — the interview with Laura is the remaining gate.'
+      : `Still needed: ${gaps.join(', ')}.`,
+  ].join('\n');
+
+  return {
+    ministry_verification_mode: mode,
+    verification_score: score,
+    verification_status: status,
+    verification_note: note,
+    interview_status: 'required',
+    verification_gaps: gaps,
+  };
+}
+
 function computeTriage(app) {
   const eDom = emailDomainOf(app.email);
   const wDom = websiteDomainOf(app.org_website);
@@ -131,8 +214,15 @@ function computeTriage(app) {
   const flags = [];
   if (tier >= 4 && smallAudience) flags.push('tier_audience_mismatch');
 
+  // Verification is a gate, not a scoring input: however strong the rest of the
+  // file looks, an unverified ministry does not skip the queue.
+  const verificationScore = Number(app.verification_score);
+  const verificationComplete = Number.isFinite(verificationScore) && verificationScore >= 5;
+  if (!verificationComplete) flags.push('ministry_unverified');
+
   const confidence = score >= 3 ? 'High' : score === 2 ? 'Medium' : 'Low';
-  const fastTrack = confidence === 'High' && tier >= 1 && tier <= 3 && flags.length === 0;
+  const fastTrack = confidence === 'High' && tier >= 1 && tier <= 3
+    && verificationComplete && flags.filter((f) => f !== 'ministry_unverified').length === 0;
 
   const notes = [];
   notes.push(`Verification ${score}/3 — ` + [
@@ -153,9 +243,11 @@ function computeTriage(app) {
       notes.push(`${tierLine} — tier and audience are consistent.`);
     }
   }
+  if (app.verification_note) notes.push(String(app.verification_note));
   notes.push(fastTrack
-    ? 'Fast-track candidate: high confidence and a low-cost tier (1-3).'
-    : flags.length ? 'Needs manual review before any approval.' : `Standard review (${confidence.toLowerCase()} confidence).`);
+    ? 'Fast-track candidate: verified ministry, high confidence, low-cost tier (1-3).'
+    : !verificationComplete ? 'Blocked from fast-track: ministry verification is incomplete.'
+      : flags.length ? 'Needs manual review before any approval.' : `Standard review (${confidence.toLowerCase()} confidence).`);
 
   return {
     email_domain_match: domainMatch,
@@ -177,17 +269,24 @@ async function sendApplicationEmails({ app, triage }) {
   const agentEmail = process.env.AGENT_EMAIL || teamEmail;
   const tierLabel = app.kit_tier ? `Tier ${app.kit_tier} — ${KIT_TIERS[app.kit_tier] || ''}` : 'No tier selected';
   const teamBody = [
-    `New equipment & funding application`,
+    `New VillageServer application`,
     ``,
     `Name: ${app.name}`,
     `Organization: ${app.organization || '—'}`,
     `Email: ${app.email}`,
     `Phone: ${[app.phone_country_code, app.phone].filter(Boolean).join(' ') || '—'}`,
     `Country: ${app.country}${app.region ? `, ${app.region}` : ''}`,
-    `Kit requested: ${tierLabel}`,
+    `Building toward: ${tierLabel}`,
+    `Funnel: ${app.funnel === 'kenya_schools' ? 'Kenya schools campaign' : 'main site'}`,
     `Shipping address / delivery destination: ${app.shipping_address || '—'}`,
-    `Funding requested: ${app.funding_needed || '—'}`,
     `Timeframe: ${app.timeframe || '—'}`,
+    ``,
+    `── Ministry verification: ${app.verification_score || 0}/5 · ${String(app.verification_status || 'unverified').replace(/_/g, ' ')} ──`,
+    `Route: ${app.ministry_verification_mode === 'safety_exempt' ? 'SAFETY EXEMPTION — no documents, verify by referees + interview' : 'documents'}`,
+    `Photo ID: ${app.id_document ? 'attached' : '—'} · Licensing: ${app.license_document ? 'attached' : (app.ministry_license_body || '—')} · Ministry photos: ${(app.ministry_photos || []).length}`,
+    `Referee 1: ${app.reference_name || '—'} (${app.reference_relationship || 'relationship not stated'}) — ${app.reference_contact || '—'}`,
+    `Referee 2: ${app.reference2_name || '—'} (${app.reference2_relationship || 'relationship not stated'}) — ${app.reference2_contact || '—'}`,
+    `Interview: ${app.interview_consent ? 'agreed' : 'NOT agreed'}${app.interview_availability ? ` · availability: ${app.interview_availability}` : ''}`,
     ``,
     `── Triage: ${triage.triage_confidence} confidence${triage.fast_track ? ' · FAST-TRACK CANDIDATE' : ''}${triage.triage_flags.length ? ' · FLAGGED' : ''} ──`,
     triage.triage_note,
@@ -197,9 +296,14 @@ async function sendApplicationEmails({ app, triage }) {
   const applicantBody = [
     `Hi ${app.name},`,
     ``,
-    `Thank you for applying to the VillageServer Initiative equipment & funding program. Your application has been received and our team will review it personally — we reply to every application by email.`,
+    `Thank you for applying to the VillageServer Initiative. Your application has been received and our team reviews every one personally — we reply by email.`,
     ``,
-    `What you requested: ${tierLabel}`,
+    `Two things worth knowing now, so nothing comes as a surprise later:`,
+    ``,
+    `What we send is a microSD card loaded with the offline library, and an SD card adapter so it fits a phone or a reader. That is the whole of it today — the phones, servers, projectors, televisions, and satellite equipment that can be built around the card are things you would obtain locally yourself.`,
+    ``,
+    `Before anything ships, Laura will arrange a short interview with you. That conversation is part of how we verify every ministry we send to, and she will write to you about arranging it.`,
+    ``,
     `Mission country: ${app.country}`,
     ``,
     `If you need to add anything to your application, just reply to this email.`,
@@ -530,12 +634,10 @@ export default async function handler(req, res) {
 
     const oneOf = (value, allowed) => (allowed.includes(String(value || '')) ? String(value) : null);
     const kitTier = Number.isInteger(Number(b.kit_tier)) && Number(b.kit_tier) >= 1 && Number(b.kit_tier) <= 5 ? Number(b.kit_tier) : null;
-    let supportingDoc = null;
-    if (typeof b.supporting_document === 'string'
-      && /^data:(image\/(png|jpeg|webp|gif)|application\/pdf);base64,[a-zA-Z0-9+/=]+$/.test(b.supporting_document)
-      && b.supporting_document.length <= 3000000) {
-      supportingDoc = b.supporting_document;
-    }
+    const supportingDoc = cleanDataUrl(b.supporting_document, 3000000);
+    const idDoc = cleanDataUrl(b.id_document);
+    const licenseDoc = cleanDataUrl(b.license_document);
+    const ministryPhotos = cleanPhotoArray(b.ministry_photos);
 
     const payload = {
       visitor_id: cleanVisitorId || null,
@@ -575,6 +677,23 @@ export default async function handler(req, res) {
       current_reach: trimText(b.current_reach, 200) || null,
       supporting_document: supportingDoc,
       supporting_document_name: supportingDoc ? (trimText(b.supporting_document_name, 200) || 'document') : null,
+      // ── Proof of ministry ──
+      ministry_verification_mode: oneOf(b.ministry_verification_mode, ['documents', 'safety_exempt']) || 'documents',
+      ministry_license_body: trimText(b.ministry_license_body, 200) || null,
+      ministry_license_ref: trimText(b.ministry_license_ref, 120) || null,
+      id_document: idDoc,
+      id_document_name: idDoc ? (trimText(b.id_document_name, 200) || 'photo-id') : null,
+      license_document: licenseDoc,
+      license_document_name: licenseDoc ? (trimText(b.license_document_name, 200) || 'licensing') : null,
+      ministry_photos: ministryPhotos,
+      reference_relationship: trimText(b.reference_relationship, 200) || null,
+      reference2_name: trimText(b.reference2_name, 160) || null,
+      reference2_contact: trimText(b.reference2_contact, 255) || null,
+      reference2_relationship: trimText(b.reference2_relationship, 200) || null,
+      interview_consent: typeof b.interview_consent === 'boolean' ? b.interview_consent : null,
+      interview_availability: trimText(b.interview_availability, 600) || null,
+      safety_exempt_reason: trimText(b.safety_exempt_reason, 1000) || null,
+      funnel: oneOf(b.funnel, ['general', 'kenya_schools']) || 'general',
       receiving_plan: oneOf(b.receiving_plan, ['cover_import_costs', 'transport_partner', 'approved_retailer', 'alternative_plan', 'need_help']),
       receiving_plan_details: trimText(b.receiving_plan_details, 1000) || null,
       shipping_address: trimText(b.shipping_address, 1000) || null,
@@ -583,6 +702,11 @@ export default async function handler(req, res) {
       status: 'submitted',
     };
 
+    // Verification first — triage reads its score, because an unverified file
+    // must never fast-track no matter how clean the rest of it looks.
+    const verification = computeVerification(payload);
+    const { verification_gaps: verificationGaps, ...verificationColumns } = verification;
+    Object.assign(payload, verificationColumns);
     const triage = computeTriage(payload);
     Object.assign(payload, triage);
 
@@ -590,6 +714,17 @@ export default async function handler(req, res) {
     // been pasted into Supabase yet — original columns only.
     const payloadWithoutShipping = { ...payload };
     delete payloadWithoutShipping.shipping_address;
+    // A database that has the structured intake columns but not yet the
+    // ministry-verification migration would otherwise skip all the way down to
+    // legacyPayload and lose every structured answer. This tier keeps them.
+    const payloadWithoutVerification = { ...payload };
+    for (const col of ['ministry_verification_mode', 'ministry_license_body', 'ministry_license_ref',
+      'id_document', 'id_document_name', 'license_document', 'license_document_name', 'ministry_photos',
+      'reference_relationship', 'reference2_name', 'reference2_contact', 'reference2_relationship',
+      'interview_consent', 'interview_availability', 'interview_status', 'safety_exempt_reason',
+      'verification_status', 'verification_score', 'verification_note', 'funnel']) {
+      delete payloadWithoutVerification[col];
+    }
     const legacyPayload = {
       visitor_id: payload.visitor_id, site_host: payload.site_host, name: payload.name,
       email: payload.email, phone_country_code: payload.phone_country_code, phone: payload.phone,
@@ -602,6 +737,7 @@ export default async function handler(req, res) {
     const r = await fetchWithFallback([
       { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(payload) } },
       { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(payloadWithoutShipping) } },
+      { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(payloadWithoutVerification) } },
       { url: `${SUPABASE_URL}/rest/v1/equipment_applications`, options: { method: 'POST', headers: { ...sbH, Prefer: 'return=representation' }, body: JSON.stringify(legacyPayload) } },
     ]);
     if (r.ok) {
@@ -661,6 +797,23 @@ export default async function handler(req, res) {
       patch.status_updated_at = new Date().toISOString();
     }
     if (b.admin_notes !== undefined) patch.admin_notes = trimText(b.admin_notes, 4000) || null;
+
+    // Marking the interview done is the one gate Laura cannot open for herself,
+    // so it has to be settable by a human here. Setting it to 'completed'
+    // stamps the time, because "when did we speak to them" is the question
+    // asked later and a boolean cannot answer it.
+    const INTERVIEW_STATUSES = ['not_needed', 'required', 'invited', 'scheduled', 'completed', 'declined'];
+    if (b.interview_status !== undefined) {
+      if (!INTERVIEW_STATUSES.includes(String(b.interview_status))) return res.status(400).json({ error: 'invalid interview_status' });
+      patch.interview_status = String(b.interview_status);
+      patch.interview_completed_at = patch.interview_status === 'completed' ? new Date().toISOString() : null;
+    }
+    const VERIFICATION_STATUSES = ['unverified', 'pending_review', 'interview_required', 'verified', 'rejected'];
+    if (b.verification_status !== undefined) {
+      if (!VERIFICATION_STATUSES.includes(String(b.verification_status))) return res.status(400).json({ error: 'invalid verification_status' });
+      patch.verification_status = String(b.verification_status);
+    }
+
     if (!Object.keys(patch).length) return res.status(400).json({ error: 'nothing to update' });
     const r = await fetch(`${SUPABASE_URL}/rest/v1/equipment_applications?id=eq.${encodeURIComponent(id)}`, {
       method: 'PATCH',

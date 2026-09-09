@@ -38,6 +38,8 @@
     .reach-head .meta{margin:0 0 8px;text-transform:uppercase;letter-spacing:.16em;font-weight:900;color:var(--gold);font-size:.76rem}
     .reach-head h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(2rem,4vw,3.6rem);line-height:1.04;letter-spacing:-.03em;margin:0;color:var(--ink)}
     .reach-head p{margin:14px auto 0;color:var(--muted);font-size:1.08rem;line-height:1.5}
+    .reach-head p.reach-supply{max-width:720px;margin-top:18px;padding:16px 20px;border:1.5px solid var(--line);border-left:4px solid var(--blue);border-radius:0 16px 16px 0;background:#fff;text-align:left;font-size:.98rem;color:var(--ink)}
+    .reach-head p.reach-supply strong{color:var(--blue-dark)}
     .reach-ladder{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
     .reach-step{display:flex;flex-direction:column;gap:8px;padding:20px;border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:20px;background:#fff;box-shadow:0 12px 30px rgba(22,58,107,.08)}
     .reach-rank{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:#fff;font-weight:900;font-family:"DM Sans",sans-serif}
@@ -272,6 +274,7 @@
           <p class="meta">How the reach multiplies</p>
           <h2 id="reach-title">One library. Five ways to reach further.</h2>
           <p>The same offline VillageServer library scales from a single card in one hand to a satellite signal serving a whole region. Each step multiplies how many people the Word reaches.</p>
+          <p class="reach-supply"><strong>What we send is the card and an SD card adapter.</strong> The phones, Wi-Fi hubs, Raspberry Pi servers, televisions, projectors, solar power, and satellite equipment described below are obtained locally by the people who deploy them. We are not able to send equipment or funding at this stage, and we would rather say so here than let anyone plan around it.</p>
         </div>
         <ol class="reach-ladder">
           <li class="reach-step">
@@ -326,7 +329,7 @@
             <a href="./testimonials.html">Testimonials</a>
             <a href="./visuals.html">Photos &amp; Visuals</a>
             <a href="./affiliates.html">Ministry Partners</a>
-            <a href="./equipment-application.html" id="apply-directory-link" hidden>Equipment &amp; Funding Application</a>
+            <a href="./equipment-application.html" id="apply-directory-link" hidden>Apply for a Card</a>
           </div>
         </div>
         <div class="directory-group">
@@ -574,7 +577,7 @@
       if(!el)return;
       el.addEventListener('click',function(){clearTimeout(t);n++;if(n>=3){n=0;window.location.href='./admin.html';}t=setTimeout(function(){n=0;},600);});
     })();
-    // Reveal the Equipment & Funding Application link only when applications are open.
+    // Reveal the card application link only when applications are open.
     (function(){
       var link=document.getElementById('apply-directory-link');
       if(!link)return;

@@ -1,6 +1,6 @@
 # Intake & Deployment System
 
-How the equipment/funding application pipeline, triage scoring, and the
+How the card application pipeline, ministry verification, triage scoring, and the
 deployment log work — and what must be configured for them to run.
 
 ## Architecture

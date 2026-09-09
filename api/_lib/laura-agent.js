@@ -73,6 +73,13 @@ const EXTRACTABLE_FIELDS = {
   contact_timezone: 'text',
   mission_context: 'text',
   kit_tier: 'int',
+  reference_relationship: 'text',
+  reference2_name: 'text',
+  reference2_contact: 'text',
+  reference2_relationship: 'text',
+  ministry_license_body: 'text',
+  ministry_license_ref: 'text',
+  interview_availability: 'text',
 };
 
 // What the initiative can actually put in the post today. While this is
@@ -309,12 +316,17 @@ function appSummaryLines(app) {
     `Power/internet: ${app.power_internet_access || ''}`,
     `Website: ${app.org_website || ''}`,
     `Sending org: ${app.sending_org || ''}`,
-    `Reference: ${[app.reference_name, app.reference_contact].filter(Boolean).join(' - ')}`,
+    `Reference: ${[app.reference_name, app.reference_contact, app.reference_relationship].filter(Boolean).join(' - ')}`,
+    `Second reference: ${[app.reference2_name, app.reference2_contact, app.reference2_relationship].filter(Boolean).join(' - ')}`,
+    `Verification route: ${app.ministry_verification_mode === 'safety_exempt' ? `SAFETY EXEMPTION - ${app.safety_exempt_reason || 'no reason given'}` : (app.ministry_verification_mode || '')}`,
+    `Verification held: ${[app.id_document && 'photo ID', app.license_document && 'licensing document', app.ministry_license_body && `licensed by ${app.ministry_license_body}`, (app.ministry_photos || []).length && `${app.ministry_photos.length} ministry photo(s)`].filter(Boolean).join(', ')}`,
+    `Verification outstanding: ${detectVerificationGaps(app).join(' | ')}`,
+    `Interview: ${interviewDone(app) ? `completed ${app.interview_completed_at || ''}` : (app.interview_status || 'not started')}${app.interview_availability ? ` - reachable ${app.interview_availability}` : ''}`,
     `Years in field: ${app.years_in_field || ''}`,
     `Current reach: ${app.current_reach || ''}`,
     `Receiving plan: ${[app.receiving_plan, app.receiving_plan_details].filter(Boolean).join(' - ')}`,
     `Shipping address / delivery destination: ${app.shipping_address || ''}`,
-    `Funding requested: ${app.funding_needed || ''}`,
+    `Funding requested (legacy applications only): ${app.funding_needed || ''}`,
     `Timeframe: ${app.timeframe || ''}`,
     `Preferred contact: ${[app.preferred_contact_method, app.contact_timezone].filter(Boolean).join(' / ')}`,
     `Mission context: ${app.mission_context || ''}`,
@@ -617,6 +629,139 @@ export function detectApplicantClarificationNeeds(app) {
   }).slice(0, 9);
 }
 
+// ── Proof of ministry ───────────────────────────────────────────────────
+// Larry's rule: no card leaves before we know the ministry is real. The form
+// collects the evidence; Laura's job is to notice what is missing, chase it,
+// and hold the file at the interview until a human has actually spoken to the
+// applicant.
+//
+// This mirrors computeVerification in api/track.js. It is duplicated rather
+// than shared because the two run in different places for different reasons —
+// the API scores a submission once, Laura re-reads the file every run after
+// replies have been transcribed onto it, and the gaps she names have to be the
+// gaps as they stand now, not as they stood at submission.
+export function detectVerificationGaps(app) {
+  const mode = String(app && app.ministry_verification_mode || '');
+  // Applications submitted before the verification form existed carry no mode
+  // at all. They are not chased for documents they were never asked for — the
+  // interview still applies to them, because that gate is about the person and
+  // Laura can cover the same ground in conversation.
+  if (!mode) return [];
+  const exempt = mode === 'safety_exempt';
+  const referees = [
+    !!(trim(app && app.reference_name, 160) && trim(app && app.reference_contact, 255)),
+    !!(trim(app && app.reference2_name, 160) && trim(app && app.reference2_contact, 255)),
+  ].filter(Boolean).length;
+  const hasLicense = !!(app && (app.license_document
+    || (trim(app.ministry_license_body, 200) && trim(app.ministry_license_ref, 120))));
+  const photos = Array.isArray(app && app.ministry_photos) ? app.ministry_photos.length : 0;
+
+  const gaps = [];
+  if (exempt ? referees < 2 : referees < 1) {
+    gaps.push(exempt
+      ? 'Two people who know your ministry and can speak for it — name, how they know you, and an email or phone for each.'
+      : 'A referee who knows your ministry — name, how they know you, and an email or phone.');
+  }
+  if (!exempt && !(app && app.id_document)) {
+    gaps.push('A photograph of a government-issued photo ID — passport, national ID, or driver\'s licence.');
+  }
+  if (!exempt && !hasLicense) {
+    gaps.push('Your pastoral licensing or ministry authorization — an ordination certificate, a ministry licence, or a letter from your church or denomination.');
+  }
+  if (!exempt && !photos) {
+    gaps.push('A photograph or two of your ministry — a gathering, a service, or your work in the community.');
+  }
+  if (app && app.interview_consent === false) {
+    gaps.push('Your agreement to a short conversation with me about your ministry.');
+  }
+  return gaps;
+}
+
+// The interview is the one check no document replaces, so it is the last gate
+// before a card is offered. It counts as done when a human has marked it so on
+// the file — Laura never marks her own interview complete.
+function interviewDone(app) {
+  return String(app && app.interview_status || '') === 'completed'
+    || !!(app && app.interview_completed_at);
+}
+
+function interviewInvited(app, messages) {
+  return sentActionCount(messages, 'send_schedule_link') > 0
+    || ['invited', 'scheduled', 'completed'].includes(String(app && app.interview_status || ''));
+}
+
+// Chasing the proof. Named items, no lecture, and the reason stated plainly —
+// people send documents faster when they know why they are being asked.
+function verificationRequestDecision(app, thread, gaps) {
+  const c = config();
+  const exempt = String(app && app.ministry_verification_mode || '') === 'safety_exempt';
+  return {
+    next_action: 'ask_customer',
+    state: 'waiting_on_customer',
+    audience: 'applicant',
+    missing_fields: ['ministry verification'],
+    summary: `${app.name || 'Applicant'} is missing ministry verification: ${gaps.length} item${gaps.length > 1 ? 's' : ''} outstanding.`,
+    draft_subject: `Verifying your ministry [VS-${thread.thread_token}]`,
+    draft_body: [
+      `Hi ${app.name || 'there'},`,
+      '',
+      `Thank you for your application. Before I can take it further I need to finish verifying your ministry — we do this for everyone, because the cards go out to real ministries serving real communities and this is how we know.`,
+      '',
+      exempt
+        ? `You told us that sharing documents would not be safe where you are, and that is respected — nobody will ask you for them again. What I still need instead:`
+        : `Here is what is still outstanding:`,
+      '',
+      ...gaps.map((gap, index) => `${index + 1}. ${gap}`),
+      '',
+      exempt
+        ? `Your two referees and our conversation together take the place of the paperwork.`
+        : `Photographs are completely fine — hold the document under good light and take a picture with your phone. Reply with them attached to this email.`,
+      '',
+      `If any of this is difficult where you are, tell me and we will find another way round it.`,
+      '',
+      c.agentName,
+      'VillageServer Initiative',
+    ].join('\n'),
+    reasoning: 'Ministry verification is incomplete; asked for the outstanding items by name.',
+    auto_send_ok: true,
+  };
+}
+
+// The file is complete on paper. Now the conversation, which is the part Larry
+// actually asked for — and the part that catches what no document catches.
+function interviewInviteDecision(app, thread) {
+  const c = config();
+  const when = trim(app && app.interview_availability, 400);
+  return {
+    next_action: 'send_schedule_link',
+    state: 'waiting_on_customer',
+    audience: 'applicant',
+    missing_fields: [],
+    summary: `${app.name || 'Applicant'} is verified on paper. Inviting them to the interview before any card is offered.`,
+    draft_subject: `A short conversation about your ministry [VS-${thread.thread_token}]`,
+    draft_body: [
+      `Hi ${app.name || 'there'},`,
+      '',
+      `Thank you — I have everything I need on paper now.`,
+      '',
+      `The last step is a short conversation between the two of us about your ministry and the people you serve. It is not a test, and there is nothing to prepare. I speak with everyone we send to, and it usually takes twenty minutes or so.`,
+      '',
+      c.calBookingUrl
+        ? `Pick whatever time suits you here: ${c.calBookingUrl}`
+        : (when
+          ? `You told us you are usually reachable ${when} — I will work around that. Reply with two or three times that suit you and how you would like to talk, whether that is WhatsApp, an ordinary phone call, or video.`
+          : `Reply with two or three times that suit you over the next week or so, your time zone, and how you would like to talk — WhatsApp, an ordinary phone call, or video all work.`),
+      '',
+      `If the connection where you are makes a call difficult, say so and we will work out something that does.`,
+      '',
+      c.agentName,
+      'VillageServer Initiative',
+    ].join('\n'),
+    reasoning: 'Verification is complete on paper; the interview is the remaining gate before a card is offered.',
+    auto_send_ok: true,
+  };
+}
+
 function hasInboundRole(messages, role) {
   return asArray(messages).some((m) => m.role === role && (m.direction === 'inbound' || m.status === 'received'));
 }
@@ -718,6 +863,11 @@ function readyForOffer(app, messages = []) {
   // Achebe's Vermont address forwarded on to Kenya by his brother is a real
   // arrangement, not an error, and no regex is going to settle that.
   if (!hasInboundRole(messages, 'applicant') && detectApplicantClarificationNeeds(app).length) return false;
+  // Larry's rule: the ministry is verified and the interview has happened
+  // before anything is offered. Both are hard gates — a clean, complete form
+  // from someone nobody has spoken to is exactly the case this is here for.
+  if (detectVerificationGaps(app).length) return false;
+  if (!interviewDone(app)) return false;
   return detectMissingFields(app).filter((field) => !/language|shipping|receiving/i.test(field)).length === 0;
 }
 
@@ -943,7 +1093,23 @@ function fallbackDecision(app, thread, messages) {
     return cardConfirmationDecision(app, thread);
   }
 
-  // Verified and consistent, but they have not been levelled with yet.
+  // Proof of ministry comes before anything is offered. Chase what is missing,
+  // bounded by the same ask-round cap as any other question so a file cannot
+  // be chased forever.
+  const verifyGaps = detectVerificationGaps(app);
+  if (cardsOnly && !settled && !offered && verifyGaps.length
+    && sentActionCount(messages, 'ask_customer') < config().maxAskRounds) {
+    return verificationRequestDecision(app, thread, verifyGaps);
+  }
+
+  // Complete on paper, but nobody has spoken to them yet.
+  if (cardsOnly && !settled && !offered && !verifyGaps.length
+    && !interviewDone(app) && !interviewInvited(app, messages)) {
+    return interviewInviteDecision(app, thread);
+  }
+
+  // Verified, interviewed, and consistent — but they have not been levelled
+  // with yet.
   if (cardsOnly && !settled && !offered && readyForOffer(app, messages)) {
     return sdCardOfferDecision(app, thread);
   }
@@ -1089,6 +1255,31 @@ export function normalizeDecision(decision, app, thread, messages) {
   // letter all over again. Past that point the model's reply stands.
   const settled = POST_SHIPPING_STATES.has(String(thread && thread.state || ''))
     || sentActionCount(messages, 'confirm_card') > 0;
+  // Neither gate is the model's to waive, and unlike the rules below these
+  // must also catch it proposing the card offer or the confirmation directly —
+  // a card offered to an unverified applicant, or to one nobody has spoken to,
+  // is the exact failure Larry asked us to close.
+  const gateable = supersedable || ['offer_sd_card', 'confirm_card'].includes(action);
+  if (offerMode() === 'sd_card_only' && gateable && !settled && !hasOfferedSdCard(messages)) {
+    const verifyGaps = detectVerificationGaps(app);
+    if (verifyGaps.length && sentActionCount(messages, 'ask_customer') < config().maxAskRounds) {
+      const forced = verificationRequestDecision(app, thread, verifyGaps);
+      return {
+        ...forced,
+        auto_send_ok: forced.auto_send_ok && d.auto_send_ok !== false,
+        reasoning: `${forced.reasoning} Overrode ${action} because the ministry is not verified yet.`,
+      };
+    }
+    if (!verifyGaps.length && !interviewDone(app) && !interviewInvited(app, messages)) {
+      const forced = interviewInviteDecision(app, thread);
+      return {
+        ...forced,
+        auto_send_ok: forced.auto_send_ok && d.auto_send_ok !== false,
+        reasoning: `${forced.reasoning} Overrode ${action} because no one has interviewed this applicant yet.`,
+      };
+    }
+  }
+
   if (offerMode() === 'sd_card_only' && supersedable && !settled) {
     // They took up the offer and sent something, but it will not ship. Ask for
     // the missing part by name before anything else gets decided.
@@ -1156,8 +1347,11 @@ async function callAnthropicDecision({ app, thread, messages }) {
     `If the applicant is missing routine details, ask for only the important missing details in a warm short email.`,
     ...(offerMode() === 'sd_card_only' ? [
       `WHAT IS ACTUALLY AVAILABLE RIGHT NOW: microSD cards loaded with the offline library, in the applicant's language. Nothing else. No Raspberry Pi servers, no projectors, no satellite kits, no funding, regardless of what tier they asked for.`,
-      `So your goal for every applicant is: get the form details complete and consistent, and once you are satisfied the person and their ministry are real, use next_action "offer_sd_card". That message thanks them warmly, tells them plainly that only cards are going out for now, and asks for exactly two things: the language they need and a shipping address with a recipient name and phone.`,
-      `Do not propose a call, a booking link, a deployment or a review by Larry as the next step for a clean file — the card offer comes first.`,
+      `WHAT THE INITIATIVE SENDS: the card itself and an SD card adapter. Nothing else. Phones, televisions, projectors, Raspberry Pi servers, Wi-Fi hubs, solar, and satellite equipment are all things the applicant obtains locally themselves. If they ask, say that plainly and without apology — it is not a disappointment we are hiding, it is what we do.`,
+      `PROOF OF MINISTRY comes before any offer, for everyone. A file is verified when we hold: a referee, a government photo ID, pastoral licensing or authorization, ministry photos, and their agreement to speak with you. Applicants who cannot safely send documents take the exemption route instead: two independent referees and the same conversation. Never treat the exemption as a lesser file and never ask an exempt applicant for papers again.`,
+      `THE INTERVIEW is the last gate and it is not optional. You speak with every applicant before a card is offered. Only a human marks that interview complete — never assume it happened, and never offer a card to someone nobody has spoken to.`,
+      `So the order for every applicant is: complete and consistent form details, then ministry verification, then the interview, and only then next_action "offer_sd_card". That message thanks them warmly, tells them plainly that only cards are going out for now, and asks for exactly two things: the language they need and a shipping address with a recipient name and phone.`,
+      `Do not propose a deployment or a review by Larry as the next step for a file that is merely complete — verification and the interview come first.`,
       `Once they have replied with a language and a real shipping address, use next_action "confirm_card": thank them, repeat the language and address back so they can correct it, and say the card is on the list to send. Never give or imply a shipping date.`,
       `Never suggest that a larger kit or funding is coming, is likely, or is being considered. You may say their file stays with us for when more equipment is available.`,
     ] : [
@@ -1174,6 +1368,9 @@ async function callAnthropicDecision({ app, thread, messages }) {
     appSummaryLines(app).join('\n'),
     '',
     `Detected missing fields: ${missing.length ? missing.join(', ') : 'none'}`,
+    `Ministry verification route: ${String(app.ministry_verification_mode || 'not recorded (application predates the requirement)')}`,
+    `Outstanding verification items: ${detectVerificationGaps(app).join(' | ') || 'none'}`,
+    `Interview: ${interviewDone(app) ? 'completed' : `not completed (status: ${app.interview_status || 'none'})`}`,
     `Applicant clarification needed before Larry review: ${clarificationNeeds.length ? clarificationNeeds.map((item) => `${item.code}: ${item.summary} Ask: ${item.request}`).join(' | ') : 'none'}`,
     '',
     `Recent conversation:`,

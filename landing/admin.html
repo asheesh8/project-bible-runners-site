@@ -1167,7 +1167,7 @@ details.res-section[open] .section-caret{transform:rotate(180deg)}
         <!-- Application section on/off toggle -->
         <div class="res-section">
           <div class="res-section-title">🔌 &nbsp;Application section on the public site</div>
-          <p style="margin:0 0 14px;color:#57606a;max-width:640px">Turn the public <strong>Equipment &amp; Funding Application</strong> page on or off. While it is off, the link is hidden from the site and the form will not accept submissions — keep it off until the 501(c)(3) is in place.</p>
+          <p style="margin:0 0 14px;color:#57606a;max-width:640px">Turn the public <strong>card application</strong> page on or off. While it is off, the link is hidden from the site and the form will not accept submissions — keep it off until the 501(c)(3) is in place.</p>
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
             <span id="apps-flag-state" style="display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;font-weight:800;font-size:.85rem;background:#eaeef2;color:#57606a">Loading…</span>
             <button type="button" id="apps-flag-toggle" style="padding:9px 18px;border-radius:8px;border:0;background:#316dca;color:#fff;font-weight:800;font-size:.9rem;cursor:pointer;opacity:.6" disabled>Loading…</button>
@@ -3733,6 +3733,7 @@ function renderApplicationCard(a){
   if(a.email_domain_match != null) verif.push((a.email_domain_match ? '✓' : '✗') + ' email domain');
   if(a.reference_provided != null) verif.push((a.reference_provided ? '✓' : '✗') + ' reference');
   if(a.web_presence_found != null) verif.push((a.web_presence_found ? '✓' : '✗') + ' web presence');
+  var ministryBlock = renderMinistryVerification(a);
 
   return '<div style="padding:16px 20px;border:1px solid #d0d7de;border-radius:12px;background:#fff;margin-bottom:12px">'
     + '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">'
@@ -3763,13 +3764,14 @@ function renderApplicationCard(a){
     + detailRow('Current reach', a.current_reach)
     + detailRow('Receiving plan', PLAN_NAMES[a.receiving_plan] ? (PLAN_NAMES[a.receiving_plan] + (a.receiving_plan_details ? ' — ' + a.receiving_plan_details : '')) : '')
     + detailRow('Shipping address', a.shipping_address)
-    + detailRow('Funding', a.funding_needed)
+    + detailRow('Funding (legacy)', a.funding_needed)
     + detailRow('Timeframe', a.timeframe)
     + detailRow('Contact via', [a.preferred_contact_method, a.contact_timezone].filter(Boolean).join(' · '))
     + (verif.length ? detailRow('Verification', verif.join(' · ')) : '')
     + (a.mission_context ? '<div style="margin-top:8px;font-size:.9rem;color:#24292f"><strong>Context:</strong> ' + esc(a.mission_context) + '</div>' : '')
     + (a.message ? '<div style="margin-top:6px;font-size:.9rem;color:#24292f"><strong>Message:</strong> ' + esc(a.message) + '</div>' : '')
     + (a.supporting_document ? '<div style="margin-top:6px;font-size:.88rem"><a href="' + a.supporting_document + '" download="' + esc(a.supporting_document_name || 'document') + '" style="color:#0969da;font-weight:700">⬇ Supporting document (' + esc(a.supporting_document_name || 'file') + ')</a></div>' : '')
+    + ministryBlock
     + '</div>'
     + '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eaeef2">'
     + '<label style="font-size:.82rem;font-weight:800;color:#57606a;display:block;margin-bottom:5px">'
@@ -3782,6 +3784,76 @@ function renderApplicationCard(a){
     + '<button onclick="approveAndDeploy(\'' + a.id + '\')" style="padding:7px 16px;background:#8250df;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Approve → Deployment</button>'
     + '<button onclick="buildCampaignFromApp(\'' + a.id + '\')" style="padding:7px 16px;background:#1a7f37;border:0;border-radius:7px;color:#fff;font-size:.82rem;font-weight:700;cursor:pointer">Build Campaign →</button>'
     + '</div></div></div>';
+}
+
+// Proof of ministry, laid out so Larry can actually check it: the evidence to
+// open, the referees to ring, and the one button Laura cannot press herself.
+function renderMinistryVerification(a){
+  if(!a.ministry_verification_mode && !a.interview_status) return '';
+  var exempt = a.ministry_verification_mode === 'safety_exempt';
+  var photos = Array.isArray(a.ministry_photos) ? a.ministry_photos : [];
+  var docLink = function(data, name, label){
+    if(!data) return '';
+    return '<a href="' + data + '" download="' + esc(name || label) + '" target="_blank" rel="noopener" '
+      + 'style="display:inline-block;margin:0 8px 6px 0;padding:5px 11px;border:1px solid #d0d7de;border-radius:7px;'
+      + 'background:#fff;color:#0969da;font-weight:700;font-size:.8rem;text-decoration:none">⬇ ' + esc(label) + '</a>';
+  };
+
+  var evidence = exempt
+    ? '<div style="font-size:.86rem;color:#9a6700;background:#fff8c5;border:1px solid #f0dfa8;border-radius:7px;padding:9px 11px">'
+      + '<strong>Safety exemption.</strong> No documents were requested. Verified by two referees and the interview.'
+      + (a.safety_exempt_reason ? '<div style="margin-top:5px;color:#57606a">' + esc(a.safety_exempt_reason) + '</div>' : '')
+      + '</div>'
+    : (docLink(a.id_document, a.id_document_name, 'Photo ID')
+      + docLink(a.license_document, a.license_document_name, 'Licensing')
+      + photos.map(function(ph, i){ return docLink(ph.data, ph.name, 'Ministry photo ' + (i + 1)); }).join('')
+      || '<span style="font-size:.84rem;color:#cf222e;font-weight:700">No documents on file.</span>');
+
+  var referees = [
+    [a.reference_name, a.reference_contact, a.reference_relationship],
+    [a.reference2_name, a.reference2_contact, a.reference2_relationship]
+  ].filter(function(r){ return r[0] || r[1]; })
+   .map(function(r){ return esc(r.filter(Boolean).join(' — ')); })
+   .join('<br>') || '<span style="color:#cf222e;font-weight:700">None on file.</span>';
+
+  var done = a.interview_status === 'completed';
+  var interviewLine = done
+    ? '<span style="color:#1a7f37;font-weight:800">✓ Interview completed' + (a.interview_completed_at ? ' · ' + fmtDate(a.interview_completed_at) : '') + '</span>'
+    : '<span style="color:#cf222e;font-weight:800">✗ Not interviewed' + (a.interview_status ? ' (' + esc(a.interview_status) + ')' : '') + '</span>';
+
+  return '<div style="margin-top:12px;padding:12px 14px;border:1px solid ' + (done ? '#c3e6cd' : '#ffd8d3') + ';'
+    + 'border-left:3px solid ' + (done ? '#1a7f37' : '#cf222e') + ';border-radius:8px;background:' + (done ? '#f6fdf8' : '#fff8f7') + '">'
+    + '<div style="font-size:.76rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#57606a;margin-bottom:8px">'
+    + 'Proof of ministry' + (a.verification_score != null ? ' · ' + a.verification_score + '/5' : '')
+    + (exempt ? ' · safety exemption' : '') + '</div>'
+    + '<div style="margin-bottom:9px">' + evidence + '</div>'
+    + (a.ministry_license_body ? '<div style="font-size:.85rem;color:#24292f;margin-bottom:6px"><strong>Licensed by:</strong> ' + esc(a.ministry_license_body) + (a.ministry_license_ref ? ' · ' + esc(a.ministry_license_ref) : '') + '</div>' : '')
+    + '<div style="font-size:.85rem;color:#24292f;margin-bottom:9px"><strong>Referees:</strong><br>' + referees + '</div>'
+    + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:9px;border-top:1px solid #eaeef2">'
+    + '<span style="font-size:.85rem">' + interviewLine + '</span>'
+    + (a.interview_availability ? '<span style="font-size:.8rem;color:#57606a">reachable: ' + esc(a.interview_availability) + '</span>' : '')
+    + '<button onclick="setInterviewStatus(\'' + a.id + '\', \'' + (done ? 'required' : 'completed') + '\')" '
+    + 'style="padding:6px 13px;background:' + (done ? '#57606a' : '#1a7f37') + ';border:0;border-radius:7px;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer">'
+    + (done ? 'Undo — not interviewed' : '✓ I have interviewed them') + '</button>'
+    + '</div>'
+    + (done ? '' : '<div style="margin-top:8px;font-size:.8rem;color:#57606a">Laura will not offer a card until this is marked.</div>')
+    + '</div>';
+}
+
+// The interview gate. Laura invites, a human confirms — she never marks her own.
+function setInterviewStatus(appId, status){
+  var a = _appsCache[appId];
+  if(!a) return;
+  trackApi('PATCH', 'applications', {interview_status: status}, appId)
+    .then(function(){
+      a.interview_status = status;
+      a.interview_completed_at = status === 'completed' ? new Date().toISOString() : null;
+      renderApplicationsList();
+      showStatus(status === 'completed'
+        ? 'Interview marked complete — Laura can offer this applicant a card now.'
+        : 'Interview un-marked. Laura will hold the card again.', 'ok');
+    })
+    .catch(function(){ showStatus('Could not update the interview (has the ministry-verification migration been applied?).', 'err'); });
 }
 
 function renderAppFilterChips(){

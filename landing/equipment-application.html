@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Equipment &amp; Funding Application | VillageServer Initiative</title>
-  <meta name="description" content="Missionaries and field partners can apply to receive VillageServer equipment and funding to equip a mission — offline Bible libraries, phones, Raspberry Pi kits, projectors, satellite, and solar power.">
+  <title>Apply for a VillageServer Card | VillageServer Initiative</title>
+  <meta name="description" content="Missionaries and field partners can apply for a VillageServer microSD card and adapter — the full offline Bible library in your community's language, on any phone, with no internet.">
   <link rel="canonical" href="https://villageserver.org/equipment-application">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="VillageServer Initiative">
-  <meta property="og:title" content="Equipment &amp; Funding Application | VillageServer Initiative">
-  <meta property="og:description" content="Missionaries and field partners can apply to receive VillageServer equipment and funding to equip a mission — offline Bible libraries, phones, Raspberry Pi kits, projectors, satellite, and solar power.">
+  <meta property="og:title" content="Apply for a VillageServer Card | VillageServer Initiative">
+  <meta property="og:description" content="Missionaries and field partners can apply for a VillageServer microSD card and adapter — the full offline Bible library in your community's language, on any phone, with no internet.">
   <meta property="og:url" content="https://villageserver.org/equipment-application">
   <meta property="og:image" content="https://villageserver.org/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Equipment &amp; Funding Application | VillageServer Initiative">
-  <meta name="twitter:description" content="Missionaries and field partners can apply to receive VillageServer equipment and funding to equip a mission — offline Bible libraries, phones, Raspberry Pi kits, projectors, satellite, and solar power.">
+  <meta name="twitter:title" content="Apply for a VillageServer Card | VillageServer Initiative">
+  <meta name="twitter:description" content="Missionaries and field partners can apply for a VillageServer microSD card and adapter — the full offline Bible library in your community's language, on any phone, with no internet.">
   <meta name="twitter:image" content="https://villageserver.org/og-image.jpg">
 
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
@@ -82,6 +82,25 @@
     /* Honeypot — hidden from humans, present for bots */
     .apply-website-field{position:absolute !important;left:-9999px !important;width:1px;height:1px;overflow:hidden}
     .apply-file-note{font-size:.82rem;color:var(--muted)}
+    /* What we send / what you provide */
+    .supplies{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 26px}
+    .supplies-col{padding:18px 20px;border:1.5px solid var(--line);border-radius:18px;background:#fff}
+    .supplies-col.is-sent{border-color:var(--blue);background:var(--blue-soft)}
+    .supplies-col h2{font-size:.74rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase;margin:0 0 10px;color:var(--blue-dark)}
+    .supplies-col.is-yours h2{color:var(--muted)}
+    .supplies-col ul{margin:0;padding-left:18px;color:var(--ink);font-size:.92rem;line-height:1.6}
+    .supplies-col.is-yours ul{color:var(--muted)}
+    .supplies-note{grid-column:1/-1;margin:0;font-size:.88rem;color:var(--muted);line-height:1.55}
+    @media (max-width:620px){.supplies{grid-template-columns:1fr}}
+    /* Verification step */
+    .verify-note{padding:14px 16px;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:0 12px 12px 0;margin:0 0 18px;font-size:.9rem;line-height:1.55;color:var(--ink)}
+    .verify-upload{display:grid;gap:6px;padding:14px 16px;border:1.5px dashed var(--line);border-radius:14px;background:var(--paper)}
+    .verify-upload.is-filled{border-style:solid;border-color:#1d7a4c;background:#f2fbf6}
+    .verify-upload label{font-weight:800;font-size:.9rem}
+    .verify-state{font-size:.82rem;font-weight:800;color:#1d7a4c;margin:0}
+    .safety-toggle{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border:1.5px solid var(--line);border-radius:14px;background:var(--paper);cursor:pointer;font-size:.93rem;line-height:1.5;color:var(--ink);margin:0 0 18px}
+    .safety-toggle:has(input:checked){border-color:var(--gold);background:#fff7e0}
+    .safety-toggle input{accent-color:var(--blue);width:17px;height:17px;margin-top:2px;flex:0 0 auto}
     .apply-err{color:#b3271d;font-weight:800;font-size:.88rem;margin:10px 0 0;display:none}
     @media (max-width:620px){.apply-grid{grid-template-columns:1fr}}
     @media (min-width:720px){.tier-grid{grid-template-columns:1fr 1fr}.tier-card.tier-card-wide{grid-column:1/-1}}
@@ -98,14 +117,38 @@
   <main id="main">
     <section class="board-hero">
       <div class="wrap">
-        <p class="meta">Equipment &amp; Funding Application</p>
-        <h1>Apply to equip your mission</h1>
-        <p class="summary">Missionaries and field partners can apply to receive VillageServer equipment and funding — offline Bible libraries, phones, Raspberry Pi kits, projectors, satellite receive-and-replay, and solar power — to carry God's Word into the villages you serve. The application takes about 10 minutes.</p>
+        <p class="meta">Application</p>
+        <h1>Apply for a VillageServer card</h1>
+        <p class="summary">Missionaries and field partners can apply to receive a microSD card carrying the full offline library — Scripture, audio Bible, gospel films, and teaching — in the language your community actually reads and hears. It works on an ordinary phone with no internet at all. The application takes about 15 minutes.</p>
       </div>
     </section>
 
     <section class="page-body">
       <div class="wrap apply-wrap">
+
+        <!-- What the initiative actually ships, stated before anyone fills a
+             field in. Larry's "chips only" policy: the card and the adapter
+             are the whole of it, and everything built around the card is
+             obtained locally. -->
+        <div class="supplies">
+          <div class="supplies-col is-sent">
+            <h2>What we send you</h2>
+            <ul>
+              <li>A microSD card carrying the full offline library, loaded in your community's language</li>
+              <li>An SD card adapter, so the card fits a phone, a reader, or a computer</li>
+            </ul>
+          </div>
+          <div class="supplies-col is-yours">
+            <h2>What you obtain locally</h2>
+            <ul>
+              <li>Phones, tablets, or computers to read the card</li>
+              <li>Televisions, projectors, and speakers for showings</li>
+              <li>Raspberry Pi servers, Wi-Fi hubs, and solar power</li>
+              <li>Satellite dishes, receivers, and installation</li>
+            </ul>
+          </div>
+          <p class="supplies-note">We are not able to send equipment or funding at this stage, and we would rather say so plainly than leave you waiting on something that is not coming. The card is genuinely the beginning — everything on the right can be built around it later, and your file stays with us as more becomes available.</p>
+        </div>
 
         <!-- Loading state while we check whether applications are open -->
         <div class="apply-loading" id="apply-loading">Loading application…</div>
@@ -113,13 +156,14 @@
         <!-- Shown when the admin has applications turned OFF -->
         <div class="apply-closed" id="apply-closed" hidden>
           <h2>Applications are not open yet</h2>
-          <p>We are finishing our nonprofit setup before opening equipment and funding applications. Please check back soon — or use the <a href="./index.html#contact">contact form</a> to reach the team and we will follow up when applications open.</p>
+          <p>We are finishing our nonprofit setup before opening card applications. Please check back soon — or use the <a href="./index.html#contact">contact form</a> to reach the team and we will follow up when applications open.</p>
         </div>
 
         <!-- Shown after a successful submission -->
         <div class="apply-done" id="apply-done" hidden>
           <h2>Application received</h2>
-          <p>Thank you — our team reviews every application personally and will reply by email. A confirmation is on its way to your inbox. If you need to add anything, reply to that email or write to villageserverinitiative@gmail.com.</p>
+          <p>Thank you — our team reviews every application personally. A confirmation is on its way to your inbox now.</p>
+          <p style="margin-top:14px">The next step is a short conversation with Laura about your ministry and the people you serve. She will write to arrange a time that suits you. If you need to add anything before then, reply to the confirmation email or write to villageserverinitiative@gmail.com.</p>
         </div>
 
         <!-- The application form (shown only when applications are open) -->
@@ -139,16 +183,16 @@
 
             <!-- ── STEP 1: Kit selector ─────────────────── -->
             <div class="apply-step is-active" data-step="1">
-              <h2 class="apply-step-title">Which kit fits your mission?</h2>
-              <p class="apply-step-sub">One library, five ways to reach further. Choose the single configuration that matches the people you actually gather today — smaller tiers ship faster, and you can always apply again as your reach grows.</p>
-              <div class="tier-grid" role="radiogroup" aria-label="Kit tier">
+              <h2 class="apply-step-title">What are you building toward?</h2>
+              <p class="apply-step-sub">The card we send is the same in every case — this tells us the shape of the deployment you have in mind, so we load the right library and know what you are working towards. Choose the configuration that matches the people you actually gather today. Only the card and its adapter come from us; the hardware in each description is obtained locally.</p>
+              <div class="tier-grid" role="radiogroup" aria-label="Deployment you are building toward">
                 <label class="tier-card">
                   <input type="radio" name="kit_tier" value="1">
                   <span class="tier-rank">1</span>
                   <span class="tier-body">
                     <h3>microSD card</h3>
                     <p class="tier-reach">Reaches 1 person</p>
-                    <p class="tier-includes">Full offline library — Bibles, teaching, and films — on a single card, with an adapter for any phone.</p>
+                    <p class="tier-includes">Full offline library — Bibles, teaching, and films — on a single card, with an adapter for any phone. This is exactly what we send.</p>
                   </span>
                 </label>
                 <label class="tier-card">
@@ -157,7 +201,7 @@
                   <span class="tier-body">
                     <h3>Wi-Fi sharing hub</h3>
                     <p class="tier-reach">Up to 5 phones</p>
-                    <p class="tier-includes">Pocket hub + preloaded card that broadcasts the library so nearby phones browse and download together.</p>
+                    <p class="tier-includes">Our card in a pocket Wi-Fi hub you supply, broadcasting the library so nearby phones browse and download together.</p>
                   </span>
                 </label>
                 <label class="tier-card">
@@ -166,7 +210,7 @@
                   <span class="tier-body">
                     <h3>Raspberry Pi VillageServer</h3>
                     <p class="tier-reach">20–40 people</p>
-                    <p class="tier-includes">Low-power Pi 5 server with its own Wi-Fi, power charger, and the full library — serves a gathering with no internet.</p>
+                    <p class="tier-includes">Our card in a low-power Pi 5 you supply, serving the full library over its own Wi-Fi to a gathering with no internet.</p>
                   </span>
                 </label>
                 <label class="tier-card">
@@ -175,8 +219,8 @@
                   <span class="tier-body">
                     <h3>Projector &amp; audio</h3>
                     <p class="tier-reach">Hundreds at once</p>
-                    <p class="tier-includes">Projector, speakers, and media library for showing gospel films and teaching to a whole village at once.</p>
-                    <span class="tier-note">Best for regular gatherings of 100+</span>
+                    <p class="tier-includes">Our media library played through a projector and speakers you supply, showing gospel films to a whole village at once.</p>
+                    <span class="tier-note">You supply the projector and speakers</span>
                   </span>
                 </label>
                 <label class="tier-card tier-card-wide">
@@ -185,12 +229,12 @@
                   <span class="tier-body">
                     <h3>Satellite receive-and-replay</h3>
                     <p class="tier-reach">Thousands across a region</p>
-                    <p class="tier-includes">Dish, LNB, receiver, and finder that refresh and rebroadcast the library across an entire region of villages.</p>
-                    <span class="tier-note">Best for regular gatherings of 100+ and multi-village networks</span>
+                    <p class="tier-includes">A dish, LNB, and receiver you supply, refreshing and rebroadcasting our library across an entire region of villages.</p>
+                    <span class="tier-note">You supply and install the satellite equipment</span>
                   </span>
                 </label>
               </div>
-              <p class="apply-err" id="err-1">Please choose the kit that fits your mission.</p>
+              <p class="apply-err" id="err-1">Please choose the deployment you are building toward.</p>
             </div>
 
             <!-- ── STEP 2: Reach & audience ─────────────── -->
@@ -308,14 +352,6 @@
                   <input type="text" id="apply-sending" name="sending_org" maxlength="300">
                 </div>
                 <div class="apply-field">
-                  <label for="apply-ref-name">Reference contact — name</label>
-                  <input type="text" id="apply-ref-name" name="reference_name" maxlength="160" placeholder="Someone who knows your work">
-                </div>
-                <div class="apply-field">
-                  <label for="apply-ref-contact">Reference — email or phone</label>
-                  <input type="text" id="apply-ref-contact" name="reference_contact" maxlength="255">
-                </div>
-                <div class="apply-field">
                   <label for="apply-referral">How did you hear about us?</label>
                   <select id="apply-referral" name="referral_source">
                     <option value="">Choose…</option>
@@ -336,18 +372,130 @@
                   <input type="text" id="apply-current-reach" name="current_reach" maxlength="200" placeholder="Before this equipment — an estimate is fine">
                 </div>
                 <div class="apply-field apply-field-full">
-                  <label for="apply-doc">Optional: field photo, ministry ID, or letter of recommendation</label>
+                  <label for="apply-doc">Anything else that helps us know your work (optional)</label>
                   <input type="file" id="apply-doc" accept="image/png,image/jpeg,image/webp,application/pdf">
-                  <p class="apply-file-note">Image or PDF, up to 2&nbsp;MB. Optional — never required, especially where carrying ministry documents is unsafe.</p>
+                  <p class="apply-file-note">A letter of recommendation, a newsletter, a field report. Image or PDF. Genuinely optional — the next step covers what we actually need.</p>
                 </div>
               </div>
               <p class="apply-err" id="err-4">Please fill in your name and a valid email.</p>
             </div>
 
-            <!-- ── STEP 5: Logistics & funding ──────────── -->
+            <!-- ── STEP 5: Proof of ministry ────────────── -->
+            <!-- Larry's requirement. Every applicant is verified before review:
+                 referrals, government photo ID, pastoral licensing, ministry
+                 photos, and an interview with Laura. The exemption below is
+                 not a loophole — in some places carrying ordination papers is
+                 what gets a pastor arrested, so those applicants verify
+                 through people instead of paper: a second independent referee
+                 and the same interview. -->
             <div class="apply-step" data-step="5">
-              <h2 class="apply-step-title">Receiving the equipment</h2>
-              <p class="apply-step-sub">Getting kits through customs and the last mile is usually the hardest part — tell us your plan and we'll work with it.</p>
+              <h2 class="apply-step-title">Verifying your ministry</h2>
+              <p class="apply-step-sub">We send cards to real ministries serving real communities, and this is how we confirm that. Everything here stays private to our review team and is never published or shared.</p>
+
+              <label class="safety-toggle">
+                <input type="checkbox" id="apply-safety-exempt" name="safety_exempt">
+                <span>Sharing ministry documents would put me or my community at risk. <strong>Tick this if photographing a service, carrying ordination papers, or sending government ID could endanger anyone.</strong> You will verify through two independent referees and your interview with Laura instead — and no one will ask you again.</span>
+              </label>
+
+              <!-- Document route -->
+              <div id="verify-documents">
+                <p class="verify-note">Photographs of documents are fine — hold them under good light and take a picture with your phone. Large images are shrunk in your browser before they are sent, so a slow connection is not a problem.</p>
+                <div class="apply-grid">
+                  <div class="apply-field apply-field-full">
+                    <div class="verify-upload" id="upload-id-wrap">
+                      <label for="apply-id-doc">Government-issued photo ID <span class="apply-req" aria-hidden="true">*</span></label>
+                      <input type="file" id="apply-id-doc" accept="image/png,image/jpeg,image/webp,application/pdf">
+                      <p class="apply-file-note">Passport, national ID, or driver's licence. Image or PDF.</p>
+                      <p class="verify-state" id="upload-id-state" hidden></p>
+                    </div>
+                  </div>
+                  <div class="apply-field apply-field-full">
+                    <div class="verify-upload" id="upload-license-wrap">
+                      <label for="apply-license-doc">Pastoral licensing or ministry authorization <span class="apply-req" aria-hidden="true">*</span></label>
+                      <input type="file" id="apply-license-doc" accept="image/png,image/jpeg,image/webp,application/pdf">
+                      <p class="apply-file-note">Ordination certificate, ministry licence, commissioning letter, or a letter of authorization from your church or denomination.</p>
+                      <p class="verify-state" id="upload-license-state" hidden></p>
+                    </div>
+                  </div>
+                  <div class="apply-field">
+                    <label for="apply-license-body">Issued by</label>
+                    <input type="text" id="apply-license-body" name="ministry_license_body" maxlength="200" placeholder="Church, denomination, or ordaining body">
+                  </div>
+                  <div class="apply-field">
+                    <label for="apply-license-ref">Licence or certificate number</label>
+                    <input type="text" id="apply-license-ref" name="ministry_license_ref" maxlength="120" placeholder="If it has one">
+                  </div>
+                  <div class="apply-field apply-field-full">
+                    <div class="verify-upload" id="upload-photos-wrap">
+                      <label for="apply-ministry-photos">Photos of your ministry or service <span class="apply-req" aria-hidden="true">*</span></label>
+                      <input type="file" id="apply-ministry-photos" accept="image/png,image/jpeg,image/webp" multiple>
+                      <p class="apply-file-note">Up to three photographs of you serving — a gathering, a service, teaching, or your work in the community.</p>
+                      <p class="verify-state" id="upload-photos-state" hidden></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Exemption route -->
+              <div id="verify-exempt" hidden>
+                <p class="verify-note">Understood — no documents. Give us two people who know your ministry and can speak for it, and Laura will take it from there in your interview.</p>
+                <div class="apply-grid">
+                  <div class="apply-field apply-field-full">
+                    <label for="apply-safety-reason">What makes sharing documents unsafe where you are?</label>
+                    <textarea id="apply-safety-reason" name="safety_exempt_reason" rows="2" maxlength="1000" placeholder="A sentence is enough. It helps us understand the field you work in."></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Referrals — both routes, second referee required on the exemption -->
+              <h3 class="apply-legend" style="margin:22px 0 10px">Referrals</h3>
+              <div class="apply-grid">
+                <div class="apply-field">
+                  <label for="apply-ref-name">First referee — name <span class="apply-req" aria-hidden="true">*</span></label>
+                  <input type="text" id="apply-ref-name" name="reference_name" maxlength="160" placeholder="Someone who knows your work">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-ref-contact">First referee — email or phone <span class="apply-req" aria-hidden="true">*</span></label>
+                  <input type="text" id="apply-ref-contact" name="reference_contact" maxlength="255">
+                </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-ref-rel">How do they know you?</label>
+                  <input type="text" id="apply-ref-rel" name="reference_relationship" maxlength="200" placeholder="Denominational overseer, sending pastor, fellow missionary…">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-ref2-name">Second referee — name <span class="apply-req" id="ref2-req" aria-hidden="true" hidden>*</span></label>
+                  <input type="text" id="apply-ref2-name" name="reference2_name" maxlength="160">
+                </div>
+                <div class="apply-field">
+                  <label for="apply-ref2-contact">Second referee — email or phone</label>
+                  <input type="text" id="apply-ref2-contact" name="reference2_contact" maxlength="255">
+                </div>
+                <div class="apply-field apply-field-full">
+                  <label for="apply-ref2-rel">How do they know you?</label>
+                  <input type="text" id="apply-ref2-rel" name="reference2_relationship" maxlength="200">
+                </div>
+              </div>
+              <p class="apply-hint" id="ref2-hint">A second referee is optional on this route, but it moves your file faster.</p>
+
+              <!-- The interview -->
+              <h3 class="apply-legend" style="margin:22px 0 10px">Your interview with Laura</h3>
+              <p class="apply-step-sub" style="margin-bottom:12px">Laura speaks with every applicant before a card is sent. It is a short, ordinary conversation about your ministry and the people you serve — not a test. She will write to you to arrange a time.</p>
+              <label class="opt-row" style="margin-bottom:12px">
+                <input type="checkbox" id="apply-interview-consent" name="interview_consent">
+                <span>Yes — I will speak with Laura. <span class="apply-req" aria-hidden="true">*</span></span>
+              </label>
+              <div class="apply-field apply-field-full">
+                <label for="apply-interview-availability">When are you usually reachable?</label>
+                <textarea id="apply-interview-availability" name="interview_availability" rows="2" maxlength="600" placeholder="Days, times, and your time zone — plus whether WhatsApp, phone, or video works best where you are."></textarea>
+              </div>
+
+              <p class="apply-err" id="err-5">Please complete your ministry verification: a first referee, the documents above, and your agreement to speak with Laura.</p>
+            </div>
+
+            <!-- ── STEP 6: Receiving the card ───────────── -->
+            <div class="apply-step" data-step="6">
+              <h2 class="apply-step-title">Receiving the card</h2>
+              <p class="apply-step-sub">A card and adapter travel as ordinary small post, so this is far simpler than shipping equipment — but the last mile still matters, and an address a courier cannot find is the most common reason a card never arrives.</p>
               <fieldset style="border:0;margin:0 0 16px;padding:0">
                 <legend class="apply-legend" style="margin-bottom:8px">Your receiving plan <span class="apply-req" aria-hidden="true">*</span></legend>
                 <div class="opt-list">
@@ -365,11 +513,7 @@
                 </div>
                 <div class="apply-field apply-field-full">
                   <label for="apply-shipping-address">Shipping address / delivery destination</label>
-                  <textarea id="apply-shipping-address" name="shipping_address" rows="2" maxlength="1000" placeholder="If known, include recipient name, address, city/region, postal code, country, and phone or WhatsApp for delivery."></textarea>
-                </div>
-                <div class="apply-field">
-                  <label for="apply-funding">Funding requested / budget</label>
-                  <input type="text" id="apply-funding" name="funding_needed" maxlength="200" placeholder="Optional — an estimate is fine">
+                  <textarea id="apply-shipping-address" name="shipping_address" rows="2" maxlength="1000" placeholder="Recipient name, village or street and a nearby landmark, town, region, country, and a phone or WhatsApp number. A landmark a driver can ask for works where there is no street name."></textarea>
                 </div>
                 <div class="apply-field">
                   <label for="apply-timeframe">Timeframe</label>
@@ -394,7 +538,7 @@
                   <textarea id="apply-message" name="message" rows="3" maxlength="2000" placeholder="Partnerships, references, shipping notes, or questions."></textarea>
                 </div>
               </div>
-              <p class="apply-err" id="err-5">Please choose a receiving plan.</p>
+              <p class="apply-err" id="err-6">Please choose a receiving plan.</p>
             </div>
 
             <div class="apply-actions">
@@ -435,8 +579,18 @@
       var backBtn = document.getElementById('apply-back-btn');
       var nextBtn = document.getElementById('apply-next-btn');
       var submitBtn = document.getElementById('apply-submit-btn');
-      var TOTAL_STEPS = 5;
+      var TOTAL_STEPS = 6;
       var step = 1;
+
+      // Which funnel sent this applicant here. The Kenya schools campaign
+      // links to ?funnel=kenya_schools so its applications can be counted,
+      // qualified, and reported on separately from ordinary site traffic.
+      var FUNNEL = (function(){
+        try {
+          var q = new URLSearchParams(window.location.search).get('funnel');
+          return q === 'kenya_schools' ? 'kenya_schools' : 'general';
+        } catch(e){ return 'general'; }
+      })();
 
       // Ask the server whether applications are currently open.
       fetch('/api/track?type=setting&key=applications_open', { cache: 'no-store' })
@@ -475,12 +629,28 @@
         cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
+      function isSafetyExempt(){
+        var el = document.getElementById('apply-safety-exempt');
+        return !!(el && el.checked);
+      }
+
+      // Step 5 is the proof of ministry. Both routes end at the same place —
+      // an interview with Laura — but the document route asks for the three
+      // uploads, and the exemption route asks for a second referee instead.
+      function validateVerification(){
+        if(!document.getElementById('apply-interview-consent').checked) return false;
+        if(!(val('apply-ref-name') && val('apply-ref-contact'))) return false;
+        if(isSafetyExempt()) return !!(val('apply-ref2-name') && val('apply-ref2-contact'));
+        return !!(uploads.id_document && uploads.license_document && uploads.ministry_photos.length);
+      }
+
       function validateStep(n){
         if(n === 1) return !!radioValue('kit_tier');
         if(n === 2) return !!(val('apply-reach') && val('apply-audience') && val('apply-frequency'));
         if(n === 3) return !!val('apply-country');
         if(n === 4) return !!(val('apply-name') && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('apply-email')));
-        if(n === 5) return !!radioValue('receiving_plan');
+        if(n === 5) return validateVerification();
+        if(n === 6) return !!radioValue('receiving_plan');
         return true;
       }
 
@@ -535,28 +705,153 @@
         });
       });
 
-      // ── Optional supporting document (≤ 2 MB → data URL) ──
-      var docDataUrl = null, docName = null;
-      document.getElementById('apply-doc').addEventListener('change', function(e){
-        var file = e.target.files && e.target.files[0];
-        docDataUrl = null; docName = null;
-        if(!file) return;
-        if(file.size > 2 * 1024 * 1024){
-          statusEl.textContent = 'That file is over 2 MB — please choose a smaller file or skip the upload.';
-          statusEl.className = 'apply-status is-error';
-          e.target.value = '';
-          return;
-        }
-        var reader = new FileReader();
-        reader.onload = function(){ docDataUrl = reader.result; docName = file.name; statusEl.textContent = ''; statusEl.className = 'apply-status'; };
-        reader.readAsDataURL(file);
+      // ── Safety exemption: swap the document route for the referee route ──
+      var safetyEl = document.getElementById('apply-safety-exempt');
+      safetyEl.addEventListener('change', function(){
+        var exempt = safetyEl.checked;
+        document.getElementById('verify-documents').hidden = exempt;
+        document.getElementById('verify-exempt').hidden = !exempt;
+        document.getElementById('ref2-req').hidden = !exempt;
+        document.getElementById('ref2-hint').textContent = exempt
+          ? 'Both referees are required on this route — they take the place of the documents.'
+          : 'A second referee is optional on this route, but it moves your file faster.';
+        showErr(5, false);
       });
+
+      // ── Uploads ──────────────────────────────────────
+      // Field photographs off a phone are routinely 4–8 MB, which would blow
+      // the request body long before the third one. Images are redrawn to a
+      // sane size in the browser first; PDFs cannot be, so they are capped.
+      var uploads = { id_document: null, license_document: null, ministry_photos: [], supporting_document: null };
+      var uploadNames = { id_document: null, license_document: null, supporting_document: null };
+      var MAX_EDGE = 1400;
+      var PDF_LIMIT = 1.2 * 1024 * 1024;
+      var TOTAL_LIMIT = 3.6 * 1024 * 1024;   // data-URL characters, under Vercel's body cap
+
+      function readAsDataUrl(file){
+        return new Promise(function(resolve, reject){
+          var reader = new FileReader();
+          reader.onload = function(){ resolve(reader.result); };
+          reader.onerror = function(){ reject(new Error('Could not read that file.')); };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // Redraw an image down to MAX_EDGE on its long side. Falls back to the
+      // original bytes if the browser cannot decode it — better a large upload
+      // than a lost one.
+      function shrinkImage(file){
+        return readAsDataUrl(file).then(function(dataUrl){
+          return new Promise(function(resolve){
+            var img = new Image();
+            img.onload = function(){
+              var scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height));
+              if(scale === 1 && dataUrl.length < 900000) return resolve(dataUrl);
+              var canvas = document.createElement('canvas');
+              canvas.width = Math.round(img.width * scale);
+              canvas.height = Math.round(img.height * scale);
+              var ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              try { resolve(canvas.toDataURL('image/jpeg', 0.78)); }
+              catch(err){ resolve(dataUrl); }
+            };
+            img.onerror = function(){ resolve(dataUrl); };
+            img.src = dataUrl;
+          });
+        });
+      }
+
+      function prepareFile(file){
+        if(file.type === 'application/pdf'){
+          if(file.size > PDF_LIMIT){
+            return Promise.reject(new Error('That PDF is over 1.2 MB. A photograph of the document usually works better — or export the PDF at a smaller size.'));
+          }
+          return readAsDataUrl(file);
+        }
+        if(!/^image\//.test(file.type)){
+          return Promise.reject(new Error('Please choose an image or a PDF.'));
+        }
+        return shrinkImage(file);
+      }
+
+      function setUploadState(wrapId, stateId, text){
+        var wrap = document.getElementById(wrapId);
+        var state = document.getElementById(stateId);
+        if(wrap) wrap.classList.toggle('is-filled', !!text);
+        if(state){ state.textContent = text || ''; state.hidden = !text; }
+      }
+
+      function uploadError(message){
+        statusEl.textContent = message;
+        statusEl.className = 'apply-status is-error';
+      }
+
+      function wireSingleUpload(inputId, key, wrapId, stateId){
+        document.getElementById(inputId).addEventListener('change', function(e){
+          var file = e.target.files && e.target.files[0];
+          uploads[key] = null; uploadNames[key] = null;
+          setUploadState(wrapId, stateId, '');
+          if(!file) return;
+          statusEl.textContent = 'Preparing ' + file.name + '…';
+          statusEl.className = 'apply-status';
+          prepareFile(file).then(function(dataUrl){
+            uploads[key] = dataUrl;
+            uploadNames[key] = file.name;
+            setUploadState(wrapId, stateId, '✓ ' + file.name + ' ready');
+            statusEl.textContent = ''; statusEl.className = 'apply-status';
+            showErr(5, false);
+          }).catch(function(err){
+            e.target.value = '';
+            uploadError(err.message);
+          });
+        });
+      }
+
+      wireSingleUpload('apply-id-doc', 'id_document', 'upload-id-wrap', 'upload-id-state');
+      wireSingleUpload('apply-license-doc', 'license_document', 'upload-license-wrap', 'upload-license-state');
+      wireSingleUpload('apply-doc', 'supporting_document', null, null);
+
+      document.getElementById('apply-ministry-photos').addEventListener('change', function(e){
+        var files = Array.prototype.slice.call(e.target.files || []).slice(0, 3);
+        uploads.ministry_photos = [];
+        setUploadState('upload-photos-wrap', 'upload-photos-state', '');
+        if(!files.length) return;
+        statusEl.textContent = 'Preparing ' + files.length + ' photo' + (files.length > 1 ? 's' : '') + '…';
+        statusEl.className = 'apply-status';
+        Promise.all(files.map(function(file){
+          return prepareFile(file).then(function(dataUrl){ return { name: file.name, data: dataUrl }; });
+        })).then(function(photos){
+          uploads.ministry_photos = photos;
+          setUploadState('upload-photos-wrap', 'upload-photos-state', '✓ ' + photos.length + ' photo' + (photos.length > 1 ? 's' : '') + ' ready');
+          statusEl.textContent = ''; statusEl.className = 'apply-status';
+          showErr(5, false);
+        }).catch(function(err){
+          e.target.value = '';
+          uploads.ministry_photos = [];
+          uploadError(err.message);
+        });
+      });
+
+      // Everything base64 lives in one JSON body, so the total is what matters.
+      function uploadBytes(){
+        var total = (uploads.id_document || '').length
+          + (uploads.license_document || '').length
+          + (uploads.supporting_document || '').length;
+        uploads.ministry_photos.forEach(function(p){ total += p.data.length; });
+        return total;
+      }
 
       // ── Submit ───────────────────────────────────────
       form.addEventListener('submit', function(e){
         e.preventDefault();
         for(var n = 1; n <= TOTAL_STEPS; n++){
           if(!validateStep(n)){ step = n; renderStep(); showErr(n, true); return; }
+        }
+
+        if(uploadBytes() > TOTAL_LIMIT){
+          step = 5; renderStep();
+          uploadError('Those files come to more than we can send in one go. Try fewer ministry photos, or photograph the documents instead of attaching PDFs.');
+          return;
         }
 
         submitBtn.disabled = true;
@@ -589,12 +884,28 @@
           referral_source: val('apply-referral'),
           years_in_field: val('apply-years'),
           current_reach: val('apply-current-reach'),
-          supporting_document: docDataUrl,
-          supporting_document_name: docName,
+          supporting_document: uploads.supporting_document,
+          supporting_document_name: uploadNames.supporting_document,
+          // ── Proof of ministry ──
+          ministry_verification_mode: isSafetyExempt() ? 'safety_exempt' : 'documents',
+          safety_exempt_reason: isSafetyExempt() ? val('apply-safety-reason') : '',
+          id_document: isSafetyExempt() ? null : uploads.id_document,
+          id_document_name: isSafetyExempt() ? null : uploadNames.id_document,
+          license_document: isSafetyExempt() ? null : uploads.license_document,
+          license_document_name: isSafetyExempt() ? null : uploadNames.license_document,
+          ministry_photos: isSafetyExempt() ? [] : uploads.ministry_photos,
+          ministry_license_body: val('apply-license-body'),
+          ministry_license_ref: val('apply-license-ref'),
+          reference_relationship: val('apply-ref-rel'),
+          reference2_name: val('apply-ref2-name'),
+          reference2_contact: val('apply-ref2-contact'),
+          reference2_relationship: val('apply-ref2-rel'),
+          interview_consent: document.getElementById('apply-interview-consent').checked,
+          interview_availability: val('apply-interview-availability'),
+          funnel: FUNNEL,
           receiving_plan: radioValue('receiving_plan'),
           receiving_plan_details: val('apply-plan-details'),
           shipping_address: val('apply-shipping-address'),
-          funding_needed: val('apply-funding'),
           timeframe: val('apply-timeframe'),
           preferred_contact_method: val('apply-contact-method'),
           contact_timezone: val('apply-timezone'),

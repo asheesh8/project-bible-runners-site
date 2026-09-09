@@ -28,11 +28,12 @@ as `Authorization: Bearer …`.
 ### Applications & Campaigns  (`data-tab="applications"`)
 The main intake tab. Three things live here.
 
-**Application review queue** — every equipment/funding application.
+**Application review queue** — every card application.
 - API: `GET/PATCH/DELETE /api/track?type=applications`
 - Table: **`equipment_applications`**
 - Fed by: the public form at **`landing/equipment-application.html`** → `POST /api/track?type=application`
-- Fields shown per card: identity (`name`, `organization`, `email`, `phone_*`, `country`, `region`, `role`), kit + reach (`kit_tier`, `audience_type`, `frequency_of_use`, `reach_justification`, `has_gathering_infrastructure`), context (`languages`, `literacy_context`, `power_internet_access`), verification (`org_website`, `sending_org`, `reference_name`, `reference_contact`, `referral_source`, `years_in_field`, `current_reach`, `supporting_document`), logistics (`receiving_plan`, `receiving_plan_details`, `shipping_address`, `funding_needed`, `timeframe`, `preferred_contact_method`, `contact_timezone`, `message`).
+- Fields shown per card: identity (`name`, `organization`, `email`, `phone_*`, `country`, `region`, `role`), kit + reach (`kit_tier`, `audience_type`, `frequency_of_use`, `reach_justification`, `has_gathering_infrastructure`), context (`languages`, `literacy_context`, `power_internet_access`), background (`org_website`, `sending_org`, `referral_source`, `years_in_field`, `current_reach`, `supporting_document`), proof of ministry (`ministry_verification_mode`, `id_document`, `license_document`, `ministry_photos`, `ministry_license_body`, `reference_name`/`reference2_name` and their contacts, `interview_status`, `verification_score`), logistics (`receiving_plan`, `receiving_plan_details`, `shipping_address`, `timeframe`, `preferred_contact_method`, `contact_timezone`, `message`).
+- **Proof of ministry** appears as its own block on each card: the uploaded ID, licensing, and ministry photos open in a new tab, the referees are listed with their stated relationships, and one button marks the interview complete. Laura will not offer a card until that button is pressed — she invites applicants to the interview but never records her own as done. Applicants who took the safety exemption show a marked panel instead of documents, with the reason they gave.
 - Triage columns (computed server-side on submit): `email_domain_match`, `reference_provided`, `web_presence_found`, `triage_score`, `triage_confidence`, `triage_flags`, `triage_note`, `fast_track`.
 - Workflow columns the admin edits: `status` (submitted / under_review / approved / declined / waitlisted), `admin_notes`, `status_updated_at`.
 - Buttons: status dropdown (`PATCH status`), Save Notes (`PATCH admin_notes`), **Approve → Deployment** (sets `status=approved`, opens a prefilled deployment), Build Campaign (prefills the campaign form). Filter chips + CSV export are client-side.
@@ -61,7 +62,7 @@ Backend receptionist console for application follow-up and Larry handoff.
 - API: `GET/POST /api/intake-agent`, the action endpoint `/api/laura-action`, plus cron endpoints `intake-gmail-poll` and `intake-digest`
 - Tables: **`intake_threads`**, **`intake_messages`**, **`agent_filing_items`**, **`agent_digests`**
 - Fed by: new `equipment_applications` rows; recent rows can also be backfilled with **Create missing threads**
-- Layout: one collapsible client cabinet per applicant, with the client email, Laura mailbox, thread token, current reply stage, latest actionable draft, non-draft email history, filing tasks, funding request, shipping destination, and deployment/CSV status.
+- Layout: one collapsible client cabinet per applicant, with the client email, Laura mailbox, thread token, current reply stage, latest actionable draft, non-draft email history, filing tasks, shipping destination, and deployment/CSV status.
 - Buttons: Run Laura, approve/send current draft, poll Gmail, send Larry digest, run follow-ups, file deployment
 - **Larry's call** — the five decisions (Approve, Send draft, Ask for more info, Hold, Decline) appear both on each file here and as one-click buttons in Larry's email, so the panel and the inbox never disagree.
 - **Autonomy dropdown** — `draft_only` / `staged` / `full`, stored as `laura_autonomy` in `site_settings`. Whether any email leaves without Larry is decided by this plus a 24h per-applicant cooldown and a 3-nudge cap.
@@ -110,7 +111,8 @@ Static help content baked into `admin.html` (WireGuard setup Q&A, etc.). No data
 
 | Form | Page | Endpoint | Table | Also emails? |
 |---|---|---|---|---|
-| Equipment & Funding Application | `equipment-application.html` | `POST /api/track?type=application` | `equipment_applications` | Team + applicant (if `RESEND_API_KEY` set) |
+| Card application | `equipment-application.html` | `POST /api/track?type=application` | `equipment_applications` | Team + applicant (if `RESEND_API_KEY` set) |
+| Kenya schools funnel | `kenya-schools.html` | links to the application with `?funnel=kenya_schools` | `equipment_applications.funnel` | as above |
 | Contact | `index.html` | `POST /api/track?type=contact` | `contact_messages` | Team (if `RESEND_API_KEY` set) |
 
 Everything else in the panel is admin-authored content or read-only analytics.

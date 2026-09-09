@@ -262,11 +262,75 @@ Laura will include the link when a thread is ready to schedule.
 
 ## What Laura is allowed to offer
 
-The initiative can only post microSD cards right now, so that is the only thing
-Laura ever offers — whatever tier the form asked for.
+The initiative posts a microSD card and an SD card adapter. That is the whole of
+it, whatever tier the form asked for. Phones, televisions, projectors, Raspberry
+Pi servers, Wi-Fi hubs, solar power, and satellite equipment are obtained locally
+by whoever deploys the card — the site says so on the homepage, on the
+application, and on the Kenya schools funnel, and Laura says so in her own words
+when the question comes up.
 
 ```text
 LAURA_OFFER_MODE=sd_card_only   # default; set to full_kits when larger tiers return
+```
+
+## Screening: how an inquiry becomes a card
+
+Every applicant passes three gates in order. Laura runs the first two herself
+and holds the file at the third until a human has actually spoken to somebody.
+
+**Gate 1 — the file makes sense.** `detectApplicantClarificationNeeds` catches
+the things that contradict each other: a placeholder name, a Tier 5 request from
+a small group, a reference using the applicant's own email address, a mission
+country that does not match the shipping country, an address no courier could
+deliver to. Laura asks the applicant about these before Larry ever sees the
+file, because they are the applicant's to explain, not his to guess at.
+`detectMissingFields` covers the ordinary gaps — languages, receiving plan,
+contact method.
+
+**Gate 2 — the ministry is verified.** `detectVerificationGaps` holds the file
+until we have all five of:
+
+| Evidence | Why |
+|---|---|
+| A referee — name, relationship, and a contact | Someone outside the application vouches for it |
+| Government-issued photo ID | The person is who the form says they are |
+| Pastoral licensing or authorization | The ministry is recognised by somebody other than itself |
+| Ministry or service photographs | The work described actually happens |
+| Their agreement to speak with Laura | Gate 3 cannot happen without it |
+
+**The safety exemption.** In parts of the field, carrying ordination papers or
+photographing a service is what gets a pastor arrested. Applicants tick a box on
+the form and verify through people instead of paper: **two** independent
+referees rather than one, plus the same interview. It is a different route, not
+a lighter one, and Laura never asks an exempt applicant for documents again —
+the letter she sends them does not even mention photographing anything.
+
+Applications submitted before this requirement existed carry no
+`ministry_verification_mode` at all. Those are not chased for documents nobody
+asked them for. Gate 3 still applies to them, because that one is about the
+person and Laura can cover the same ground in conversation.
+
+**Gate 3 — somebody has spoken to them.** No card is offered to an applicant
+nobody has interviewed. This is the one check no document replaces, and it is
+deliberately the last thing before the offer. Laura invites them — using
+`LARRY_CAL_BOOKING_URL` when it is set, and asking for two or three times that
+suit them when it is not — but she never marks her own interview complete. A
+human sets `interview_status` to `completed` on the application row, and only
+then does `readyForOffer` return true.
+
+All three gates are enforced twice: once in `fallbackDecision`, which runs when
+the model is unreachable, and again in `normalizeDecision`, which overrides
+whatever the model proposed. The second matters more than it looks — a model
+that decides to offer a card to an unverified applicant has its answer replaced,
+not merely discouraged in a prompt.
+
+```
+application arrives
+  -> gate 1: does the file contradict itself?     -> ask the applicant
+  -> gate 2: is the ministry verified?            -> ask for what is missing
+  -> gate 3: has anyone interviewed them?         -> invite them
+  -> a human marks the interview complete
+  -> only now: offer the card
 ```
 
 ### The loop, end to end

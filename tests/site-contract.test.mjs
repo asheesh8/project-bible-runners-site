@@ -397,3 +397,137 @@ test('old campaign page redirects back into the new directory instead of staying
   assert.match(html, /This campaign page has moved/);
   assert.doesNotMatch(html, /Give a Bible|donate\.html|Fund the mission|Spring Uganda/i);
 });
+
+// ── Larry's checklist: cards only, proof of ministry, the Kenya funnel ──
+
+test('the site says plainly that only a card and an adapter are sent', () => {
+  const apply = read('landing/equipment-application.html');
+  const home = read('landing/index.html');
+  const kenya = read('landing/kenya-schools.html');
+
+  // Every page that could set an expectation states what actually arrives.
+  for (const [name, html] of [['application', apply], ['homepage', home], ['kenya funnel', kenya]]) {
+    assert.match(html, /SD card adapter/, `${name} should name the adapter as part of what is sent`);
+    assert.match(html, /not able to send equipment or funding/i, `${name} should be plain about what is not available`);
+  }
+
+  // And each names the hardware the recipient obtains themselves, so "chips
+  // only" is not left as something the reader has to infer. The lists differ
+  // by audience — a schools funnel has no reason to discuss satellite dishes.
+  for (const item of ['rojector', 'atellite', 'aspberry Pi']) {
+    assert.match(apply, new RegExp(item), `the application should say who provides the ${item}`);
+  }
+  for (const item of ['rojector', 'elevision', 'phone, tablet, or computer']) {
+    assert.match(kenya, new RegExp(item), `the Kenya funnel should say who provides the ${item}`);
+  }
+
+  // Funding is no longer something the form invites anyone to request.
+  assert.doesNotMatch(apply, /name="funding_needed"/, 'the form should not ask for a funding amount');
+  assert.doesNotMatch(apply, /Equipment &amp; Funding Application/, 'the page should no longer be titled as a funding application');
+});
+
+test('the application collects proof of ministry, with a route for people who cannot send documents', () => {
+  const apply = read('landing/equipment-application.html');
+
+  // The five things Larry asked for.
+  assert.match(apply, /id="apply-id-doc"/, 'government photo ID upload');
+  assert.match(apply, /id="apply-license-doc"/, 'pastoral licensing upload');
+  assert.match(apply, /id="apply-ministry-photos"/, 'ministry/service photos upload');
+  assert.match(apply, /name="reference_name"/, 'first referee');
+  assert.match(apply, /name="reference2_name"/, 'second referee');
+  assert.match(apply, /id="apply-interview-consent"/, 'agreement to the interview with Laura');
+
+  // The exemption, and the second referee that pays for it.
+  assert.match(apply, /id="apply-safety-exempt"/);
+  assert.match(apply, /would put me or my community at risk/);
+  assert.match(apply, /Both referees are required on this route/);
+
+  // Six steps, and the verification step is the one before logistics.
+  assert.match(apply, /var TOTAL_STEPS = 6;/);
+  assert.match(apply, /data-step="5"[\s\S]{0,400}Verifying your ministry/);
+
+  // Phone photographs are shrunk in the browser, or the request body cannot
+  // carry four of them.
+  assert.match(apply, /function shrinkImage/);
+  assert.match(apply, /canvas\.toDataURL\('image\/jpeg'/);
+});
+
+test('the Kenya schools funnel is its own page and tags the applications it sends', () => {
+  const kenya = read('landing/kenya-schools.html');
+  const apply = read('landing/equipment-application.html');
+  const track = read('api/track.js');
+  const sitemap = read('landing/sitemap.xml');
+
+  assert.ok(existsSync(join(root, 'landing/kenya-schools.html')));
+  // Its calls to action carry the funnel tag, or the campaign cannot be counted.
+  assert.match(kenya, /equipment-application\.html\?funnel=kenya_schools/);
+  assert.equal([...kenya.matchAll(/funnel=kenya_schools/g)].length, 2, 'both CTAs should tag the funnel');
+  assert.match(apply, /q === 'kenya_schools' \? 'kenya_schools' : 'general'/);
+  assert.match(track, /oneOf\(b\.funnel, \['general', 'kenya_schools'\]\)/);
+
+  // The audience Larry named, and the handoff to Laura.
+  assert.match(kenya, /6 to 12/);
+  assert.match(kenya, /Laura/);
+  assert.match(sitemap, /villageserver\.org\/kenya-schools/);
+});
+
+test('the admin panel can see the evidence and open the interview gate', () => {
+  const admin = read('landing/admin.html');
+  const track = read('api/track.js');
+
+  assert.match(admin, /function renderMinistryVerification/);
+  assert.match(admin, /function setInterviewStatus/);
+  assert.match(admin, /I have interviewed them/);
+  // The documents have to be openable, not merely recorded as present.
+  assert.match(admin, /Photo ID/);
+  assert.match(admin, /Ministry photo/);
+  // And the API has to accept the change the button makes.
+  assert.match(track, /interview_status/);
+  assert.match(track, /patch\.interview_completed_at/);
+});
+
+test('ministry verification scores the evidence and never self-certifies the interview', async () => {
+  const { computeVerification } = await import('../api/track.js');
+
+  const complete = {
+    ministry_verification_mode: 'documents',
+    reference_name: 'Pastor Mary', reference_contact: 'mary@example.org',
+    id_document: 'data:image/jpeg;base64,A',
+    license_document: 'data:image/jpeg;base64,B',
+    ministry_photos: [{ name: 'service.jpg', data: 'data:image/jpeg;base64,C' }],
+    interview_consent: true,
+  };
+
+  // A complete file still stops at the interview. Nothing the applicant can
+  // upload makes them 'verified' — only a human who has spoken to them.
+  const full = computeVerification(complete);
+  assert.equal(full.verification_score, 5);
+  assert.equal(full.verification_status, 'interview_required');
+  assert.deepEqual(full.verification_gaps, []);
+  assert.notEqual(full.verification_status, 'verified');
+
+  // Gaps are named specifically, so Laura can ask for the right thing.
+  const partial = computeVerification({ ...complete, id_document: null, ministry_photos: [] });
+  assert.equal(partial.verification_score, 3);
+  assert.equal(partial.verification_status, 'pending_review');
+  assert.deepEqual(partial.verification_gaps, ['government-issued photo ID', 'ministry or service photos']);
+
+  // The exemption costs a second referee rather than being free.
+  const exemptOne = computeVerification({
+    ministry_verification_mode: 'safety_exempt',
+    reference_name: 'Pastor Mary', reference_contact: 'mary@example.org',
+    interview_consent: true,
+  });
+  assert.deepEqual(exemptOne.verification_gaps, ['two independent referees']);
+
+  const exemptTwo = computeVerification({
+    ministry_verification_mode: 'safety_exempt',
+    reference_name: 'Pastor Mary', reference_contact: 'mary@example.org',
+    reference2_name: 'Bishop Otieno', reference2_contact: 'otieno@example.org',
+    interview_consent: true,
+  });
+  assert.equal(exemptTwo.verification_score, 5);
+  assert.equal(exemptTwo.verification_status, 'interview_required');
+  // And it is never recorded as a lesser file.
+  assert.match(exemptTwo.verification_note, /safety-exemption route/);
+});

@@ -387,6 +387,37 @@ alter table public.equipment_applications add column if not exists fast_track bo
 alter table public.equipment_applications add column if not exists admin_notes text;
 alter table public.equipment_applications add column if not exists status_updated_at timestamptz;
 
+-- ── Proof-of-ministry verification (see ministry-verification-migration.sql) ──
+-- An application is not reviewable until the ministry behind it is verified:
+-- referrals, government photo ID, pastoral licensing, ministry photos, and an
+-- interview with Laura. Applicants who cannot safely send documents take the
+-- exemption path — two independent referees and the interview instead.
+alter table public.equipment_applications add column if not exists ministry_verification_mode text check (ministry_verification_mode in ('documents','safety_exempt'));
+alter table public.equipment_applications add column if not exists ministry_license_body text;
+alter table public.equipment_applications add column if not exists ministry_license_ref text;
+alter table public.equipment_applications add column if not exists id_document text;
+alter table public.equipment_applications add column if not exists id_document_name text;
+alter table public.equipment_applications add column if not exists license_document text;
+alter table public.equipment_applications add column if not exists license_document_name text;
+alter table public.equipment_applications add column if not exists ministry_photos jsonb not null default '[]'::jsonb;
+alter table public.equipment_applications add column if not exists reference_relationship text;
+alter table public.equipment_applications add column if not exists reference2_name text;
+alter table public.equipment_applications add column if not exists reference2_contact text;
+alter table public.equipment_applications add column if not exists reference2_relationship text;
+alter table public.equipment_applications add column if not exists interview_consent boolean;
+alter table public.equipment_applications add column if not exists interview_availability text;
+alter table public.equipment_applications add column if not exists interview_status text check (interview_status in ('not_needed','required','invited','scheduled','completed','declined'));
+alter table public.equipment_applications add column if not exists interview_completed_at timestamptz;
+alter table public.equipment_applications add column if not exists safety_exempt_reason text;
+alter table public.equipment_applications add column if not exists verification_status text check (verification_status in ('unverified','pending_review','interview_required','verified','rejected'));
+alter table public.equipment_applications add column if not exists verification_score smallint;
+alter table public.equipment_applications add column if not exists verification_note text;
+-- Which funnel the application arrived through ('kenya_schools' = FB campaign).
+alter table public.equipment_applications add column if not exists funnel text;
+
+create index if not exists equipment_applications_verification_idx on public.equipment_applications (verification_status, interview_status);
+create index if not exists equipment_applications_funnel_idx on public.equipment_applications (funnel, created_at desc);
+
 create index if not exists equipment_applications_triage_idx on public.equipment_applications (triage_confidence, fast_track);
 
 -- ── Deployment log — mirrors Eric's Excel sheet column-for-column ───
